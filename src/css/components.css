@@ -1,0 +1,1478 @@
+/* ============ COMPONENTES ============ */
+
+/* ── Cabecera: la isla de navegación ───────────────────────────────
+
+   La barra es una píldora del azul navy de la marca que en reposo sólo
+   enseña la identidad. Al acercar el puntero, al enfocarla con el teclado
+   o al tocar su botón, se abre en horizontal y saca los enlaces y el CTA;
+   al salir, se cierra sola.
+
+   Aquí no hay `:hover` ni `:focus-within` que abran nada. Los tuvo, y de
+   ahí venía el fallo: al pulsar la ✕ el puntero sigue encima y el foco
+   dentro, así que el CSS la reabría en el mismo fotograma mientras el
+   JavaScript la daba por cerrada; el icono decía una cosa y la píldora
+   otra. Ahora abrir y cerrar es una sola clase, `is-open`, y quien la pone
+   y la quita es nav-island.ts —incluidos el puntero y el foco—. Un solo
+   sitio decide, así que no hay dos estados que puedan discrepar.
+
+   La apertura se anima con `grid-template-columns` de 0fr a 1fr: el menú
+   nunca necesita un ancho fijo, así que cambiar un enlace no obliga a
+   volver a calcular ningún número a mano.
+   ───────────────────────────────────────────────────────────────────── */
+
+.site-header {
+  position: sticky;
+  top: var(--gutter);
+  z-index: 100;
+  margin: var(--gutter) auto 0;
+  width: calc(100% - var(--gutter) * 2);
+  max-width: var(--content-max);
+  display: flex;
+  justify-content: center;
+  /* La cabecera ocupa todo el ancho pero sólo la píldora recibe el
+     puntero: lo que quede a los lados sigue siendo la página. */
+  pointer-events: none;
+}
+
+.nav-island {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 16px;
+  border-radius: 999px;
+  background: linear-gradient(152deg, #1D3565 0%, var(--navy) 46%, #0D1B38 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 16px 36px -14px rgba(6, 13, 31, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  transition:
+    box-shadow var(--transition-smooth),
+    transform var(--transition-smooth);
+}
+
+.nav-island.is-open {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 26px 54px -16px rgba(6, 13, 31, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.nav-island-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  color: var(--text-white);
+}
+
+.nav-island-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px -3px var(--green-glow);
+}
+
+/* ── El pliegue ────────────────────────────────────────────────────── */
+
+/* En móvil el menú no cabe al lado de la marca: se despliega como un
+   panel debajo de la píldora, con el mismo azul. */
+.nav-island-reveal {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  padding: 10px;
+  border-radius: 24px;
+  background: linear-gradient(160deg, #1D3565 0%, var(--navy) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 48px -18px rgba(6, 13, 31, 0.7);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.97);
+  transform-origin: 50% 0;
+  transition:
+    opacity var(--transition-normal),
+    transform 0.45s var(--ease-spring),
+    visibility 0s linear 0.3s;
+}
+
+.nav-island.is-open > .nav-island-reveal {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  transition-delay: 0s;
+}
+
+.nav-island-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-island-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/*
+  El enlace no cambia de fondo de golpe: el fondo es un pseudo-elemento que
+  crece desde el 80 % hasta su tamaño. Un rectángulo que se enciende y se
+  apaga es un cambio de color; uno que se abre es un gesto, y es lo que
+  separa una barra normal de una que se siente cara.
+*/
+.nav-link {
+  position: relative;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-white-dim);
+  transition: color var(--transition-fast);
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.12);
+  opacity: 0;
+  transform: scale(0.8);
+  transition:
+    opacity 0.22s var(--ease-out-cubic),
+    transform 0.34s var(--ease-spring);
+}
+
+.nav-link:hover,
+.nav-link:focus-visible {
+  color: var(--text-white);
+}
+
+.nav-link:hover::before,
+.nav-link:focus-visible::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.nav-island-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: var(--green);
+  color: var(--text-white);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  /* El brillo interior de arriba es lo que hace que un botón lleno se lea
+     como una pieza física y no como un rectángulo de color. */
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    0 8px 20px -8px var(--green-glow);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+/*
+  El hover no levanta el botón. Levantarlo lo sacaba de su hueco: entre el
+  CTA y el borde de la píldora hay 8 px, y un desplazamiento de 1 px con
+  una sombra de 26 px de difuminado la cruzaba por abajo y se veía el verde
+  chorreando fuera del navy. Aquí el brillo se queda dentro: el fondo sube
+  medio tono y el filo de arriba se abre. Es el botón el que se enciende,
+  no la píldora la que se mancha.
+*/
+.nav-island-cta:hover,
+.nav-island-cta:focus-visible {
+  /* Sin verde nuevo: el mismo #00A859 con un velo de blanco encima. */
+  background-image: linear-gradient(rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
+  box-shadow:
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 6px 14px -8px var(--green-glow);
+}
+
+/* ── El botón que abre y cierra ────────────────────────────────────── */
+
+.nav-island-toggle {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    transform 0.28s var(--ease-spring);
+}
+
+.nav-island-toggle:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.06);
+}
+
+.nav-island-toggle:active {
+  transform: scale(0.94);
+}
+
+.nav-island-toggle:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+
+/* Dos trazos que se cruzan al abrir: sin íconos de más, es el mismo
+   elemento cambiando de forma. */
+.nav-island-grip,
+.nav-island-grip::before {
+  content: '';
+  display: block;
+  width: 15px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--text-white);
+  transition: transform 0.4s var(--ease-spring);
+}
+
+.nav-island-grip {
+  position: relative;
+  transform: translateY(-3px);
+}
+
+.nav-island-grip::before {
+  position: absolute;
+  top: 6px;
+  left: 0;
+}
+
+.nav-island.is-open .nav-island-grip {
+  transform: translateY(0) rotate(45deg);
+}
+
+.nav-island.is-open .nav-island-grip::before {
+  transform: translateY(-6px) rotate(-90deg);
+}
+
+/* ── En pantalla ancha: se despliega en horizontal ─────────────────── */
+
+@media (min-width: 880px) {
+  .nav-island-reveal {
+    position: static;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    /* El pliegue: de 0fr a 1fr, con el contenido recortado mientras dura. */
+    display: grid;
+    grid-template-columns: 0fr;
+    transition: grid-template-columns 0.55s var(--ease-out-cubic);
+  }
+
+  .nav-island.is-open > .nav-island-reveal {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-island-inner {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
+    padding-left: 6px;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease-out-cubic);
+  }
+
+  .nav-island.is-open .nav-island-inner {
+    opacity: 1;
+    transition-delay: 0.12s;
+  }
+
+  .nav-island-links {
+    flex-direction: row;
+    gap: 2px;
+  }
+
+  /* Con puntero el despliegue es el hover: el botón se queda como pista
+     visual de que la píldora se abre, y sigue funcionando al tocarlo. */
+  .nav-island.is-open .nav-island-grip {
+    transform: translateY(0) rotate(45deg);
+  }
+}
+
+/* Sin animación: la isla se queda abierta y no se mueve nada. */
+@media (prefers-reduced-motion: reduce) {
+  .nav-island-reveal,
+  .nav-island-inner,
+  .nav-island-grip,
+  .nav-island-grip::before {
+    transition: none;
+  }
+
+  .nav-island-reveal {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  .nav-island-toggle {
+    display: none;
+  }
+
+  @media (min-width: 880px) {
+    .nav-island-reveal {
+      grid-template-columns: 1fr;
+    }
+
+    .nav-island-inner {
+      opacity: 1;
+    }
+  }
+}
+
+/* ── Botones ───────────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--text-white);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  /* La línea de luz de arriba es lo que hace que un botón lleno se lea como
+     una pieza física y no como un rectángulo de color. */
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), var(--shadow-md);
+}
+
+.btn-green {
+  background: var(--green);
+  padding: 16px 30px;
+  font-size: 15px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 12px 26px -10px var(--green-glow);
+}
+
+.btn-green:hover {
+  background: var(--green-accessible);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 18px 34px -10px var(--green-glow);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 28px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(11, 22, 40, 0.16);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn-outline:hover {
+  border-color: rgba(11, 22, 40, 0.32);
+  background: var(--surface);
+  transform: translateY(-2px);
+}
+
+/* ── Hero Split Layout (2 Columnas Amplias) ───────────────────────── */
+.hero-panel {
+  margin-top: calc(var(--gutter) * -1 - 50px);
+  padding-top: 96px;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: clamp(48px, 5vw, 80px);
+  width: 100%;
+  max-width: 1550px;
+  margin: 0 auto;
+  padding: clamp(36px, 4vw, 64px) clamp(24px, 4.5vw, 80px);
+}
+
+@media (min-width: 1024px) {
+  .hero-grid {
+    /* La escena pide algo más que la columna de texto: dentro van el
+       teléfono y, a los lados, los dos carriles donde caen los avisos. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.18fr);
+    justify-content: space-between;
+    gap: clamp(40px, 4vw, 90px);
+  }
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 22px;
+  max-width: 640px;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 5.5vw, 82px);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.hero-title .highlight {
+  display: inline;
+  color: var(--green);
+}
+
+.hero-description {
+  font-size: clamp(18px, 1.5vw, 22px);
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-width: 540px;
+  margin-top: 4px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.hero-subtext {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ── Escena del hero (Columna Derecha: Celular + Buses + Píldoras) ─── */
+/*
+  La escena reparte su ancho en tres: el teléfono al centro y un carril a
+  cada lado para los avisos. Como el teléfono está centrado, cada carril
+  mide `50% - --tel/2 - --aire`, y las tarjetas se anclan al borde interior
+  del carril con ese mismo cálculo. Así no se solapan con el aparato por
+  construcción, sin números a ojo que haya que recalcular cada vez que
+  cambie el tamaño del teléfono.
+*/
+.hero-scene {
+  --tel: 288px;
+  /* Aire entre el marco del teléfono y la tarjeta. */
+  --aire: 14px;
+  /* Lo que la tarjeta puede asomar por fuera de la escena: a la izquierda
+     hacia el hueco entre columnas, a la derecha hacia el margen de la
+     página. Cero mientras no haya sitio de sobra. */
+  --sobrante: 0px;
+  --carril: calc(50% - var(--tel) / 2 - var(--aire) + var(--sobrante));
+
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 680px;
+  min-height: 600px;
+  margin: 0 auto;
+  pointer-events: none;
+  overflow: visible;
+}
+
+@media (min-width: 768px) {
+  .hero-scene {
+    --tel: 304px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-scene {
+    margin-left: auto;
+    margin-right: 0;
+    /* Ya hay hueco entre columnas y margen de página: las tarjetas pueden
+       asomar un poco por fuera de la escena sin tocar nada. */
+    --sobrante: 26px;
+  }
+}
+
+/* Contenedor del teléfono con su atribución debajo */
+.hero-phone-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+/* El aparato mide lo que dice la escena: si los dos números se separaran,
+   los carriles dejarían de cuadrar con el marco. */
+.hero-phone-wrap .phone-shell {
+  --ancho: var(--tel);
+}
+
+.hero-phone-wrap .map-credit {
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Buses flotantes vectoriales con fix de nitidez y aceleración */
+.scene-bus,
+.bus-floating-svg {
+  position: absolute;
+  z-index: 20;
+  width: clamp(144px, 16vw, 176px);
+  filter: drop-shadow(0 16px 28px rgba(11, 22, 40, 0.16)) drop-shadow(0 4px 10px rgba(11, 22, 40, 0.08));
+  pointer-events: none;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
+  will-change: transform;
+}
+
+.scene-bus-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
+}
+
+/* 1. Sobusa — Arriba a la derecha */
+.scene-bus--sobusa {
+  top: 4%;
+  right: -4%;
+}
+
+/* 2. Transmetro / Azul — Centro a la izquierda */
+.scene-bus--transmetro {
+  top: 32%;
+  left: -8%;
+}
+
+/* 3. Sodetrans — Centro a la derecha. Va por encima de la mitad para
+   dejarle libre la esquina de abajo al aviso de "está cerca de ti". */
+.scene-bus--sodis {
+  top: 41%;
+  right: -6%;
+}
+
+/* 4. Coolitoral — Abajo a la izquierda */
+.scene-bus--coolitoral {
+  bottom: 4%;
+  left: -6%;
+}
+
+/* Píldoras de Estado Flotantes */
+.scene-card {
+  position: absolute;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 290px;
+  padding: 13px 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 16px 36px -8px rgba(11, 22, 40, 0.14), 0 4px 12px -2px rgba(11, 22, 40, 0.06);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.scene-card strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.scene-card span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Píldora 1: Ruta activa. Va en el carril de la izquierda, pegada al
+   marco por su borde interior y sin pisarlo. Dice "Ruta activa", así que
+   sólo se enseña cuando la demo ya tiene una ruta puesta. */
+.scene-card--route {
+  top: 7%;
+  left: auto;
+  right: calc(50% + var(--tel) / 2 + var(--aire));
+  width: max-content;
+  max-width: var(--carril);
+}
+
+/* Entran y salen sólo con opacidad y desenfoque: el `transform` ya lo lleva
+   la levitación, y dos reglas peleándose por él no se ven. */
+.scene-card--route,
+.scene-card--notif {
+  opacity: 0;
+  filter: blur(3px);
+  transition: opacity 0.45s ease, filter 0.45s ease;
+}
+
+.scene-card--route.is-on,
+.scene-card--notif.is-on {
+  opacity: 1;
+  filter: blur(0);
+}
+
+.scene-route-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--electric-blue);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.16);
+  flex-shrink: 0;
+}
+
+/* Píldora 2: Alerta cerca. El carril de la derecha, abajo, por el mismo
+   procedimiento. Nace escondida: la enciende el guion cuando el bus entra
+   en el kilómetro, que es cuando la app manda la notificación de verdad. */
+.scene-card--notif {
+  bottom: 6%;
+  right: auto;
+  left: calc(50% + var(--tel) / 2 + var(--aire));
+  width: max-content;
+  max-width: var(--carril);
+}
+
+.notif-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--green);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* Responsividad para pantallas medianas y móviles */
+@media (max-width: 1200px) {
+  .scene-bus--sobusa {
+    right: -2%;
+  }
+
+  .scene-bus--transmetro {
+    left: -4%;
+  }
+
+  .scene-bus--sodis {
+    right: -3%;
+  }
+
+  .scene-bus--coolitoral {
+    left: -3%;
+  }
+}
+
+@media (max-width: 1023px) {
+  .hero-copy {
+    align-items: center;
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .hero-description {
+    max-width: 520px;
+  }
+
+  .hero-actions {
+    justify-content: center;
+  }
+
+  .scene-bus--sobusa {
+    top: 3%;
+    right: 2%;
+  }
+
+  .scene-bus--transmetro {
+    top: 33%;
+    left: 1%;
+  }
+
+  .scene-bus--sodis {
+    top: 46%;
+    right: 1%;
+  }
+
+  .scene-bus--coolitoral {
+    bottom: 4%;
+    left: 1%;
+  }
+
+  .scene-card--route {
+    top: 4%;
+  }
+}
+
+@media (max-width: 768px) {
+  .scene-bus {
+    width: clamp(90px, 14vw, 120px);
+    opacity: 0.95;
+  }
+
+  .scene-card {
+    /* El ancho ya lo pone el carril; aquí sólo se aprieta el relleno. */
+    padding: 10px 14px;
+  }
+
+  .scene-card strong {
+    font-size: 11.5px;
+  }
+
+  .scene-card span {
+    font-size: 10.5px;
+  }
+}
+
+@media (max-width: 640px) {
+  .scene-bus {
+    width: 80px;
+    opacity: 0.9;
+  }
+
+  .scene-bus--sobusa {
+    top: 2%;
+    right: -2%;
+  }
+
+  .scene-bus--transmetro {
+    top: 32%;
+    left: -2%;
+  }
+
+  .scene-bus--sodis {
+    top: 48%;
+    right: -2%;
+  }
+
+  .scene-bus--coolitoral {
+    bottom: 2%;
+    left: -2%;
+  }
+
+  .scene-card {
+    display: none;
+  }
+}
+
+/* ── Franja de datos ───────────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 20px;
+}
+
+@media (min-width: 860px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.2rem + 2.4vw, 3rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--amber);
+}
+
+.stat-label {
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: var(--text-white-dim);
+}
+
+/* ── Rejilla de tarjetas (problema) ────────────────────────────────── */
+.cards-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 760px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .feature-card--lead {
+    grid-column: span 2;
+  }
+}
+
+/* En pantalla ancha la rejilla deja de ser tres columnas iguales: la causa
+   de todo —no saber cuánto falta— ocupa una columna alta a la izquierda y
+   sus dos consecuencias se apilan al lado. La jerarquía la da el tamaño. */
+@media (min-width: 1100px) {
+  .cards-grid {
+    grid-template-columns: 7fr 5fr;
+    align-items: stretch;
+  }
+
+  .feature-card--lead {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    justify-content: flex-start;
+    gap: 20px;
+    padding: clamp(38px, 4vw, 56px);
+    background: linear-gradient(158deg, var(--coral-light) 0%, var(--arena) 62%);
+    border-color: rgba(232, 106, 94, 0.22);
+  }
+
+  .feature-card--lead .card-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+  }
+
+  .feature-card--lead .card-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .feature-card--lead .card-title {
+    font-size: var(--step-h2);
+  }
+
+  .feature-card--lead .card-text {
+    max-width: 32ch;
+    font-size: calc(var(--step-body) * 1.06);
+  }
+}
+
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: clamp(26px, 3vw, 38px);
+  border-radius: 24px;
+  background: var(--arena);
+  border: 1px solid var(--border-subtle);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+}
+
+.card-icon.coral {
+  background: var(--coral-light);
+  color: var(--coral);
+}
+
+.card-icon.amber {
+  background: var(--amber-tint);
+  color: var(--warn);
+}
+
+.card-icon.green {
+  background: var(--green-tint);
+  color: var(--green-accessible);
+}
+
+.card-title {
+  font-size: var(--step-h3);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.card-text {
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* ── La solución: intro al lado y los pasos en un riel ─────────────
+   Antes eran tres tarjetas iguales en fila, justo encima de otras tres y de
+   otras tres. Aquí los pasos se leen como lo que son —una secuencia— y se
+   apoyan en un riel vertical, así que la sección deja de rimar con sus
+   vecinas y el ojo tiene por dónde bajar. */
+.solucion-grid {
+  display: grid;
+  gap: clamp(34px, 4vw, 64px);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+@media (min-width: 940px) {
+  .solucion-grid {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(48px, 6vw, 96px);
+  }
+}
+
+.solucion-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+@media (min-width: 940px) {
+  .solucion-intro {
+    position: sticky;
+    top: 120px;
+  }
+}
+
+.solucion-nota {
+  padding-left: 16px;
+  border-left: 2px solid var(--green);
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--green-accessible);
+}
+
+.ruta-pasos {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(26px, 3vw, 40px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* El riel nace en el primer número y muere en el último, no atraviesa toda
+   la columna: una línea que sobresale por abajo no lleva a ninguna parte. */
+.ruta-pasos::before {
+  content: '';
+  position: absolute;
+  left: 21px;
+  top: 21px;
+  bottom: 21px;
+  width: 2px;
+  background: linear-gradient(180deg, var(--green) 0%,
+    rgba(0, 168, 89, 0.28) 55%, rgba(0, 168, 89, 0.1) 100%);
+}
+
+.ruta-paso {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.ruta-punto {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  /* Un halo del color del panel para que el riel no se le vea por debajo. */
+  box-shadow: 0 0 0 6px var(--green-tint), 0 8px 18px -8px var(--green-glow);
+}
+
+.ruta-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 6px;
+}
+
+.ruta-cuerpo h3 {
+  font-size: var(--step-h3);
+  letter-spacing: -0.025em;
+}
+
+.ruta-cuerpo p {
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--text-secondary);
+  max-width: 46ch;
+}
+
+/* ── Anatomía de la pantalla ───────────────────────────────────────
+   Cinco piezas, no tres, y de dos tamaños: las dos que explican de qué va
+   la app ocupan media fila cada una y las tres de detalle se reparten la
+   siguiente. La rejilla de seis columnas hace las dos cuentas. */
+.anatomia-grid {
+  display: grid;
+  gap: 34px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 720px) {
+  .anatomia-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(30px, 3.4vw, 52px);
+  }
+
+  .anatomia-grid > .detail-card,
+  .anatomia-grid > .detail-card--ancho {
+    grid-column: span 3;
+  }
+}
+
+@media (min-width: 1060px) {
+  .anatomia-grid > .detail-card {
+    grid-column: span 2;
+  }
+
+  .anatomia-grid > .detail-card--ancho {
+    grid-column: span 3;
+  }
+}
+
+.detail-card--ancho p {
+  max-width: 52ch;
+}
+
+/* Aquí no hay tarjetas: la sección ya está sobre arena, así que una caja
+   del mismo color sólo añadía un borde que no separa nada. Cada bloque se
+   apoya en una línea fina y en el aire que tiene alrededor. */
+.detail-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.detail-card h3 {
+  font-size: var(--step-h3);
+  letter-spacing: -0.025em;
+}
+
+.detail-card p {
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.feature-badge {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--green-tint);
+  color: var(--green-accessible);
+}
+
+.feature-badge--tinte {
+  background: var(--green-tint);
+  color: var(--green-accessible);
+}
+
+.feature-badge--solido {
+  background: var(--green);
+  color: #FFFFFF;
+}
+
+/* El gris del bus sin señal y el azul de la ruta activa: los dos salen del
+   mapa de la app, no de una paleta aparte. */
+.feature-badge--gris {
+  background: var(--surface-muted);
+  color: var(--bus-ghost);
+}
+
+.feature-badge--azul {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--electric-blue);
+}
+
+/* El número grande de la hoja de ETA, en miniatura. */
+.feature-badge--num {
+  width: auto;
+  min-width: 44px;
+  padding: 0 12px;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--coral-light);
+  color: var(--coral);
+}
+
+/* ── Empresas y formulario ─────────────────────────────────────────── */
+.companies-grid {
+  display: grid;
+  gap: clamp(36px, 5vw, 64px);
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .companies-grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  }
+}
+
+.companies-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.companies-info p {
+  font-size: var(--step-lead);
+  line-height: 1.5;
+  color: var(--text-white-dim);
+}
+
+.whatsapp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 26px;
+  border-radius: 999px;
+  background: #25D366;
+  color: #06301A;
+  font-size: 15px;
+  font-weight: 700;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.whatsapp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px -12px rgba(37, 211, 102, 0.6);
+}
+
+.contact-form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: clamp(26px, 3vw, 38px);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-white-dim);
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border-glass);
+  color: var(--text-white);
+  font-size: 15px;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.form-input::placeholder {
+  color: var(--text-white-sub);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--green);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.form-submit-btn {
+  margin-top: 6px;
+  padding: 16px;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.form-submit-btn:hover {
+  background: #00C267;
+  transform: translateY(-2px);
+}
+
+/* El aviso de recibido lo enseña y lo esconde el atributo `hidden`, no una
+   clase aparte: un solo interruptor, el que el navegador ya entiende. */
+.form-success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: clamp(30px, 4vw, 46px);
+  border-radius: 26px;
+  background: rgba(0, 168, 89, 0.12);
+  border: 1px solid rgba(0, 168, 89, 0.35);
+}
+
+.form-success-message[hidden] {
+  display: none;
+}
+
+/* Un envío que falla lo dice donde el usuario está mirando: justo encima
+   del botón que acaba de tocar. */
+.form-error {
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(232, 106, 94, 0.14);
+  border: 1px solid rgba(232, 106, 94, 0.4);
+  color: #FBE7E4;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.form-error[hidden] {
+  display: none;
+}
+
+.form-success-message h3 {
+  color: var(--text-white);
+  font-size: var(--step-h3);
+}
+
+.form-success-message p {
+  color: var(--text-white-dim);
+  font-size: var(--step-body);
+  line-height: 1.5;
+  max-width: 44ch;
+}
+
+.form-success-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* ── Pie ─────────────────────────────────────────────────────────────
+   Cierra como una pieza de la página, no como una postal aparte: tinta,
+   una trama muy leve y el verde de la marca para dirigir la última acción. */
+.site-footer {
+  position: relative;
+  overflow: hidden;
+  margin: var(--panel-gap) var(--gutter) var(--gutter);
+  padding: clamp(42px, 6vw, 78px) clamp(24px, 5vw, 72px) 22px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--panel-radius);
+  background:
+    radial-gradient(circle at 88% 18%, rgba(0, 168, 89, 0.2), transparent 25rem),
+    linear-gradient(135deg, #132B57 0%, var(--ink) 46%, var(--ink-deep) 100%);
+  color: var(--text-white);
+}
+
+.site-footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.36;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+  background-size: 18px 18px;
+  mask-image: linear-gradient(90deg, transparent, black 20%, black 80%, transparent);
+}
+
+.footer-grid,
+.footer-bottom {
+  position: relative;
+  z-index: 1;
+  max-width: var(--content-max);
+  margin: 0 auto;
+}
+
+.footer-grid {
+  display: grid;
+  gap: 34px;
+}
+
+.footer-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 11px;
+  color: var(--text-white);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.footer-brand img {
+  border-radius: 50%;
+  box-shadow: 0 8px 18px -7px var(--green-glow);
+}
+
+.footer-intro p {
+  color: var(--text-white-dim);
+  font-size: var(--step-body);
+  line-height: 1.55;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.footer-nav a,
+.footer-legal-links a {
+  color: var(--text-white-dim);
+  font-size: 14px;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.footer-nav a:hover,
+.footer-nav a:focus-visible,
+.footer-legal-links a:hover,
+.footer-legal-links a:focus-visible {
+  color: var(--text-white);
+}
+
+.footer-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: start;
+  gap: 24px;
+  padding: 13px 16px 13px 18px;
+  border-radius: 999px;
+  background: var(--green);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 12px 24px -12px var(--green-glow);
+  color: var(--text-white);
+  font-size: 14px;
+  font-weight: 800;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.footer-whatsapp span {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.footer-whatsapp:hover,
+.footer-whatsapp:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 18px 30px -13px var(--green-glow);
+}
+
+.footer-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: clamp(42px, 6vw, 76px);
+  padding-top: 19px;
+  border-top: 1px solid var(--border-glass);
+  color: var(--text-white-sub);
+  font-size: 12px;
+}
+
+.footer-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.footer-legal-links a {
+  font-size: 12px;
+}
+
+@media (min-width: 700px) {
+  .footer-grid {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: clamp(38px, 6vw, 96px);
+  }
+
+  .footer-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 11px;
+  }
+
+  .footer-bottom {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

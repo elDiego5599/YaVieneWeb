@@ -1,0 +1,911 @@
+/* ============ EL TELÉFONO DEL MOCKUP ============ */
+
+/*
+  Dos piezas independientes:
+
+  1. La carcasa (.phone-shell) — un Pixel: bisel parejo por los cuatro
+     lados, cámara en agujero centrada, marco de aluminio azul lavanda con
+     los cuatro cantos planos y radios concéntricos.
+
+  2. La pantalla — la app de verdad, redibujada en HTML. Cada medida sale
+     del código Flutter (search_pill_bar.dart, location_status_chip.dart,
+     route_selector_sheet.dart, eta_bottom_sheet.dart) y se expresa en
+     `--u`, que vale un píxel lógico de un teléfono de 412 pt de ancho. Así
+     la interfaz se reduce entera y en proporción, en vez de que cada
+     tamaño de letra se escoja a ojo.
+
+  El mockup es una vitrina: se reproduce solo y nadie lo toca. Por eso no
+  hay estados :hover ni cursores de clic aquí dentro — sugerirían una
+  interacción que no existe.
+*/
+
+.phone-shell {
+  /* Todas las medidas de la carcasa cuelgan del ancho, para que el bisel y
+     los radios encojan con el aparato en vez de quedarse en píxeles fijos. */
+  --ancho: clamp(268px, 30vw, 356px);
+  --bisel: calc(var(--ancho) * 0.029);
+  --radio: calc(var(--ancho) * 0.135);
+
+  position: relative;
+  width: var(--ancho);
+  /* Pixel 9: 152.8 × 72 mm. */
+  aspect-ratio: 72 / 152.8;
+  padding: var(--bisel);
+  border-radius: var(--radio);
+
+  /*
+    El marco: aluminio pulido en el azul navy de la marca. No hay ningún
+    tono nuevo aquí dentro; todas las paradas son `color-mix` de tres
+    colores que ya existen —navy #14274E, navy claro #1E3A6D y el
+    gris-blanco #E5E7EB del divisor— con negro o con blanco, que es lo que
+    hace el volumen del riel.
+
+    El aparato es azul, no plateado: el gris-blanco entra sólo en dos
+    filos de un punto de ancho, los dos cantos donde el aluminio pulido
+    devuelve la luz de frente. Lo demás, del 0 % al 100 %, es navy. Cuando
+    esas dos bandas eran anchas el teléfono parecía de acero y perdía la
+    marca.
+  */
+  background: linear-gradient(
+    104deg,
+    color-mix(in srgb, var(--navy) 45%, #000) 0%,
+    color-mix(in srgb, var(--navy) 88%, #000) 6%,
+    var(--navy-light) 8.4%,
+    var(--divider) 9.4%,
+    var(--navy-light) 10.4%,
+    color-mix(in srgb, var(--navy) 92%, #000) 17%,
+    var(--navy) 46%,
+    var(--navy-light) 70%,
+    color-mix(in srgb, var(--navy-light) 82%, #FFF) 87.6%,
+    var(--divider) 88.5%,
+    color-mix(in srgb, var(--navy-light) 82%, #FFF) 89.4%,
+    var(--navy) 95%,
+    color-mix(in srgb, var(--navy) 38%, #000) 100%
+  );
+  box-shadow:
+    var(--shadow-phone),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55);
+
+  /* La pantalla consulta este contenedor: como el relleno es el bisel, el
+     ancho de consulta es exactamente el ancho de la pantalla. */
+  container-type: inline-size;
+}
+
+/* Luz ambiental detrás del aparato, el reflejo verde de la marca. */
+.phone-shell::before {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 168, 89, 0.3), rgba(0, 168, 89, 0) 70%);
+  filter: blur(52px);
+  z-index: -1;
+}
+
+/* Botones: el mismo degradado del marco, sobresaliendo apenas medio píxel,
+   como los del Pixel — se notan de perfil, no de frente. */
+.phone-key {
+  position: absolute;
+  right: calc(var(--bisel) * -0.34);
+  width: calc(var(--bisel) * 0.34);
+  border-radius: 0 2px 2px 0;
+  background: linear-gradient(
+    180deg,
+    var(--divider) 0%,
+    var(--navy-light) 18%,
+    var(--navy) 55%,
+    color-mix(in srgb, var(--navy) 55%, #000) 100%
+  );
+  box-shadow: 1px 0 2px rgba(11, 22, 40, 0.45);
+}
+
+.phone-key--power {
+  top: 22%;
+  height: 7.5%;
+}
+
+.phone-key--vol {
+  top: 32%;
+  height: 12%;
+}
+
+/* ── Pantalla ──────────────────────────────────────────────────────── */
+
+.phone-screen {
+  /* Un píxel lógico de un teléfono de 412 pt. Toda la interfaz de la app
+     se mide con esto. */
+  --u: 0.24272cqw;
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--arena);
+  /* Radio exterior menos el bisel: los dos bordes quedan concéntricos. */
+  border-radius: calc(var(--radio) - var(--bisel));
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+  font-size: calc(14 * var(--u));
+  color: var(--app-text-primary);
+}
+
+/*
+  Cierre del ciclo. La demo se repite sola, y volver del último cuadro al
+  primero de un tirón se sentía un corte de tijera: la ruta, el pin y la
+  hoja cambiaban todos a la vez sin que nadie los tocara.
+
+  Lo que se recoge es la sesión, no el teléfono: el mosaico y la barra de
+  Android se quedan donde están —el mapa nunca se va en la app— y lo que se
+  despide es la píldora y la hoja. El trazado, el pin y los buses se apagan
+  por su cuenta, con las transiciones que ya tienen. Así el ciclo se cierra
+  como si el pasajero soltara la búsqueda, y no como un corte de montaje.
+*/
+.phone-topbar {
+  transition: opacity 0.6s var(--ease-out-cubic),
+    transform 0.6s var(--ease-out-cubic);
+}
+
+.phone-screen.is-cerrando .phone-topbar {
+  opacity: 0;
+  transform: translateY(calc(-10 * var(--u)));
+}
+
+/* La hoja no se limita a apagarse: se va por abajo, que es como se cierra
+   una hoja de verdad. */
+.phone-screen.is-cerrando .phone-sheet {
+  opacity: 0;
+  transform: translateY(46%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phone-topbar {
+    transition-duration: 0.01ms;
+  }
+}
+
+/* ── La cámara en agujero ──────────────────────────────────────────
+
+   El Pixel no lleva isla, lleva un agujero perforado en el panel, y de
+   cerca ese agujero tiene tres cosas: el corte negro del panel, el barril
+   de la lente hundido dentro y un destello en el cristal. Antes era un
+   círculo plano de un solo color y por eso parecía una pegatina.
+
+   Se arma con tres capas sobre el mismo elemento: el corte es el fondo del
+   propio `.phone-lens`, `::before` es el barril y el iris, y `::after` es
+   el reflejo. Todo cuelga de `--lente`, para que encoja con el aparato.
+   ────────────────────────────────────────────────────────────────────── */
+.phone-lens {
+  /* El agujero del Pixel mide ~3,7 mm en un aparato de 72 mm: un 5 % del
+     ancho, que en pantalla de 412 pt son 19 puntos. Y queda centrado en la
+     barra de estado, que mide 40. */
+  --lente: calc(19 * var(--u));
+
+  position: absolute;
+  top: calc(10.5 * var(--u));
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--lente);
+  height: var(--lente);
+  border-radius: 50%;
+  /* El corte del panel: negro absoluto, que es lo que se ve del hueco. */
+  background: #000;
+  /* El halo de píxeles apagados alrededor del corte, y el filo de vidrio. */
+  box-shadow:
+    0 0 0 calc(var(--lente) * 0.055) rgba(0, 0, 0, 0.55),
+    0 0 calc(var(--lente) * 0.3) rgba(0, 0, 0, 0.45),
+    inset 0 0 0 0.5px rgba(229, 231, 235, 0.28);
+  z-index: 40;
+  pointer-events: none;
+}
+
+/* El barril: un cono oscuro con el iris azulado al fondo. El navy del
+   marco es el que se cuela en el vidrio, no un azul de otro sitio. */
+.phone-lens::before {
+  content: '';
+  position: absolute;
+  inset: 13%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(20, 39, 78, 0.85) 0%, rgba(20, 39, 78, 0) 58%),
+    radial-gradient(circle at 38% 30%, #1B2C4F 0%, #060A14 55%, #000 100%);
+  box-shadow: inset 0 0 calc(var(--lente) * 0.14) rgba(0, 0, 0, 0.9);
+}
+
+/* El destello: pequeño, arriba a la izquierda y desenfocado. Un punto
+   blanco nítido se leería como un defecto, no como un reflejo. */
+.phone-lens::after {
+  content: '';
+  position: absolute;
+  top: 17%;
+  left: 20%;
+  width: 32%;
+  height: 26%;
+  border-radius: 50%;
+  background: linear-gradient(140deg, rgba(255, 255, 255, 0.85), rgba(229, 231, 235, 0.1));
+  filter: blur(0.4px);
+}
+
+/* Barra de estado de Android: la app dibuja debajo de ella (SafeArea). */
+.phone-status {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(40 * var(--u));
+  padding: 0 calc(20 * var(--u));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: calc(12 * var(--u));
+  font-weight: 700;
+  letter-spacing: calc(-0.2 * var(--u));
+  color: var(--app-text-primary);
+  z-index: 35;
+  pointer-events: none;
+}
+
+.phone-status-glifos {
+  display: flex;
+  align-items: center;
+  gap: calc(5 * var(--u));
+}
+
+.phone-status svg {
+  width: calc(13 * var(--u));
+  height: calc(13 * var(--u));
+  display: block;
+}
+
+/* Barra de gestos. */
+.phone-gesture {
+  position: absolute;
+  bottom: calc(8 * var(--u));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(108 * var(--u));
+  height: calc(4 * var(--u));
+  border-radius: 999px;
+  background: rgba(11, 22, 40, 0.32);
+  z-index: 40;
+}
+
+/* ── Mapa ──────────────────────────────────────────────────────────── */
+
+.phone-map {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--arena);
+}
+
+.routes-svg-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* El SVG se escala para caber en la pantalla; sin non-scaling-stroke los
+   trazos se adelgazarían hasta desaparecer. Sólo aplica a la ruta: los
+   marcadores sí llevan relleno y su propio tamaño. */
+.map-route-casing,
+.map-route-active,
+.map-terminals circle,
+.map-radio {
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/*
+  Ruta seleccionada. El grosor no es un número escogido a ojo: es el que
+  pide map_widget.dart —`lineWidth: 4.0`, `lineOpacity: 0.9`, color
+  #2563EB— expresado en `--u`, o sea cuatro píxeles lógicos del teléfono.
+  Antes estaba en 2,6 px de pantalla y, como el teléfono del mockup mide
+  la tercera parte de uno de verdad, la ruta salía como un pelo y no se
+  veía sobre el mosaico.
+
+  La orla blanca no está en la app: allí el mapa es vectorial y clarito, y
+  la línea azul se lee sola. Aquí el fondo es un mosaico con calles
+  amarillas del mismo calibre, así que la ruta lleva debajo un filo blanco
+  para despegarse de ellas. Es lo justo para separarla, no un segundo
+  trazo con vida propia.
+*/
+.map-route-casing {
+  fill: none;
+  stroke: #FFFFFF;
+  stroke-width: calc(7 * var(--u));
+  opacity: 0.9;
+}
+
+.map-route-active {
+  fill: none;
+  stroke: var(--electric-blue);
+  stroke-width: calc(4 * var(--u));
+  stroke-opacity: 0.9;
+}
+
+/* Terminales: `circleRadius: 7` con borde de 2,5, también de map_widget. */
+.map-terminals circle {
+  fill: #FFFFFF;
+  stroke: var(--electric-blue);
+  stroke-width: calc(2.5 * var(--u));
+}
+
+/* Radio "cerca de ti" alrededor del punto de espera: los mismos valores
+   que map_widget.dart le pasa a la capa de relleno y a la de línea. */
+.map-radio {
+  fill: #00A859;
+  fill-opacity: 0.05;
+  stroke: #00A859;
+  stroke-width: calc(1.5 * var(--u));
+  stroke-opacity: 0.28;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out-cubic);
+}
+
+.map-radio.is-on {
+  opacity: 1;
+}
+
+/* La ruta entra y sale con la elección, no de golpe. */
+.map-route-casing,
+.map-route-active,
+.map-terminals {
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-out-cubic);
+}
+
+.map-route-casing.is-on,
+.map-route-active.is-on,
+.map-terminals.is-on {
+  opacity: 1;
+}
+
+/* Marcadores: aparecen y desaparecen con opacidad, nunca con transform —
+   su transform lo escribe phone-map.ts en cada cuadro. */
+.map-bus,
+.map-pin {
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out-cubic);
+}
+
+.map-bus.is-on,
+.map-pin.is-on {
+  opacity: 1;
+}
+
+.map-bus {
+  filter: drop-shadow(0 2px 3px rgba(20, 39, 78, 0.4));
+}
+
+.map-pin {
+  filter: drop-shadow(0 3px 4px rgba(20, 39, 78, 0.32));
+}
+
+/* ── Barra superior: search_pill_bar.dart ──────────────────────────── */
+
+.phone-topbar {
+  position: absolute;
+  top: calc(40 * var(--u));
+  left: 0;
+  right: 0;
+  /* SafeArea + EdgeInsets.symmetric(horizontal: 20, vertical: 12). */
+  padding: calc(12 * var(--u)) calc(20 * var(--u));
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: calc(10 * var(--u));
+  pointer-events: none;
+}
+
+.app-pill {
+  height: calc(60 * var(--u));
+  padding: calc(6 * var(--u)) calc(8 * var(--u));
+  border-radius: 999px;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  box-shadow: 0 calc(8 * var(--u)) calc(24 * var(--u)) rgba(20, 39, 78, 0.08);
+}
+
+/* Los dos botones circulares de 48 de la píldora. */
+.app-pill-btn {
+  width: calc(48 * var(--u));
+  height: calc(48 * var(--u));
+  border-radius: 50%;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--navy);
+}
+
+.app-pill-btn svg {
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+  display: block;
+}
+
+/* El bloque de texto va centrado en la píldora, con las dos filas
+   centradas entre sí. */
+.app-pill-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(2 * var(--u));
+}
+
+.app-pill-linea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(6 * var(--u));
+  max-width: 100%;
+}
+
+/* Punto verde: sólo con ruta activa. */
+.app-pill-dot {
+  width: calc(8 * var(--u));
+  height: calc(8 * var(--u));
+  border-radius: 50%;
+  background: var(--green);
+  flex: none;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.25s var(--ease-out-cubic), transform 0.25s var(--ease-spring);
+}
+
+.app-pill-dot.is-on {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.app-pill-title {
+  font-size: calc(16 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(-0.4 * var(--u));
+  color: var(--app-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-pill-sub {
+  font-size: calc(12 * var(--u));
+  font-weight: 500;
+  color: var(--app-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.25s ease;
+}
+
+/* Con ruta activa el subtítulo pasa a verde accesible (4.5:1 sobre
+   blanco); el verde de marca a secas se queda en ~3.1:1. */
+.app-pill-sub.is-activa {
+  color: var(--green-accessible);
+}
+
+/* ── Chip de ubicación: location_status_chip.dart ──────────────────── */
+
+.app-chip {
+  /* map_screen.dart lo mete en una Column, y una Column centra por defecto:
+     el chip va centrado bajo la píldora, no pegado a la izquierda. */
+  align-self: center;
+  max-width: 100%;
+  padding: calc(7 * var(--u)) calc(14 * var(--u)) calc(7 * var(--u)) calc(8 * var(--u));
+  border-radius: calc(22 * var(--u));
+  background: #FFFFFF;
+  border: 1px solid var(--divider);
+  box-shadow: 0 calc(6 * var(--u)) calc(16 * var(--u)) rgba(20, 39, 78, 0.07);
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+}
+
+.app-chip-icon {
+  width: calc(32 * var(--u));
+  height: calc(32 * var(--u));
+  border-radius: calc(10 * var(--u));
+  background: var(--green-tint);
+  color: var(--green);
+  flex: none;
+  display: grid;
+  place-items: center;
+}
+
+.app-chip-icon svg {
+  width: calc(18 * var(--u));
+  height: calc(18 * var(--u));
+  display: block;
+}
+
+.app-chip-text {
+  font-size: calc(13.5 * var(--u));
+  font-weight: 700;
+  letter-spacing: calc(-0.25 * var(--u));
+  color: var(--app-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* "Quitar" es una acción de borrar: rojo suave, no verde. */
+.app-chip-action {
+  flex: none;
+  padding: calc(7 * var(--u)) calc(12 * var(--u));
+  border-radius: calc(14 * var(--u));
+  background: var(--error-light);
+  color: var(--error);
+  font-size: calc(12 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(-0.2 * var(--u));
+}
+
+.app-chip-action[hidden] {
+  display: none;
+}
+
+/* ── Hoja inferior: eta_bottom_sheet.dart ──────────────────────────── */
+
+/* La hoja de eta_bottom_sheet.dart. */
+.phone-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 32;
+  background: var(--arena);
+  border-radius: calc(32 * var(--u)) calc(32 * var(--u)) 0 0;
+  box-shadow: 0 calc(-8 * var(--u)) calc(32 * var(--u)) rgba(20, 39, 78, 0.08);
+  padding: calc(14 * var(--u)) 0 calc(26 * var(--u));
+  overflow: hidden;
+  transform: translateY(0);
+  transition: transform 0.52s var(--ease-out-cubic),
+    opacity 0.5s var(--ease-out-cubic);
+}
+
+/*
+  El alto de la hoja se anima al cambiar de vista, como el AnimatedSize de
+  route_selector_sheet.dart: 260 ms con easeOutCubic. El número lo escribe
+  phone-simulator.ts midiendo la vista que entra; sin él la hoja pegaba un
+  brinco cada vez que cambiaba de paso.
+*/
+.sheet-views {
+  position: relative;
+  overflow: hidden;
+  transition: height 0.26s var(--ease-out-cubic);
+}
+
+.phone-sheet.hidden-sheet {
+  transform: translateY(103%);
+}
+
+.sheet-handle {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: calc(44 * var(--u));
+  height: calc(5 * var(--u));
+  border-radius: 999px;
+  background: var(--divider);
+  margin: 0 auto calc(18 * var(--u));
+}
+
+.sheet-view {
+  display: none;
+  padding: 0 calc(24 * var(--u));
+}
+
+/*
+  La vista no aparece: entra. route_selector_sheet.dart la trae con un
+  AnimatedSwitcher de 220 ms que mueve el contenido un 4 % de su ancho
+  desde la derecha mientras sube la opacidad, y eso es lo que se copia
+  aquí. Es un detalle chico y es el que hace que la demo se sienta tocada
+  por alguien en vez de armada por cortes.
+*/
+.sheet-view.active {
+  display: block;
+  animation: sheetEntra 0.22s var(--ease-out-cubic);
+}
+
+@keyframes sheetEntra {
+  from {
+    opacity: 0;
+    transform: translateX(4%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Estado vacío: ícono gris, título y subtítulo centrados. */
+.sheet-empty {
+  padding-bottom: calc(16 * var(--u));
+  text-align: center;
+}
+
+.sheet-empty-icon {
+  color: var(--app-text-disabled);
+  margin-bottom: calc(12 * var(--u));
+}
+
+.sheet-empty-icon svg {
+  width: calc(32 * var(--u));
+  height: calc(32 * var(--u));
+  display: block;
+  margin: 0 auto;
+}
+
+.sheet-empty-icon [hidden] {
+  display: none;
+}
+
+.sheet-empty-title {
+  font-size: calc(18 * var(--u));
+  font-weight: 800;
+  color: var(--app-text-primary);
+  text-wrap: balance;
+}
+
+.sheet-empty-sub {
+  margin-top: calc(4 * var(--u));
+  font-size: calc(14 * var(--u));
+  color: var(--app-text-secondary);
+  text-wrap: balance;
+}
+
+/* Cabecera del selector: título grande alineado a la izquierda. */
+.sheet-head {
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  margin-bottom: calc(12 * var(--u));
+}
+
+.sheet-back {
+  width: calc(28 * var(--u));
+  height: calc(28 * var(--u));
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: var(--navy);
+}
+
+.sheet-back svg {
+  width: calc(20 * var(--u));
+  height: calc(20 * var(--u));
+  display: block;
+}
+
+.sheet-head-title {
+  font-size: calc(28 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(-0.5 * var(--u));
+  color: var(--app-text-primary);
+}
+
+/* Tres fichas justas y las siguientes desvaneciéndose: así se lee que la
+   lista sigue, sin cortar una ficha por la mitad. */
+/*
+  La lista es una ventana: caben poco más de tres rutas de las seis. Como
+  cada ciclo elige una distinta, casi siempre hay que bajar para llegar a
+  ella, y eso es lo que se ve — el desplazamiento no es un adorno, es el
+  camino hasta la fila que se va a tocar. El empujón lo calcula
+  phone-simulator.ts midiendo la fila.
+*/
+.sheet-lista {
+  max-height: calc(196 * var(--u));
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, #000 0 78%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0 78%, transparent 100%);
+}
+
+.sheet-lista-inner {
+  /* Posicionado para que el `offsetTop` de cada fila se mida contra el
+     carril y no contra la hoja entera, que va varias cajas más arriba. */
+  position: relative;
+  transform: translateY(0);
+  transition: transform 0.62s var(--ease-out-cubic);
+}
+
+/* Fila de lista: _compactTile() del selector. */
+.app-tile {
+  background: #F8FAFC;
+  border-radius: calc(16 * var(--u));
+  padding: calc(10 * var(--u)) calc(16 * var(--u));
+  margin-bottom: calc(8 * var(--u));
+  display: flex;
+  align-items: center;
+  gap: calc(16 * var(--u));
+}
+
+/* La fila ya elegida se marca al volver a la lista. */
+.app-tile.is-activa {
+  box-shadow: inset 0 0 0 1.5px var(--navy);
+}
+
+.app-tile-icon {
+  width: calc(40 * var(--u));
+  height: calc(40 * var(--u));
+  border-radius: calc(12 * var(--u));
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-size: calc(14 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(-0.2 * var(--u));
+}
+
+.app-tile-icon svg {
+  width: calc(20 * var(--u));
+  height: calc(20 * var(--u));
+  display: block;
+}
+
+/* Ruta: ícono verde sobre el tinte verde, como en el selector. */
+.app-tile-icon--ruta {
+  background: var(--green-tint);
+  color: var(--green);
+}
+
+/* Empresa: insignia de iniciales con color determinístico. La suma de los
+   códigos de "sobusa" cae en el azul eléctrico de la paleta. */
+.app-tile-icon--empresa {
+  background: var(--electric-blue);
+  color: #FFFFFF;
+}
+
+.app-tile-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-tile-title {
+  font-size: calc(16 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(-0.3 * var(--u));
+  color: var(--app-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-tile-sub {
+  margin-top: calc(2 * var(--u));
+  font-size: calc(12 * var(--u));
+  font-weight: 500;
+  color: var(--app-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-tile-chevron {
+  flex: none;
+  color: #CBD5E1;
+  font-size: calc(20 * var(--u));
+  line-height: 1;
+}
+
+/* ── Hoja de ETA ───────────────────────────────────────────────────── */
+
+.eta-strip {
+  height: calc(4 * var(--u));
+  border-radius: 999px;
+  background: var(--green);
+  transition: background-color 0.6s ease;
+}
+
+.eta-route {
+  margin-top: calc(18 * var(--u));
+  text-align: center;
+  font-size: calc(13 * var(--u));
+  font-weight: 700;
+  letter-spacing: calc(0.4 * var(--u));
+  color: var(--app-text-secondary);
+}
+
+/* El número hero: 64, peso 200 y muy poco interlineado — es el mismo
+   AppTextStyles.etaNumber que usa la app. */
+.eta-number {
+  margin-top: calc(10 * var(--u));
+  text-align: center;
+  font-size: calc(64 * var(--u));
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: calc(-2 * var(--u));
+  font-variant-numeric: tabular-nums;
+  color: var(--navy);
+}
+
+.eta-unit {
+  margin-top: calc(6 * var(--u));
+  text-align: center;
+  font-size: calc(15 * var(--u));
+  font-weight: 600;
+  color: var(--app-text-secondary);
+}
+
+/* El detalle sólo aparece cuando la app tiene algo que decir. */
+.eta-detail {
+  margin-top: calc(14 * var(--u));
+  text-align: center;
+  font-size: calc(14 * var(--u));
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--app-text-secondary);
+  text-wrap: balance;
+}
+
+.eta-detail[hidden] {
+  display: none;
+}
+
+/*
+  Escalón "peek". La hoja de la app tiene tres alturas —colapsada, peek y
+  expandida— y se pasa de una a otra arrastrando el asa; en peek deja sólo
+  el número y el botón, "menos relleno vertical porque ya no lleva
+  identidad ni detalle", dice eta_bottom_sheet.dart. Es lo que se hace
+  aquí: se van la línea de "ruta - placa" y el detalle, la hoja baja y
+  aparece más mapa. El guion lo usa a mitad del tramo en vivo, que es
+  justo lo que hace cualquiera cuando quiere ver por dónde va el bus.
+*/
+.phone-sheet.is-peek .eta-route,
+.phone-sheet.is-peek .eta-detail {
+  display: none;
+}
+
+.phone-sheet.is-peek .eta-strip {
+  margin-top: calc(-4 * var(--u));
+}
+
+.phone-sheet.is-peek .app-cta {
+  margin-top: calc(14 * var(--u));
+}
+
+/* Botón de aviso: 60 de alto, píldora completa, verde de marca; con el
+   aviso puesto pasa al verde profundo. */
+.app-cta {
+  margin-top: calc(18 * var(--u));
+  height: calc(60 * var(--u));
+  border-radius: 999px;
+  background: var(--green);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(10 * var(--u));
+  font-size: calc(15 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(0.5 * var(--u));
+  text-align: center;
+  box-shadow: 0 calc(8 * var(--u)) calc(20 * var(--u)) rgba(0, 168, 89, 0.24);
+  transition: background-color 0.25s var(--ease-out-cubic), box-shadow 0.25s var(--ease-out-cubic);
+}
+
+.app-cta.active {
+  background: #065F46;
+  box-shadow: 0 calc(8 * var(--u)) calc(20 * var(--u)) rgba(6, 95, 70, 0.24);
+}
+
+.app-cta svg {
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+  flex: none;
+  display: block;
+}
+
+/* Los íconos que la demo intercambia son SVG, y el atributo `hidden` no
+   los esconde por sí solo: el navegador sólo lo aplica a HTML. */
+[data-icono][hidden] {
+  display: none;
+}

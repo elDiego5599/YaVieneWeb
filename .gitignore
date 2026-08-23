@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.vite/
+*.local
+
+.DS_Store
+.idea/
+.vscode/
+
+# Cachés de Python del generador del mapa
+__pycache__/
+*.pyc

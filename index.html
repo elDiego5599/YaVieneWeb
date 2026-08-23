@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ya Viene — Tu bus en tiempo real en Barranquilla</title>
+  <meta name="description"
+    content="Ya Viene: mira tu bus moverse en el mapa de Barranquilla en tiempo real y recibe un aviso automático antes de que llegue a tu parada." />
+
+  <!-- Open Graph / Meta Social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Ya Viene — Tu bus en tiempo real en Barranquilla" />
+  <meta property="og:description" content="Mira tu bus en el mapa en vivo y recibe un aviso antes de que llegue." />
+  <meta property="og:image" content="/logo.svg" />
+  <meta name="theme-color" content="#0B1628" />
+
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+
+  <!-- Typography: Bricolage Grotesque (titulares) + Plus Jakarta Sans (texto e interfaz) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+
+  <!-- El CSS y el JS los junta el empaquetador desde src/main.ts. -->
+  <script type="module" src="/src/main.ts"></script>
+</head>
+
+<body>
+
+  <!-- ============ CABECERA: LA ISLA DE NAVEGACIÓN ============ -->
+  <header class="site-header" id="top">
+    <div class="nav-island">
+      <a href="#top" class="nav-island-brand" aria-label="Ya Viene, inicio">
+        <svg class="nav-island-logo" viewBox="0 0 512 512" role="img" aria-label="Ya Viene Logo">
+        <circle cx="256" cy="256" r="256" fill="#00A859" />
+        <path d="M 120 130 A 200 200 0 0 1 392 130" fill="none" stroke="#FFFFFF" stroke-width="32"
+        stroke-linecap="round" opacity="0.5" />
+        <path d="M 176 190 A 130 130 0 0 1 336 190" fill="none" stroke="#FFFFFF" stroke-width="32"
+        stroke-linecap="round" />
+        <rect x="136" y="240" width="240" height="180" rx="36" fill="#14274E" />
+        <rect x="166" y="270" width="180" height="72" rx="16" fill="#FFFFFF" />
+        <rect x="290" y="270" width="30" height="72" fill="#14274E" opacity="0.1" />
+        <circle cx="180" cy="375" r="16" fill="#FFC107" />
+        <circle cx="332" cy="375" r="16" fill="#FFC107" />
+        <rect x="160" y="410" width="32" height="24" rx="8" fill="#0A1428" />
+        <rect x="320" y="410" width="32" height="24" rx="8" fill="#0A1428" />
+        </svg>
+        <span class="wordmark">YA VIENE</span>
+      </a>
+
+      <div class="nav-island-reveal" id="nav-island-menu">
+        <div class="nav-island-inner">
+          <nav class="nav-island-links" aria-label="Navegación principal">
+            <a href="#problema" class="nav-link">El problema</a>
+            <a href="#como-funciona" class="nav-link">Cómo funciona</a>
+            <a href="#empresas" class="nav-link">Para empresas</a>
+          </nav>
+          <a href="#empresas" class="nav-island-cta">Únete a la beta</a>
+        </div>
+      </div>
+
+      <button type="button" class="nav-island-toggle" aria-expanded="false"
+        aria-controls="nav-island-menu" aria-label="Abrir el menú">
+        <span class="nav-island-grip" aria-hidden="true"></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="contenido">
+
+    <!-- ============ HERO ============ -->
+    <section class="panel panel--sun hero-panel" id="hero">
+      <div class="panel-dots" aria-hidden="true"></div>
+
+      <div class="panel-inner hero-grid">
+
+        <!-- Columna Izquierda: Mensaje Comercial / Copy -->
+        <div class="hero-copy">
+          <h1 class="hero-title">¿Cuánto falta <span class="highlight">para tu bus?</span></h1>
+          <p class="hero-description">Tu ciudad en tiempo real: mira el bus moverse en el mapa y te avisamos antes de
+            que llegue el tuyo.</p>
+
+          <div class="hero-actions">
+            <a href="#empresas" class="btn-primary btn-green">Únete a la beta</a>
+            <a href="#como-funciona" class="btn-outline">Ver cómo funciona</a>
+          </div>
+
+          <p class="hero-subtext">Ya en pruebas con Sobusa y sus 6 rutas reales de Barranquilla.</p>
+        </div>
+
+        <!--
+          Escena: el teléfono con los 4 buses vectoriales flotantes y las
+          superficies reales de la app alrededor.
+        -->
+        <div class="hero-scene" aria-hidden="true">
+
+          <!-- 1. Bus Arriba a la Derecha (Sobusa) -->
+          <div class="scene-bus scene-bus--sobusa animate-float-slow">
+            <img src="./src/assets/buses/sobusa.webp" alt="Sobusa" class="scene-bus-img" />
+          </div>
+
+          <!-- 2. Bus Medio a la Izquierda (Azul / Transmetro / Universidades) -->
+          <div class="scene-bus scene-bus--transmetro animate-float-delayed">
+            <img src="./src/assets/buses/transmetro.webp" alt="Ruta Universidades" class="scene-bus-img" />
+          </div>
+
+          <!-- 3. Bus Medio a la Derecha (Sodetrans) -->
+          <div class="scene-bus scene-bus--sodis animate-float-slow">
+            <img src="./src/assets/buses/sodis.webp" alt="Sodetrans" class="scene-bus-img" />
+          </div>
+
+          <!-- 4. Bus Abajo a la Izquierda (Coolitoral) -->
+          <div class="scene-bus scene-bus--coolitoral animate-float-delayed">
+            <img src="./src/assets/buses/coolitoral.webp" alt="Coolitoral" class="scene-bus-img" />
+          </div>
+
+          <!-- 5. Etiqueta flotante: Ruta Activa (Arriba a la Izquierda) -->
+          <div class="scene-card scene-card--route animate-float-slow" data-escena="route">
+            <span class="scene-route-dot"></span>
+            <div>
+              <strong data-escena="route-name">C16 Calle 72 Uninorte</strong>
+              <span>Ruta activa</span>
+            </div>
+          </div>
+
+          <!--
+            6. El teléfono. Todo lo que se ve dentro de la pantalla es la
+            app redibujada en HTML: la píldora de búsqueda
+            (search_pill_bar.dart), el chip de ubicación
+            (location_status_chip.dart), el selector de empresa y ruta
+            (route_selector_sheet.dart) y la hoja de distancia
+            (eta_bottom_sheet.dart). Los textos son los mismos, literales.
+          -->
+          <div class="hero-phone-wrap">
+            <div class="phone-shell">
+              <span class="phone-key phone-key--power"></span>
+              <span class="phone-key phone-key--vol"></span>
+
+              <div class="phone-screen" id="phone">
+
+                <!-- La cámara perforada del Pixel, encima de todo. -->
+                <span class="phone-lens"></span>
+
+                <!-- Mapa: mosaico real de Barranquilla + rutas reales. -->
+                <div class="phone-map" id="phone-map">
+                  <svg class="routes-svg-layer" id="phone-routes"></svg>
+                </div>
+
+                <!-- Barra de estado de Android: la app dibuja debajo. -->
+                <div class="phone-status">
+                  <span>7:23</span>
+                  <span class="phone-status-glifos">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3 18h3v3H3zM9 13h3v8H9zM15 8h3v13h-3zM21 3h-3v18h3z" opacity="0.9" />
+                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round">
+                      <path d="M2 8.5a15 15 0 0 1 20 0" />
+                      <path d="M5.5 12.5a10 10 0 0 1 13 0" />
+                      <path d="M9 16.5a5 5 0 0 1 6 0" />
+                      <circle cx="12" cy="20" r="0.6" fill="currentColor" />
+                    </svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="7" width="16" height="10" rx="3" />
+                      <rect x="5" y="9" width="10" height="6" rx="1.5" fill="currentColor"
+                        stroke="none" />
+                      <path d="M21 10.5v3" stroke-linecap="round" />
+                    </svg>
+                  </span>
+                </div>
+
+                <!-- Píldora de búsqueda + chip de ubicación. -->
+                <div class="phone-topbar">
+                  <div class="app-pill">
+                    <span class="app-pill-btn">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round">
+                        <path d="M4 7h16M4 12h16M4 17h16" />
+                      </svg>
+                    </span>
+
+                    <span class="app-pill-text">
+                      <span class="app-pill-linea">
+                        <span class="app-pill-dot" data-el="pill-dot"></span>
+                        <span class="app-pill-title" data-el="pill-title">¿Qué bus esperas?</span>
+                      </span>
+                      <span class="app-pill-sub" data-el="pill-sub">Toca para buscar tu ruta</span>
+                    </span>
+
+                    <span class="app-pill-btn">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round">
+                        <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+                        <circle cx="15" cy="7" r="2" />
+                        <circle cx="9" cy="17" r="2" />
+                      </svg>
+                    </span>
+                  </div>
+
+                  <div class="app-chip">
+                    <span class="app-chip-icon">
+                      <svg data-icono="gps" data-grupo="chip" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4" />
+                        <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
+                        <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+                      </svg>
+                      <svg data-icono="pin" data-grupo="chip" hidden viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0
+                          9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" />
+                      </svg>
+                    </span>
+                    <span class="app-chip-text" data-el="chip-text">Localizando tu ubicación…</span>
+                    <span class="app-chip-action" data-el="chip-action" hidden>Quitar</span>
+                  </div>
+                </div>
+
+                <!-- Hoja inferior: los cuatro estados por los que pasa. -->
+                <div class="phone-sheet" data-el="sheet">
+                  <span class="sheet-handle"></span>
+
+                  <!-- El envoltorio que le da alto a la hoja: al cambiar de
+                       vista se anima, como el AnimatedSize del selector. -->
+                  <div class="sheet-views" data-el="views">
+                  <div class="sheet-view active" data-view="empty">
+                    <div class="sheet-empty">
+                      <div class="sheet-empty-icon">
+                        <svg data-icono="toque" data-grupo="vacio" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <path d="M10 10V5.5a1.5 1.5 0 0 1 3 0V12" />
+                          <path d="M13 11.5a1.5 1.5 0 0 1 3 0V13" />
+                          <path d="M16 12.5a1.5 1.5 0 0 1 3 0V17a5 5 0 0 1-5 5h-2a5 5 0
+                            0 1-4.3-2.5l-2.3-4a1.5 1.5 0 0 1 2.6-1.5L10 16" />
+                        </svg>
+                        <svg data-icono="ruta" data-grupo="vacio" hidden viewBox="0 0 24 24"
+                          fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <path d="M4 18h4a4 4 0 0 0 4-4V10a4 4 0 0 1 4-4h4" />
+                          <path d="M17 3l3 3l-3 3" />
+                          <circle cx="5" cy="18" r="2" />
+                        </svg>
+                      </div>
+                      <div class="sheet-empty-title" data-el="empty-title">
+                        Toca el mapa para indicar dónde estás
+                      </div>
+                      <div class="sheet-empty-sub" data-el="empty-sub">
+                        Pon tu punto de espera; después podrás mover el pin si hace falta
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="sheet-view" data-view="companies">
+                    <div class="sheet-head">
+                      <span class="sheet-back">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M15 5l-7 7l7 7" />
+                        </svg>
+                      </span>
+                      <span class="sheet-head-title">Selecciona una empresa</span>
+                    </div>
+                    <!-- Iniciales e insignia como en el selector: "Sobusa" da
+                         "SO", y el color sale de la paleta de marca por la
+                         suma de los códigos de su id ("sobusa" → 653, y
+                         653 % 6 cae en el verde accesible). -->
+                    <div class="app-tile">
+                      <span class="app-tile-icon app-tile-icon--empresa">SO</span>
+                      <span class="app-tile-body">
+                        <span class="app-tile-title">Sobusa</span>
+                      </span>
+                      <span class="app-tile-chevron" aria-hidden="true">›</span>
+                    </div>
+                  </div>
+
+                  <div class="sheet-view" data-view="routes">
+                    <div class="sheet-head">
+                      <span class="sheet-back">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M15 5l-7 7l7 7" />
+                        </svg>
+                      </span>
+                      <span class="sheet-head-title">Selecciona una ruta</span>
+                    </div>
+                    <!-- Las seis rutas las escribe phone-simulator.ts con los
+                         datos de rutas.json, no están copiadas aquí. -->
+                    <div class="sheet-lista" data-el="route-list"></div>
+                  </div>
+
+                  <div class="sheet-view" data-view="eta">
+                    <div class="eta-strip" data-el="eta-bar"></div>
+                    <div class="eta-route" data-el="eta-route"></div>
+                    <div class="eta-number" data-el="eta-value">—</div>
+                    <div class="eta-unit" data-el="eta-unit">m de ti</div>
+                    <div class="eta-detail" data-el="eta-sub" hidden></div>
+
+                    <!-- Un div y no un button: es el dibujo de un botón, y un
+                         button real quedaría enfocable dentro de una escena
+                         marcada como aria-hidden. -->
+                    <div class="app-cta" data-el="alert-btn">
+                      <svg data-icono="campana" data-grupo="aviso" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7" />
+                        <path d="M10.2 20a2 2 0 0 0 3.6 0" />
+                      </svg>
+                      <svg data-icono="visto" data-grupo="aviso" hidden viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M8 12.5l2.8 2.8L16 10" />
+                      </svg>
+                      <span data-el="alert-label">AVISARME CUANDO ESTÉ CERCA</span>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+
+                <div class="phone-gesture"></div>
+              </div>
+            </div>
+            <p class="map-credit">Mapa base © OpenStreetMap · © CARTO</p>
+          </div>
+
+          <!-- 7. Etiqueta flotante: Notificación cerca (Abajo a la Derecha) -->
+          <div class="scene-card scene-card--notif animate-float-delayed" data-escena="notif">
+            <div class="notif-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round">
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 -6 11 -6 11s-6 -4 -6 -11" />
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+              </svg>
+            </div>
+            <div>
+              <strong data-escena="notif-title">B18 Tcherassi - B-042 está cerca de ti</strong>
+              <span data-escena="notif-body">Está a 320 m de tu ubicación</span>
+            </div>
+          </div>
+
+        </div>
+
+        <p class="solo-lectores">
+          La demostración muestra la app: primero localiza tu ubicación, luego
+          eliges la empresa Sobusa y una de sus seis rutas, y por último ves los
+          buses moverse sobre el mapa de Barranquilla con los metros que faltan
+          para que llegue el más cercano.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ FRANJA DE DATOS ============ -->
+    <section class="panel panel--ink stats-panel" aria-label="Estado del piloto">
+      <div class="panel-dots" aria-hidden="true"></div>
+      <div class="panel-inner tight stats-grid">
+        <div class="stat reveal">
+          <span class="stat-value">6</span>
+          <span class="stat-label">rutas reales trazadas</span>
+        </div>
+        <div class="stat reveal" data-reveal-delay="80">
+          <span class="stat-value">Sobusa</span>
+          <span class="stat-label">empresa en prueba piloto</span>
+        </div>
+        <div class="stat reveal" data-reveal-delay="160">
+          <span class="stat-value">1 km</span>
+          <span class="stat-label">radio del aviso automático</span>
+        </div>
+        <div class="stat reveal" data-reveal-delay="240">
+          <span class="stat-value">0</span>
+          <span class="stat-label">equipos extra por bus</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROBLEMA ============ -->
+    <section class="panel panel--arena" id="problema">
+      <div class="panel-dots" aria-hidden="true"></div>
+      <div class="panel-inner">
+        <div class="section-head reveal">
+          <span class="tracked-eyebrow eyebrow--coral">EL PROBLEMA</span>
+          <h2 class="section-title">Esperar el bus,<br />a ciegas</h2>
+        </div>
+
+        <div class="cards-grid">
+          <article class="feature-card feature-card--lead reveal">
+            <div class="card-icon coral">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 3" />
+              </svg>
+            </div>
+            <h3 class="card-title">Esperar sin saber</h3>
+            <p class="card-text">El bus puede tardar 3 minutos o 30, y no hay forma de saberlo hasta que aparece — o no
+              aparece.</p>
+          </article>
+
+          <article class="feature-card reveal" data-reveal-delay="100">
+            <div class="card-icon amber">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round">
+                <circle cx="12" cy="12" r="5" />
+                <path
+                  d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4 -1.4M18.4 5.6l1.4 -1.4" />
+              </svg>
+            </div>
+            <h3 class="card-title">Bajo el sol de Barranquilla</h3>
+            <p class="card-text">Cada minuto de espera es un minuto más de calor, sin sombra ni certeza de que valga la
+              pena seguir esperando.</p>
+          </article>
+
+          <article class="feature-card reveal" data-reveal-delay="200">
+            <div class="card-icon green">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round">
+                <path d="M5 22h14" />
+                <path d="M5 2h14" />
+                <path d="M17 22v-6.5a1.5 1.5 0 0 0 -1.5 -1.5h-7a1.5 1.5 0 0 0 -1.5 1.5v6.5" />
+                <path d="M9 2v4.5a1.5 1.5 0 0 0 1.5 1.5h3a1.5 1.5 0 0 0 1.5 -1.5v-4.5" />
+              </svg>
+            </div>
+            <h3 class="card-title">Tiempo que se pierde</h3>
+            <p class="card-text">Ese tiempo suma: llegadas tarde, citas que se corren, planes que dependen de adivinar.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SOLUCIÓN ============ -->
+    <section class="panel panel--mint" id="solucion">
+      <div class="panel-dots" aria-hidden="true"></div>
+      <div class="panel-inner solucion-grid">
+
+        <div class="solucion-intro reveal">
+          <span class="tracked-eyebrow eyebrow--verde">LA SOLUCIÓN</span>
+          <h2 class="section-title">Tres toques<br />y ya sabes</h2>
+          <p class="section-lead measure">No hay cuenta que crear ni nada que configurar: abres, marcas dónde
+            esperas y eliges la ruta. De ahí en adelante la app trabaja sola.</p>
+          <p class="solucion-nota">Y puedes guardar el teléfono: el aviso llega con Ya Viene en segundo plano.</p>
+        </div>
+
+        <ol class="ruta-pasos reveal" data-reveal-delay="120">
+          <li class="ruta-paso">
+            <span class="ruta-punto">1</span>
+            <div class="ruta-cuerpo">
+              <h3>Fija tu punto de espera</h3>
+              <p>Toca el mapa y marca desde dónde esperas. También puedes usar tu GPS para que el mapa te siga.</p>
+            </div>
+          </li>
+
+          <li class="ruta-paso">
+            <span class="ruta-punto">2</span>
+            <div class="ruta-cuerpo">
+              <h3>Elige tu ruta</h3>
+              <p>Selecciona la empresa de transporte que buscas y después la ruta — revisa sus terminales y buses
+                activos.</p>
+            </div>
+          </li>
+
+          <li class="ruta-paso">
+            <span class="ruta-punto">3</span>
+            <div class="ruta-cuerpo">
+              <h3>Te avisamos</h3>
+              <p>Activa el aviso y te notificamos cuando el bus esté a un kilómetro — sigue con lo tuyo mientras
+                tanto.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ CÓMO FUNCIONA ============ -->
+    <section class="panel panel--arena" id="como-funciona">
+      <div class="panel-dots" aria-hidden="true"></div>
+      <div class="panel-inner">
+        <div class="section-head reveal">
+          <span class="tracked-eyebrow eyebrow--tenue">CÓMO FUNCIONA</span>
+          <h2 class="section-title">Así se ve en tu bolsillo</h2>
+          <p class="section-lead">La misma pantalla del mockup de arriba: ubicación en vivo, tus buses moviéndose sobre
+            la ruta real y un aviso a un toque de distancia.</p>
+        </div>
+
+        <div class="anatomia-grid">
+          <div class="detail-card detail-card--ancho reveal">
+            <div class="feature-badge feature-badge--num">850</div>
+            <h3>Distancia real, no un cálculo bonito</h3>
+            <p>Un número grande y honesto: los metros que faltan medidos sobre el recorrido, no en línea recta. Un bus
+              no cruza por encima de las manzanas, y el número tampoco.</p>
+          </div>
+
+          <div class="detail-card detail-card--ancho reveal" data-reveal-delay="90">
+            <div class="feature-badge feature-badge--solido">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round">
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 -6 11 -6 11s-6 -4 -6 -11" />
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+              </svg>
+            </div>
+            <h3>Un toque y ya no hay que mirar</h3>
+            <p>"AVISARME CUANDO ESTÉ CERCA" y la notificación llega al kilómetro, con la app en segundo plano y sin
+              dejarte el teléfono en cero.</p>
+          </div>
+
+          <div class="detail-card reveal" data-reveal-delay="180">
+            <div class="feature-badge feature-badge--tinte">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round">
+                <path d="M20 10c0 6 -8 12 -8 12s-8 -6 -8 -12a8 8 0 0 1 16 0Z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            </div>
+            <h3>Chip de estado</h3>
+            <p>De "Localizando tu ubicación…" a "Con tu ubicación: 2 buses cerca". Siempre sabes qué está pasando.</p>
+          </div>
+
+          <div class="detail-card reveal" data-reveal-delay="240">
+            <div class="feature-badge feature-badge--gris">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round">
+                <path d="M3 3l18 18" />
+                <path d="M4 7a2 2 0 0 1 2 -2h9" />
+                <path d="M18 5a2 2 0 0 1 2 2v8" />
+                <path d="M4 11v5a2 2 0 0 0 2 2h11" />
+                <circle cx="8" cy="21" r="1" />
+                <circle cx="16" cy="21" r="1" />
+              </svg>
+            </div>
+            <h3>Cuando el bus se calla</h3>
+            <p>Si deja de reportar cinco minutos, se marca <em>sin señal</em> y se apaga a gris. Preferimos decirte que
+              no sabemos antes que enseñarte una posición vieja.</p>
+          </div>
+
+          <div class="detail-card reveal" data-reveal-delay="300">
+            <div class="feature-badge feature-badge--azul">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6l6 -3l6 3l6 -3v15l-6 3l-6 -3l-6 3z" />
+                <path d="M9 3v15M15 6v15" />
+              </svg>
+            </div>
+            <h3>Rutas de verdad</h3>
+            <p>Las seis de Sobusa están trazadas waypoint por waypoint sobre MapLibre GL — el recorrido que ves es el
+              que hace el bus, con sus terminales y sus vueltas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EMPRESAS & CONTACT ============ -->
+    <section class="panel panel--ink" id="empresas">
+      <div class="panel-dots" aria-hidden="true"></div>
+      <div class="panel-inner companies-grid">
+
+        <div class="companies-info reveal">
+          <span class="tracked-eyebrow eyebrow--ambar">PARA EMPRESAS</span>
+          <h2 class="section-title">¿Eres empresa de transporte? Conecta tu flota.</h2>
+          <p class="measure">El conductor lleva la app en su celular, sin hardware extra — GPS, rumbo y velocidad se
+            publican solos. Tú ves tu flota en vivo desde el panel de control, ruta por ruta.</p>
+
+          <a href="https://wa.me/573004438626" target="_blank" rel="noopener" class="whatsapp-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.159.57 4.184 1.564 5.938l-1.664 6.082 6.221-1.632c1.705.93 3.655 1.467 5.727 1.467 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12z" />
+            </svg>
+            Escríbenos por WhatsApp
+          </a>
+        </div>
+
+        <div class="reveal" data-reveal-delay="150">
+          <form id="contact-form" class="contact-form-card">
+            <div class="form-group">
+              <label class="form-label" for="nombre">Nombre</label>
+              <input required type="text" id="nombre" name="nombre" class="form-input" placeholder="Tu nombre" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="empresa">Empresa de transporte</label>
+              <input required type="text" id="empresa" name="empresa" class="form-input"
+                placeholder="Nombre de la empresa" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="telefono">Teléfono / WhatsApp</label>
+              <input required type="tel" id="telefono" name="telefono" class="form-input" placeholder="300 000 0000" />
+            </div>
+
+            <p id="form-error" class="form-error" role="alert" hidden></p>
+
+            <button type="submit" class="form-submit-btn">Quiero conectar mi flota</button>
+          </form>
+
+          <div id="form-success" class="form-success-message" hidden>
+            <div class="form-success-icon">✓</div>
+            <h3>¡Solicitud recibida!</h3>
+            <p>Te contactaremos pronto para contarte cómo conectar tus buses a la red YaViene.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer" id="pie">
+    <div class="footer-grid">
+      <div class="footer-intro">
+        <a class="footer-brand" href="#top" aria-label="Ya Viene, inicio">
+          <img src="/logo.svg" alt="" width="38" height="38" />
+          <span>YA VIENE</span>
+        </a>
+        <p>Tu ruta, cuando importa.<br />Barranquilla se mueve contigo.</p>
+      </div>
+
+      <nav class="footer-nav" aria-label="Navegación del pie de página">
+        <a href="#problema">El problema</a>
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#empresas">Para empresas</a>
+      </nav>
+
+      <a class="footer-whatsapp" href="https://wa.me/573004438626" target="_blank" rel="noopener">
+        Hablemos por WhatsApp
+        <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 YaViene · Barranquilla, Colombia</p>
+      <div class="footer-legal-links">
+        <a href="#">Términos</a>
+        <a href="#">Privacidad</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>
