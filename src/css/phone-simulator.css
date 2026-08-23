@@ -818,6 +818,12 @@
   transition: background-color 0.6s ease;
 }
 
+/* colorUrgencia() de phone-simulator.ts: dentro del kilómetro la barra pasa
+   a ámbar. A 850 y a 640 metros —los dos casos del visor—, es el que toca. */
+.eta-strip--cerca {
+  background: var(--warn);
+}
+
 .eta-route {
   margin-top: calc(18 * var(--u));
   text-align: center;
@@ -908,6 +914,13 @@
 .app-cta.active {
   background: #065F46;
   box-shadow: 0 calc(8 * var(--u)) calc(20 * var(--u)) rgba(6, 95, 70, 0.24);
+}
+
+/* Bloqueado: AppColors.textDisabled y sin sombra, como en eta_bottom_sheet
+   cuando el bus lleva rato sin reportar. No invita a tocarlo. */
+.app-cta.is-bloqueado {
+  background: var(--app-text-disabled);
+  box-shadow: none;
 }
 
 .app-cta svg {

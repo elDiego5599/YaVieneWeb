@@ -8,7 +8,9 @@
   position: relative;
   margin: 0 var(--gutter) var(--panel-gap);
   border-radius: var(--panel-radius);
-  overflow: hidden;
+  /* Recorta igual que `hidden` —respeta el radio— pero sin volverse
+     contenedor de scroll, que dejaría muertas las escenas pegadas. */
+  overflow: clip;
   /* Cada panel es su propio contexto de apilado: los glows y patrones
      decorativos de uno nunca se cuelan sobre el de al lado. */
   isolation: isolate;
@@ -20,6 +22,68 @@
   max-width: var(--content-max);
   margin: 0 auto;
   padding: clamp(52px, 7vw, 116px) clamp(22px, 4vw, 64px);
+}
+
+/*
+  Banda a sangre. Un panel flotante siempre se lee como una tarjeta grande:
+  por ancho que sea, el ojo ve dónde termina. Estas dejan el margen y el
+  radio y toman la ventana entera, así la página alterna tarjeta y banda en
+  vez de apilar seis veces la misma forma. Sólo lo llevan las secciones que
+  cargan color o producto —la franja de datos, el visor y empresas—; el
+  hero y las dos del medio siguen flotando, que es lo que hace el contraste.
+*/
+.panel--sangre {
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+  border-radius: 0;
+}
+
+/* El pie va pegado a la banda de empresas: el hueco de siempre dejaría
+   una raya crema entre dos fondos oscuros. */
+.panel--sangre + .site-footer {
+  margin-top: 0;
+}
+
+/* Tras una banda, el panel que vuelve a flotar necesita su aire de arriba:
+   el hueco entre paneles lo daba el margen inferior, y la banda no lo tiene. */
+.panel--sangre + .panel {
+  margin-top: var(--panel-gap);
+}
+
+/* El taller: el fondo arena de la app —el mismo del mockup— bajo las piezas
+   de producto, que van en blanco encima. Sobre blanco no se despegarían. */
+.panel--taller {
+  background: var(--arena);
+}
+
+.panel-inner--ancho {
+  max-width: var(--content-wide);
+}
+
+/*
+  Costura. Entre dos bandas pegadas el corte de color es una raya recta que
+  parte la página en dos; esto disuelve el borde inferior de la banda en el
+  color de quien viene detrás. Se pinta por encima del fondo y por debajo
+  del contenido (`.panel-inner` va en z-index 1).
+*/
+.costura {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: clamp(70px, 8vw, 140px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.costura--abajo {
+  bottom: 0;
+  background: linear-gradient(180deg, transparent, var(--costura-color, #FFFCF7));
+}
+
+.costura--arriba {
+  top: 0;
+  background: linear-gradient(0deg, transparent, var(--costura-color, #FFFCF7));
 }
 
 .panel-inner.tight {
@@ -152,4 +216,66 @@
 
 .panel--ink .section-head .section-lead {
   color: var(--text-white-dim);
+}
+
+
+/* La costura que baja al azul del panel de empresas. */
+.costura--ink {
+  --costura-color: var(--navy);
+}
+
+/* ── Pista y escena: el andamio del scrollytelling ────────────────────
+   Una pista es un bloque de varias pantallas de alto con una escena
+   pegada dentro. Mientras la pista cruza la ventana la escena se queda
+   quieta y lo que cambia es lo que hay dentro: el reloj corre, los pasos
+   se acercan, el visor pasa de una pieza a otra. `--tramos` dice cuántos
+   momentos tiene y `--paso` cuánto scroll cuesta cada uno.
+
+   Cuidado con `overflow` en cualquier antepasado: `hidden` convierte al
+   padre en contenedor de scroll y el pegado deja de funcionar. Por eso el
+   panel y el body recortan con `clip`. */
+.pista {
+  --tramos: 3;
+  --paso: 82vh;
+  position: relative;
+  height: calc(var(--tramos) * var(--paso) + 100vh);
+}
+
+.escena {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  min-height: 100vh;
+  display: grid;
+  align-content: center;
+}
+
+/* Dentro de la escena el aire vertical lo pone la ventana, no el relleno
+   de siempre del panel: con aquel no cabría la escena en una pantalla. */
+.escena .panel-inner {
+  width: 100%;
+  padding-top: clamp(20px, 3.2vh, 44px);
+  padding-bottom: clamp(20px, 3.2vh, 44px);
+}
+
+/*
+  Con las animaciones desactivadas no hay recorrido que valga: la pista se
+  encoge a lo que ocupe su contenido, la escena deja de pegarse y todo lo
+  que estaba apilado en una sola celda pasa a leerse de arriba abajo. Cada
+  módulo se encarga de dejar sus piezas visibles.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .pista {
+    height: auto;
+  }
+
+  .escena {
+    position: static;
+    min-height: 0;
+  }
+
+  .escena .panel-inner {
+    padding-top: clamp(52px, 7vw, 116px);
+    padding-bottom: clamp(52px, 7vw, 116px);
+  }
 }

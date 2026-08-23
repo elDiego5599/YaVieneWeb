@@ -21,8 +21,11 @@ import { ContactForm } from './contact-form';
 import { NavIsland } from './nav-island';
 import { PhoneMap } from './phone-map';
 import { PhoneSimulator } from './phone-simulator';
+import { Pasos } from './pasos';
 import { ProblemWeather } from './problem-weather';
+import { Reloj } from './reloj';
 import { ScrollEffects } from './scroll-effects';
+import { Visor } from './visor';
 
 const arrancar = (): void => {
   // Apariciones al entrar en pantalla: no depende de nada más.
@@ -62,6 +65,29 @@ const arrancar = (): void => {
 
   const problema = document.querySelector<HTMLElement>('#problema');
   if (problema) new ProblemWeather(problema);
+
+  /*
+    Las tres secciones que se recorren en vez de leerse de un golpe. Cada
+    una mide su propia pista; si la suya no está en la página, se salta.
+  */
+  const pistaReloj = document.querySelector<HTMLElement>('[data-reloj-pista]');
+  if (pistaReloj) new Reloj(pistaReloj);
+
+  const pistaPasos = document.querySelector<HTMLElement>('[data-pasos-pista]');
+  if (pistaPasos) new Pasos(pistaPasos);
+
+  /*
+    El visor lleva su propio mapa: el mismo mosaico y las mismas seis
+    polilíneas del teléfono, en un marco vertical, para que la pieza de las
+    rutas enseñe la que se toca en la lista de al lado.
+  */
+  const pistaVisor = document.querySelector<HTMLElement>('[data-visor-pista]');
+  if (pistaVisor) {
+    const svgVisor = document.querySelector<SVGSVGElement>('#visor-rutas');
+    const lienzoVisor = document.querySelector<HTMLElement>('#visor-mapa');
+    const mapaVisor = svgVisor && lienzoVisor ? new PhoneMap(svgVisor, lienzoVisor) : null;
+    new Visor(pistaVisor, mapaVisor);
+  }
 };
 
 if (document.readyState === 'loading') {

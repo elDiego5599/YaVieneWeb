@@ -19,7 +19,10 @@ body {
   background-color: #FFFCF7;
   color: var(--text-primary);
   font-family: var(--font-family);
-  overflow-x: hidden;
+  /* `clip` y no `hidden`: los dos recortan lo que se sale de lado, pero
+     `hidden` convierte al body en contenedor de scroll y eso rompe el
+     `position: sticky` de las escenas. */
+  overflow-x: clip;
   line-height: 1.5;
 }
 

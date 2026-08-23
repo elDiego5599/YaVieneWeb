@@ -86,6 +86,36 @@
         <path d="M120 -10 C60 180 280 260 220 480" />
         <path d="M-20 740 C180 660 400 880 620 780 C800 700 900 860 1020 800" />
       </g>
+      <g id="trama-rutas-datos" fill="none" stroke="currentColor" stroke-width="1.5"
+        stroke-linecap="round" vector-effect="non-scaling-stroke">
+        <path d="M-30 420 C170 360 260 500 460 430 S760 280 1030 360" />
+        <path d="M-20 670 C180 590 360 760 560 670 S820 560 1030 620" />
+        <circle cx="460" cy="430" r="6" fill="currentColor" stroke="none" />
+        <circle cx="560" cy="670" r="6" fill="currentColor" stroke="none" />
+      </g>
+      <g id="trama-rutas-problema" fill="none" stroke="currentColor" stroke-width="1.5"
+        stroke-linecap="round" vector-effect="non-scaling-stroke">
+        <path d="M-40 300 C160 220 300 380 500 300 S820 220 1040 300" />
+        <path d="M-40 700 C180 610 340 780 540 690 S820 600 1040 700" />
+      </g>
+      <g id="trama-rutas-solucion" fill="none" stroke="currentColor" stroke-width="1.5"
+        stroke-linecap="round" vector-effect="non-scaling-stroke">
+        <path d="M-40 260 C180 180 340 340 540 260 S820 180 1040 260" />
+        <path d="M-40 760 C180 680 360 830 560 740 S820 660 1040 760" />
+        <circle cx="540" cy="260" r="8" fill="currentColor" stroke="none" />
+        <circle cx="560" cy="740" r="8" fill="currentColor" stroke="none" />
+      </g>
+      <g id="trama-rutas-anatomia" fill="none" stroke="currentColor" stroke-width="1.5"
+        stroke-linecap="round" vector-effect="non-scaling-stroke">
+        <path d="M-30 240 C190 340 340 120 520 270 S820 460 1030 320" />
+        <path d="M-30 790 C220 680 400 900 610 730 S850 610 1030 760" />
+      </g>
+      <g id="trama-rutas-empresas" fill="none" stroke="currentColor" stroke-width="1.5"
+        stroke-linecap="round" vector-effect="non-scaling-stroke">
+        <path d="M-40 300 C180 220 320 360 520 290 S820 220 1040 300" />
+        <path d="M-40 520 C180 450 360 590 560 510 S820 450 1040 520" />
+        <path d="M-40 760 C200 680 360 820 580 750 S820 680 1040 760" />
+      </g>
     </defs>
   </svg>
 
@@ -599,12 +629,12 @@
 
 
     <!-- ============ FRANJA DE DATOS ============ -->
-    <section class="panel panel--ink stats-panel" aria-label="Estado del piloto">
+    <section class="panel panel--ink panel--sangre stats-panel" aria-label="Estado del piloto">
       <div class="panel-dots" aria-hidden="true">
         <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
-          focusable="false"><use href="#trama-rutas" /></svg>
+          focusable="false"><use href="#trama-rutas-datos" /></svg>
       </div>
-      <div class="panel-inner tight stats-grid">
+      <div class="panel-inner panel-inner--ancho tight stats-grid">
         <div class="stat reveal">
           <span class="stat-value">6</span>
           <span class="stat-label">rutas reales trazadas</span>
@@ -633,195 +663,454 @@
       grande, el clima abajo y el coste al final en voz baja. El texto es el
       mismo de siempre; lo que cambia es quién habla más fuerte.
     -->
+    <!-- ============ PROBLEMA: EL RELOJ ============ -->
+    <!--
+      Esta sección no se lee de un golpe: se recorre. Mientras se baja por
+      ella el reloj de la derecha va de cero a treinta minutos —los dos
+      números son los de la frase, «3 minutos o 30»— y el texto de la
+      izquierda se va sumando a medida que la espera se alarga. El color
+      del reloj sigue la escala de la app: verde, ámbar, coral.
+    -->
     <section class="panel panel--arena" id="problema" data-clima="sol">
       <div class="panel-dots" aria-hidden="true">
         <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
-          focusable="false"><use href="#trama-rutas" /></svg>
+          focusable="false"><use href="#trama-rutas-problema" /></svg>
       </div>
-      <div class="panel-inner problema-banda">
 
-        <div class="section-head reveal problema-cabeza">
-          <span class="tracked-eyebrow eyebrow--coral">EL PROBLEMA</span>
-          <h2 class="section-title">Esperar el bus,<br />a ciegas</h2>
-        </div>
+      <div class="pista pista--reloj" data-reloj-pista>
+        <div class="escena">
+          <div class="panel-inner panel-inner--ancho problema-escena">
 
-        <p class="problema-lead reveal" data-reveal-delay="90">
-          El bus puede tardar 3 minutos o 30, y no hay forma de saberlo hasta que aparece — o no
-          aparece.
-        </p>
+            <div class="problema-texto">
+              <div class="section-head">
+                <span class="tracked-eyebrow eyebrow--coral">EL PROBLEMA</span>
+                <h2 class="section-title">Esperar el bus,<br />a ciegas</h2>
+              </div>
 
-        <div class="problema-regla reveal" data-reveal-delay="140" aria-hidden="true"></div>
+              <p class="problema-lead problema-beat" data-beat="0.02">
+                El bus puede tardar 3 minutos o 30, y no hay forma de saberlo hasta que aparece — o no
+                aparece.
+              </p>
 
-        <div class="problema-clima reveal" data-reveal-delay="180">
-          <div class="card-icon amber weather-icon" aria-hidden="true">
-            <svg class="weather-icon__sun" width="22" height="22" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <circle cx="12" cy="12" r="5" />
-              <path
-                d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4 -1.4M18.4 5.6l1.4 -1.4" />
+              <div class="problema-clima problema-beat" data-beat="0.34">
+                <div class="card-icon amber weather-icon" aria-hidden="true">
+                  <svg class="weather-icon__sun" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <circle cx="12" cy="12" r="5" />
+                    <path
+                      d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4 -1.4M18.4 5.6l1.4 -1.4" />
+                  </svg>
+                  <svg class="weather-icon__rain" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 18h10a4 4 0 0 0 .7-7.94A6 6 0 0 0 6.2 8.8 4.5 4.5 0 0 0 7 18Z" />
+                    <path d="M8 20l-1 2M12 20l-1 2M16 20l-1 2" />
+                  </svg>
+                </div>
+                <div class="problema-clima-cuerpo">
+                  <h3 class="problema-clima-titulo">Bajo el <button class="clima-word clima-word--sol is-active"
+                      type="button" data-clima-choice="sol" aria-pressed="true">sol</button> o la <button
+                      class="clima-word clima-word--lluvia" type="button" data-clima-choice="lluvia"
+                      aria-pressed="false">lluvia</button> de Barranquilla</h3>
+                  <p class="weather-text">
+                    <span class="weather-text__sol">Cada minuto de espera es un minuto más de calor, sin sombra ni certeza
+                      de que valga la pena seguir esperando.</span>
+                    <span class="weather-text__lluvia">Y cuando cae el aguacero tampoco hay dónde meterse: se espera igual,
+                      mojándose, sin saber si el bus ya pasó.</span>
+                  </p>
+                </div>
+              </div>
+
+              <p class="problema-coste problema-beat" data-beat="0.72">
+                Ese tiempo suma: llegadas tarde, citas que se corren, planes que dependen de adivinar.
+              </p>
+            </div>
+
+            <!--
+              El reloj. La aguja larga marca el recorrido de la esfera —los
+              treinta minutos— y el segundero da una vuelta entera por cada
+              minuto, que es lo que hace que se lea como un reloj andando y
+              no como una barra de progreso.
+            -->
+            <div class="reloj" data-reloj data-urgencia="calma">
+              <span class="reloj-halo" aria-hidden="true"></span>
+              <svg class="reloj-esfera" viewBox="0 0 280 280" aria-hidden="true" focusable="false">
+              <g class="reloj-marcas">
+                <line class="reloj-marca--larga" x1="81.5" y1="241.3" x2="76.5" y2="250.0" />
+                <line x1="63.5" y1="231.2" x2="60.3" y2="235.0" />
+                <line x1="48.8" y1="216.5" x2="45.0" y2="219.7" />
+                <line x1="36.9" y1="199.5" x2="32.6" y2="202.0" />
+                <line x1="28.2" y1="180.7" x2="23.5" y2="182.4" />
+                <line class="reloj-marca--larga" x1="24.8" y1="160.3" x2="14.9" y2="162.1" />
+                <line x1="21.0" y1="140.0" x2="16.0" y2="140.0" />
+                <line x1="22.8" y1="119.3" x2="17.9" y2="118.5" />
+                <line x1="28.2" y1="99.3" x2="23.5" y2="97.6" />
+                <line x1="36.9" y1="80.5" x2="32.6" y2="78.0" />
+                <line class="reloj-marca--larga" x1="50.4" y1="64.8" x2="42.7" y2="58.4" />
+                <line x1="63.5" y1="48.8" x2="60.3" y2="45.0" />
+                <line x1="80.5" y1="36.9" x2="78.0" y2="32.6" />
+                <line x1="99.3" y1="28.2" x2="97.6" y2="23.5" />
+                <line x1="119.3" y1="22.8" x2="118.5" y2="17.9" />
+                <line class="reloj-marca--larga" x1="140.0" y1="23.0" x2="140.0" y2="13.0" />
+                <line x1="160.7" y1="22.8" x2="161.5" y2="17.9" />
+                <line x1="180.7" y1="28.2" x2="182.4" y2="23.5" />
+                <line x1="199.5" y1="36.9" x2="202.0" y2="32.6" />
+                <line x1="216.5" y1="48.8" x2="219.7" y2="45.0" />
+                <line class="reloj-marca--larga" x1="229.6" y1="64.8" x2="237.3" y2="58.4" />
+                <line x1="243.1" y1="80.5" x2="247.4" y2="78.0" />
+                <line x1="251.8" y1="99.3" x2="256.5" y2="97.6" />
+                <line x1="257.2" y1="119.3" x2="262.1" y2="118.5" />
+                <line x1="259.0" y1="140.0" x2="264.0" y2="140.0" />
+                <line class="reloj-marca--larga" x1="255.2" y1="160.3" x2="265.1" y2="162.1" />
+                <line x1="251.8" y1="180.7" x2="256.5" y2="182.4" />
+                <line x1="243.1" y1="199.5" x2="247.4" y2="202.0" />
+                <line x1="231.2" y1="216.5" x2="235.0" y2="219.7" />
+                <line x1="216.5" y1="231.2" x2="219.7" y2="235.0" />
+                <line class="reloj-marca--larga" x1="198.5" y1="241.3" x2="203.5" y2="250.0" />
+              </g>
+              <text class="reloj-cifra reloj-cifra--tres" x="17.9" y="210.5" dominant-baseline="middle" text-anchor="middle">3</text>
+              <text class="reloj-cifra reloj-cifra--treinta" x="210.5" y="262.1" dominant-baseline="middle" text-anchor="middle">30</text>
+              <circle class="reloj-riel" cx="140" cy="140" r="110" />
+              <circle class="reloj-avance" data-reloj-avance cx="140" cy="140" r="110" />
+              <!-- Ninguna aguja cruza el centro: ahí va la lectura. El
+                   segundero es una raya corta pegada al aro y la aguja de
+                   los minutos, el botón que monta la punta del arco. -->
+              <g class="reloj-segundero" data-reloj-segundero>
+                <line x1="140" y1="52" x2="140" y2="40" />
+              </g>
+              <g class="reloj-aguja" data-reloj-aguja>
+                <circle cx="140" cy="30" r="9" />
+              </g>
             </svg>
-            <svg class="weather-icon__rain" width="22" height="22" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M7 18h10a4 4 0 0 0 .7-7.94A6 6 0 0 0 6.2 8.8 4.5 4.5 0 0 0 7 18Z" />
-              <path d="M8 20l-1 2M12 20l-1 2M16 20l-1 2" />
-            </svg>
-          </div>
-          <div class="problema-clima-cuerpo">
-            <h3 class="problema-clima-titulo">Bajo el <button class="clima-word clima-word--sol is-active"
-                type="button" data-clima-choice="sol" aria-pressed="true">sol</button> o la <button
-                class="clima-word clima-word--lluvia" type="button" data-clima-choice="lluvia"
-                aria-pressed="false">lluvia</button> de Barranquilla</h3>
-            <p class="weather-text">
-              <span class="weather-text__sol">Cada minuto de espera es un minuto más de calor, sin sombra ni certeza
-                de que valga la pena seguir esperando.</span>
-              <span class="weather-text__lluvia">Y cuando cae el aguacero tampoco hay dónde meterse: se espera igual,
-                mojándose, sin saber si el bus ya pasó.</span>
-            </p>
+              <div class="reloj-lectura">
+                <span class="reloj-tiempo">
+                  <span data-reloj-min>00</span><i aria-hidden="true">:</i><span data-reloj-seg>00</span>
+                </span>
+                <span class="reloj-unidad">min esperando</span>
+              </div>
+            </div>
+
           </div>
         </div>
-
-        <p class="problema-coste reveal" data-reveal-delay="240">
-          Ese tiempo suma: llegadas tarde, citas que se corren, planes que dependen de adivinar.
-        </p>
       </div>
     </section>
 
-
-    <!-- ============ SOLUCIÓN ============ -->
+    <!-- ============ SOLUCIÓN: LOS TRES TOQUES ============ -->
+    <!--
+      Los tres pasos ya no son una lista: son tres momentos. Al entrar sólo
+      está el titular; al bajar, el titular se abre y detrás aparece el
+      primer paso, y cada uno se acerca hasta pasarse de largo para dejar
+      sitio al siguiente. El texto es el mismo de siempre.
+    -->
     <section class="panel panel--mint" id="solucion">
       <div class="panel-dots" aria-hidden="true">
         <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
-          focusable="false"><use href="#trama-rutas" /></svg>
+          focusable="false"><use href="#trama-rutas-solucion" /></svg>
       </div>
-      <div class="panel-inner solucion-grid">
 
-        <div class="solucion-intro reveal">
-          <span class="tracked-eyebrow eyebrow--verde">LA SOLUCIÓN</span>
-          <h2 class="section-title">Tres toques<br />y ya sabes</h2>
-          <p class="section-lead measure">No hay cuenta que crear ni nada que configurar: abres, marcas dónde
-            esperas y eliges la ruta. De ahí en adelante la app trabaja sola.</p>
-          <p class="solucion-nota">Y puedes guardar el teléfono: el aviso llega con Ya Viene en segundo plano.</p>
+      <div class="pista pista--pasos" data-pasos-pista>
+        <div class="escena">
+          <div class="panel-inner panel-inner--ancho pasos-escena">
+            <span class="pasos-fantasma" data-pasos-fantasma aria-hidden="true"></span>
+
+            <div class="pasos-pila">
+              <div class="pasos-portada" data-pasos-portada>
+                <span class="tracked-eyebrow eyebrow--verde">LA SOLUCIÓN</span>
+                <h2 class="section-title">Tres toques<br />y ya sabes</h2>
+                <p class="section-lead measure">No hay cuenta que crear ni nada que configurar: abres, marcas dónde
+                  esperas y eliges la ruta. De ahí en adelante la app trabaja sola.</p>
+                <p class="solucion-nota">Y puedes guardar el teléfono: el aviso llega con Ya Viene en segundo plano.</p>
+              </div>
+
+              <article class="paso" data-paso>
+                <span class="paso-numero">1</span>
+                <h3 class="paso-titulo">Fija tu punto de espera</h3>
+                <p class="paso-texto">Toca el mapa y marca desde dónde esperas. También puedes usar tu GPS para que el
+                  mapa te siga.</p>
+              </article>
+
+              <article class="paso" data-paso>
+                <span class="paso-numero">2</span>
+                <h3 class="paso-titulo">Elige tu ruta</h3>
+                <p class="paso-texto">Selecciona la empresa de transporte que buscas y después la ruta — revisa sus
+                  terminales y buses activos.</p>
+              </article>
+
+              <article class="paso" data-paso>
+                <span class="paso-numero">3</span>
+                <h3 class="paso-titulo">Te avisamos</h3>
+                <p class="paso-texto">Activa el aviso y te notificamos cuando el bus esté a un kilómetro — sigue con lo
+                  tuyo mientras tanto.</p>
+              </article>
+            </div>
+          </div>
         </div>
-
-        <ol class="ruta-pasos reveal" data-reveal-delay="120">
-          <li class="ruta-paso">
-            <span class="ruta-punto">1</span>
-            <div class="ruta-cuerpo">
-              <h3>Fija tu punto de espera</h3>
-              <p>Toca el mapa y marca desde dónde esperas. También puedes usar tu GPS para que el mapa te siga.</p>
-            </div>
-          </li>
-
-          <li class="ruta-paso">
-            <span class="ruta-punto">2</span>
-            <div class="ruta-cuerpo">
-              <h3>Elige tu ruta</h3>
-              <p>Selecciona la empresa de transporte que buscas y después la ruta — revisa sus terminales y buses
-                activos.</p>
-            </div>
-          </li>
-
-          <li class="ruta-paso">
-            <span class="ruta-punto">3</span>
-            <div class="ruta-cuerpo">
-              <h3>Te avisamos</h3>
-              <p>Activa el aviso y te notificamos cuando el bus esté a un kilómetro — sigue con lo tuyo mientras
-                tanto.</p>
-            </div>
-          </li>
-        </ol>
       </div>
     </section>
 
 
-    <!-- ============ CÓMO FUNCIONA ============ -->
-    <section class="panel panel--arena" id="como-funciona">
+    <!-- ============ CÓMO FUNCIONA: EL VISOR ============ -->
+    <!--
+      Antes esto eran cinco tarjetas de texto en fila. El texto es el mismo,
+      palabra por palabra, pero ahora cada pieza se ve: a la derecha va el
+      componente real de la app —la misma hoja, el mismo chip, el mismo
+      botón que dibuja el mockup de arriba, con `--u` y todo—, y el riel de
+      abajo va pasando de una a otra sola. Es una banda a sangre sobre
+      arena, que es el fondo de la app, para que las piezas blancas se
+      despeguen.
+    -->
+    <section class="panel panel--taller panel--sangre" id="como-funciona">
       <div class="panel-dots" aria-hidden="true">
         <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
-          focusable="false"><use href="#trama-rutas" /></svg>
+          focusable="false"><use href="#trama-rutas-anatomia" /></svg>
       </div>
-      <div class="panel-inner">
+      <span class="costura costura--abajo costura--ink" aria-hidden="true"></span>
+
+      <div class="panel-inner panel-inner--ancho visor-cabeza">
         <div class="section-head reveal">
           <span class="tracked-eyebrow eyebrow--tenue">CÓMO FUNCIONA</span>
           <h2 class="section-title">Así se ve en tu bolsillo</h2>
           <p class="section-lead">La misma pantalla del mockup de arriba: ubicación en vivo, tus buses moviéndose sobre
             la ruta real y un aviso a un toque de distancia.</p>
         </div>
+      </div>
 
-        <div class="anatomia-grid">
-          <div class="detail-card detail-card--ancho reveal">
-            <div class="feature-badge feature-badge--num">850</div>
-            <h3>Distancia real, no un cálculo bonito</h3>
-            <p>Un número grande y honesto: los metros que faltan medidos sobre el recorrido, no en línea recta. Un bus
-              no cruza por encima de las manzanas, y el número tampoco.</p>
+      <!--
+        La pista: cinco pantallas de recorrido, una por pieza. La escena se
+        queda pegada mientras tanto, así que bajar no mueve nada de sitio,
+        sólo cambia lo que se enseña.
+      -->
+      <div class="pista pista--visor" data-visor-pista>
+        <div class="escena">
+          <div class="panel-inner panel-inner--ancho visor" data-visor-raiz>
+          <div class="visor-escenario">
+
+            <!-- 1. Distancia -->
+            <div class="visor-vista is-activa" data-visor="distancia" role="tabpanel"
+              id="visor-distancia" aria-labelledby="tab-distancia">
+              <div class="visor-copia">
+                <span class="visor-indice">01 / 05</span>
+                <h3>Distancia real, no un cálculo bonito</h3>
+                <p>Un número grande y honesto: los metros que faltan medidos sobre el recorrido, no en línea recta. Un bus
+                  no cruza por encima de las manzanas, y el número tampoco.</p>
+              </div>
+              <div class="visor-toma">
+                <div class="visor-hoja">
+                  <span class="sheet-handle"></span>
+                  <div class="visor-hoja-cuerpo">
+                    <div class="eta-strip eta-strip--cerca"></div>
+                    <div class="eta-route">C16 Calle 72 Uninorte - B-042</div>
+                    <div class="eta-number">850</div>
+                    <div class="eta-unit">m de ti</div>
+                    <div class="app-cta">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7" />
+                        <path d="M10.2 20a2 2 0 0 0 3.6 0" />
+                      </svg>
+                      <span>AVISARME CUANDO ESTÉ CERCA</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Aviso -->
+            <div class="visor-vista" data-visor="aviso" role="tabpanel" id="visor-aviso"
+              aria-labelledby="tab-aviso">
+              <div class="visor-copia">
+                <span class="visor-indice">02 / 05</span>
+                <h3>Un toque y ya no hay que mirar</h3>
+                <p>"AVISARME CUANDO ESTÉ CERCA" y la notificación llega al kilómetro, con la app en segundo plano y sin
+                  dejarte el teléfono en cero.</p>
+              </div>
+              <div class="visor-toma visor-toma--apilada">
+                <div class="visor-notif">
+                  <div class="notif-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.2" stroke-linecap="round">
+                      <path d="M6 8a6 6 0 0 1 12 0c0 7 -6 11 -6 11s-6 -4 -6 -11" />
+                      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                    </svg>
+                  </div>
+                  <div>
+                    <strong>C16 Calle 72 Uninorte - B-042 está cerca de ti</strong>
+                    <span>Está a 640 m de tu ubicación</span>
+                  </div>
+                </div>
+                <div class="visor-hoja">
+                  <span class="sheet-handle"></span>
+                  <div class="visor-hoja-cuerpo">
+                    <div class="eta-strip eta-strip--cerca"></div>
+                    <div class="eta-route">C16 Calle 72 Uninorte - B-042</div>
+                    <div class="eta-number">640</div>
+                    <div class="eta-unit">m de ti</div>
+                    <div class="eta-detail">Puedes cambiar de aplicación; no cierres Ya Viene del todo</div>
+                    <div class="app-cta active">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M8 12.5l2.8 2.8L16 10" />
+                      </svg>
+                      <span>AVISO ACTIVADO</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Estado -->
+            <div class="visor-vista" data-visor="estado" role="tabpanel" id="visor-estado"
+              aria-labelledby="tab-estado">
+              <div class="visor-copia">
+                <span class="visor-indice">03 / 05</span>
+                <h3>Chip de estado</h3>
+                <p>De "Localizando tu ubicación…" a "Con tu ubicación: 2 buses cerca". Siempre sabes qué está pasando.</p>
+              </div>
+              <div class="visor-toma">
+                <div class="visor-barra">
+                  <div class="app-pill">
+                    <span class="app-pill-btn">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round">
+                        <path d="M4 7h16M4 12h16M4 17h16" />
+                      </svg>
+                    </span>
+                    <span class="app-pill-text">
+                      <span class="app-pill-linea">
+                        <span class="app-pill-dot is-on"></span>
+                        <span class="app-pill-title">C16 Calle 72 Uninorte</span>
+                      </span>
+                      <span class="app-pill-sub is-activa">Ruta activa &middot; Toca para cambiar</span>
+                    </span>
+                    <span class="app-pill-btn">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                        stroke-linecap="round">
+                        <path d="M6 6l12 12M18 6L6 18" />
+                      </svg>
+                    </span>
+                  </div>
+
+                  <div class="app-chip">
+                    <span class="app-chip-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round">
+                        <circle cx="12" cy="12" r="4" />
+                        <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
+                        <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+                      </svg>
+                    </span>
+                    <span class="app-chip-text">Localizando tu ubicación…</span>
+                  </div>
+
+                  <div class="app-chip">
+                    <span class="app-chip-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0
+                          9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" />
+                      </svg>
+                    </span>
+                    <span class="app-chip-text">Con tu ubicación: 2 buses cerca</span>
+                    <span class="app-chip-action">Quitar</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Sin señal -->
+            <div class="visor-vista" data-visor="sinsenal" role="tabpanel" id="visor-sinsenal"
+              aria-labelledby="tab-sinsenal">
+              <div class="visor-copia">
+                <span class="visor-indice">04 / 05</span>
+                <h3>Cuando el bus se calla</h3>
+                <p>Si deja de reportar cinco minutos, se marca <em>sin señal</em> y se apaga a gris. Preferimos decirte que
+                  no sabemos antes que enseñarte una posición vieja.</p>
+              </div>
+              <div class="visor-toma">
+                <div class="visor-hoja">
+                  <span class="sheet-handle"></span>
+                  <div class="visor-hoja-cuerpo visor-mudo">
+                    <svg class="visor-mudo-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 3l19 19" />
+                      <path d="M8.5 16.4a5 5 0 0 1 7 0" />
+                      <path d="M5 12.9a10 10 0 0 1 3.2-2.1M19 12.9a10 10 0 0 0-4.6-2.6" />
+                      <path d="M1.8 9.4A15 15 0 0 1 6.6 6.4M22.2 9.4a15 15 0 0 0-9.9-3.3" />
+                      <circle cx="12" cy="20" r="1" fill="currentColor" stroke="none" />
+                    </svg>
+                    <strong class="visor-mudo-titulo">Sin señal &middot; hace 3 min</strong>
+                    <span class="visor-mudo-sub">C16 Calle 72 Uninorte - B-042 &middot; conserva su última posición</span>
+                    <div class="app-cta is-bloqueado"><span>BUS SIN SEÑAL</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. Rutas -->
+            <div class="visor-vista" data-visor="rutas" role="tabpanel" id="visor-rutas-panel"
+              aria-labelledby="tab-rutas">
+              <div class="visor-copia">
+                <span class="visor-indice">05 / 05</span>
+                <h3>Rutas de verdad</h3>
+                <p>Las seis de Sobusa están trazadas waypoint por waypoint sobre MapLibre GL — el recorrido que ves es el
+                  que hace el bus, con sus terminales y sus vueltas.</p>
+              </div>
+              <div class="visor-toma visor-toma--mapa">
+                <div class="visor-mapa" id="visor-mapa">
+                  <svg class="routes-svg-layer" id="visor-rutas"></svg>
+                </div>
+                <!-- Las seis filas las escribe visor.ts con rutas-landing.ts:
+                     nombre, terminales y kilómetros salen de rutas.json. -->
+                <ul class="visor-lista" data-visor-rutas></ul>
+              </div>
+            </div>
+
           </div>
 
-          <div class="detail-card detail-card--ancho reveal" data-reveal-delay="90">
-            <div class="feature-badge feature-badge--solido">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round">
-                <path d="M6 8a6 6 0 0 1 12 0c0 7 -6 11 -6 11s-6 -4 -6 -11" />
-                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-              </svg>
+          <!--
+            El riel. Hace de índice y de barra de avance a la vez: la pieza
+            activa se llena en los segundos que dura, y al final pasa sola a
+            la siguiente. Con el cursor encima o con el teclado dentro, se
+            para y espera.
+          -->
+          <div class="visor-riel" role="tablist" aria-label="Piezas de la pantalla">
+            <button class="visor-tab is-activa" type="button" role="tab" id="tab-distancia"
+              aria-controls="visor-distancia" aria-selected="true" data-visor-tab="distancia">
+              <span class="visor-tab-nombre">Distancia</span>
+              <span class="visor-tab-barra"><span class="visor-tab-avance"></span></span>
+            </button>
+            <button class="visor-tab" type="button" role="tab" id="tab-aviso" tabindex="-1"
+              aria-controls="visor-aviso" aria-selected="false" data-visor-tab="aviso">
+              <span class="visor-tab-nombre">Aviso</span>
+              <span class="visor-tab-barra"><span class="visor-tab-avance"></span></span>
+            </button>
+            <button class="visor-tab" type="button" role="tab" id="tab-estado" tabindex="-1"
+              aria-controls="visor-estado" aria-selected="false" data-visor-tab="estado">
+              <span class="visor-tab-nombre">Estado</span>
+              <span class="visor-tab-barra"><span class="visor-tab-avance"></span></span>
+            </button>
+            <button class="visor-tab" type="button" role="tab" id="tab-sinsenal" tabindex="-1"
+              aria-controls="visor-sinsenal" aria-selected="false" data-visor-tab="sinsenal">
+              <span class="visor-tab-nombre">Sin señal</span>
+              <span class="visor-tab-barra"><span class="visor-tab-avance"></span></span>
+            </button>
+            <button class="visor-tab" type="button" role="tab" id="tab-rutas" tabindex="-1"
+              aria-controls="visor-rutas-panel" aria-selected="false" data-visor-tab="rutas">
+              <span class="visor-tab-nombre">Rutas</span>
+              <span class="visor-tab-barra"><span class="visor-tab-avance"></span></span>
+            </button>
             </div>
-            <h3>Un toque y ya no hay que mirar</h3>
-            <p>"AVISARME CUANDO ESTÉ CERCA" y la notificación llega al kilómetro, con la app en segundo plano y sin
-              dejarte el teléfono en cero.</p>
-          </div>
-
-          <div class="detail-card reveal" data-reveal-delay="180">
-            <div class="feature-badge feature-badge--tinte">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round">
-                <path d="M20 10c0 6 -8 12 -8 12s-8 -6 -8 -12a8 8 0 0 1 16 0Z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-            </div>
-            <h3>Chip de estado</h3>
-            <p>De "Localizando tu ubicación…" a "Con tu ubicación: 2 buses cerca". Siempre sabes qué está pasando.</p>
-          </div>
-
-          <div class="detail-card reveal" data-reveal-delay="240">
-            <div class="feature-badge feature-badge--gris">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round">
-                <path d="M3 3l18 18" />
-                <path d="M4 7a2 2 0 0 1 2 -2h9" />
-                <path d="M18 5a2 2 0 0 1 2 2v8" />
-                <path d="M4 11v5a2 2 0 0 0 2 2h11" />
-                <circle cx="8" cy="21" r="1" />
-                <circle cx="16" cy="21" r="1" />
-              </svg>
-            </div>
-            <h3>Cuando el bus se calla</h3>
-            <p>Si deja de reportar cinco minutos, se marca <em>sin señal</em> y se apaga a gris. Preferimos decirte que
-              no sabemos antes que enseñarte una posición vieja.</p>
-          </div>
-
-          <div class="detail-card reveal" data-reveal-delay="300">
-            <div class="feature-badge feature-badge--azul">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 6l6 -3l6 3l6 -3v15l-6 3l-6 -3l-6 3z" />
-                <path d="M9 3v15M15 6v15" />
-              </svg>
-            </div>
-            <h3>Rutas de verdad</h3>
-            <p>Las seis de Sobusa están trazadas waypoint por waypoint sobre MapLibre GL — el recorrido que ves es el
-              que hace el bus, con sus terminales y sus vueltas.</p>
           </div>
         </div>
       </div>
     </section>
 
-
     <!-- ============ EMPRESAS & CONTACT ============ -->
-    <section class="panel panel--ink" id="empresas">
+    <section class="panel panel--ink panel--sangre" id="empresas">
       <div class="panel-dots" aria-hidden="true">
         <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
-          focusable="false"><use href="#trama-rutas" /></svg>
+          focusable="false"><use href="#trama-rutas-empresas" /></svg>
       </div>
-      <div class="panel-inner companies-grid">
+      <div class="panel-inner panel-inner--ancho companies-grid">
 
         <div class="companies-info reveal">
           <span class="tracked-eyebrow eyebrow--ambar">PARA EMPRESAS</span>
