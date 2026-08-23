@@ -43,6 +43,19 @@ const PIN_ALTO = 76;
  */
 const RADIO_CERCA_M = 2000;
 
+/**
+ * Encuadre de la cámara sobre el mosaico, en fracciones del mismo.
+ *
+ * No es un acercamiento: la ventana mide 934 x 1982, exactamente lo que
+ * ya cabía en la pantalla del teléfono —la proporción es la misma, 72 a
+ * 152,8—, así que el mapa se ve al mismo tamaño de siempre. Lo único que
+ * cambia es dónde mira: corrida hasta el borde derecho y pegada arriba,
+ * que es donde están el norte de la ciudad, la Vía 40 y Uninorte. Antes
+ * el recorte iba centrado y se comía trozos de las seis rutas por el
+ * este; así, ninguna baja del 78 % de su trazo a la vista.
+ */
+const CAMARA = { x: 350 / 1284, y: 0, w: 934 / 1284, h: 1 };
+
 const nuevo = <K extends keyof SVGElementTagNameMap>(tag: K): SVGElementTagNameMap[K] =>
   document.createElementNS(SVG_NS, tag);
 
@@ -54,6 +67,7 @@ export class PhoneMap {
   private readonly svg: SVGSVGElement;
   private readonly host: HTMLElement;
   private readonly lienzo: { w: number; h: number };
+  private readonly camara: { x: number; y: number; w: number; h: number };
 
   private readonly casingEl: SVGPathElement;
   private readonly activeEl: SVGPathElement;
@@ -77,14 +91,21 @@ export class PhoneMap {
     this.host = host;
 
     const [vx, vy, w, h] = YV_RUTAS.viewBox;
-    this.lienzo = { w, h };
+    this.camara = {
+      x: vx + w * CAMARA.x,
+      y: vy + h * CAMARA.y,
+      w: w * CAMARA.w,
+      h: h * CAMARA.h,
+    };
+    this.lienzo = { w: this.camara.w, h: this.camara.h };
     this.activeRoute = this.rutas[0];
 
     this.svg.replaceChildren();
-    // Encuadre fijo: todo el mosaico. `slice` lo escala hasta cubrir la
-    // pantalla del teléfono y recorta lo que sobra por los lados, sin
-    // deformar nada.
-    this.svg.setAttribute('viewBox', `${vx} ${vy} ${w} ${h}`);
+    // Encuadre fijo sobre el norte de la ciudad. `slice` lo escala hasta
+    // cubrir la pantalla del teléfono y recorta lo que sobre, sin deformar
+    // nada. La imagen sigue entrando entera: lo que la recorta es esto.
+    this.svg.setAttribute('viewBox',
+      `${this.camara.x} ${this.camara.y} ${this.camara.w} ${this.camara.h}`);
     this.svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
 
     const defs = nuevo('defs');
@@ -262,9 +283,10 @@ export class PhoneMap {
     if (!this.largo || rect.width === 0 || rect.height === 0) return 0.5;
 
     // De fracción de pantalla a unidades del mosaico. Con `slice` el
-    // contenido queda centrado, así que el desvío es simétrico.
-    const cx = (fx - 0.5) * rect.width * this.unitsPerPx + this.lienzo.w / 2;
-    const cy = (fy - 0.5) * rect.height * this.unitsPerPx + this.lienzo.h / 2;
+    // contenido queda centrado en la cámara, así que el desvío es simétrico
+    // respecto al centro del recorte —no del mosaico entero.
+    const cx = (fx - 0.5) * rect.width * this.unitsPerPx + this.camara.x + this.camara.w / 2;
+    const cy = (fy - 0.5) * rect.height * this.unitsPerPx + this.camara.y + this.camara.h / 2;
 
     const metros = this.metrosDeRuta;
     const saltos = metros > 0 ? atras.map(m => m / metros) : [];
