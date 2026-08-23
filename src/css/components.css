@@ -2430,7 +2430,7 @@
 
   .panel-mosaico span {
     animation: none !important;
-    opacity: 0.5;
+    opacity: 0;
     transform: none;
   }
 }
