@@ -2317,10 +2317,10 @@
   background:
     radial-gradient(620px circle at 8% 8%, rgba(17, 169, 199, 0.28), transparent 62%),
     radial-gradient(560px circle at 92% 92%, rgba(232, 106, 94, 0.24), transparent 62%),
-    linear-gradient(145deg, #123B59 0%, var(--ink) 52%, var(--ink-deep) 100%);
+  linear-gradient(145deg, #123B59 0%, var(--ink) 52%, var(--ink-deep) 100%);
   margin-bottom: 0;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 24px 64px -28px rgba(4, 12, 29, 0.64);
+  box-shadow: none;
 }
 
 #empresas > .panel-inner {
