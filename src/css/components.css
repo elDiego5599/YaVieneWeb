@@ -1891,10 +1891,10 @@
 
 @keyframes footer-gradient-respiro {
   0% {
-    background-position: 0% 42%, 100% 0%, 50% 50%;
+    background-size: 135% 135%, 115% 115%, 100% 100%;
   }
   100% {
-    background-position: 100% 58%, 0% 12%, 50% 50%;
+    background-size: 155% 155%, 132% 132%, 100% 100%;
   }
 }
 
@@ -2084,15 +2084,16 @@
   position: relative;
   overflow: hidden;
   width: 100%;
-  margin: var(--panel-gap) 0 0;
+  margin: 0;
   padding: clamp(58px, 8vw, 112px) clamp(24px, 5vw, 78px) 24px;
   border: 0;
   border-radius: 0;
   background:
-    radial-gradient(760px circle at 10% 100%, rgba(232, 106, 94, 0.5), transparent 64%),
-    radial-gradient(700px circle at 92% 2%, rgba(255, 193, 7, 0.34), transparent 62%),
-    linear-gradient(145deg, #FFFDF8 0%, #FFF3E8 48%, #FBE7E4 100%);
-  background-size: 180% 180%, 180% 180%, 100% 100%;
+    radial-gradient(640px circle at 50% 112%, rgba(255, 193, 7, 0.38), transparent 64%),
+    radial-gradient(980px circle at 50% 122%, rgba(232, 106, 94, 0.52), transparent 68%),
+    linear-gradient(180deg, #FFFDF8 0%, #FFF5EC 48%, #FBE7E4 100%);
+  background-size: 135% 135%, 115% 115%, 100% 100%;
+  background-position: 50% 100%, 50% 100%, 50% 50%;
   animation: footer-gradient-respiro 10s ease-in-out infinite alternate;
   color: var(--text-primary);
 }
@@ -2317,6 +2318,7 @@
     radial-gradient(620px circle at 8% 8%, rgba(17, 169, 199, 0.28), transparent 62%),
     radial-gradient(560px circle at 92% 92%, rgba(232, 106, 94, 0.24), transparent 62%),
     linear-gradient(145deg, #123B59 0%, var(--ink) 52%, var(--ink-deep) 100%);
+  margin-bottom: 0;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 24px 64px -28px rgba(4, 12, 29, 0.64);
 }
