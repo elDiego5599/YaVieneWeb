@@ -86,38 +86,6 @@
     rgba(0, 0, 0, 0.45) 76%, transparent 100%);
 }
 
-/*
-  El motivo de la página: las mismas curvas de ruta que MapPatternPainter
-  dibuja en la app, no una trama de puntos que podría ser de cualquiera.
-  Cada panel enseña un trozo distinto del lienzo largo definido en el HTML,
-  así la línea baja atravesando la página en lugar de repetirse.
-
-  El color es `currentColor`: sale blanca sobre los paneles de tinta y azul
-  marino sobre los claros, con la misma regla. Y la opacidad es la del
-  painter —0,045 sobre claro— porque esto es textura, no ilustración.
-*/
-.panel-rutas {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  color: var(--navy);
-  opacity: 0.1;
-  /* Se apaga hacia los bordes: si la línea llega hasta la esquina redonda
-     del panel se corta en seco y se nota el recorte. */
-  mask-image: radial-gradient(ellipse 92% 86% at 50% 46%, #000 44%,
-    rgba(0, 0, 0, 0.4) 80%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 92% 86% at 50% 46%, #000 44%,
-    rgba(0, 0, 0, 0.4) 80%, transparent 100%);
-}
-
-.panel--ink .panel-rutas {
-  color: var(--text-white);
-  opacity: 0.16;
-}
-
 /* Sobre tinta el punto blanco pesa más que el azul sobre beige. */
 .panel--ink .panel-dots {
   opacity: 0.09;

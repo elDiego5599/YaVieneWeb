@@ -989,127 +989,111 @@
   border-radius: 6px;
 }
 
-.cards-grid {
+/* ── El problema: banda editorial, no rejilla de tarjetas ──────────────
+   Tres tarjetas iguales reparten el peso a partes iguales, y eso es
+   justo lo que no queremos: la frase que duele —no saber si el bus tarda
+   3 minutos o 30— tiene que sonar más alto que las otras dos. Así que la
+   jerarquía la da el tamaño del texto y su sitio en la rejilla, y no un
+   borde redondeado alrededor de cada párrafo. */
+
+.problema-banda {
   display: grid;
-  gap: 18px;
   grid-template-columns: minmax(0, 1fr);
+  row-gap: clamp(26px, 3.4vw, 44px);
 }
 
-@media (min-width: 760px) {
-  .cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .feature-card--lead {
-    grid-column: span 2;
-  }
+.problema-cabeza {
+  margin-bottom: 0;
 }
 
-/* En pantalla ancha la rejilla deja de ser tres columnas iguales: la causa
-   de todo —no saber cuánto falta— ocupa una columna alta a la izquierda y
-   sus dos consecuencias se apilan al lado. La jerarquía la da el tamaño. */
-@media (min-width: 1100px) {
-  .cards-grid {
-    grid-template-columns: 7fr 5fr;
-    align-items: stretch;
-  }
-
-  .feature-card--lead {
-    grid-column: 1;
-    grid-row: 1 / span 2;
-    justify-content: flex-start;
-    gap: 20px;
-    padding: clamp(38px, 4vw, 56px);
-    border-color: rgba(232, 106, 94, 0.22);
-  }
-
-  #problema[data-clima='sol'] .feature-card--lead {
-    background:
-      radial-gradient(420px circle at 94% 6%, rgba(255, 193, 7, 0.2), transparent 62%),
-      linear-gradient(158deg, rgba(251, 231, 228, 0.92) 0%, rgba(250, 246, 240, 0.88) 62%);
-  }
-
-  #problema[data-clima='lluvia'] .feature-card--lead {
-    background:
-      radial-gradient(420px circle at 94% 6%, rgba(37, 99, 235, 0.14), transparent 62%),
-      linear-gradient(158deg, rgba(238, 245, 255, 0.92) 0%, rgba(248, 251, 255, 0.82) 66%);
-    border-color: rgba(37, 99, 235, 0.16);
-  }
-
-  .feature-card--lead .card-icon {
-    width: 58px;
-    height: 58px;
-    border-radius: 18px;
-  }
-
-  .feature-card--lead .card-icon svg {
-    width: 28px;
-    height: 28px;
-  }
-
-  .feature-card--lead .card-title {
-    font-size: var(--step-h2);
-  }
-
-.feature-card--lead .card-text {
-    max-width: 32ch;
-    font-size: calc(var(--step-body) * 1.06);
-  }
+/* La frase que carga el peso: casi tamaño de titular, y con el ancho de
+   lectura corto para que se lea de golpe y no como párrafo. */
+.problema-lead {
+  max-width: 30ch;
+  font-family: var(--font-display);
+  font-size: clamp(23px, 2.9vw, 38px);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  color: var(--ink);
 }
 
-#problema[data-clima='sol'] .feature-card--lead,
-#problema[data-clima='lluvia'] .feature-card--lead {
-  background-size: 180% 180%, 100% 100%;
-  animation: card-gradient-respiro 9s ease-in-out infinite alternate;
+.problema-regla {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(232, 106, 94, 0.4), rgba(11, 22, 40, 0.1) 42%, transparent);
 }
 
-.feature-card {
-  position: relative;
-  z-index: 1;
+.problema-clima {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(14px, 1.6vw, 22px);
+}
+
+.problema-clima-cuerpo {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: clamp(26px, 3vw, 38px);
-  border-radius: 24px;
-  background: rgba(250, 246, 240, 0.82);
-  border: 1px solid var(--border-subtle);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  gap: 10px;
+  max-width: 56ch;
 }
 
-#problema[data-clima='sol'] .feature-card {
-  background: rgba(250, 246, 240, 0.82);
-  border-color: rgba(217, 119, 6, 0.14);
+.problema-clima-titulo {
+  font-size: var(--step-h3);
+  font-weight: 800;
+  letter-spacing: -0.025em;
 }
 
-#problema[data-clima='lluvia'] .feature-card {
-  background: rgba(248, 251, 255, 0.78);
-  border-color: rgba(37, 99, 235, 0.13);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58);
+.weather-text {
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--text-secondary);
 }
 
-.feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+/* El coste va al final y en voz baja: es la consecuencia, no la noticia.
+   La barra coral a la izquierda lo ata a la regla de arriba. */
+.problema-coste {
+  max-width: 46ch;
+  padding-left: 16px;
+  border-left: 2px solid rgba(232, 106, 94, 0.45);
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--text-secondary);
 }
 
+/* A partir de tablet la banda se desequilibra a propósito: el titular
+   ocupa cinco columnas y la frase grande las siete de la derecha, un poco
+   más abajo. El clima entra sangrado y el coste cierra por la derecha. */
+@media (min-width: 900px) {
+  .problema-banda {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(20px, 3vw, 48px);
+    row-gap: clamp(34px, 4vw, 60px);
+    align-items: start;
+  }
+
+  .problema-cabeza { grid-column: 1 / 6; }
+  .problema-lead   { grid-column: 7 / 13; align-self: end; padding-bottom: 4px; }
+  .problema-regla  { grid-column: 1 / 13; }
+  .problema-clima  { grid-column: 2 / 9; }
+  .problema-coste  { grid-column: 9 / 13; align-self: start; }
+}
+
+/* Sin tarjeta detrás, el cuadro de color volvía a parecer una: el icono
+   se queda en un disco discreto que sólo sirve de ancla al párrafo. */
 .card-icon {
+  flex: none;
   display: grid;
   place-items: center;
   width: 46px;
   height: 46px;
-  border-radius: 14px;
-}
-
-.card-icon.coral {
-  background: var(--coral-light);
-  color: var(--coral);
+  border-radius: 50%;
+  margin-top: 2px;
 }
 
 .card-icon.amber {
   background: var(--amber-tint);
   color: var(--warn);
+  transition: background var(--transition-normal), color var(--transition-normal);
 }
 
 .weather-icon {
@@ -1174,23 +1158,6 @@
   visibility: visible;
   opacity: 1;
   transition-delay: 0s;
-}
-
-.card-icon.green {
-  background: var(--green-tint);
-  color: var(--green-accessible);
-}
-
-.card-title {
-  font-size: var(--step-h3);
-  font-weight: 800;
-  letter-spacing: -0.025em;
-}
-
-.card-text {
-  font-size: var(--step-body);
-  line-height: 1.55;
-  color: var(--text-secondary);
 }
 
 /* ── La solución: intro al lado y los pasos en un riel ─────────────
@@ -1563,15 +1530,6 @@
   }
 }
 
-@keyframes card-gradient-respiro {
-  0% {
-    background-position: 0% 50%, 50% 50%;
-  }
-  100% {
-    background-position: 100% 50%, 50% 50%;
-  }
-}
-
 @keyframes footer-gradient-respiro {
   0% {
     background-position: 0% 42%, 100% 0%, 50% 50%;
@@ -1681,8 +1639,6 @@
   #problema::before,
   #problema::after,
   #problema,
-  #problema[data-clima='sol'] .feature-card--lead,
-  #problema[data-clima='lluvia'] .feature-card--lead,
   .weather-text > span,
   .panel--mint,
   .site-footer {
