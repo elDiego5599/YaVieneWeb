@@ -55,10 +55,10 @@
         <div class="nav-island-inner">
           <nav class="nav-island-links" aria-label="Navegación principal">
             <a href="#problema" class="nav-link">El problema</a>
-            <a href="#como-funciona" class="nav-link">Cómo funciona</a>
+            <a href="#solucion" class="nav-link">Cómo funciona</a>
             <a href="#empresas" class="nav-link">Para empresas</a>
           </nav>
-          <a href="#como-funciona" class="nav-island-cta">Ver la app</a>
+          <a href="#solucion" class="nav-island-cta">Ver la app</a>
         </div>
       </div>
 
@@ -137,7 +137,7 @@
             que llegue el tuyo.</p>
 
           <div class="hero-actions">
-            <a href="#como-funciona" class="btn-primary btn-green">Ver cómo funciona</a>
+            <a href="#solucion" class="btn-primary btn-green">Ver cómo funciona</a>
             <a href="#empresas" class="btn-outline">Para empresas</a>
           </div>
 
@@ -794,310 +794,432 @@
       </div>
     </section>
 
-    <!-- ============ SOLUCIÓN: LOS TRES TOQUES ============ -->
+    <!-- ============ LA SOLUCIÓN: LA APP, PASO A PASO ============ -->
     <!--
-      Los tres pasos ya no son una lista: son tres momentos. Al entrar sólo
-      está el titular; al bajar, el titular se abre y detrás aparece el
-      primer paso, y cada uno se acerca hasta pasarse de largo para dejar
-      sitio al siguiente. El texto es el mismo de siempre.
+      Una sola sección para lo que antes iba partido en "la solución" y "cómo
+      funciona": era el mismo discurso contado dos veces. Ahora es un
+      recorrido. Al entrar sólo está el titular; al bajar, el titular se abre
+      y detrás entra el primer momento —texto a la izquierda, teléfono a la
+      derecha— y cada uno cruza hacia la izquierda para dejar sitio al que
+      viene. Los teléfonos no son fotos fijas: cada uno repite en bucle el
+      gesto del que habla su texto.
     -->
-    <section class="panel panel--mint" id="solucion">
-      <div class="panel-dots" aria-hidden="true">
-        <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
-          focusable="false"><use href="#trama-rutas-solucion" /></svg>
-      </div>
+    <section class="panel panel--mint panel--sangre" id="solucion">
+      <span class="costura costura--abajo costura--ink" aria-hidden="true"></span>
 
       <div class="pista pista--pasos" data-pasos-pista>
         <div class="escena">
           <div class="panel-inner panel-inner--ancho pasos-escena">
-            <span class="pasos-fantasma" data-pasos-fantasma aria-hidden="true"></span>
-
             <div class="pasos-pila">
               <div class="pasos-portada" data-pasos-portada>
                 <span class="tracked-eyebrow eyebrow--verde">LA SOLUCIÓN</span>
                 <h2 class="section-title">Tres toques<br />y ya sabes</h2>
-                <p class="section-lead measure">No hay cuenta que crear ni nada que configurar: abres, marcas dónde
+                <p class="section-lead">No hay cuenta que crear ni nada que configurar: abres, marcas dónde
                   esperas y eliges la ruta. De ahí en adelante la app trabaja sola.</p>
                 <p class="solucion-nota">Y puedes guardar el teléfono: el aviso llega con Ya Viene en segundo plano.</p>
               </div>
 
-              <article class="paso" data-paso>
-                <span class="paso-numero">1</span>
-                <h3 class="paso-titulo">Fija tu punto de espera</h3>
-                <p class="paso-texto">Toca el mapa y marca desde dónde esperas. También puedes usar tu GPS para que el
-                  mapa te siga.</p>
-              </article>
+              <article class="paso" data-paso data-demo="1">
+                <div class="paso-cuerpo">
+                  <span class="paso-numero">1</span>
+                  <h3 class="paso-titulo">Fija tu punto de espera</h3>
+                  <p class="paso-texto">Toca el mapa y marca desde dónde esperas. También puedes usar tu GPS
+                    para que el mapa te siga.</p>
+                  <p class="paso-nota">De "Localizando tu ubicación…" a "Con tu ubicación: 2 buses cerca".
+                    Siempre sabes qué está pasando.</p>
+                </div>
 
-              <article class="paso" data-paso>
-                <span class="paso-numero">2</span>
-                <h3 class="paso-titulo">Elige tu ruta</h3>
-                <p class="paso-texto">Selecciona la empresa de transporte que buscas y después la ruta — revisa sus
-                  terminales y buses activos.</p>
-              </article>
-
-              <article class="paso" data-paso>
-                <span class="paso-numero">3</span>
-                <h3 class="paso-titulo">Te avisamos</h3>
-                <p class="paso-texto">Activa el aviso y te notificamos cuando el bus esté a un kilómetro — sigue con lo
-                  tuyo mientras tanto.</p>
-              </article>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- ============ CÓMO FUNCIONA: EL VISOR ============ -->
-    <!--
-      Antes esto eran cinco tarjetas de texto en fila. El texto es el mismo,
-      palabra por palabra, pero ahora cada pieza se ve: a la derecha va el
-      componente real de la app —la misma hoja, el mismo chip, el mismo
-      botón que dibuja el mockup de arriba, con `--u` y todo—, y el riel de
-      abajo va pasando de una a otra sola. Es una banda a sangre sobre
-      arena, que es el fondo de la app, para que las piezas blancas se
-      despeguen.
-    -->
-    <section class="panel panel--taller panel--sangre" id="como-funciona">
-      <div class="panel-dots" aria-hidden="true">
-        <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
-          focusable="false"><use href="#trama-rutas-anatomia" /></svg>
-      </div>
-      <span class="costura costura--abajo costura--ink" aria-hidden="true"></span>
-
-      <div class="panel-inner panel-inner--ancho visor-cabeza">
-        <div class="section-head reveal">
-          <span class="tracked-eyebrow eyebrow--tenue">CÓMO FUNCIONA</span>
-          <h2 class="section-title">Así se ve en tu bolsillo</h2>
-          <p class="section-lead">La misma pantalla del mockup de arriba: ubicación en vivo, tus buses moviéndose sobre
-            la ruta real y un aviso a un toque de distancia.</p>
-        </div>
-      </div>
-
-      <!--
-        La pista: cinco pantallas de recorrido, una por pieza. La escena se
-        queda pegada mientras tanto, así que bajar no mueve nada de sitio,
-        sólo cambia lo que se enseña.
-      -->
-      <div class="pista pista--visor" data-visor-pista>
-        <div class="escena">
-          <div class="panel-inner panel-inner--ancho visor" data-visor-raiz>
-          <div class="visor-escenario">
-
-            <!-- 1. Distancia -->
-            <div class="visor-vista is-activa" data-visor="distancia" role="tabpanel"
-              id="visor-distancia" aria-labelledby="tab-distancia">
-              <div class="visor-copia">
-                <span class="visor-indice">01 / 05</span>
-                <h3>Distancia real, no un cálculo bonito</h3>
-                <p>Un número grande y honesto: los metros que faltan medidos sobre el recorrido, no en línea recta. Un bus
-                  no cruza por encima de las manzanas, y el número tampoco.</p>
-              </div>
-              <div class="visor-toma">
-                <div class="visor-hoja">
-                  <span class="sheet-handle"></span>
-                  <div class="visor-hoja-cuerpo">
-                    <div class="eta-strip eta-strip--cerca"></div>
-                    <div class="eta-route">C16 Calle 72 Uninorte - B-042</div>
-                    <div class="eta-number">850</div>
-                    <div class="eta-unit">m de ti</div>
-                    <div class="app-cta">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7" />
-                        <path d="M10.2 20a2 2 0 0 0 3.6 0" />
-                      </svg>
-                      <span>AVISARME CUANDO ESTÉ CERCA</span>
+                <div class="paso-toma">
+                  <div class="phone-shell phone-shell--paso">
+                    <span class="phone-key phone-key--power"></span>
+                    <span class="phone-key phone-key--vol"></span>
+                    <div class="phone-screen">
+                      <span class="phone-lens"></span>
+                      <span class="phone-toque" data-el="toque" aria-hidden="true"></span>
+                      <div class="phone-map" id="paso-mapa-1">
+                        <svg class="routes-svg-layer" id="paso-rutas-1"></svg>
+                      </div>
+                      <div class="phone-status">
+                        <span>7:23</span>
+                        <span class="phone-status-glifos">
+                          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                            stroke-linejoin="round">
+                            <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                          </svg>
+                          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                            stroke-linejoin="round">
+                            <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                          </svg>
+                          <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
+                            <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
+                              stroke-width="1.5" opacity="0.5" />
+                            <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
+                            <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                              opacity="0.5" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="phone-topbar">
+                        <div class="app-pill">
+                          <span class="app-pill-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                              stroke-linecap="round">
+                              <path d="M4 7h16M4 12h16M4 17h16" />
+                            </svg>
+                          </span>
+                          <span class="app-pill-text">
+                            <span class="app-pill-linea">
+                              <span class="app-pill-title">¿Qué bus esperas?</span>
+                            </span>
+                            <span class="app-pill-sub">Toca para buscar tu ruta</span>
+                          </span>
+                          <span class="app-pill-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                              stroke-linecap="round">
+                              <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+                              <circle cx="15" cy="7" r="2" />
+                              <circle cx="9" cy="17" r="2" />
+                            </svg>
+                          </span>
+                        </div>
+                        <div class="app-chip" data-el="chip">
+                          <span class="app-chip-icon">
+                            <svg data-icono="gps" data-grupo="chip" hidden viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                              <circle cx="12" cy="12" r="4" />
+                              <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
+                              <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+                            </svg>
+                            <svg data-icono="pin" data-grupo="chip" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0
+                                9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" />
+                            </svg>
+                          </span>
+                          <span class="app-chip-text" data-el="chip-text">Con tu ubicación: 2 buses cerca</span>
+                          <span class="app-chip-action" data-el="chip-action">Quitar</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </article>
 
-            <!-- 2. Aviso -->
-            <div class="visor-vista" data-visor="aviso" role="tabpanel" id="visor-aviso"
-              aria-labelledby="tab-aviso">
-              <div class="visor-copia">
-                <span class="visor-indice">02 / 05</span>
-                <h3>Un toque y ya no hay que mirar</h3>
-                <p>"AVISARME CUANDO ESTÉ CERCA" y la notificación llega al kilómetro, con la app en segundo plano y sin
-                  dejarte el teléfono en cero.</p>
-              </div>
-              <div class="visor-toma visor-toma--apilada">
-                <div class="visor-notif">
-                  <div class="notif-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2.2" stroke-linecap="round">
-                      <path d="M6 8a6 6 0 0 1 12 0c0 7 -6 11 -6 11s-6 -4 -6 -11" />
-                      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                    </svg>
-                  </div>
-                  <div>
-                    <strong>C16 Calle 72 Uninorte - B-042 está cerca de ti</strong>
-                    <span>Está a 640 m de tu ubicación</span>
-                  </div>
+              <article class="paso" data-paso data-demo="2">
+                <div class="paso-cuerpo">
+                  <span class="paso-numero">2</span>
+                  <h3 class="paso-titulo">Elige tu ruta</h3>
+                  <p class="paso-texto">Selecciona la empresa de transporte que buscas y después la ruta —
+                    revisa sus terminales y buses activos.</p>
                 </div>
-                <div class="visor-hoja">
-                  <span class="sheet-handle"></span>
-                  <div class="visor-hoja-cuerpo">
-                    <div class="eta-strip eta-strip--cerca"></div>
-                    <div class="eta-route">C16 Calle 72 Uninorte - B-042</div>
-                    <div class="eta-number">640</div>
-                    <div class="eta-unit">m de ti</div>
-                    <div class="eta-detail">Puedes cambiar de aplicación; no cierres Ya Viene del todo</div>
-                    <div class="app-cta active">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="9" />
-                        <path d="M8 12.5l2.8 2.8L16 10" />
-                      </svg>
-                      <span>AVISO ACTIVADO</span>
+
+                <div class="paso-toma">
+                  <div class="phone-shell phone-shell--paso">
+                    <span class="phone-key phone-key--power"></span>
+                    <span class="phone-key phone-key--vol"></span>
+                    <div class="phone-screen">
+                      <span class="phone-lens"></span>
+                      <span class="phone-toque" data-el="toque" aria-hidden="true"></span>
+                      <div class="phone-map" id="paso-mapa-2">
+                        <svg class="routes-svg-layer" id="paso-rutas-2"></svg>
+                      </div>
+                      <div class="phone-status">
+                        <span>7:23</span>
+                        <span class="phone-status-glifos">
+                          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                            stroke-linejoin="round">
+                            <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                          </svg>
+                          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                            stroke-linejoin="round">
+                            <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                          </svg>
+                          <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
+                            <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
+                              stroke-width="1.5" opacity="0.5" />
+                            <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
+                            <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                              opacity="0.5" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="phone-scrim" data-el="scrim"></div>
+                      <div class="phone-sheet phone-sheet--fija" data-el="sheet">
+                        <span class="sheet-handle"></span>
+                        <div class="sheet-selector">
+                          <div class="sheet-head">
+                            <span class="sheet-head-title">Elige tu ruta</span>
+                          </div>
+                          <span class="sheet-label">EMPRESA</span>
+                          <div class="app-select" data-el="sel-empresa">
+                            <span class="app-select-icon">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3.5 20.5V9.5l7-3.5" />
+                                <path d="M10.5 20.5V4.6a1.6 1.6 0 0 1 1.6-1.6h6.3A1.6 1.6 0 0 1 20 4.6v15.9" />
+                                <path d="M2 20.5h20" />
+                                <path d="M13.5 7.5h3M13.5 11.5h3M13.5 15.5h3" />
+                              </svg>
+                            </span>
+                            <span class="app-select-body">
+                              <span class="app-select-title">Sobusa</span>
+                              <span class="app-select-sub">Empresa de transporte masivo</span>
+                            </span>
+                            <span class="app-select-chevron">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9.5 5l7 7l-7 7" />
+                              </svg>
+                            </span>
+                          </div>
+                          <span class="sheet-label">RUTA</span>
+                          <div class="app-select" data-el="sel-ruta">
+                            <span class="app-select-icon">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 18h4a4 4 0 0 0 4-4V10a4 4 0 0 1 4-4h4" />
+                                <path d="M17 3l3 3l-3 3" />
+                                <circle cx="5" cy="18" r="2" />
+                              </svg>
+                            </span>
+                            <span class="app-select-body">
+                              <span class="app-select-title">C16 Calle 72 Uninorte</span>
+                              <span class="app-select-sub">Granabastos ↔ Uninorte</span>
+                            </span>
+                            <span class="app-select-chevron">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9.5 5l7 7l-7 7" />
+                              </svg>
+                            </span>
+                          </div>
+                          <div class="app-launch" data-el="launch">Ver buses en vivo</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </article>
 
-            <!-- 3. Estado -->
-            <div class="visor-vista" data-visor="estado" role="tabpanel" id="visor-estado"
-              aria-labelledby="tab-estado">
-              <div class="visor-copia">
-                <span class="visor-indice">03 / 05</span>
-                <h3>Chip de estado</h3>
-                <p>De "Localizando tu ubicación…" a "Con tu ubicación: 2 buses cerca". Siempre sabes qué está pasando.</p>
-              </div>
-              <div class="visor-toma">
-                <div class="visor-barra">
-                  <div class="app-pill">
-                    <span class="app-pill-btn">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                        stroke-linecap="round">
-                        <path d="M4 7h16M4 12h16M4 17h16" />
-                      </svg>
-                    </span>
-                    <span class="app-pill-text">
-                      <span class="app-pill-linea">
-                        <span class="app-pill-dot is-on"></span>
-                        <span class="app-pill-title">C16 Calle 72 Uninorte</span>
-                      </span>
-                      <span class="app-pill-sub is-activa">Ruta activa &middot; Toca para cambiar</span>
-                    </span>
-                    <span class="app-pill-btn">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                        stroke-linecap="round">
-                        <path d="M6 6l12 12M18 6L6 18" />
-                      </svg>
-                    </span>
-                  </div>
+              <article class="paso" data-paso data-demo="3">
+                <div class="paso-cuerpo">
+                  <span class="paso-numero">3</span>
+                  <h3 class="paso-titulo">Te avisamos</h3>
+                  <p class="paso-texto">Activa el aviso y te notificamos cuando el bus esté a un kilómetro —
+                    sigue con lo tuyo mientras tanto.</p>
+                  <p class="paso-nota">Un número grande y honesto: los metros que faltan medidos sobre el
+                    recorrido, no en línea recta. Un bus no cruza por encima de las manzanas, y el número
+                    tampoco.</p>
+                </div>
 
-                  <div class="app-chip">
-                    <span class="app-chip-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round">
-                        <circle cx="12" cy="12" r="4" />
-                        <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
-                        <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-                      </svg>
-                    </span>
-                    <span class="app-chip-text">Localizando tu ubicación…</span>
-                  </div>
-
-                  <div class="app-chip">
-                    <span class="app-chip-icon">
-                      <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0
-                          9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" />
-                      </svg>
-                    </span>
-                    <span class="app-chip-text">Con tu ubicación: 2 buses cerca</span>
-                    <span class="app-chip-action">Quitar</span>
+                <div class="paso-toma">
+                  <div class="phone-shell phone-shell--paso">
+                    <span class="phone-key phone-key--power"></span>
+                    <span class="phone-key phone-key--vol"></span>
+                    <div class="phone-screen">
+                      <span class="phone-lens"></span>
+                      <span class="phone-toque" data-el="toque" aria-hidden="true"></span>
+                      <div class="phone-map" id="paso-mapa-3">
+                        <svg class="routes-svg-layer" id="paso-rutas-3"></svg>
+                      </div>
+                      <div class="phone-status">
+                        <span>7:23</span>
+                        <span class="phone-status-glifos">
+                          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                            stroke-linejoin="round">
+                            <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                          </svg>
+                          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                            stroke-linejoin="round">
+                            <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                          </svg>
+                          <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
+                            <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
+                              stroke-width="1.5" opacity="0.5" />
+                            <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
+                            <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                              opacity="0.5" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="phone-notif" data-el="notif">
+                        <span class="phone-notif-icono">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round">
+                            <path d="M6 8a6 6 0 0 1 12 0c0 7 -6 11 -6 11s-6 -4 -6 -11" />
+                            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                          </svg>
+                        </span>
+                        <span class="phone-notif-texto">
+                          <strong data-el="notif-title">C16 Calle 72 Uninorte - B-042 está cerca de ti</strong>
+                          <span data-el="notif-body">Está a 640 m de tu ubicación</span>
+                        </span>
+                      </div>
+                      <div class="phone-sheet phone-sheet--fija" data-el="sheet">
+                        <span class="sheet-handle"></span>
+                        <div class="eta-strip eta-strip--cerca" data-el="eta-bar"></div>
+                        <div class="eta-route" data-el="eta-route">C16 Calle 72 Uninorte - B-042</div>
+                        <div class="eta-number" data-el="eta-value">640</div>
+                        <div class="eta-unit" data-el="eta-unit">m de ti</div>
+                        <div class="eta-detail" data-el="eta-sub">Puedes cambiar de aplicación; no cierres Ya Viene del todo</div>
+                        <div class="app-cta active" data-el="alert-btn">
+                          <svg data-icono="campana" data-grupo="aviso" hidden viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7" />
+                            <path d="M10.2 20a2 2 0 0 0 3.6 0" />
+                          </svg>
+                          <svg data-icono="visto" data-grupo="aviso" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="M8 12.5l2.8 2.8L16 10" />
+                          </svg>
+                          <span data-el="alert-label">AVISO ACTIVADO</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </article>
 
-            <!-- 4. Sin señal -->
-            <div class="visor-vista" data-visor="sinsenal" role="tabpanel" id="visor-sinsenal"
-              aria-labelledby="tab-sinsenal">
-              <div class="visor-copia">
-                <span class="visor-indice">04 / 05</span>
-                <h3>Cuando el bus se calla</h3>
-                <p>Si deja de reportar cinco minutos, se marca <em>sin señal</em> y se apaga a gris. Preferimos decirte que
-                  no sabemos antes que enseñarte una posición vieja.</p>
-              </div>
-              <div class="visor-toma">
-                <div class="visor-hoja">
-                  <span class="sheet-handle"></span>
-                  <div class="visor-hoja-cuerpo visor-mudo">
-                    <svg class="visor-mudo-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M2 3l19 19" />
-                      <path d="M8.5 16.4a5 5 0 0 1 7 0" />
-                      <path d="M5 12.9a10 10 0 0 1 3.2-2.1M19 12.9a10 10 0 0 0-4.6-2.6" />
-                      <path d="M1.8 9.4A15 15 0 0 1 6.6 6.4M22.2 9.4a15 15 0 0 0-9.9-3.3" />
-                      <circle cx="12" cy="20" r="1" fill="currentColor" stroke="none" />
-                    </svg>
-                    <strong class="visor-mudo-titulo">Sin señal &middot; hace 3 min</strong>
-                    <span class="visor-mudo-sub">C16 Calle 72 Uninorte - B-042 &middot; conserva su última posición</span>
-                    <div class="app-cta is-bloqueado"><span>BUS SIN SEÑAL</span></div>
+              <article class="paso" data-paso data-demo="4">
+                <div class="paso-cuerpo">
+                  <span class="paso-etiqueta">Sin señal</span>
+                  <h3 class="paso-titulo">Cuando el bus se calla</h3>
+                  <p class="paso-texto">Si deja de reportar cinco minutos, se marca <em>sin señal</em> y se
+                    apaga a gris. Preferimos decirte que no sabemos antes que enseñarte una posición vieja.</p>
+                </div>
+
+                <div class="paso-toma">
+                  <div class="phone-shell phone-shell--paso">
+                    <span class="phone-key phone-key--power"></span>
+                    <span class="phone-key phone-key--vol"></span>
+                    <div class="phone-screen">
+                      <span class="phone-lens"></span>
+                      <span class="phone-toque" data-el="toque" aria-hidden="true"></span>
+                      <div class="phone-map" id="paso-mapa-4">
+                        <svg class="routes-svg-layer" id="paso-rutas-4"></svg>
+                      </div>
+                      <div class="phone-status">
+                        <span>7:23</span>
+                        <span class="phone-status-glifos">
+                          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                            stroke-linejoin="round">
+                            <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                          </svg>
+                          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                            stroke-linejoin="round">
+                            <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                          </svg>
+                          <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
+                            <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
+                              stroke-width="1.5" opacity="0.5" />
+                            <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
+                            <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                              opacity="0.5" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="phone-sheet phone-sheet--fija" data-el="sheet">
+                        <span class="sheet-handle"></span>
+                        <div class="eta-strip eta-strip--mudo" data-el="eta-bar"></div>
+                        <div class="eta-route" data-el="eta-route">C16 Calle 72 Uninorte - B-042</div>
+                        <div class="sheet-mudo">
+                          <svg class="sheet-mudo-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3l19 19" />
+                            <path d="M8.5 16.4a5 5 0 0 1 7 0" />
+                            <path d="M5 12.9a10 10 0 0 1 3.2-2.1M19 12.9a10 10 0 0 0-4.6-2.6" />
+                            <path d="M1.8 9.4A15 15 0 0 1 6.6 6.4M22.2 9.4a15 15 0 0 0-9.9-3.3" />
+                            <circle cx="12" cy="20" r="1" fill="currentColor" stroke="none" />
+                          </svg>
+                          <strong class="sheet-mudo-titulo">Sin señal &middot; hace 3 min</strong>
+                          <span class="sheet-mudo-sub">Conserva su última posición</span>
+                        </div>
+                        <div class="app-cta is-bloqueado"><span>BUS SIN SEÑAL</span></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </article>
 
-            <!-- 5. Rutas -->
-            <div class="visor-vista" data-visor="rutas" role="tabpanel" id="visor-rutas-panel"
-              aria-labelledby="tab-rutas">
-              <div class="visor-copia">
-                <span class="visor-indice">05 / 05</span>
-                <h3>Rutas de verdad</h3>
-                <p>Las seis de Sobusa están trazadas waypoint por waypoint sobre MapLibre GL — el recorrido que ves es el
-                  que hace el bus, con sus terminales y sus vueltas.</p>
-              </div>
-              <div class="visor-toma visor-toma--mapa">
-                <div class="visor-mapa" id="visor-mapa">
-                  <svg class="routes-svg-layer" id="visor-rutas"></svg>
+              <article class="paso" data-paso data-demo="5">
+                <div class="paso-cuerpo">
+                  <span class="paso-etiqueta">Rutas</span>
+                  <h3 class="paso-titulo">Rutas de verdad</h3>
+                  <p class="paso-texto">Las seis de Sobusa están trazadas waypoint por waypoint sobre MapLibre
+                    GL — el recorrido que ves es el que hace el bus, con sus terminales y sus vueltas.</p>
+                  <!-- Las seis filas las escribe rutas-lista.ts con rutas-landing.ts:
+                       nombre, terminales y kilómetros salen de rutas.json. -->
+                  <ul class="paso-rutas" data-rutas-lista></ul>
                 </div>
-                <!-- Las seis filas las escribe visor.ts con rutas-landing.ts:
-                     nombre, terminales y kilómetros salen de rutas.json. -->
-                <ul class="visor-lista" data-visor-rutas></ul>
-              </div>
+
+                <div class="paso-toma">
+                  <div class="phone-shell phone-shell--paso">
+                    <span class="phone-key phone-key--power"></span>
+                    <span class="phone-key phone-key--vol"></span>
+                    <div class="phone-screen">
+                      <span class="phone-lens"></span>
+                      <span class="phone-toque" data-el="toque" aria-hidden="true"></span>
+                      <div class="phone-map" id="paso-mapa-5">
+                        <svg class="routes-svg-layer" id="paso-rutas-5"></svg>
+                      </div>
+                      <div class="phone-status">
+                        <span>7:23</span>
+                        <span class="phone-status-glifos">
+                          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                            stroke-linejoin="round">
+                            <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                          </svg>
+                          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                            stroke-linejoin="round">
+                            <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                          </svg>
+                          <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
+                            <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
+                              stroke-width="1.5" opacity="0.5" />
+                            <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
+                            <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                              opacity="0.5" />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </article>
             </div>
 
-          </div>
-
-          <!--
-            El riel. Hace de índice y de barra de avance a la vez: la pieza
-            activa se llena en los segundos que dura, y al final pasa sola a
-            la siguiente. Con el cursor encima o con el teclado dentro, se
-            para y espera.
-          -->
-          <div class="visor-riel" role="tablist" aria-label="Piezas de la pantalla">
-            <button class="visor-tab is-activa" type="button" role="tab" id="tab-distancia"
-              aria-controls="visor-distancia" aria-selected="true" data-visor-tab="distancia">
-              <span class="visor-tab-nombre">Distancia</span>
-              <span class="visor-tab-barra"><span class="visor-tab-avance"></span></span>
-            </button>
-            <button class="visor-tab" type="button" role="tab" id="tab-aviso" tabindex="-1"
-              aria-controls="visor-aviso" aria-selected="false" data-visor-tab="aviso">
-              <span class="visor-tab-nombre">Aviso</span>
-              <span class="visor-tab-barra"><span class="visor-tab-avance"></span></span>
-            </button>
-            <button class="visor-tab" type="button" role="tab" id="tab-estado" tabindex="-1"
-              aria-controls="visor-estado" aria-selected="false" data-visor-tab="estado">
-              <span class="visor-tab-nombre">Estado</span>
-              <span class="visor-tab-barra"><span class="visor-tab-avance"></span></span>
-            </button>
-            <button class="visor-tab" type="button" role="tab" id="tab-sinsenal" tabindex="-1"
-              aria-controls="visor-sinsenal" aria-selected="false" data-visor-tab="sinsenal">
-              <span class="visor-tab-nombre">Sin señal</span>
-              <span class="visor-tab-barra"><span class="visor-tab-avance"></span></span>
-            </button>
-            <button class="visor-tab" type="button" role="tab" id="tab-rutas" tabindex="-1"
-              aria-controls="visor-rutas-panel" aria-selected="false" data-visor-tab="rutas">
-              <span class="visor-tab-nombre">Rutas</span>
-              <span class="visor-tab-barra"><span class="visor-tab-avance"></span></span>
-            </button>
+            <!--
+              El riel hace de índice y de barra de avance a la vez: el momento
+              activo se llena mientras dura y tocar uno lleva la página hasta
+              su tramo, que es la única manera de que el scroll y los botones
+              no se peleen.
+            -->
+            <div class="pasos-riel" role="group" aria-label="Momentos de la app">
+              <button class="pasos-tab is-activa" type="button"
+                aria-label="Ir a: Punto de espera" data-pasos-tab="0">
+                <span class="pasos-tab-nombre">Punto de espera</span>
+                <span class="pasos-tab-barra"><span class="pasos-tab-avance"></span></span>
+              </button>
+              <button class="pasos-tab" type="button"
+                aria-label="Ir a: Ruta" tabindex="-1" data-pasos-tab="1">
+                <span class="pasos-tab-nombre">Ruta</span>
+                <span class="pasos-tab-barra"><span class="pasos-tab-avance"></span></span>
+              </button>
+              <button class="pasos-tab" type="button"
+                aria-label="Ir a: Aviso" tabindex="-1" data-pasos-tab="2">
+                <span class="pasos-tab-nombre">Aviso</span>
+                <span class="pasos-tab-barra"><span class="pasos-tab-avance"></span></span>
+              </button>
+              <button class="pasos-tab" type="button"
+                aria-label="Ir a: Sin señal" tabindex="-1" data-pasos-tab="3">
+                <span class="pasos-tab-nombre">Sin señal</span>
+                <span class="pasos-tab-barra"><span class="pasos-tab-avance"></span></span>
+              </button>
+              <button class="pasos-tab" type="button"
+                aria-label="Ir a: Rutas" tabindex="-1" data-pasos-tab="4">
+                <span class="pasos-tab-nombre">Rutas</span>
+                <span class="pasos-tab-barra"><span class="pasos-tab-avance"></span></span>
+              </button>
             </div>
           </div>
         </div>
@@ -1172,7 +1294,7 @@
       <h2>La ciudad se mueve contigo.</h2>
       <p>Menos adivinar, más llegar. Ya Viene convierte cada ruta de Barranquilla en una respuesta en tiempo real.</p>
       <div class="footer-actions">
-        <a href="#como-funciona" class="btn-primary btn-green">Explorar la app</a>
+        <a href="#solucion" class="btn-primary btn-green">Explorar la app</a>
       </div>
       <p class="footer-cta-note">En movimiento con Sobusa y sus 6 rutas reales.</p>
     </div>
@@ -1190,7 +1312,7 @@
         <div class="footer-nav-group">
           <span>Explora</span>
           <a href="#problema">El problema</a>
-          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#solucion">Cómo funciona</a>
         </div>
         <div class="footer-nav-group">
           <span>Conecta</span>

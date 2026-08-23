@@ -29,8 +29,8 @@
   por ancho que sea, el ojo ve dónde termina. Estas dejan el margen y el
   radio y toman la ventana entera, así la página alterna tarjeta y banda en
   vez de apilar seis veces la misma forma. Sólo lo llevan las secciones que
-  cargan color o producto —la franja de datos, el visor y empresas—; el
-  hero y las dos del medio siguen flotando, que es lo que hace el contraste.
+  cargan color o producto —la franja de datos, la solución y empresas—; el
+  hero y el problema siguen flotando, que es lo que hace el contraste.
 */
 .panel--sangre {
   margin-left: 0;
@@ -228,7 +228,7 @@
    Una pista es un bloque de varias pantallas de alto con una escena
    pegada dentro. Mientras la pista cruza la ventana la escena se queda
    quieta y lo que cambia es lo que hay dentro: el reloj corre, los pasos
-   se acercan, el visor pasa de una pieza a otra. `--tramos` dice cuántos
+   se relevan de uno en uno. `--tramos` dice cuántos
    momentos tiene y `--paso` cuánto scroll cuesta cada uno.
 
    Cuidado con `overflow` en cualquier antepasado: `hidden` convierte al
@@ -239,6 +239,14 @@
   --paso: 82vh;
   position: relative;
   height: calc(var(--tramos) * var(--paso) + 100vh);
+}
+
+/* La solución pide más scroll por momento que las demás pistas: en la
+   mitad de cada turno el teléfono se queda quieto haciendo su demo, y ese
+   descanso tiene que durar lo que dura la demo. Si el tramo fuera corto,
+   la cinta se llevaría la animación a media frase. */
+.pista--pasos {
+  --paso: 112vh;
 }
 
 .escena {

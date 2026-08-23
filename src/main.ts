@@ -19,13 +19,14 @@ import './css/animations.css';
 
 import { ContactForm } from './contact-form';
 import { NavIsland } from './nav-island';
+import { PasoDemo } from './paso-demo';
+import { Pasos } from './pasos';
 import { PhoneMap } from './phone-map';
 import { PhoneSimulator } from './phone-simulator';
-import { Pasos } from './pasos';
 import { ProblemWeather } from './problem-weather';
 import { Reloj } from './reloj';
+import { RutasLista } from './rutas-lista';
 import { ScrollEffects } from './scroll-effects';
-import { Visor } from './visor';
 
 const arrancar = (): void => {
   // Apariciones al entrar en pantalla: no depende de nada más.
@@ -73,20 +74,41 @@ const arrancar = (): void => {
   const pistaReloj = document.querySelector<HTMLElement>('[data-reloj-pista]');
   if (pistaReloj) new Reloj(pistaReloj);
 
-  const pistaPasos = document.querySelector<HTMLElement>('[data-pasos-pista]');
-  if (pistaPasos) new Pasos(pistaPasos);
-
   /*
-    El visor lleva su propio mapa: el mismo mosaico y las mismas seis
-    polilíneas del teléfono, en un marco vertical, para que la pieza de las
-    rutas enseñe la que se toca en la lista de al lado.
+    La solución: cinco momentos sobre una cinta, cada uno con su propio
+    teléfono. Los mapas son el mismo mosaico y las mismas seis polilíneas
+    del hero, uno por momento, porque cada guion mueve su bus a su ritmo.
+
+    Los cuatro primeros llevan demo; el quinto no, porque ahí quien manda
+    es la lista de rutas de al lado. `Pasos` avisa cuál está quieto en el
+    centro y sólo ése se anima: así la sección nunca tiene más de un bucle
+    corriendo, y la animación se ve entera antes de dar paso a la
+    siguiente.
   */
-  const pistaVisor = document.querySelector<HTMLElement>('[data-visor-pista]');
-  if (pistaVisor) {
-    const svgVisor = document.querySelector<SVGSVGElement>('#visor-rutas');
-    const lienzoVisor = document.querySelector<HTMLElement>('#visor-mapa');
-    const mapaVisor = svgVisor && lienzoVisor ? new PhoneMap(svgVisor, lienzoVisor) : null;
-    new Visor(pistaVisor, mapaVisor);
+  const pistaPasos = document.querySelector<HTMLElement>('[data-pasos-pista]');
+  if (pistaPasos) {
+    const pasos = new Pasos(pistaPasos);
+    const demos = new Map<number, PasoDemo>();
+
+    for (const paso of pistaPasos.querySelectorAll<HTMLElement>('[data-paso]')) {
+      const numero = Number(paso.dataset.demo);
+      const capa = paso.querySelector<SVGSVGElement>('.routes-svg-layer');
+      const lienzo = paso.querySelector<HTMLElement>('.phone-map');
+      if (!capa || !lienzo || !Number.isFinite(numero)) continue;
+
+      const mapa = new PhoneMap(capa, lienzo);
+      if (numero === 5) {
+        const lista = paso.querySelector<HTMLElement>('[data-rutas-lista]');
+        if (lista) new RutasLista(lista, mapa);
+        else mapa.showRoute(true);
+        continue;
+      }
+      demos.set(numero - 1, new PasoDemo(paso, mapa, numero));
+    }
+
+    pasos.alReposo = (indice) => {
+      for (const [i, demo] of demos) demo.activar(i === indice);
+    };
   }
 };
 

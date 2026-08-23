@@ -58,8 +58,9 @@
   --panel-radius: 28px;
   --panel-gap: 14px;
   --content-max: 1480px;
-  /* Las bandas que enseñan producto respiran más: la escena del visor y el
-     mapa panorámico se quedaban encajonados a 1360 en una pantalla grande. */
+  /* Las bandas que enseñan producto respiran más: la escena de la solución
+     y el mapa panorámico se quedaban encajonados a 1360 en una pantalla
+     grande. */
   --content-wide: 1680px;
   --measure: 62ch;
 

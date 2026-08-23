@@ -819,7 +819,7 @@
 }
 
 /* colorUrgencia() de phone-simulator.ts: dentro del kilómetro la barra pasa
-   a ámbar. A 850 y a 640 metros —los dos casos del visor—, es el que toca. */
+   a ámbar. A los 640 metros del tercer momento, es el que toca. */
 .eta-strip--cerca {
   background: var(--warn);
 }
@@ -1290,4 +1290,216 @@
   font-size: calc(14 * var(--u));
   font-weight: 700;
   color: var(--green);
+}
+
+/* ── El teléfono de cada momento de la solución ──────────────────────
+   Es el mismo aparato del hero, más pequeño porque comparte fila con el
+   texto. Todo lo de dentro cuelga de `--u`, así que basta con cambiarle
+   el ancho: la app se reescala entera y sigue midiendo lo que mide en el
+   teléfono de verdad.
+*/
+.phone-shell--paso {
+  --ancho: clamp(232px, 21vw, 330px);
+}
+
+/* Sin la segunda columna el teléfono va debajo del texto, y a 232 px de
+   ancho no cabrían los dos en la misma pantalla. */
+@media (max-width: 759px) {
+  .phone-shell--paso {
+    --ancho: clamp(128px, 34vw, 180px);
+  }
+}
+
+/* El punto donde cae el dedo. La demo lo coloca sobre lo que va a tocar y
+   lanza la onda; entre toque y toque no está en ninguna parte. */
+.phone-toque {
+  position: absolute;
+  z-index: 60;
+  width: calc(56 * var(--u));
+  height: calc(56 * var(--u));
+  margin: calc(-28 * var(--u)) 0 0 calc(-28 * var(--u));
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 calc(2 * var(--u)) rgba(255, 255, 255, 0.7);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.phone-toque.is-on {
+  animation: paso-toque 0.62s var(--ease-out-cubic);
+}
+
+@keyframes paso-toque {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  28% {
+    opacity: 0.95;
+    transform: scale(0.72);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/*
+  La notificación asomada por arriba, como la manda Android con la app en
+  segundo plano: tarjeta blanca a 16 del borde, bajo la barra de estado.
+  El texto es el de bus_notification_service.dart, igual que el del hero.
+*/
+.phone-notif {
+  position: absolute;
+  z-index: 50;
+  top: calc(52 * var(--u));
+  left: calc(16 * var(--u));
+  right: calc(16 * var(--u));
+  display: flex;
+  align-items: flex-start;
+  gap: calc(10 * var(--u));
+  padding: calc(12 * var(--u)) calc(14 * var(--u));
+  border-radius: calc(20 * var(--u));
+  background: #FFFFFF;
+  box-shadow: 0 calc(10 * var(--u)) calc(28 * var(--u)) rgba(20, 39, 78, 0.24);
+}
+
+.phone-notif-icono {
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--green-tint);
+  color: var(--green-accessible);
+}
+
+.phone-notif-icono svg {
+  width: calc(14 * var(--u));
+  height: calc(14 * var(--u));
+  display: block;
+}
+
+.phone-notif-texto {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(3 * var(--u));
+}
+
+.phone-notif-texto strong {
+  font-size: calc(12 * var(--u));
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--app-text-primary);
+}
+
+.phone-notif-texto span {
+  font-size: calc(11.5 * var(--u));
+  line-height: 1.25;
+  color: var(--app-text-secondary);
+}
+
+/* ── El bus que se calló ──
+   eta_bottom_sheet.dart cambia la hoja entera cuando pasan cinco minutos
+   sin reporte: la barra y el número se van, y en su sitio queda el aviso
+   de que la posición es vieja. Gris de textDisabled, sin verde ninguno. */
+.eta-strip--mudo {
+  background: var(--app-text-disabled);
+}
+
+.sheet-mudo {
+  margin-top: calc(20 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  text-align: center;
+  color: var(--app-text-disabled);
+}
+
+.sheet-mudo-icono {
+  width: calc(30 * var(--u));
+  height: calc(30 * var(--u));
+  display: block;
+}
+
+.sheet-mudo-titulo {
+  font-size: calc(15 * var(--u));
+  font-weight: 800;
+  color: var(--app-text-secondary);
+}
+
+.sheet-mudo-sub {
+  font-size: calc(12.5 * var(--u));
+  line-height: 1.3;
+  color: var(--app-text-disabled);
+}
+
+/* Buses sin reporte: la app los apaga al gris de bus_marker.dart en vez de
+   dejarlos rojos donde estuvieron por última vez. */
+.routes-svg-layer.es-mudo .map-bus-art rect {
+  fill: var(--bus-ghost);
+}
+
+.routes-svg-layer.es-mudo .map-bus {
+  opacity: 0.72;
+}
+
+/*
+  Estados del guion. Sin JavaScript —o con las animaciones desactivadas—
+  el teléfono se queda en la foto final de su momento, que es la que
+  cuenta el texto de al lado. `es-guion` sólo la pone paso-demo.ts al
+  arrancar, y a partir de ahí las piezas entran y salen a su turno.
+*/
+.es-guion .app-chip,
+.es-guion .phone-notif {
+  opacity: 0;
+  transform: translateY(calc(-10 * var(--u)));
+  transition:
+    opacity 0.32s var(--ease-out-cubic),
+    transform 0.32s var(--ease-out-cubic);
+}
+
+.es-guion .app-chip.is-on,
+.es-guion .phone-notif.is-on {
+  opacity: 1;
+  transform: none;
+}
+
+.es-guion .phone-scrim {
+  opacity: 0;
+  transition: opacity 0.38s var(--ease-out-cubic);
+}
+
+.es-guion .phone-scrim.is-on {
+  opacity: 1;
+}
+
+.es-guion .phone-sheet--fija {
+  transform: translateY(102%);
+  transition: transform 0.46s var(--ease-spring);
+}
+
+.es-guion .phone-sheet--fija.is-on {
+  transform: none;
+}
+
+/* El hundido del dedo: lo que hace un InkWell al recibir el toque. */
+.app-select,
+.app-launch,
+.app-cta {
+  transition:
+    transform 0.18s var(--ease-out-cubic),
+    filter 0.18s var(--ease-out-cubic),
+    background-color 0.25s var(--ease-out-cubic),
+    box-shadow 0.25s var(--ease-out-cubic);
+}
+
+.app-select.is-pulsado,
+.app-launch.is-pulsado,
+.app-cta.is-pulsado {
+  transform: scale(0.965);
+  filter: brightness(0.94);
 }

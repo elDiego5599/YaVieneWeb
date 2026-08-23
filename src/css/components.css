@@ -1326,21 +1326,33 @@
   color: var(--text-muted);
 }
 
-/* ── La solución: los tres toques, uno encima de otro ──────────────────
-   Todo vive en la misma celda de la rejilla. Al entrar sólo está el
-   titular; al bajar, el titular se acerca hasta pasarse de largo y detrás
-   aparece el primer paso, y así con los tres. Cada paso entra un poco más
-   metido hacia dentro que el anterior, así el ojo cruza la página en vez
-   de leer tres renglones clavados al mismo margen. */
+/* ── La solución: la app, momento a momento ───────────────────────────
+   Una sola sección para lo que antes iba en dos. Todo vive en la misma
+   celda de la rejilla: al entrar sólo está el titular, a tamaño de
+   portada; al bajar, el titular se abre y detrás entra el primer momento.
+
+   Cada momento son dos columnas —el texto a la izquierda, el teléfono a la
+   derecha— y se relevan cruzando hacia la izquierda: el que llega viene
+   del margen izquierdo, desenfocado, y se asienta; el que se va sigue
+   hacia allá. Las dos columnas no viajan lo mismo —el teléfono va más
+   corto—, y ese desfase es lo que da la profundidad. */
 .pasos-escena {
   position: relative;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(26px, 3vw, 46px);
 }
 
+/* La cinta no usa todo el panel: con el teléfono plantado en el centro,
+   un contenedor de 1680 dejaría media pantalla muerta a la derecha. El
+   riel de abajo sí lo usa entero, y ese contraste de anchos es parte de
+   lo que evita que la sección parezca dos líneas rectas. */
 .pasos-pila {
   display: grid;
   width: 100%;
-  min-height: clamp(300px, 42vh, 460px);
+  max-width: min(100%, 1180px);
+  margin-inline: auto;
+  min-height: clamp(420px, 64vh, 660px);
   align-items: center;
 }
 
@@ -1348,32 +1360,80 @@
 .paso {
   grid-area: 1 / 1;
   align-self: center;
-  justify-self: start;
   will-change: transform, opacity, filter;
 }
 
+/* ── La portada ──
+   Centrada y del tamaño de un titular de apertura: es lo único que hay en
+   pantalla cuando la sección empieza, así que no compite con nada. */
 .pasos-portada {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 18px;
-  transform-origin: 12% 50%;
+  align-items: center;
+  justify-self: center;
+  gap: clamp(18px, 2vw, 30px);
+  text-align: center;
+  transform-origin: 50% 50%;
 }
 
+.pasos-portada .section-title {
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 1rem + 9vw, 9rem);
+  font-weight: 800;
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+}
+
+.pasos-portada .section-lead {
+  max-width: 44ch;
+  font-size: clamp(1.15rem, 0.9rem + 1.05vw, 1.9rem);
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+/* Centrada, la barra verde no puede ir al costado: pasa a ser un filo
+   arriba, que es lo que sí acompaña a un texto centrado. */
+.pasos-portada .solucion-nota {
+  max-width: 42ch;
+  padding: clamp(12px, 1.2vw, 18px) 0 0;
+  border-left: 0;
+  border-top: 2px solid var(--green);
+  font-size: clamp(1rem, 0.9rem + 0.45vw, 1.25rem);
+}
+
+/* ── Cada momento ── */
 .paso {
+  display: grid;
+  gap: clamp(24px, 3vw, 60px);
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+  transform-origin: 50% 50%;
+}
+
+/* Dos columnas partidas por la mitad. El teléfono se pega al principio de
+   la segunda, así que su borde cae justo en el eje de la página: queda a
+   la derecha del texto pero prácticamente en el centro, que es donde se
+   mira. Y baja un poco respecto a la frase, para que las dos cosas no
+   arranquen a la misma altura como en una tabla. */
+@media (min-width: 920px) {
+  .paso {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    justify-items: start;
+  }
+
+  .paso-toma {
+    justify-self: start;
+    margin-top: clamp(24px, 5vh, 76px);
+  }
+}
+
+.paso-cuerpo {
   display: flex;
   flex-direction: column;
-  gap: clamp(12px, 1.4vw, 18px);
-  max-width: 44ch;
-  transform-origin: 20% 50%;
-}
-
-.paso:nth-of-type(2) {
-  margin-left: clamp(0px, 7vw, 130px);
-}
-
-.paso:nth-of-type(3) {
-  margin-left: clamp(0px, 14vw, 260px);
+  align-items: flex-start;
+  gap: clamp(12px, 1.4vw, 20px);
+  max-width: 48ch;
 }
 
 .paso-numero {
@@ -1389,9 +1449,23 @@
   box-shadow: 0 12px 26px var(--green-glow);
 }
 
+/* Los dos últimos momentos no son toques: no llevan número, llevan
+   nombre. Es la misma marca de sitio sin mentir sobre la cuenta. */
+.paso-etiqueta {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid rgba(0, 168, 89, 0.3);
+  color: var(--green-accessible);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
 .paso-titulo {
   font-family: var(--font-display);
-  font-size: clamp(1.9rem, 1.1rem + 2.6vw, 3.4rem);
+  font-size: clamp(2rem, 1.1rem + 2.8vw, 3.6rem);
   font-weight: 700;
   line-height: 1.02;
   letter-spacing: -0.035em;
@@ -1399,354 +1473,67 @@
 }
 
 .paso-texto {
-  max-width: 40ch;
+  max-width: 42ch;
   font-size: var(--step-lead);
   line-height: 1.5;
   color: var(--text-secondary);
 }
 
-/* El número del paso, gigante y apagado contra el borde: sirve de marca
-   de sitio —se sabe por dónde va uno sin contar— y de contrapeso al texto,
-   que está todo a la izquierda. */
-.pasos-fantasma {
-  position: absolute;
-  top: 50%;
-  right: clamp(4px, 1.2vw, 28px);
-  transform: translateY(-50%);
-  font-family: var(--font-display);
-  font-size: clamp(190px, 32vw, 480px);
-  font-weight: 800;
-  line-height: 0.8;
-  letter-spacing: -0.06em;
-  color: var(--green);
-  opacity: 0;
-  transition: opacity 0.7s var(--ease-out-cubic);
-  pointer-events: none;
-  user-select: none;
-}
-
-.pasos-fantasma.is-visible {
-  opacity: 0.08;
-}
-
-/* La cabecera del visor va suelta, antes de la pista: si entrara en la
-   escena pegada se comería el alto que necesitan las piezas. */
-.visor-cabeza {
-  padding-bottom: 0;
-}
-
-/*
-  Sin animaciones: fuera la pila, fuera el maquillaje. Los pasos, los
-  golpes de texto del problema y las cinco piezas del visor se leen de
-  arriba abajo como una lista de toda la vida.
-*/
-@media (prefers-reduced-motion: reduce) {
-  .problema-beat {
-    opacity: 1;
-    transform: none;
-  }
-
-  .pasos-pila {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(32px, 4vw, 60px);
-    min-height: 0;
-  }
-
-  .pasos-portada,
-  .paso {
-    grid-area: auto;
-    margin-left: 0;
-  }
-
-  .pasos-fantasma {
-    display: none;
-  }
-
-  .visor-escenario {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(40px, 5vw, 76px);
-  }
-
-  .visor-vista {
-    grid-area: auto;
-  }
-
-  .visor-riel {
-    display: none;
-  }
-}
-
-/* ── El visor ──────────────────────────────────────────────────────
-   Cinco piezas de la app, una a la vez: el texto a la izquierda y el
-   componente real a la derecha —la misma hoja, el mismo chip y el mismo
-   botón del mockup, dibujados con `--u` como en el teléfono—. El riel de
-   abajo hace de índice y de reloj: la barra de la pieza activa se llena y
-   al terminar pasa sola a la siguiente.
-
-   Las vistas se apilan en la misma celda de la rejilla en vez de esconder
-   las inactivas con `display: none`. Así el alto del escenario lo fija la
-   pieza más alta y la banda no pega un salto cada vez que cambia. */
-.visor {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(26px, 2.6vw, 40px);
-}
-
-.visor-escenario {
-  display: grid;
-}
-
-.visor-vista {
-  grid-area: 1 / 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: clamp(26px, 3vw, 56px);
-  align-content: center;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(12px);
-  transition:
-    opacity 0.4s var(--ease-out-cubic),
-    transform 0.5s var(--ease-out-cubic),
-    visibility 0.4s;
-}
-
-.visor-vista.is-activa {
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-}
-
-@media (min-width: 960px) {
-  .visor-vista {
-    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
-    align-items: center;
-  }
-}
-
-/* ── Columna de texto ── */
-
-.visor-copia {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  align-self: center;
-}
-
-.visor-indice {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-muted);
-}
-
-.visor-copia h3 {
-  font-family: var(--font-display);
-  font-size: clamp(1.55rem, 1.05rem + 1.6vw, 2.5rem);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.032em;
-  text-wrap: balance;
-  color: var(--ink);
-}
-
-.visor-copia p {
-  max-width: 44ch;
-  font-size: var(--step-lead);
-  line-height: 1.5;
-  color: var(--text-secondary);
-}
-
-.visor-copia em {
+.paso-texto em {
   font-style: normal;
   font-weight: 700;
   color: var(--bus-ghost);
 }
 
-/* ── Escenario de producto ──
-   Un fondo frío —el mismo #F8FAFC del hero— para que las piezas de la app
-   se despeguen: la hoja es arena y la píldora es blanca, y sobre blanco no
-   se verían. `container-type` da el `cqw` con el que se mide toda la
-   interfaz; el tope de 1,15 px por unidad la deja a tamaño de teléfono
-   aunque el escenario sea mucho más ancho. */
-.visor-toma {
+/* El apunte: la letra pequeña de esa misma pantalla. Va más
+   apagado que el texto, porque es letra pequeña, no titular. */
+.paso-nota {
+  max-width: 42ch;
+  padding-left: 16px;
+  border-left: 2px solid rgba(0, 168, 89, 0.34);
+  font-size: var(--step-body);
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* ── La columna del teléfono ──
+   Un halo detrás para despegarlo del degradado menta: sin él, el titanio
+   claro del riel se funde con el fondo y el aparato pierde el canto. */
+.paso-toma {
   position: relative;
+  will-change: transform;
   display: grid;
   place-items: center;
-  align-content: center;
-  gap: clamp(14px, 1.6vw, 24px);
-  min-height: clamp(320px, 30vw, 440px);
-  padding: clamp(26px, 3vw, 48px);
-  border-radius: clamp(20px, 2vw, 30px);
-  background: linear-gradient(158deg, #F8FAFC 0%, #EDF1F6 100%);
-  border: 1px solid var(--divider);
-  overflow: hidden;
-  container-type: inline-size;
-  --u: min(0.24272cqw, 1.15px);
+  justify-self: center;
 }
 
-/* La trama del mapa, apagada, para que el escenario no sea un rectángulo
-   liso: es la misma retícula que la de los paneles. */
-.visor-toma::before {
+.paso-toma::before {
   content: '';
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-  color: var(--navy);
-  background-image:
-    radial-gradient(circle at 50% 50%, currentColor 0 1.6px, transparent 1.9px),
-    radial-gradient(circle at 50% 50%, currentColor 0 1.6px, transparent 1.9px);
-  background-size: 34px 68px;
-  background-position: 13px -6px, 1px 28px;
-  opacity: 0.055;
+  inset: -6% -16%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(20, 39, 78, 0.18), transparent 74%);
+  filter: blur(14px);
 }
 
-.visor-toma > * {
+.paso-toma > * {
   position: relative;
-  z-index: 1;
 }
 
-/* ── La hoja de ETA, suelta ──
-   Los mismos números que dentro del teléfono; lo único que cambia es que
-   aquí flota, así que se redondea por los cuatro lados en vez de sólo por
-   arriba. */
-.visor-hoja {
-  width: min(100%, calc(412 * var(--u)));
-  padding: calc(14 * var(--u)) 0 calc(26 * var(--u));
-  border-radius: calc(32 * var(--u));
-  background: var(--arena);
-  box-shadow: 0 calc(20 * var(--u)) calc(48 * var(--u)) rgba(20, 39, 78, 0.16);
-}
-
-.visor-hoja-cuerpo {
-  padding: 0 calc(24 * var(--u));
-}
-
-/* Con el aviso puesto la tarjeta de notificación va encima de la hoja,
-   que es donde sale en el teléfono. */
-.visor-toma--apilada {
-  align-content: center;
-  gap: clamp(16px, 2vw, 26px);
-}
-
-.visor-notif {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  max-width: min(100%, 330px);
-  padding: 13px 18px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow:
-    0 16px 36px -8px rgba(11, 22, 40, 0.14),
-    0 4px 12px -2px rgba(11, 22, 40, 0.06);
-}
-
-.visor-notif strong {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.25;
-  color: var(--text-primary);
-}
-
-.visor-notif span {
-  display: block;
-  margin-top: 2px;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-/* ── Píldora y chips ──
-   Las tres piezas de la barra de arriba, en el orden en que aparecen: la
-   píldora con ruta puesta y el chip en sus dos estados. */
-.visor-barra {
-  width: min(100%, calc(412 * var(--u)));
-  display: flex;
-  flex-direction: column;
-  gap: calc(12 * var(--u));
-  padding: 0 calc(20 * var(--u));
-}
-
-/* ── Bus sin señal ──
-   Calcado de eta_bottom_sheet.dart: el ícono coral de wifi cortado, la
-   antigüedad de la última posición y el botón bloqueado en gris. */
-.visor-mudo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.visor-mudo-icono {
-  width: calc(56 * var(--u));
-  height: calc(56 * var(--u));
-  margin: calc(10 * var(--u)) 0;
-  color: var(--coral);
-}
-
-.visor-mudo-titulo {
-  font-size: calc(18 * var(--u));
-  font-weight: 800;
-  letter-spacing: calc(-0.4 * var(--u));
-  color: #475569;
-}
-
-.visor-mudo-sub {
-  margin-top: calc(4 * var(--u));
-  font-size: calc(13.5 * var(--u));
-  font-weight: 600;
-  line-height: 1.35;
-  color: var(--app-text-disabled);
-}
-
-.visor-mudo .app-cta {
-  width: 100%;
-  margin-top: calc(24 * var(--u));
-}
-
-/* ── Las seis rutas ──
-   El mapa a la izquierda y la lista a la derecha. Tocar una fila cambia la
-   ruta dibujada, y la lista va sola mientras la pieza está a la vista. */
-.visor-toma--mapa {
-  grid-template-columns: minmax(0, 1fr);
-  place-items: stretch;
-  gap: clamp(18px, 2vw, 30px);
-}
-
-@media (min-width: 620px) {
-  .visor-toma--mapa {
-    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
-    align-items: center;
-  }
-}
-
-.visor-mapa {
-  position: relative;
-  aspect-ratio: 72 / 118;
-  max-height: clamp(330px, 34vw, 470px);
-  margin: 0 auto;
-  width: 100%;
-  border-radius: clamp(14px, 1.4vw, 20px);
-  overflow: hidden;
-  background: var(--arena);
-  box-shadow: 0 18px 40px -14px rgba(11, 22, 40, 0.3);
-}
-
-.visor-lista {
+/* ── Las seis rutas, en el último momento ──
+   Es la única pieza con la que se puede jugar: al tocar una fila, el mapa
+   del teléfono de al lado redibuja su recorrido. */
+.paso-rutas {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.visor-ruta {
+.paso-ruta {
   display: flex;
   align-items: baseline;
   gap: 4px 10px;
@@ -1765,17 +1552,17 @@
     color var(--transition-fast);
 }
 
-.visor-ruta:hover {
-  background: rgba(11, 22, 40, 0.04);
+.paso-ruta:hover {
+  background: rgba(11, 22, 40, 0.05);
 }
 
-.visor-ruta.is-activa {
+.paso-ruta.is-activa {
   background: var(--surface);
   color: var(--text-secondary);
   box-shadow: var(--shadow-sm);
 }
 
-.visor-ruta-nombre {
+.paso-ruta-nombre {
   font-size: 14px;
   font-weight: 700;
   letter-spacing: -0.2px;
@@ -1783,33 +1570,91 @@
   transition: color var(--transition-fast);
 }
 
-.visor-ruta.is-activa .visor-ruta-nombre {
+.paso-ruta.is-activa .paso-ruta-nombre {
   color: var(--ink);
 }
 
-.visor-ruta-datos {
+.paso-ruta-datos {
   font-size: 12.5px;
   font-variant-numeric: tabular-nums;
 }
 
 /* ── El riel ──
-   Índice y reloj a la vez. La barra de la pieza activa se llena en los
-   segundos que dura; al llenarse, visor.ts pasa a la siguiente. */
-.visor-riel {
+   Índice y barra de avance a la vez: el momento activo se llena mientras
+   dura y tocar uno lleva la página hasta su tramo. Sólo aparece cuando la
+   portada ya se fue; antes no hay nada que indexar. */
+.pasos-riel {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 22px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 18px 10px;
   padding-top: clamp(18px, 2vw, 26px);
   border-top: 1px solid rgba(11, 22, 40, 0.1);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition:
+    opacity 0.5s var(--ease-out-cubic),
+    transform 0.5s var(--ease-out-cubic);
 }
 
-@media (min-width: 760px) {
-  .visor-riel {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+.pasos-riel.is-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+/* En un teléfono no cabe la sección entera con el mockup a tamaño de
+   escaparate: el momento se apila —frase arriba, aparato abajo— y todo
+   encoge lo justo para que quepa de una pantalla sin scroll interno. El
+   riel se queda en cinco columnas pero pierde los nombres: lo que hace
+   falta ahí es saber por dónde va la cinta, no leer un índice. */
+@media (max-width: 759px) {
+  .pasos-pila {
+    min-height: clamp(300px, 58vh, 470px);
+  }
+
+  .paso {
+    gap: clamp(16px, 4vw, 26px);
+  }
+
+  .paso-titulo {
+    font-size: clamp(1.55rem, 1.05rem + 2.4vw, 2.1rem);
+  }
+
+  .paso-texto {
+    font-size: var(--step-body);
+  }
+
+  .paso-nota {
+    font-size: 0.875rem;
+  }
+
+  /* Las seis rutas son la lista más larga de la sección y la que decide
+     cuánto mide la cinta entera. En vertical se aprietan: mismo texto,
+     menos aire. */
+  .paso-ruta {
+    gap: 1px 8px;
+    padding: 5px 10px;
+  }
+
+  .paso-ruta-nombre {
+    font-size: 13px;
+  }
+
+  .paso-ruta-datos {
+    font-size: 11.5px;
+  }
+
+  .pasos-riel {
+    gap: 0 8px;
+  }
+
+  .pasos-tab-nombre {
+    display: none;
   }
 }
 
-.visor-tab {
+.pasos-tab {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1826,25 +1671,53 @@
   transition: color var(--transition-normal);
 }
 
-.visor-tab:hover,
-.visor-tab.is-activa {
+.pasos-tab:hover,
+.pasos-tab.is-activa {
   color: var(--ink);
 }
 
-.visor-tab-barra {
+.pasos-tab-barra {
   height: 2px;
   border-radius: 999px;
   background: rgba(11, 22, 40, 0.12);
   overflow: hidden;
 }
 
-.visor-tab-avance {
+.pasos-tab-avance {
   display: block;
-  /* Lo pone visor.ts con lo que lleva recorrido el tramo. */
+  /* Lo pone pasos.ts con lo que lleva recorrido el tramo. */
   width: var(--avance, 0%);
   height: 100%;
   border-radius: 999px;
   background: var(--green);
+}
+
+/*
+  Sin animaciones: fuera la pila, fuera el maquillaje. Los momentos y los
+  golpes de texto del problema se leen de arriba abajo como una lista de
+  toda la vida, y el riel sobra porque ya no hay nada que recorrer.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .problema-beat {
+    opacity: 1;
+    transform: none;
+  }
+
+  .pasos-pila {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(44px, 5vw, 84px);
+    min-height: 0;
+  }
+
+  .pasos-portada,
+  .paso {
+    grid-area: auto;
+  }
+
+  .pasos-riel {
+    display: none;
+  }
 }
 
 @keyframes weather-icon-in {
@@ -2307,12 +2180,6 @@
     linear-gradient(125deg, #E6F7F0 0%, #FFF8E1 50%, #FBE7E4 100%);
 }
 
-#como-funciona {
-  background:
-    linear-gradient(90deg, rgba(17, 169, 199, 0.1) 0 13%, transparent 13% 100%),
-    linear-gradient(180deg, #FFFDF8 0%, #FAF6F0 100%);
-}
-
 #empresas {
   background:
     radial-gradient(620px circle at 8% 8%, rgba(17, 169, 199, 0.28), transparent 62%),
@@ -2472,7 +2339,6 @@
 @media (prefers-reduced-motion: reduce) {
   .stats-panel,
   #solucion,
-  #como-funciona,
   #empresas {
     animation: none !important;
   }
