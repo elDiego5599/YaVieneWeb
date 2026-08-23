@@ -558,7 +558,9 @@
   display: none;
   position: relative;
   z-index: 5;
-  transform: translateY(7%);
+  /* Los laterales bajan un pelo, lo justo para que el central sobresalga.
+     Más que esto y dejan de leerse como un grupo: cuelgan. */
+  transform: translateY(2.5%);
 }
 
 .hero-phone-side .phone-shell {
