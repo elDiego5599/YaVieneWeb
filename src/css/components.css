@@ -2340,13 +2340,14 @@
   position: relative;
   min-width: 0;
   min-height: 0;
-  border: 1px solid transparent;
+  border: 1px solid rgba(var(--cell-color), 0.24);
   border-radius: 3px;
-  background: transparent;
-  box-shadow: none;
+  background: linear-gradient(145deg, rgba(var(--cell-color), 0.8), rgba(var(--cell-color), 0.12));
+  box-shadow: 0 0 0 rgba(var(--cell-color), 0);
   opacity: 0;
   transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.94);
-  animation: mosaico-celda-respiro 9.4s ease-in-out infinite;
+  will-change: opacity, transform, box-shadow;
+  animation: mosaico-celda-respiro 11.5s ease-in-out infinite;
   animation-delay: var(--pulse-delay);
 }
 
@@ -2385,38 +2386,37 @@
 @keyframes mosaico-celda-respiro {
   0%, 100% {
     opacity: 0;
-    background: transparent;
-    border-color: transparent;
     transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.94);
-    box-shadow: none;
+    box-shadow: 0 0 0 rgba(var(--cell-color), 0);
   }
-  34% {
+  42% {
     opacity: 0;
-    background: transparent;
-    border-color: transparent;
     transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.96);
-    box-shadow: none;
   }
-  56% {
-    opacity: 0.28;
-    background: linear-gradient(145deg, rgba(var(--cell-color), 0.34), rgba(var(--cell-color), 0.08));
-    border-color: rgba(var(--cell-color), 0.22);
+  52% {
+    opacity: 0.06;
+    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.975);
+    box-shadow: 0 0 4px rgba(var(--cell-color), 0.05);
+  }
+  63% {
+    opacity: 0.42;
+    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.995);
+    box-shadow: 0 0 13px rgba(var(--cell-color), 0.2);
+  }
+  69% {
+    opacity: 0.7;
     transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(1);
-    box-shadow: 0 0 12px rgba(var(--cell-color), 0.18);
+    box-shadow: 0 0 24px rgba(var(--cell-color), 0.34), 0 0 6px rgba(255, 255, 255, 0.1);
   }
-  72% {
-    opacity: 0.82;
-    background: linear-gradient(145deg, rgba(var(--cell-color), 0.82), rgba(var(--cell-color), 0.24));
-    border-color: rgba(255, 255, 255, 0.38);
-    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.97);
-    box-shadow: 0 0 28px rgba(var(--cell-color), 0.46), 0 0 6px rgba(255, 255, 255, 0.16);
+  76% {
+    opacity: 0.34;
+    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.98);
+    box-shadow: 0 0 11px rgba(var(--cell-color), 0.16);
   }
   86% {
-    opacity: 0;
-    background: transparent;
-    border-color: transparent;
+    opacity: 0.02;
     transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.95);
-    box-shadow: none;
+    box-shadow: 0 0 1px rgba(var(--cell-color), 0.02);
   }
 }
 
