@@ -2325,14 +2325,15 @@
   inset: 0;
   z-index: 0;
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-template-rows: repeat(5, minmax(0, 1fr));
-  gap: clamp(5px, 0.8vw, 12px);
-  padding: clamp(28px, 5vw, 76px);
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  grid-template-rows: repeat(7, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  gap: clamp(5px, 0.75vw, 11px);
+  padding: clamp(32px, 5vw, 82px);
   pointer-events: none;
-  opacity: 0.72;
-  mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 84%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 84%, transparent 100%);
+  opacity: 0.78;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 88%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 88%, transparent 100%);
 }
 
 .panel-mosaico::after {
@@ -2345,44 +2346,71 @@
 
 .panel-mosaico span {
   --cell-color: 17, 169, 199;
+  --pulse-delay: 0s;
   position: relative;
   min-width: 0;
   min-height: 0;
   border: 1px solid rgba(255, 255, 255, 0.11);
-  border-radius: 4px;
+  border-radius: 3px;
   background: linear-gradient(145deg, rgba(var(--cell-color), 0.22), rgba(var(--cell-color), 0.035));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  opacity: 0.32;
-  transform: scale(0.93);
-  animation: mosaico-celda-pulso 5.4s cubic-bezier(0.22, 0.8, 0.25, 1) infinite;
-  animation-delay: calc(var(--i) * -0.09s);
+  opacity: 0.18;
+  transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.94);
+  animation: mosaico-celda-respiro 9.4s ease-in-out infinite;
+  animation-delay: var(--pulse-delay);
 }
 
-.panel-mosaico span:nth-child(5n + 2) { --cell-color: 0, 168, 89; }
-.panel-mosaico span:nth-child(7n + 3) { --cell-color: 255, 193, 7; }
-.panel-mosaico span:nth-child(9n + 5) { --cell-color: 232, 106, 94; }
-.panel-mosaico span:nth-child(11n + 7) { --cell-color: 109, 211, 232; }
+.panel-mosaico span:nth-child(5n + 2) {
+  --cell-color: 0, 168, 89;
+  grid-column: span 2;
+}
 
-@keyframes mosaico-celda-pulso {
-  0%, 56%, 100% {
-    opacity: 0.2;
-    transform: scale(0.93);
+.panel-mosaico span:nth-child(7n + 3) {
+  --cell-color: 255, 193, 7;
+  grid-row: span 2;
+}
+
+.panel-mosaico span:nth-child(9n + 5) {
+  --cell-color: 232, 106, 94;
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.panel-mosaico span:nth-child(11n + 7) {
+  --cell-color: 109, 211, 232;
+  --shift-y: 4px;
+}
+
+/* Fases repetidas, pero distribuidas por la trama: varias piezas respiran
+   juntas sin formar una ola ni una secuencia demasiado evidente. */
+.panel-mosaico span:nth-child(8n + 1) { --pulse-delay: -0.7s; }
+.panel-mosaico span:nth-child(8n + 2) { --pulse-delay: -2.9s; }
+.panel-mosaico span:nth-child(8n + 3) { --pulse-delay: -5.1s; }
+.panel-mosaico span:nth-child(8n + 4) { --pulse-delay: -7.4s; }
+.panel-mosaico span:nth-child(8n + 5) { --pulse-delay: -1.8s; }
+.panel-mosaico span:nth-child(8n + 6) { --pulse-delay: -4.2s; }
+.panel-mosaico span:nth-child(8n + 7) { --pulse-delay: -6.5s; }
+.panel-mosaico span:nth-child(8n + 8) { --pulse-delay: -8.2s; }
+
+@keyframes mosaico-celda-respiro {
+  0%, 100% {
+    opacity: 0.14;
+    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.94);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-  66% {
-    opacity: 0.64;
-    transform: scale(0.985);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 16px rgba(var(--cell-color), 0.2);
+  34% {
+    opacity: 0.2;
+    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.96);
   }
-  74% {
-    opacity: 0.96;
-    transform: scale(1);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 26px rgba(var(--cell-color), 0.38);
+  56% {
+    opacity: 0.68;
+    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 0 22px rgba(var(--cell-color), 0.3);
   }
-  84% {
+  72% {
     opacity: 0.34;
-    transform: scale(0.96);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.97);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 9px rgba(var(--cell-color), 0.12);
   }
 }
 
