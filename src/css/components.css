@@ -399,47 +399,42 @@
   transform: translateY(-2px);
 }
 
-/* ── Hero Split Layout (2 Columnas Amplias) ───────────────────────── */
+/* ── Hero: copy centrado y el escenario de tres teléfonos ─────────── */
 .hero-panel {
   margin-top: calc(var(--gutter) * -1 - 50px);
   padding-top: 96px;
 }
 
+/*
+  Una sola columna. El titular manda arriba, a lo ancho, y debajo va el
+  escenario; el reparto en dos columnas dejaba el teléfono peleando con el
+  texto por el mismo eje y ninguno de los dos ganaba.
+*/
 .hero-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: clamp(48px, 5vw, 80px);
+  gap: clamp(40px, 4.5vw, 68px);
   width: 100%;
   max-width: 1550px;
   margin: 0 auto;
-  padding: clamp(36px, 4vw, 64px) clamp(24px, 4.5vw, 80px);
-}
-
-@media (min-width: 1024px) {
-  .hero-grid {
-    /* La escena pide algo más que la columna de texto: dentro van el
-       teléfono y, a los lados, los dos carriles donde caen los avisos. */
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.18fr);
-    justify-content: space-between;
-    gap: clamp(40px, 4vw, 90px);
-  }
+  padding: clamp(36px, 4vw, 64px) clamp(24px, 4.5vw, 80px) clamp(24px, 3vw, 44px);
 }
 
 .hero-copy {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
+  align-items: center;
+  text-align: center;
   gap: 22px;
-  max-width: 640px;
+  max-width: 940px;
 }
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(48px, 5.5vw, 82px);
+  font-size: clamp(48px, 7vw, 112px);
   font-weight: 900;
-  line-height: 0.98;
+  line-height: 0.92;
   letter-spacing: -0.04em;
   color: var(--text-primary);
   margin: 0;
@@ -451,10 +446,10 @@
 }
 
 .hero-description {
-  font-size: clamp(18px, 1.5vw, 22px);
+  font-size: clamp(18px, 1.6vw, 23px);
   line-height: 1.5;
   color: var(--text-secondary);
-  max-width: 540px;
+  max-width: 620px;
   margin-top: 4px;
 }
 
@@ -462,7 +457,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 16px;
   margin-top: 10px;
 }
@@ -473,32 +468,45 @@
   margin-top: 2px;
 }
 
-/* ── Escena del hero (Columna Derecha: Celular + Buses + Píldoras) ─── */
+/* ── Escena del hero: el escenario de tres teléfonos ───────────────── */
 /*
-  La escena reparte su ancho en tres: el teléfono al centro y un carril a
-  cada lado para los avisos. Como el teléfono está centrado, cada carril
-  mide `50% - --tel/2 - --aire`, y las tarjetas se anclan al borde interior
-  del carril con ese mismo cálculo. Así no se solapan con el aparato por
-  construcción, sin números a ojo que haya que recalcular cada vez que
-  cambie el tamaño del teléfono.
+  El escenario son tres aparatos: el central, que es la demo que corre
+  sola, y dos laterales quietos con las dos pantallas que ve cualquiera al
+  abrir la app —la de entrada y el selector de ruta—. Los laterales miden
+  tres cuartos del central y se meten un poco por debajo, así que el ancho
+  del grupo no es la suma de los tres sino:
+
+      escenario = central + 2 × (lateral − solape)
+
+  Ese número es la referencia de todo lo demás. A cada lado queda un
+  carril —`50% − escenario/2 − aire`— y ahí van, sin tocarse, la tarjeta de
+  ruta y dos buses a la izquierda, y dos buses y el aviso a la derecha. Al
+  estar anclados con la misma cuenta, cambiar el tamaño del teléfono
+  recoloca la escena entera sola, sin números a ojo.
 */
 .hero-scene {
   --tel: 288px;
-  /* Aire entre el marco del teléfono y la tarjeta. */
-  --aire: 14px;
-  /* Lo que la tarjeta puede asomar por fuera de la escena: a la izquierda
-     hacia el hueco entre columnas, a la derecha hacia el margen de la
-     página. Cero mientras no haya sitio de sobra. */
-  --sobrante: 0px;
-  --carril: calc(50% - var(--tel) / 2 - var(--aire) + var(--sobrante));
+  /* Las proporciones del grupo salen de medir la referencia: los laterales
+     casi tan altos como el central y metidos un dedo por debajo, para que
+     los tres se lean como un solo objeto y no como tres estampas. */
+  --lado: calc(var(--tel) * 0.93);
+  --solape: calc(var(--lado) * 0.16);
+  /* Mientras los laterales no estén en pantalla el escenario es el
+     teléfono central a secas, y los carriles vuelven a ser los de antes. */
+  --escenario: var(--tel);
+  /* Aire entre el marco del aparato de la punta y lo que caiga al lado. */
+  --aire: 20px;
+  --carril: calc(50% - var(--escenario) / 2 - var(--aire));
+  /* Alto del aparato central: el marco es un Pixel 9, 152,8 × 72 mm. */
+  --alto-tel: calc(var(--tel) * 152.8 / 72);
 
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 680px;
-  min-height: 600px;
+  max-width: 1440px;
+  min-height: calc(var(--alto-tel) + 72px);
   margin: 0 auto;
   pointer-events: none;
   overflow: visible;
@@ -510,21 +518,27 @@
   }
 }
 
-@media (min-width: 1024px) {
+/*
+  Los laterales sólo entran cuando hay carril de sobra para ellos y para
+  las tarjetas: por debajo de esto el grupo se comería los avisos, así que
+  la escena vuelve a ser un solo teléfono.
+*/
+@media (min-width: 1400px) {
   .hero-scene {
-    margin-left: auto;
-    margin-right: 0;
-    /* Ya hay hueco entre columnas y margen de página: las tarjetas pueden
-       asomar un poco por fuera de la escena sin tocar nada. */
-    --sobrante: 26px;
+    --tel: 340px;
+    --escenario: calc(var(--tel) + 2 * (var(--lado) - var(--solape)));
   }
 }
 
-/* Contenedor del teléfono con su atribución debajo */
+.hero-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenedor del teléfono central: por encima de los dos laterales. */
 .hero-phone-wrap {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   position: relative;
   z-index: 10;
 }
@@ -535,8 +549,43 @@
   --ancho: var(--tel);
 }
 
-.hero-phone-wrap .map-credit {
-  margin-top: 12px;
+/*
+  Los laterales: más chicos, un pelo más abajo y por debajo del central.
+  El halo verde va a media luz — tres halos encendidos al mismo tiempo
+  emborronaban el hueco entre aparatos.
+*/
+.hero-phone-side {
+  display: none;
+  position: relative;
+  z-index: 5;
+  transform: translateY(7%);
+}
+
+.hero-phone-side .phone-shell {
+  --ancho: var(--lado);
+}
+
+.hero-phone-side .phone-shell::before {
+  opacity: 0.5;
+}
+
+.hero-phone-side--izq {
+  margin-right: calc(var(--solape) * -1);
+}
+
+.hero-phone-side--der {
+  margin-left: calc(var(--solape) * -1);
+}
+
+@media (min-width: 1400px) {
+  .hero-phone-side {
+    display: block;
+  }
+}
+
+/* La atribución cuelga de la escena entera: hay dos mapas, no uno. */
+.hero-grid > .map-credit {
+  margin-top: -14px;
   font-size: 11px;
   color: var(--text-muted);
   text-align: center;
@@ -547,7 +596,9 @@
 .bus-floating-svg {
   position: absolute;
   z-index: 20;
-  width: clamp(144px, 16vw, 176px);
+  /* Nunca más anchos que su carril: si el carril se estrecha, el bus se
+     encoge antes que asomarse fuera de la escena. */
+  width: min(clamp(144px, 16vw, 176px), var(--carril));
   filter: drop-shadow(0 16px 28px rgba(11, 22, 40, 0.16)) drop-shadow(0 4px 10px rgba(11, 22, 40, 0.08));
   pointer-events: none;
   transform: translateZ(0);
@@ -570,29 +621,37 @@
   image-rendering: high-quality;
 }
 
-/* 1. Sobusa — Arriba a la derecha */
+/*
+  Los cuatro buses viven en los carriles, anclados por su borde interior al
+  costado del escenario: nunca pisan un teléfono, por construcción. Se
+  reparten tres alturas distintas a cada lado para que no queden en fila.
+*/
+/* Carril derecho, arriba — la tarjeta de ruta ocupa el izquierdo. */
 .scene-bus--sobusa {
-  top: 4%;
-  right: -4%;
+  top: 5%;
+  right: auto;
+  left: calc(50% + var(--escenario) / 2 + var(--aire));
 }
 
-/* 2. Transmetro / Azul — Centro a la izquierda */
+/* Carril izquierdo, a media altura. */
 .scene-bus--transmetro {
-  top: 32%;
-  left: -8%;
+  top: 34%;
+  left: auto;
+  right: calc(50% + var(--escenario) / 2 + var(--aire));
 }
 
-/* 3. Sodetrans — Centro a la derecha. Va por encima de la mitad para
-   dejarle libre la esquina de abajo al aviso de "está cerca de ti". */
+/* Carril derecho, a media altura. */
 .scene-bus--sodis {
   top: 41%;
-  right: -6%;
+  right: auto;
+  left: calc(50% + var(--escenario) / 2 + var(--aire));
 }
 
-/* 4. Coolitoral — Abajo a la izquierda */
+/* Carril izquierdo, abajo — el aviso ocupa el derecho. */
 .scene-bus--coolitoral {
-  bottom: 4%;
-  left: -6%;
+  bottom: 3%;
+  left: auto;
+  right: calc(50% + var(--escenario) / 2 + var(--aire));
 }
 
 /* Píldoras de Estado Flotantes */
@@ -634,11 +693,11 @@
    marco por su borde interior y sin pisarlo. Dice "Ruta activa", así que
    sólo se enseña cuando la demo ya tiene una ruta puesta. */
 .scene-card--route {
-  top: 7%;
+  top: 4%;
   left: auto;
-  right: calc(50% + var(--tel) / 2 + var(--aire));
+  right: calc(50% + var(--escenario) / 2 + var(--aire));
   width: max-content;
-  max-width: var(--carril);
+  max-width: min(var(--carril), 290px);
 }
 
 /* Entran y salen sólo con opacidad y desenfoque: el `transform` ya lo lleva
@@ -669,11 +728,11 @@
    procedimiento. Nace escondida: la enciende el guion cuando el bus entra
    en el kilómetro, que es cuando la app manda la notificación de verdad. */
 .scene-card--notif {
-  bottom: 6%;
+  bottom: 4%;
   right: auto;
-  left: calc(50% + var(--tel) / 2 + var(--aire));
+  left: calc(50% + var(--escenario) / 2 + var(--aire));
   width: max-content;
-  max-width: var(--carril);
+  max-width: min(var(--carril), 290px);
 }
 
 .notif-icon {
@@ -688,62 +747,37 @@
 }
 
 /* Responsividad para pantallas medianas y móviles */
-@media (max-width: 1200px) {
-  .scene-bus--sobusa {
-    right: -2%;
-  }
-
-  .scene-bus--transmetro {
-    left: -4%;
-  }
-
-  .scene-bus--sodis {
-    right: -3%;
-  }
-
-  .scene-bus--coolitoral {
-    left: -3%;
-  }
-}
-
-@media (max-width: 1023px) {
-  .hero-copy {
-    align-items: center;
-    text-align: center;
-    max-width: 680px;
-    margin: 0 auto;
-  }
-
-  .hero-description {
-    max-width: 520px;
-  }
-
-  .hero-actions {
-    justify-content: center;
-  }
-
+/*
+  Sin los laterales el escenario vuelve a ser un teléfono y los carriles se
+  ensanchan solos: aquí sólo hace falta subir los buses de la izquierda,
+  que si no se juntan con la tarjeta de ruta en un carril más corto.
+*/
+@media (max-width: 1399px) {
   .scene-bus--sobusa {
     top: 3%;
-    right: 2%;
   }
 
   .scene-bus--transmetro {
     top: 33%;
-    left: 1%;
   }
 
   .scene-bus--sodis {
     top: 46%;
-    right: 1%;
   }
 
   .scene-bus--coolitoral {
     bottom: 4%;
-    left: 1%;
   }
+}
 
-  .scene-card--route {
-    top: 4%;
+/*
+  Las dos tarjetas sincronizadas viven en el carril, y por debajo de esta
+  anchura el carril ya no da para una línea de texto decente: antes que
+  partir cada frase en seis renglones, se van.
+*/
+@media (max-width: 860px) {
+  .scene-card {
+    display: none;
   }
 }
 
@@ -767,35 +801,46 @@
   }
 }
 
+/*
+  Por debajo de esto ya no hay carril: la escena mide menos que el teléfono
+  más dos buses. Los buses dejan de anclarse al costado del escenario y se
+  montan sobre las esquinas del aparato, que es donde caben. Las tarjetas
+  no caben de ninguna manera y se van.
+*/
 @media (max-width: 640px) {
   .scene-bus {
     width: 80px;
     opacity: 0.9;
   }
 
+  /* Sin carriles laterales que valgan la pena, los buses se montan sobre el
+     teléfono a propósito: pasan por encima del mapa, nunca sobre la hoja de
+     abajo, que es donde vive el botón. */
   .scene-bus--sobusa {
-    top: 2%;
+    top: 1%;
+    left: auto;
     right: -2%;
   }
 
   .scene-bus--transmetro {
-    top: 32%;
+    top: 24%;
+    right: auto;
     left: -2%;
   }
 
   .scene-bus--sodis {
-    top: 48%;
+    top: 40%;
+    left: auto;
     right: -2%;
   }
 
   .scene-bus--coolitoral {
-    bottom: 2%;
+    top: 52%;
+    bottom: auto;
+    right: auto;
     left: -2%;
   }
 
-  .scene-card {
-    display: none;
-  }
 }
 
 /* ── Franja de datos ───────────────────────────────────────────────── */
@@ -833,6 +878,115 @@
 }
 
 /* ── Rejilla de tarjetas (problema) ────────────────────────────────── */
+#problema {
+  background:
+    radial-gradient(860px circle at 78% 16%, rgba(255, 193, 7, 0.14), transparent 58%),
+    linear-gradient(180deg, #FFFFFF 0%, #FFF9EF 100%);
+  background-size: 180% 180%, 100% 100%;
+  background-position: 0% 50%, 50% 50%;
+  animation: panel-gradient-respiro 10s ease-in-out infinite alternate;
+  transition: background 0.7s var(--ease-out-cubic);
+}
+
+#problema::before,
+#problema::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#problema::before {
+  z-index: 0;
+  background:
+    radial-gradient(620px circle at 72% 12%, rgba(255, 193, 7, 0.28), transparent 60%),
+    linear-gradient(135deg, rgba(255, 248, 225, 0.9) 0%, rgba(255, 255, 255, 0.2) 54%,
+      rgba(251, 231, 228, 0.5) 100%);
+  opacity: 1;
+  background-size: 180% 180%, 180% 180%;
+  background-position: 0% 50%, 50% 50%;
+  animation: clima-gradient-respiro 9s ease-in-out infinite alternate,
+    clima-luz-respiro 9s ease-in-out infinite alternate;
+  transition: opacity 0.65s var(--ease-out-cubic);
+}
+
+#problema::after {
+  z-index: 1;
+  background:
+    radial-gradient(520px circle at 76% 14%, rgba(15, 35, 63, 0.2), transparent 64%),
+    linear-gradient(138deg, rgba(15, 35, 63, 0.14), transparent 58%);
+  opacity: 0;
+  background-size: 180% 180%, 180% 180%;
+  background-position: 100% 50%, 50% 50%;
+  animation: clima-gradient-respiro 9s ease-in-out infinite alternate-reverse;
+  transition: opacity 0.5s var(--ease-out-cubic);
+}
+
+#problema[data-clima='lluvia'] {
+  background:
+    radial-gradient(760px circle at 74% 8%, rgba(37, 99, 235, 0.16), transparent 62%),
+    linear-gradient(180deg, #F1F6FC 0%, #E6EEF8 58%, #F7FAFC 100%);
+}
+
+#problema[data-clima='lluvia']::before {
+  opacity: 0;
+}
+
+#problema[data-clima='lluvia']::after {
+  opacity: 1;
+}
+
+#problema .panel-dots {
+  z-index: 1;
+}
+
+#problema .panel-inner {
+  z-index: 2;
+}
+
+.clima-word {
+  appearance: none;
+  border: 0;
+  padding: 0 1px;
+  border-radius: 0;
+  background: transparent;
+  font: inherit;
+  font-family: var(--font-display);
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  transition:
+    color var(--transition-normal),
+    text-shadow var(--transition-normal),
+    transform 0.38s var(--ease-spring);
+}
+
+.clima-word--sol {
+  color: var(--warn);
+}
+
+.clima-word--lluvia {
+  color: var(--electric-blue);
+}
+
+.clima-word.is-active {
+  transform: translateY(-1px);
+  text-shadow: 0 5px 16px rgba(11, 22, 40, 0.14);
+}
+
+.clima-word:hover {
+  transform: translateY(-2px);
+}
+
+.clima-word:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 6px;
+  border-radius: 6px;
+}
+
 .cards-grid {
   display: grid;
   gap: 18px;
@@ -864,8 +1018,20 @@
     justify-content: flex-start;
     gap: 20px;
     padding: clamp(38px, 4vw, 56px);
-    background: linear-gradient(158deg, var(--coral-light) 0%, var(--arena) 62%);
     border-color: rgba(232, 106, 94, 0.22);
+  }
+
+  #problema[data-clima='sol'] .feature-card--lead {
+    background:
+      radial-gradient(420px circle at 94% 6%, rgba(255, 193, 7, 0.2), transparent 62%),
+      linear-gradient(158deg, rgba(251, 231, 228, 0.92) 0%, rgba(250, 246, 240, 0.88) 62%);
+  }
+
+  #problema[data-clima='lluvia'] .feature-card--lead {
+    background:
+      radial-gradient(420px circle at 94% 6%, rgba(37, 99, 235, 0.14), transparent 62%),
+      linear-gradient(158deg, rgba(238, 245, 255, 0.92) 0%, rgba(248, 251, 255, 0.82) 66%);
+    border-color: rgba(37, 99, 235, 0.16);
   }
 
   .feature-card--lead .card-icon {
@@ -883,21 +1049,42 @@
     font-size: var(--step-h2);
   }
 
-  .feature-card--lead .card-text {
+.feature-card--lead .card-text {
     max-width: 32ch;
     font-size: calc(var(--step-body) * 1.06);
   }
 }
 
+#problema[data-clima='sol'] .feature-card--lead,
+#problema[data-clima='lluvia'] .feature-card--lead {
+  background-size: 180% 180%, 100% 100%;
+  animation: card-gradient-respiro 9s ease-in-out infinite alternate;
+}
+
 .feature-card {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 14px;
   padding: clamp(26px, 3vw, 38px);
   border-radius: 24px;
-  background: var(--arena);
+  background: rgba(250, 246, 240, 0.82);
   border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+#problema[data-clima='sol'] .feature-card {
+  background: rgba(250, 246, 240, 0.82);
+  border-color: rgba(217, 119, 6, 0.14);
+}
+
+#problema[data-clima='lluvia'] .feature-card {
+  background: rgba(248, 251, 255, 0.78);
+  border-color: rgba(37, 99, 235, 0.13);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58);
 }
 
 .feature-card:hover {
@@ -921,6 +1108,70 @@
 .card-icon.amber {
   background: var(--amber-tint);
   color: var(--warn);
+}
+
+.weather-icon {
+  position: relative;
+}
+
+.weather-icon__rain {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  opacity: 0;
+  transform: scale(0.58) translateY(-3px) rotate(-8deg);
+  transform-origin: 50% 50%;
+  transition: opacity 0.3s ease, transform 0.55s var(--ease-spring);
+}
+
+.weather-icon__sun {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  transform-origin: 50% 50%;
+  transition: opacity 0.3s ease, transform 0.55s var(--ease-spring);
+}
+
+#problema[data-clima='lluvia'] .weather-icon {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--electric-blue);
+}
+
+#problema[data-clima='lluvia'] .weather-icon__sun {
+  opacity: 0;
+  transform: scale(0.58) rotate(42deg);
+}
+
+#problema[data-clima='lluvia'] .weather-icon__rain {
+  opacity: 1;
+  transform: scale(1) translateY(0) rotate(0deg);
+  animation: weather-icon-in 0.55s var(--ease-spring) both;
+}
+
+/* El texto también cambia de clima: si el icono pasa a lluvia y el párrafo
+   sigue hablando de calor, el guiño se cae solo. Las dos versiones ocupan la
+   misma celda de rejilla, así que la tarjeta mide siempre lo que la más larga
+   y no da un salto al alternar. `visibility` va además de `opacity` para que
+   el lector de pantalla lea una sola. */
+.weather-text {
+  display: grid;
+}
+
+.weather-text > span {
+  grid-area: 1 / 1;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+#problema[data-clima='sol'] .weather-text__lluvia,
+#problema[data-clima='lluvia'] .weather-text__sol {
+  visibility: hidden;
+  opacity: 0;
+}
+
+#problema[data-clima='sol'] .weather-text__sol,
+#problema[data-clima='lluvia'] .weather-text__lluvia {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0s;
 }
 
 .card-icon.green {
@@ -950,6 +1201,11 @@
   gap: clamp(34px, 4vw, 64px);
   grid-template-columns: minmax(0, 1fr);
   align-items: start;
+}
+
+.panel--mint {
+  background-size: 180% 180%;
+  animation: panel-gradient-respiro 10s ease-in-out infinite alternate;
 }
 
 @media (min-width: 940px) {
@@ -996,12 +1252,45 @@
 .ruta-pasos::before {
   content: '';
   position: absolute;
-  left: 21px;
+  left: 20px;
   top: 21px;
   bottom: 21px;
-  width: 2px;
-  background: linear-gradient(180deg, var(--green) 0%,
-    rgba(0, 168, 89, 0.28) 55%, rgba(0, 168, 89, 0.1) 100%);
+  width: 4px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.75),
+      rgba(255, 255, 255, 0) 18% 82%,
+      rgba(255, 255, 255, 0.55)),
+    linear-gradient(180deg, rgba(0, 168, 89, 0.58), rgba(0, 168, 89, 0.16));
+}
+
+.ruta-pasos::after {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 21px;
+  bottom: 21px;
+  width: 6px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg,
+      transparent 0%,
+      transparent 39%,
+      rgba(181, 255, 219, 0.15) 43%,
+      #FFFFFF 48%,
+      var(--green) 50%,
+      #FFFFFF 52%,
+      rgba(181, 255, 219, 0.15) 57%,
+      transparent 61%,
+      transparent 100%);
+  background-size: 100% 310%;
+  background-position: 50% 0%;
+  filter:
+    drop-shadow(0 0 8px rgba(0, 168, 89, 0.7))
+    drop-shadow(0 0 18px rgba(0, 168, 89, 0.3));
+  animation: ruta-riel-onda 4.8s cubic-bezier(0.62, 0, 0.28, 1) infinite;
+  pointer-events: none;
 }
 
 .ruta-paso {
@@ -1020,13 +1309,61 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--green);
+  background:
+    radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.36), transparent 28%),
+    linear-gradient(160deg, #06C56C 0%, var(--green) 48%, #047A42 100%);
   color: #fff;
   font-family: var(--font-display);
   font-size: 19px;
   font-weight: 700;
+  isolation: isolate;
+  text-shadow: 0 1px 0 rgba(0, 66, 34, 0.16);
   /* Un halo del color del panel para que el riel no se le vea por debajo. */
-  box-shadow: 0 0 0 6px var(--green-tint), 0 8px 18px -8px var(--green-glow);
+  box-shadow:
+    0 0 0 7px var(--green-tint),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -10px 18px rgba(0, 103, 55, 0.24),
+    0 12px 24px -12px var(--green-glow);
+  transform-origin: 50% 50%;
+  will-change: transform, box-shadow;
+}
+
+.ruta-punto::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.72) 0 28%, rgba(0, 168, 89, 0.22) 48%, transparent 72%);
+  opacity: 0;
+  transform: scale(0.72);
+  filter: blur(0.2px);
+  will-change: transform, opacity;
+}
+
+.ruta-paso:nth-child(1) .ruta-punto {
+  animation: ruta-punto-uno 4.8s var(--ease-out-cubic) infinite;
+}
+
+.ruta-paso:nth-child(1) .ruta-punto::before {
+  animation: ruta-halo-uno 4.8s var(--ease-out-cubic) infinite;
+}
+
+.ruta-paso:nth-child(2) .ruta-punto {
+  animation: ruta-punto-dos 4.8s var(--ease-out-cubic) infinite;
+}
+
+.ruta-paso:nth-child(2) .ruta-punto::before {
+  animation: ruta-halo-dos 4.8s var(--ease-out-cubic) infinite;
+}
+
+.ruta-paso:nth-child(3) .ruta-punto {
+  animation: ruta-punto-tres 4.8s var(--ease-out-cubic) infinite;
+}
+
+.ruta-paso:nth-child(3) .ruta-punto::before {
+  animation: ruta-halo-tres 4.8s var(--ease-out-cubic) infinite;
 }
 
 .ruta-cuerpo {
@@ -1088,12 +1425,33 @@
    del mismo color sólo añadía un borde que no separa nada. Cada bloque se
    apoya en una línea fina y en el aire que tiene alrededor. */
 .detail-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 12px;
   padding-top: 22px;
-  border-top: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.detail-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  pointer-events: none;
+}
+
+.detail-card::before {
+  right: 0;
+  height: 1px;
+  background:
+    linear-gradient(90deg,
+      rgba(10, 26, 47, 0.07),
+      rgba(10, 26, 47, 0.13) 18%,
+      rgba(10, 26, 47, 0.13) 82%,
+      rgba(10, 26, 47, 0.07));
 }
 
 .detail-card h3 {
@@ -1150,6 +1508,189 @@
   font-variant-numeric: tabular-nums;
   background: var(--coral-light);
   color: var(--coral);
+}
+
+@keyframes ruta-riel-onda {
+  0% {
+    background-position: 50% -18%;
+  }
+  100% {
+    background-position: 50% 118%;
+  }
+}
+
+@keyframes weather-icon-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.58) translateY(-3px) rotate(-8deg);
+  }
+  72% {
+    opacity: 1;
+    transform: scale(1.08) translateY(0) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes panel-gradient-respiro {
+  0% {
+    background-position: 0% 50%, 50% 50%, 50% 50%;
+  }
+  100% {
+    background-position: 100% 50%, 50% 50%, 50% 50%;
+  }
+}
+
+@keyframes clima-gradient-respiro {
+  0% {
+    background-position: 0% 50%, 50% 50%;
+  }
+  100% {
+    background-position: 100% 50%, 50% 50%;
+  }
+}
+
+@keyframes clima-luz-respiro {
+  0%, 100% {
+    opacity: 0.78;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes card-gradient-respiro {
+  0% {
+    background-position: 0% 50%, 50% 50%;
+  }
+  100% {
+    background-position: 100% 50%, 50% 50%;
+  }
+}
+
+@keyframes footer-gradient-respiro {
+  0% {
+    background-position: 0% 42%, 100% 0%, 50% 50%;
+  }
+  100% {
+    background-position: 100% 58%, 0% 12%, 50% 50%;
+  }
+}
+
+@keyframes ruta-punto-uno {
+  0%, 9%, 100% {
+    transform: scale(1.07);
+    box-shadow:
+      0 0 0 10px var(--green-tint),
+      inset 0 1px 0 rgba(255, 255, 255, 0.42),
+      inset 0 -10px 18px rgba(0, 103, 55, 0.16),
+      0 0 0 1px rgba(255, 255, 255, 0.72),
+      0 18px 34px -13px rgba(0, 168, 89, 0.66);
+  }
+  18%, 91% {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 7px var(--green-tint),
+      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      inset 0 -10px 18px rgba(0, 103, 55, 0.24),
+      0 12px 24px -12px var(--green-glow);
+  }
+}
+
+@keyframes ruta-punto-dos {
+  0%, 27%, 45%, 100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 7px var(--green-tint),
+      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      inset 0 -10px 18px rgba(0, 103, 55, 0.24),
+      0 12px 24px -12px var(--green-glow);
+  }
+  34%, 40% {
+    transform: scale(1.07);
+    box-shadow:
+      0 0 0 10px var(--green-tint),
+      inset 0 1px 0 rgba(255, 255, 255, 0.42),
+      inset 0 -10px 18px rgba(0, 103, 55, 0.16),
+      0 0 0 1px rgba(255, 255, 255, 0.72),
+      0 18px 34px -13px rgba(0, 168, 89, 0.66);
+  }
+}
+
+@keyframes ruta-punto-tres {
+  0%, 61%, 79%, 100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 7px var(--green-tint),
+      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      inset 0 -10px 18px rgba(0, 103, 55, 0.24),
+      0 12px 24px -12px var(--green-glow);
+  }
+  68%, 74% {
+    transform: scale(1.07);
+    box-shadow:
+      0 0 0 10px var(--green-tint),
+      inset 0 1px 0 rgba(255, 255, 255, 0.42),
+      inset 0 -10px 18px rgba(0, 103, 55, 0.16),
+      0 0 0 1px rgba(255, 255, 255, 0.72),
+      0 18px 34px -13px rgba(0, 168, 89, 0.66);
+  }
+}
+
+@keyframes ruta-halo-uno {
+  0%, 9%, 100% {
+    opacity: 0.76;
+    transform: scale(1.02);
+  }
+  18%, 91% {
+    opacity: 0;
+    transform: scale(0.78);
+  }
+}
+
+@keyframes ruta-halo-dos {
+  0%, 27%, 45%, 100% {
+    opacity: 0;
+    transform: scale(0.78);
+  }
+  34%, 40% {
+    opacity: 0.76;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes ruta-halo-tres {
+  0%, 61%, 79%, 100% {
+    opacity: 0;
+    transform: scale(0.78);
+  }
+  68%, 74% {
+    opacity: 0.76;
+    transform: scale(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ruta-pasos::after,
+  .ruta-punto::before,
+  .ruta-punto,
+  #problema::before,
+  #problema::after,
+  #problema,
+  #problema[data-clima='sol'] .feature-card--lead,
+  #problema[data-clima='lluvia'] .feature-card--lead,
+  .weather-text > span,
+  .panel--mint,
+  .site-footer {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .ruta-punto {
+    transform: none !important;
+  }
 }
 
 /* ── Empresas y formulario ─────────────────────────────────────────── */
@@ -1320,19 +1861,23 @@
 }
 
 /* ── Pie ─────────────────────────────────────────────────────────────
-   Cierra como una pieza de la página, no como una postal aparte: tinta,
-   una trama muy leve y el verde de la marca para dirigir la última acción. */
+   Un cierre con la energía de la marca: CTA grande arriba y la información
+   útil debajo, sin repetir el botón de WhatsApp de la sección empresarial. */
 .site-footer {
   position: relative;
   overflow: hidden;
-  margin: var(--panel-gap) var(--gutter) var(--gutter);
-  padding: clamp(42px, 6vw, 78px) clamp(24px, 5vw, 72px) 22px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--panel-radius);
+  width: 100%;
+  margin: var(--panel-gap) 0 0;
+  padding: clamp(58px, 8vw, 112px) clamp(24px, 5vw, 78px) 24px;
+  border: 0;
+  border-radius: 0;
   background:
-    radial-gradient(circle at 88% 18%, rgba(0, 168, 89, 0.2), transparent 25rem),
-    linear-gradient(135deg, #132B57 0%, var(--ink) 46%, var(--ink-deep) 100%);
-  color: var(--text-white);
+    radial-gradient(760px circle at 10% 100%, rgba(232, 106, 94, 0.5), transparent 64%),
+    radial-gradient(700px circle at 92% 2%, rgba(255, 193, 7, 0.34), transparent 62%),
+    linear-gradient(145deg, #FFFDF8 0%, #FFF3E8 48%, #FBE7E4 100%);
+  background-size: 180% 180%, 180% 180%, 100% 100%;
+  animation: footer-gradient-respiro 10s ease-in-out infinite alternate;
+  color: var(--text-primary);
 }
 
 .site-footer::before {
@@ -1340,23 +1885,76 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.36;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+  opacity: 0.28;
+  background-image: radial-gradient(rgba(11, 22, 40, 0.16) 1px, transparent 1px);
   background-size: 18px 18px;
-  mask-image: linear-gradient(90deg, transparent, black 20%, black 80%, transparent);
+  mask-image: linear-gradient(90deg, transparent, black 16%, black 84%, transparent);
 }
 
+.footer-cta,
 .footer-grid,
 .footer-bottom {
   position: relative;
   z-index: 1;
   max-width: var(--content-max);
-  margin: 0 auto;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.footer-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  text-align: center;
+}
+
+.footer-cta h2 {
+  max-width: 12ch;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 7vw, 7.4rem);
+  font-weight: 800;
+  line-height: 0.88;
+  letter-spacing: -0.065em;
+}
+
+.footer-cta > p:not(.footer-cta-note) {
+  max-width: 56ch;
+  color: var(--text-secondary);
+  font-size: clamp(17px, 1.45vw, 22px);
+  line-height: 1.45;
+}
+
+.footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.footer-actions .btn-outline {
+  border-color: rgba(11, 22, 40, 0.2);
+  background: rgba(255, 255, 255, 0.48);
+  color: var(--text-primary);
+}
+
+.footer-actions .btn-outline:hover {
+  border-color: rgba(11, 22, 40, 0.38);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.footer-cta-note {
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 .footer-grid {
   display: grid;
-  gap: 34px;
+  gap: 42px;
+  margin-top: clamp(74px, 10vw, 142px);
+  padding-top: 34px;
+  border-top: 1px solid rgba(11, 22, 40, 0.14);
 }
 
 .footer-intro {
@@ -1370,7 +1968,7 @@
   align-items: center;
   align-self: flex-start;
   gap: 11px;
-  color: var(--text-white);
+  color: var(--text-primary);
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: 800;
@@ -1382,68 +1980,80 @@
   box-shadow: 0 8px 18px -7px var(--green-glow);
 }
 
-.footer-intro p {
-  color: var(--text-white-dim);
+.footer-intro p,
+.footer-status p {
+  color: var(--text-secondary);
   font-size: var(--step-body);
   line-height: 1.55;
 }
 
 .footer-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+}
+
+.footer-nav-group {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 18px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 11px;
+}
+
+.footer-nav-group > span,
+.footer-status > span {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .footer-nav a,
 .footer-legal-links a {
-  color: var(--text-white-dim);
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 600;
-  transition: color var(--transition-fast);
+  transition: color var(--transition-fast), transform var(--transition-fast);
 }
 
 .footer-nav a:hover,
 .footer-nav a:focus-visible,
 .footer-legal-links a:hover,
 .footer-legal-links a:focus-visible {
-  color: var(--text-white);
+  color: var(--text-primary);
+  transform: translateX(2px);
 }
 
-.footer-whatsapp {
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  align-self: start;
-  gap: 24px;
-  padding: 13px 16px 13px 18px;
-  border-radius: 999px;
-  background: var(--green);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 12px 24px -12px var(--green-glow);
-  color: var(--text-white);
+.footer-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding-left: 24px;
+  border-left: 1px solid rgba(11, 22, 40, 0.14);
+}
+
+.footer-status strong {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.5vw, 34px);
+  letter-spacing: -0.04em;
+}
+
+.footer-status p {
+  max-width: 22ch;
   font-size: 14px;
-  font-weight: 800;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.footer-whatsapp span {
-  font-size: 18px;
-  line-height: 1;
-}
-
-.footer-whatsapp:hover,
-.footer-whatsapp:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 18px 30px -13px var(--green-glow);
 }
 
 .footer-bottom {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: clamp(42px, 6vw, 76px);
+  margin-top: 54px;
   padding-top: 19px;
-  border-top: 1px solid var(--border-glass);
-  color: var(--text-white-sub);
+  border-top: 1px solid rgba(11, 22, 40, 0.14);
+  color: var(--text-muted);
   font-size: 12px;
 }
 
@@ -1457,17 +2067,11 @@
   font-size: 12px;
 }
 
-@media (min-width: 700px) {
+@media (min-width: 760px) {
   .footer-grid {
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    align-items: center;
-    gap: clamp(38px, 6vw, 96px);
-  }
-
-  .footer-nav {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 11px;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 1.2fr) minmax(160px, 0.7fr);
+    align-items: start;
+    gap: clamp(38px, 5vw, 86px);
   }
 
   .footer-bottom {

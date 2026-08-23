@@ -58,7 +58,7 @@
             <a href="#como-funciona" class="nav-link">Cómo funciona</a>
             <a href="#empresas" class="nav-link">Para empresas</a>
           </nav>
-          <a href="#empresas" class="nav-island-cta">Únete a la beta</a>
+          <a href="#como-funciona" class="nav-island-cta">Ver la app</a>
         </div>
       </div>
 
@@ -84,8 +84,8 @@
             que llegue el tuyo.</p>
 
           <div class="hero-actions">
-            <a href="#empresas" class="btn-primary btn-green">Únete a la beta</a>
-            <a href="#como-funciona" class="btn-outline">Ver cómo funciona</a>
+            <a href="#como-funciona" class="btn-primary btn-green">Ver cómo funciona</a>
+            <a href="#empresas" class="btn-outline">Para empresas</a>
           </div>
 
           <p class="hero-subtext">Ya en pruebas con Sobusa y sus 6 rutas reales de Barranquilla.</p>
@@ -126,6 +126,117 @@
             </div>
           </div>
 
+          <div class="hero-stage">
+
+          <!--
+            Teléfono izquierdo: el selector que abre la píldora de búsqueda
+            (route_selector_sheet.dart). Es una vitrina quieta —no se anima
+            ni responde—, así que la pantalla es HTML puro; lo único vivo es
+            el mapa, que es el mismo mosaico real con la ruta activa
+            dibujada por PhoneMap.
+          -->
+          <div class="hero-phone-side hero-phone-side--izq">
+            <div class="phone-shell">
+              <span class="phone-key phone-key--power"></span>
+              <span class="phone-key phone-key--vol"></span>
+
+              <div class="phone-screen">
+                <span class="phone-lens"></span>
+
+                <div class="phone-map" id="phone-map-lado">
+                  <svg class="routes-svg-layer" id="phone-routes-lado"></svg>
+                </div>
+
+                <!-- El barrier del showGeneralDialog: negro al 40 %. -->
+                <div class="phone-scrim"></div>
+
+                <div class="phone-status">
+                  <span>7:23</span>
+                  <span class="phone-status-glifos">
+                    <!-- Cobertura: la cuña llena de Android, no cuatro barritas. -->
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                      stroke-linejoin="round">
+                      <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                    </svg>
+                    <!-- Wifi al máximo: cono lleno, que tres arcos sueltos a este tamaño
+                         se leen como una mancha. -->
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                      stroke-linejoin="round">
+                      <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                    </svg>
+                    <!-- Batería: contorno a media luz y la carga sólida dentro. -->
+                    <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
+                      <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
+                        stroke-width="1.5" opacity="0.5" />
+                      <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
+                      <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                        opacity="0.5" />
+                    </svg>
+                  </span>
+                </div>
+
+                <!-- Material blanco, esquinas de arriba a 32, y encima el
+                     mismo patrón de calles del drawer en navy, tenue. -->
+                <div class="phone-sheet phone-sheet--fija">
+                  <span class="sheet-handle"></span>
+
+                  <div class="sheet-selector">
+                    <div class="sheet-head">
+                      <span class="sheet-head-title">Elige tu ruta</span>
+                    </div>
+
+                    <span class="sheet-label">EMPRESA</span>
+                    <div class="app-select">
+                      <span class="app-select-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M3.5 20.5V9.5l7-3.5" />
+                          <path d="M10.5 20.5V4.6a1.6 1.6 0 0 1 1.6-1.6h6.3A1.6 1.6 0 0 1 20 4.6v15.9" />
+                          <path d="M2 20.5h20" />
+                          <path d="M13.5 7.5h3M13.5 11.5h3M13.5 15.5h3" />
+                        </svg>
+                      </span>
+                      <span class="app-select-body">
+                        <span class="app-select-title">Sobusa</span>
+                        <span class="app-select-sub">Empresa de transporte masivo</span>
+                      </span>
+                      <span class="app-select-chevron">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M9.5 5l7 7l-7 7" />
+                        </svg>
+                      </span>
+                    </div>
+
+                    <span class="sheet-label">RUTA</span>
+                    <div class="app-select">
+                      <span class="app-select-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M4 18h4a4 4 0 0 0 4-4V10a4 4 0 0 1 4-4h4" />
+                          <path d="M17 3l3 3l-3 3" />
+                          <circle cx="5" cy="18" r="2" />
+                        </svg>
+                      </span>
+                      <span class="app-select-body">
+                        <span class="app-select-title">C16 Calle 72 Uninorte</span>
+                        <span class="app-select-sub">Granabastos ↔ Uninorte</span>
+                      </span>
+                      <span class="app-select-chevron">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M9.5 5l7 7l-7 7" />
+                        </svg>
+                      </span>
+                    </div>
+
+                    <div class="app-launch">Ver buses en vivo</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!--
             6. El teléfono. Todo lo que se ve dentro de la pantalla es la
             app redibujada en HTML: la píldora de búsqueda
@@ -153,21 +264,24 @@
                 <div class="phone-status">
                   <span>7:23</span>
                   <span class="phone-status-glifos">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M3 18h3v3H3zM9 13h3v8H9zM15 8h3v13h-3zM21 3h-3v18h3z" opacity="0.9" />
+                    <!-- Cobertura: la cuña llena de Android, no cuatro barritas. -->
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                      stroke-linejoin="round">
+                      <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
                     </svg>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                      stroke-linecap="round">
-                      <path d="M2 8.5a15 15 0 0 1 20 0" />
-                      <path d="M5.5 12.5a10 10 0 0 1 13 0" />
-                      <path d="M9 16.5a5 5 0 0 1 6 0" />
-                      <circle cx="12" cy="20" r="0.6" fill="currentColor" />
+                    <!-- Wifi al máximo: cono lleno, que tres arcos sueltos a este tamaño
+                         se leen como una mancha. -->
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                      stroke-linejoin="round">
+                      <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
                     </svg>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="3" y="7" width="16" height="10" rx="3" />
-                      <rect x="5" y="9" width="10" height="6" rx="1.5" fill="currentColor"
-                        stroke="none" />
-                      <path d="M21 10.5v3" stroke-linecap="round" />
+                    <!-- Batería: contorno a media luz y la carga sólida dentro. -->
+                    <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
+                      <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
+                        stroke-width="1.5" opacity="0.5" />
+                      <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
+                      <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                        opacity="0.5" />
                     </svg>
                   </span>
                 </div>
@@ -324,7 +438,112 @@
                 <div class="phone-gesture"></div>
               </div>
             </div>
-            <p class="map-credit">Mapa base © OpenStreetMap · © CARTO</p>
+          </div>
+
+          <!--
+            Teléfono derecho: la pantalla de entrada (login_screen.dart), la
+            primera que ve cualquiera al abrir la app. La trama de fondo son
+            las tres curvas y la retícula de puntos de MapPatternPainter,
+            resueltas para un lienzo de 412 x 874,2 — el tamaño lógico de
+            esta pantalla, así que las curvas caen donde caen en el teléfono.
+          -->
+          <div class="hero-phone-side hero-phone-side--der">
+            <div class="phone-shell">
+              <span class="phone-key phone-key--power"></span>
+              <span class="phone-key phone-key--vol"></span>
+
+              <div class="phone-screen phone-screen--tinta">
+                <span class="phone-lens"></span>
+
+                <svg class="tinta-rutas" viewBox="0 0 412 874.2" preserveAspectRatio="none">
+                  <path d="M-20 139.9 C103 69.9 156.6 262.3 255.4 192.3
+                           C329.6 139.9 362.6 297.2 432 244.8" />
+                  <path d="M49.4 -10 C24.7 157.4 115.4 227.3 90.6 419.6" />
+                  <path d="M-20 646.9 C74.2 577 164.8 769.3 255.4 681.9
+                           C329.6 611.9 370.8 751.8 432 699.4" />
+                </svg>
+
+                <div class="phone-status phone-status--claro">
+                  <span>7:23</span>
+                  <span class="phone-status-glifos">
+                    <!-- Cobertura: la cuña llena de Android, no cuatro barritas. -->
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                      stroke-linejoin="round">
+                      <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                    </svg>
+                    <!-- Wifi al máximo: cono lleno, que tres arcos sueltos a este tamaño
+                         se leen como una mancha. -->
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
+                      stroke-linejoin="round">
+                      <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                    </svg>
+                    <!-- Batería: contorno a media luz y la carga sólida dentro. -->
+                    <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
+                      <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
+                        stroke-width="1.5" opacity="0.5" />
+                      <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
+                      <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                        opacity="0.5" />
+                    </svg>
+                  </span>
+                </div>
+
+                <div class="tinta-hero">
+                  <svg class="tinta-logo" viewBox="0 0 512 512" role="img" aria-label="Ya Viene">
+                    <circle cx="256" cy="256" r="256" fill="#00A859" />
+                    <path d="M 120 130 A 200 200 0 0 1 392 130" fill="none" stroke="#FFFFFF"
+                      stroke-width="32" stroke-linecap="round" opacity="0.5" />
+                    <path d="M 176 190 A 130 130 0 0 1 336 190" fill="none" stroke="#FFFFFF"
+                      stroke-width="32" stroke-linecap="round" />
+                    <rect x="136" y="240" width="240" height="180" rx="36" fill="#14274E" />
+                    <rect x="166" y="270" width="180" height="72" rx="16" fill="#FFFFFF" />
+                    <rect x="290" y="270" width="30" height="72" fill="#14274E" opacity="0.1" />
+                    <circle cx="180" cy="375" r="16" fill="#FFC107" />
+                    <circle cx="332" cy="375" r="16" fill="#FFC107" />
+                    <rect x="160" y="410" width="32" height="24" rx="8" fill="#0A1428" />
+                    <rect x="320" y="410" width="32" height="24" rx="8" fill="#0A1428" />
+                  </svg>
+                  <strong class="tinta-titulo">Ya Viene</strong>
+                  <span class="tinta-lema">Tu ciudad en tiempo real.</span>
+                </div>
+
+                <div class="login-hoja">
+                  <strong class="login-titulo">Inicia sesión o regístrate</strong>
+                  <span class="login-sub">Con tu correo y una contraseña.</span>
+
+                  <div class="login-campo">
+                    <span class="login-campo-icono">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M16 8v5.2a2.6 2.6 0 0 0 5.2 0V12A9.2 9.2 0 1 0 17.4 19.4" />
+                      </svg>
+                    </span>
+                    <span class="login-campo-hint">Email</span>
+                  </div>
+
+                  <!-- Apagado: es el estado real al abrir, con el correo
+                       todavía en blanco. -->
+                  <div class="login-boton">Continuar</div>
+
+                  <div class="login-o"><span></span>o<span></span></div>
+
+                  <div class="login-google">
+                    <svg viewBox="0 0 48 48">
+                      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    Iniciar con Google
+                  </div>
+
+                  <span class="login-link">¿No tienes cuenta? Regístrate</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           </div>
 
           <!-- 7. Etiqueta flotante: Notificación cerca (Abajo a la Derecha) -->
@@ -343,6 +562,8 @@
           </div>
 
         </div>
+
+        <p class="map-credit">Mapa base © OpenStreetMap · © CARTO</p>
 
         <p class="solo-lectores">
           La demostración muestra la app: primero localiza tu ubicación, luego
@@ -377,7 +598,7 @@
     </section>
 
     <!-- ============ PROBLEMA ============ -->
-    <section class="panel panel--arena" id="problema">
+    <section class="panel panel--arena" id="problema" data-clima="sol">
       <div class="panel-dots" aria-hidden="true"></div>
       <div class="panel-inner">
         <div class="section-head reveal">
@@ -400,17 +621,29 @@
           </article>
 
           <article class="feature-card reveal" data-reveal-delay="100">
-            <div class="card-icon amber">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round">
+            <div class="card-icon amber weather-icon" aria-hidden="true">
+              <svg class="weather-icon__sun" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round">
                 <circle cx="12" cy="12" r="5" />
                 <path
                   d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4 -1.4M18.4 5.6l1.4 -1.4" />
               </svg>
+              <svg class="weather-icon__rain" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 18h10a4 4 0 0 0 .7-7.94A6 6 0 0 0 6.2 8.8 4.5 4.5 0 0 0 7 18Z" />
+                <path d="M8 20l-1 2M12 20l-1 2M16 20l-1 2" />
+              </svg>
             </div>
-            <h3 class="card-title">Bajo el sol de Barranquilla</h3>
-            <p class="card-text">Cada minuto de espera es un minuto más de calor, sin sombra ni certeza de que valga la
-              pena seguir esperando.</p>
+            <h3 class="card-title">Bajo el <button class="clima-word clima-word--sol is-active" type="button"
+                data-clima-choice="sol" aria-pressed="true">sol</button> o la <button
+                class="clima-word clima-word--lluvia" type="button" data-clima-choice="lluvia"
+                aria-pressed="false">lluvia</button> de Barranquilla</h3>
+            <p class="card-text weather-text">
+              <span class="weather-text__sol">Cada minuto de espera es un minuto más de calor, sin sombra ni certeza
+                de que valga la pena seguir esperando.</span>
+              <span class="weather-text__lluvia">Y cuando cae el aguacero tampoco hay dónde meterse: se espera igual,
+                mojándose, sin saber si el bus ya pasó.</span>
+            </p>
           </article>
 
           <article class="feature-card reveal" data-reveal-delay="200">
@@ -567,7 +800,7 @@
               <path
                 d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.159.57 4.184 1.564 5.938l-1.664 6.082 6.221-1.632c1.705.93 3.655 1.467 5.727 1.467 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12z" />
             </svg>
-            Escríbenos por WhatsApp
+            Hablemos por WhatsApp
           </a>
         </div>
 
@@ -607,6 +840,17 @@
   </main>
 
   <footer class="site-footer" id="pie">
+    <div class="footer-cta">
+      <span class="tracked-eyebrow eyebrow--ambar">YA VIENE EN BARRANQUILLA</span>
+      <h2>La ciudad se mueve contigo.</h2>
+      <p>Menos adivinar, más llegar. Ya Viene convierte cada ruta de Barranquilla en una respuesta en tiempo real.</p>
+      <div class="footer-actions">
+        <a href="#como-funciona" class="btn-primary btn-green">Explorar la app</a>
+        <a href="#empresas" class="btn-outline">Para empresas</a>
+      </div>
+      <p class="footer-cta-note">En movimiento con Sobusa y sus 6 rutas reales.</p>
+    </div>
+
     <div class="footer-grid">
       <div class="footer-intro">
         <a class="footer-brand" href="#top" aria-label="Ya Viene, inicio">
@@ -617,15 +861,23 @@
       </div>
 
       <nav class="footer-nav" aria-label="Navegación del pie de página">
-        <a href="#problema">El problema</a>
-        <a href="#como-funciona">Cómo funciona</a>
-        <a href="#empresas">Para empresas</a>
+        <div class="footer-nav-group">
+          <span>Explora</span>
+          <a href="#problema">El problema</a>
+          <a href="#como-funciona">Cómo funciona</a>
+        </div>
+        <div class="footer-nav-group">
+          <span>Conecta</span>
+          <a href="#empresas">Para empresas</a>
+          <a href="#empresas">Únete a la beta</a>
+        </div>
       </nav>
 
-      <a class="footer-whatsapp" href="https://wa.me/573004438626" target="_blank" rel="noopener">
-        Hablemos por WhatsApp
-        <span aria-hidden="true">↗</span>
-      </a>
+      <div class="footer-status">
+        <span>EN MOVIMIENTO</span>
+        <strong>6 rutas reales</strong>
+        <p>Sobusa ya se mueve en Barranquilla.</p>
+      </div>
     </div>
 
     <div class="footer-bottom">
