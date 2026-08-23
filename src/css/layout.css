@@ -63,7 +63,12 @@
   otra las derechas, y la posición de cada una es lo que le falta al centro
   de la baldosa —(17, 34)— para caer donde el painter pone el punto.
 
-  Las curvas del painter no vienen: a este tamaño competían con el contenido.
+  Y encima van las tres curvas del painter —routeA, routeB y routeC—, que es
+  lo que convierte la retícula en un mapa: puntos sueltos son textura de
+  plantilla, puntos con rutas cruzándolos son una ciudad. Viven dentro de
+  este mismo elemento, así que comparten opacidad y desvanecido y no hay que
+  cuadrar dos capas por separado.
+
   El color es `currentColor`, así que la trama sale blanca sobre los paneles
   de tinta y azul marino sobre los claros, sin repetir la regla.
 */
@@ -84,6 +89,16 @@
     rgba(0, 0, 0, 0.45) 76%, transparent 100%);
   -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 42%, #000 40%,
     rgba(0, 0, 0, 0.45) 76%, transparent 100%);
+}
+
+.panel-lineas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Se estiran al panel, igual que el painter estira sus curvas al canvas
+     que le toque: en uno ancho y bajo la ruta sale tendida, y está bien. */
+  color: inherit;
 }
 
 /* Sobre tinta el punto blanco pesa más que el azul sobre beige. */

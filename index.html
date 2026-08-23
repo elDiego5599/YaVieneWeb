@@ -69,11 +69,34 @@
     </div>
   </header>
 
+  <!--
+    Las tres curvas de MapPatternPainter, tal cual: routeA, routeB y routeC
+    con sus mismos números sobre un lienzo de 1000 x 1000. Se definen una
+    vez y cada panel las estira a su tamaño, que es exactamente lo que hace
+    el painter con el canvas que le toque.
+
+    `vector-effect` mantiene el trazo en 1,5 px aunque el panel sea ancho y
+    bajo; sin eso, estirar el lienzo estira también la línea.
+  -->
+  <svg width="0" height="0" aria-hidden="true" focusable="false" class="trama-molde">
+    <defs>
+      <g id="trama-rutas" fill="none" stroke="currentColor" stroke-width="1.5"
+        stroke-linecap="round" vector-effect="non-scaling-stroke">
+        <path d="M-20 160 C250 80 380 300 620 220 C800 160 880 340 1020 280" />
+        <path d="M120 -10 C60 180 280 260 220 480" />
+        <path d="M-20 740 C180 660 400 880 620 780 C800 700 900 860 1020 800" />
+      </g>
+    </defs>
+  </svg>
+
   <main id="contenido">
 
     <!-- ============ HERO ============ -->
     <section class="panel panel--sun hero-panel" id="hero">
-      <div class="panel-dots" aria-hidden="true"></div>
+      <div class="panel-dots" aria-hidden="true">
+        <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
+          focusable="false"><use href="#trama-rutas" /></svg>
+      </div>
 
       <div class="panel-inner hero-grid">
 
@@ -588,7 +611,10 @@
 
     <!-- ============ FRANJA DE DATOS ============ -->
     <section class="panel panel--ink stats-panel" aria-label="Estado del piloto">
-      <div class="panel-dots" aria-hidden="true"></div>
+      <div class="panel-dots" aria-hidden="true">
+        <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
+          focusable="false"><use href="#trama-rutas" /></svg>
+      </div>
       <div class="panel-inner tight stats-grid">
         <div class="stat reveal">
           <span class="stat-value">6</span>
@@ -630,7 +656,10 @@
       mismo de siempre; lo que cambia es quién habla más fuerte.
     -->
     <section class="panel panel--arena" id="problema" data-clima="sol">
-      <div class="panel-dots" aria-hidden="true"></div>
+      <div class="panel-dots" aria-hidden="true">
+        <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
+          focusable="false"><use href="#trama-rutas" /></svg>
+      </div>
       <div class="panel-inner problema-banda">
 
         <div class="section-head reveal problema-cabeza">
@@ -693,7 +722,10 @@
 
     <!-- ============ SOLUCIÓN ============ -->
     <section class="panel panel--mint" id="solucion">
-      <div class="panel-dots" aria-hidden="true"></div>
+      <div class="panel-dots" aria-hidden="true">
+        <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
+          focusable="false"><use href="#trama-rutas" /></svg>
+      </div>
       <div class="panel-inner solucion-grid">
 
         <div class="solucion-intro reveal">
@@ -748,7 +780,10 @@
 
     <!-- ============ CÓMO FUNCIONA ============ -->
     <section class="panel panel--arena" id="como-funciona">
-      <div class="panel-dots" aria-hidden="true"></div>
+      <div class="panel-dots" aria-hidden="true">
+        <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
+          focusable="false"><use href="#trama-rutas" /></svg>
+      </div>
       <div class="panel-inner">
         <div class="section-head reveal">
           <span class="tracked-eyebrow eyebrow--tenue">CÓMO FUNCIONA</span>
@@ -837,7 +872,10 @@
 
     <!-- ============ EMPRESAS & CONTACT ============ -->
     <section class="panel panel--ink" id="empresas">
-      <div class="panel-dots" aria-hidden="true"></div>
+      <div class="panel-dots" aria-hidden="true">
+        <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
+          focusable="false"><use href="#trama-rutas" /></svg>
+      </div>
       <div class="panel-inner companies-grid">
 
         <div class="companies-info reveal">
