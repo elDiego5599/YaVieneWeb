@@ -1001,19 +1001,6 @@
                           </svg>
                         </span>
                       </div>
-                      <div class="phone-notif" data-el="notif">
-                        <span class="phone-notif-icono">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                            stroke-linecap="round">
-                            <path d="M6 8a6 6 0 0 1 12 0c0 7 -6 11 -6 11s-6 -4 -6 -11" />
-                            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                          </svg>
-                        </span>
-                        <span class="phone-notif-texto">
-                          <strong data-el="notif-title">C16 Calle 72 Uninorte - B-042 está cerca de ti</strong>
-                          <span data-el="notif-body">Está a 640 m de tu ubicación</span>
-                        </span>
-                      </div>
                       <div class="phone-sheet phone-sheet--fija" data-el="sheet">
                         <span class="sheet-handle"></span>
                         <div class="eta-strip eta-strip--cerca" data-el="eta-bar"></div>
@@ -1035,6 +1022,28 @@
                           <span data-el="alert-label">AVISO ACTIVADO</span>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  <!--
+                    El aviso no se queda dentro de la pantalla: sale del
+                    aparato y se queda flotando al lado, la misma tarjeta
+                    del hero. Es lo que hace la notificación de verdad —
+                    llega aunque Ya Viene esté cerrada— y aquí además cierra
+                    el bucle: aparece, se lee y se desvanece para que el
+                    momento vuelva a empezar.
+                  -->
+                  <div class="scene-card scene-card--paso animate-float-delayed" data-el="notif">
+                    <span class="notif-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.2" stroke-linecap="round">
+                        <path d="M6 8a6 6 0 0 1 12 0c0 7 -6 11 -6 11s-6 -4 -6 -11" />
+                        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                      </svg>
+                    </span>
+                    <div>
+                      <strong data-el="notif-title">C16 Calle 72 Uninorte - B-042 está cerca de ti</strong>
+                      <span data-el="notif-body">Está a 640 m de tu ubicación</span>
                     </div>
                   </div>
                 </div>

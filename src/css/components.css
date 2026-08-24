@@ -1519,6 +1519,65 @@
   position: relative;
 }
 
+/* ── El aviso del tercer momento ──
+   La notificación no se dibuja dentro de la pantalla: sale del aparato y
+   se queda flotando a su derecha, que es la misma tarjeta del hero
+   —`.scene-card`— y aquí sólo hay que decirle dónde ponerse. Es más fiel
+   a lo que hace la app: el aviso llega con Ya Viene cerrada, así que
+   enseñarlo dentro del teléfono era enseñarlo en el sitio equivocado.
+
+   Se monta un poco sobre el canto derecho para que se lea como algo que
+   sale de ahí, y el ancho crece con la ventana porque lo que tiene al
+   lado —el trozo de columna que queda libre— también. Va después de
+   `.paso-toma > *`, que si no le gana el `position: relative`. */
+.scene-card--paso {
+  position: absolute;
+  /* Por encima de la hoja y del chip del teléfono, que llegan a 50: el
+     marco no abre contexto de apilado, así que sus piezas compiten con
+     ésta de tú a tú. */
+  z-index: 60;
+  top: 11%;
+  left: calc(100% - 96px);
+  width: max-content;
+  max-width: clamp(196px, 17vw, 240px);
+}
+
+/* Entra y sale como las del hero: sólo opacidad y desenfoque, que el
+   `transform` se lo lleva la levitación. Sin JavaScript —o sin
+   animaciones— se queda puesta, que es la foto con la que termina el
+   momento. */
+.es-guion .scene-card--paso {
+  opacity: 0;
+  filter: blur(3px);
+  transition: opacity 0.45s ease, filter 0.45s ease;
+}
+
+.es-guion .scene-card--paso.is-on {
+  opacity: 1;
+  filter: blur(0);
+}
+
+/* En una columna no hay costado que valga: el teléfono se centra, se hace
+   pequeño y la tarjeta pasa a cruzarlo por arriba, sobresaliendo por los
+   dos lados. Va sobre el mapa y no sobre la hoja porque abajo está el
+   número, que es lo que hay que poder leer. Y hay que devolverle el
+   `display`, porque las del hero se esconden por debajo de 860 y ésta no
+   está en el hero. */
+@media (max-width: 919px) {
+  .scene-card--paso {
+    top: 8%;
+    left: 50%;
+    translate: -50% 0;
+    max-width: min(268px, 76vw);
+  }
+}
+
+@media (max-width: 860px) {
+  .scene-card--paso {
+    display: flex;
+  }
+}
+
 /* ── El riel ──
    Índice y barra de avance a la vez: el momento activo se llena mientras
    dura y tocar uno lleva la página hasta su tramo. Aparece en cuanto la

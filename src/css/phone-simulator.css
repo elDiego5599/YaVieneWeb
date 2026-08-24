@@ -1338,78 +1338,13 @@
 }
 
 /*
-  La notificación asomada por arriba, como la manda Android con la app en
-  segundo plano: bajo la barra de estado, a 16 de cada borde.
-  El texto es el de bus_notification_service.dart y la tarjeta es la misma
-  del hero —vidrio esmerilado, filo blanco, sombra en dos capas y el
-  cuadrado verde con la campana—, sólo que aquí cada medida va en `--u`
-  para que siga siendo del tamaño que le toca dentro del teléfono.
-*/
-.phone-notif {
-  position: absolute;
-  z-index: 50;
-  top: calc(52 * var(--u));
-  left: calc(16 * var(--u));
-  right: calc(16 * var(--u));
-  display: flex;
-  align-items: center;
-  gap: calc(12 * var(--u));
-  padding: calc(13 * var(--u)) calc(18 * var(--u));
-  border-radius: calc(16 * var(--u));
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(calc(16 * var(--u)));
-  -webkit-backdrop-filter: blur(calc(16 * var(--u)));
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow:
-    0 calc(16 * var(--u)) calc(36 * var(--u)) calc(-8 * var(--u)) rgba(11, 22, 40, 0.14),
-    0 calc(4 * var(--u)) calc(12 * var(--u)) calc(-2 * var(--u)) rgba(11, 22, 40, 0.06);
-}
-
-.phone-notif-icono {
-  width: calc(32 * var(--u));
-  height: calc(32 * var(--u));
-  flex: none;
-  display: grid;
-  place-items: center;
-  border-radius: calc(10 * var(--u));
-  background: var(--green);
-  color: #FFFFFF;
-}
-
-.phone-notif-icono svg {
-  width: calc(16 * var(--u));
-  height: calc(16 * var(--u));
-  display: block;
-}
-
-.phone-notif-texto {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: calc(2 * var(--u));
-}
-
-.phone-notif-texto strong {
-  font-size: calc(13 * var(--u));
-  font-weight: 700;
-  line-height: 1.25;
-  color: var(--text-primary);
-}
-
-.phone-notif-texto span {
-  font-size: calc(12 * var(--u));
-  line-height: 1.3;
-  color: var(--text-secondary);
-}
-
-/*
   Estados del guion. Sin JavaScript —o con las animaciones desactivadas—
   el teléfono se queda en la foto final de su momento, que es la que
   cuenta el texto de al lado. `es-guion` sólo la pone paso-demo.ts al
-  arrancar, y a partir de ahí las piezas entran y salen a su turno.
+  arrancar —sobre el momento entero, porque el aviso ya vive fuera de la
+  pantalla— y a partir de ahí las piezas entran y salen a su turno.
 */
-.es-guion .app-chip,
-.es-guion .phone-notif {
+.es-guion .app-chip {
   opacity: 0;
   transform: translateY(calc(-10 * var(--u)));
   transition:
@@ -1417,8 +1352,7 @@
     transform 0.32s var(--ease-out-cubic);
 }
 
-.es-guion .app-chip.is-on,
-.es-guion .phone-notif.is-on {
+.es-guion .app-chip.is-on {
   opacity: 1;
   transform: none;
 }

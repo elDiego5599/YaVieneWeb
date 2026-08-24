@@ -102,7 +102,6 @@ const arrancar = (): void => {
   */
   const pistaPasos = document.querySelector<HTMLElement>('[data-pasos-pista]');
   if (pistaPasos) {
-    const pasos = new Pasos(pistaPasos);
     const demos = new Map<number, PasoDemo>();
 
     for (const paso of pistaPasos.querySelectorAll<HTMLElement>('[data-paso]')) {
@@ -114,9 +113,12 @@ const arrancar = (): void => {
       demos.set(numero - 1, new PasoDemo(paso, new PhoneMap(capa, lienzo), numero));
     }
 
-    pasos.alReposo = (indice) => {
+    // Los teléfonos primero: `Pasos` mide en cuanto se construye, y si la
+    // página se refresca ya parada dentro de un momento ése es el único
+    // aviso que va a dar. Tienen que estar todos listos para recibirlo.
+    new Pasos(pistaPasos, (indice) => {
       for (const [i, demo] of demos) demo.activar(i === indice);
-    };
+    });
   }
 };
 

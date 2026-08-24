@@ -105,13 +105,24 @@ export class Pasos {
   private portadaIrse = -1;
   private rielVisible = false;
 
-  /** Le dice a main.ts qué teléfono está quieto y le toca moverse. */
-  alReposo: ((indice: number) => void) | null = null;
+  /**
+   * Le dice a main.ts qué teléfono está quieto y le toca moverse.
+   *
+   * Entra por el constructor y no como propiedad suelta a propósito. La
+   * primera medida se toma aquí dentro, antes de devolver el objeto: si
+   * la página arranca ya parada dentro de un momento —refrescando a media
+   * sección— ése es el único aviso que se da en todo el rato, porque el
+   * siguiente no llega hasta que el reposo cambie de momento. Asignando
+   * el aviso después, ese primero se perdía y el teléfono se quedaba
+   * congelado en su foto de reposo hasta que uno subía y volvía a bajar.
+   */
+  private readonly alReposo: ((indice: number) => void) | null;
 
-  constructor(pista: HTMLElement) {
+  constructor(pista: HTMLElement, alReposo?: (indice: number) => void) {
     const portada = pista.querySelector<HTMLElement>('[data-pasos-portada]');
     const pasos = Array.from(pista.querySelectorAll<HTMLElement>('[data-paso]'));
     if (!portada || pasos.length === 0) throw new Error('Pasos: faltan piezas');
+    this.alReposo = alReposo ?? null;
     this.pista = pista;
     this.portada = portada;
     this.riel = pista.querySelector<HTMLElement>('.pasos-riel');

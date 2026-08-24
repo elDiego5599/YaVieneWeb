@@ -36,6 +36,7 @@ const MIRA_X = 0.5;
 const MIRA_Y = 0.44;
 
 export class PasoDemo {
+  private readonly raiz: HTMLElement;
   private readonly pantalla: HTMLElement;
   private readonly mapa: PhoneMap;
   private readonly guion: number;
@@ -57,6 +58,7 @@ export class PasoDemo {
     const pantalla = paso.querySelector<HTMLElement>('.phone-screen');
     if (!pantalla) throw new Error('PasoDemo: el momento no trae teléfono');
 
+    this.raiz = paso;
     this.pantalla = pantalla;
     this.mapa = mapa;
     this.guion = guion;
@@ -82,7 +84,7 @@ export class PasoDemo {
 
     // A partir de aquí manda el guion: sin esta clase el teléfono se queda
     // en esa misma foto, que es lo que se ve si el JavaScript no llega.
-    this.pantalla.classList.add('es-guion');
+    this.raiz.classList.add('es-guion');
     this.reposo();
   }
 
@@ -106,8 +108,12 @@ export class PasoDemo {
 
   /* ---------- Andamio ---------- */
 
+  /*
+    Se busca en el momento entero y no sólo en la pantalla: el aviso del
+    tercero ya no se dibuja dentro del teléfono, sino flotando al lado.
+  */
   private el(nombre: string): HTMLElement | null {
-    return this.pantalla.querySelector<HTMLElement>(`[data-el="${nombre}"]`);
+    return this.raiz.querySelector<HTMLElement>(`[data-el="${nombre}"]`);
   }
 
   private texto(nombre: string, valor: string): void {
