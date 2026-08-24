@@ -86,7 +86,6 @@ export class MapaVivo {
   private readonly lecturaBus: HTMLElement;
   private readonly lecturaMetros: HTMLElement;
   private readonly lecturaPie: HTMLElement;
-  private readonly pieRuta: HTMLElement;
 
   private readonly casing: SVGPathElement;
   private readonly activa: SVGPathElement;
@@ -122,7 +121,6 @@ export class MapaVivo {
     this.lecturaBus = req<HTMLElement>(raiz, '[data-mapa-bus]');
     this.lecturaMetros = req<HTMLElement>(raiz, '[data-mapa-metros]');
     this.lecturaPie = req<HTMLElement>(raiz, '[data-mapa-lectura-pie]');
-    this.pieRuta = req<HTMLElement>(raiz, '[data-mapa-pie]');
 
     // La C16 Calle 72 Uninorte es la que abre el resto de la página.
     this.ruta = YV_RUTAS.rutas.find(r => r.id === 'R-106') ?? YV_RUTAS.rutas[0];
@@ -309,7 +307,6 @@ export class MapaVivo {
     for (const boton of this.lista.querySelectorAll<HTMLElement>('[data-ruta]')) {
       boton.setAttribute('aria-pressed', String(boton.dataset.ruta === id));
     }
-    this.pieRuta.textContent = `${ruta.nombre} · ${ruta.terminalA} → ${ruta.terminalB}`;
 
     this.dibujarTerminales();
     // Al cambiar de ruta el punto de espera se queda donde estaba, pero su
