@@ -75,9 +75,32 @@
   background: var(--surface);
 }
 
-/* Superficie técnica: blanco roto #F8FAFC bajo la trama de puntos. */
+/*
+  El fondo del hero. Era un #F8FAFC plano —blanco azulado de laboratorio,
+  de una sola pieza— y con la trama encima acababa pareciendo la sala de
+  espera de una consulta. Ahora es luz en vez de pintura: blanco limpio
+  arriba, que es donde caen la isla de navegación y el titular y donde el
+  texto necesita el contraste entero, y hacia abajo se va calentando hasta
+  la crema de la app —`--arena`, la misma superficie que llevan las hojas
+  del teléfono—, con un halo verde detrás del grupo de aparatos y dos
+  respiros de azul marino en las esquinas altas para que el blanco no se
+  lea liso.
+
+  El halo va abajo y no en el centro a propósito: es lo que despega los
+  teléfonos del fondo ahora que el fondo también tira a cálido, y de paso
+  ata el hero al verde de la marca sin teñir el titular.
+
+  El resto de paneles claros —`papel`, `mint`— van hacia el verde frío;
+  éste es el único que va hacia el cálido, y por eso la apertura no se
+  confunde con ninguna de las secciones que vienen después.
+*/
 .panel--sun {
-  background-color: #F8FAFC;
+  background-color: #F7F3EC;
+  background-image:
+    radial-gradient(1120px 680px at 50% 96%, rgba(0, 168, 89, 0.16), rgba(0, 168, 89, 0) 66%),
+    radial-gradient(820px 460px at 92% 0%, rgba(20, 39, 78, 0.07), rgba(20, 39, 78, 0) 68%),
+    radial-gradient(720px 420px at 6% 4%, rgba(20, 39, 78, 0.06), rgba(20, 39, 78, 0) 68%),
+    linear-gradient(180deg, #FFFFFF 0%, #FDFBF7 34%, #F5F0E7 100%);
 }
 
 .panel--mint {
@@ -136,6 +159,12 @@
     rgba(0, 0, 0, 0.45) 76%, transparent 100%);
   -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 42%, #000 40%,
     rgba(0, 0, 0, 0.45) 76%, transparent 100%);
+}
+
+/* Sobre el hero la trama baja un punto: el fondo ya tiene degradado y
+   halo, y a 0,07 los puntos volvían a leerse como rejilla de plantilla. */
+.panel--sun .panel-dots {
+  opacity: 0.05;
 }
 
 /* Sobre tinta el punto blanco pesa más que el azul sobre beige. */

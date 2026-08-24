@@ -571,12 +571,55 @@
   opacity: 0.5;
 }
 
+/*
+  El velo del diálogo, bajado sólo aquí. En la app es Color(0x66000000)
+  —negro al 40 %— y ahí está bien: se mira un teléfono y el velo dice que
+  encima hay una hoja. En el hero hay tres juntos, y a esa fuerza el de la
+  izquierda dejaba de leerse como la misma app que el central: un mapa
+  gris al lado de un mapa crema. Se conserva el velo, que es real, pero al
+  24 % y en el azul marino de la marca en vez de negro puro: oscurece sin
+  desaturar, y los tres vuelven a ser el mismo aparato. La demo de los
+  momentos —un solo teléfono en pantalla— se queda con el 40 % de la app.
+*/
+.hero-phone-side .phone-scrim {
+  background: rgba(11, 22, 40, 0.24);
+}
+
+/*
+  Los tres aparatos respiran. Sin esto la escena es una foto con un vídeo
+  pegado en el medio: todo el movimiento queda encerrado en la pantalla
+  del central y el conjunto se siente tieso. Amplitudes chicas y periodos
+  largos y distintos, para que no suban y bajen a la vez como un ascensor.
+
+  Se anima `translate` y no `transform` a propósito: los laterales ya
+  llevan un `translateY(2.5%)` propio y las dos propiedades se componen
+  sin pisarse. Además compone en el hilo de composición, igual que un
+  `transform`, así que no cuesta un reflujo por cuadro.
+*/
+@keyframes heroRespira {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 calc(var(--respiro, 7px) * -1);
+  }
+}
+
+.hero-phone-wrap {
+  animation: heroRespira 9s ease-in-out infinite;
+}
+
 .hero-phone-side--izq {
+  --respiro: 5px;
   margin-right: calc(var(--solape) * -1);
+  animation: heroRespira 11.5s ease-in-out -4.2s infinite;
 }
 
 .hero-phone-side--der {
+  --respiro: 4px;
   margin-left: calc(var(--solape) * -1);
+  animation: heroRespira 10.4s ease-in-out -7.6s infinite;
 }
 
 @media (min-width: 1400px) {
@@ -1526,20 +1569,27 @@
    a lo que hace la app: el aviso llega con Ya Viene cerrada, así que
    enseñarlo dentro del teléfono era enseñarlo en el sitio equivocado.
 
-   Se monta un poco sobre el canto derecho para que se lea como algo que
-   sale de ahí, y el ancho crece con la ventana porque lo que tiene al
-   lado —el trozo de columna que queda libre— también. Va después de
-   `.paso-toma > *`, que si no le gana el `position: relative`. */
+   Flota entera fuera del aparato, sin montarse encima, que es como están
+   las dos del hero: allí se apartan del escenario `--aire` píxeles y por
+   eso se leen como algo que ocurre al lado del teléfono y no como un
+   parche pegado a la pantalla. Aquí el hueco es lo que sobra de la
+   columna —el teléfono va pegado a su principio—, así que el apartado y
+   el ancho crecen con la ventana pero sin llegar nunca a pasarse de la
+   mitad de página. Va después de `.paso-toma > *`, que si no le gana el
+   `position: relative`. */
 .scene-card--paso {
   position: absolute;
   /* Por encima de la hoja y del chip del teléfono, que llegan a 50: el
      marco no abre contexto de apilado, así que sus piezas compiten con
      ésta de tú a tú. */
   z-index: 60;
-  top: 11%;
-  left: calc(100% - 96px);
+  top: 16%;
+  left: calc(100% + clamp(10px, 1.4vw, 26px));
   width: max-content;
-  max-width: clamp(196px, 17vw, 240px);
+  /* El tope es el que deja el sitio libre en el peor caso —920 px, con la
+     columna en su mínimo—: por encima de esto la tarjeta se saldría del
+     panel, que va recortado. */
+  max-width: clamp(180px, 17vw, 272px);
 }
 
 /* Entra y sale como las del hero: sólo opacidad y desenfoque, que el

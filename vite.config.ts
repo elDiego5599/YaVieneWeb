@@ -1,8 +1,13 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 
 export default defineConfig({
   // La landing se sirve desde la raíz del dominio.
   base: '/',
+  // Los tests de humo montan el formulario real: necesitan un DOM.
+  test: {
+    environment: 'happy-dom',
+  },
   build: {
     outDir: 'dist',
     // El mosaico de Barranquilla pesa ~160 KB. Si se inline como data URI
