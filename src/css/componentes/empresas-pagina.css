@@ -1,18 +1,15 @@
-/* ── EMPRESAS (PÁGINA) ─────────────────────────────────────
+/* ── EMPRESAS (LA PÁGINA) ──────────────────────────────────
 
-   La página `/empresas.html`: la que se abre cuando una empresa de
-   transporte quiere saber qué tiene que hacer para que sus buses salgan
-   en el mapa. La portada sólo deja el aviso y el enlace.
+   `/empresas.html` es una sola pantalla: a la izquierda qué es esto y qué
+   se ve desde la oficina, a la derecha los tres datos con los que te
+   llamamos. Nada más. La página anterior contaba el turno del conductor
+   en cinco paneles, y ese producto ya no existe: el GPS va montado en el
+   vehículo, así que no hay turno que contar ni app que abrir.
 
-   Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
-   Se carga desde ahí y **el orden importa**: hay reglas que se pisan
-   entre secciones a propósito, así que mover este `@import` de sitio
-   cambia lo que se ve. Si haces una regla nueva que no se aplica, mira
-   primero si más abajo en el orden de carga hay otra con la misma
-   especificidad. Es el fallo que más veces ha pasado en esta base.
-
-   Nada de aquí cuelga de un `#id`: la portada y esta página comparten
-   la llamada final y las dos tienen que poder usar las mismas clases.
+   Este fichero no se carga desde `components.css`: lo importa
+   `src/empresas.ts`, que es la única entrada que lo usa. Va después del
+   índice de componentes, así que en la cascada sigue siendo el último y
+   puede afinar lo que venga de `nav.css`.
    ────────────────────────────────────────────────────────────────── */
 
 /* ── El menú, estando ya en la página ──────────────────────────────── */
@@ -33,299 +30,411 @@
   background: rgba(255, 255, 255, 0.07);
 }
 
-/* ── Apertura ──────────────────────────────────────────────────────── */
+/* ── Las dos columnas ──────────────────────────────────────────────── */
 
-.empresa-hero {
+/*
+  Explicación y formulario, uno al lado del otro. `start` y no `center`:
+  las dos columnas miden distinto y alineadas por el centro la ficha
+  quedaba flotando media pantalla más abajo que su titular.
+*/
+.empresa-consulta {
+  display: grid;
+  gap: clamp(28px, 4vw, 60px);
+  align-items: start;
+}
+
+@media (min-width: 1000px) {
+  .empresa-consulta {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+  }
+}
+
+/* ── La columna de la izquierda ────────────────────────────────────── */
+
+/* Arena, el fondo de la app, sobre el papel del panel: la ficha se lee
+   como una pieza de producto y no como otro párrafo de la página. */
+.empresa-ficha {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 22px;
-  text-align: center;
-}
-
-.empresa-hero h1 {
-  font-family: var(--font-display);
-  font-size: var(--step-h2);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
-  font-weight: 700;
-  max-width: 20ch;
-}
-
-.empresa-hero-lead {
-  font-size: var(--step-lead);
-  line-height: 1.5;
-  color: var(--text-secondary);
-  max-width: var(--measure);
-}
-
-.empresa-nota {
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.empresa-acciones {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-}
-
-/*
-  Las tres cifras de debajo del titular. Son datos del código de la app
-  del conductor, no adornos: el intervalo del GPS, el tamaño del búfer y
-  la espera del ACK. Van en dígitos tabulares porque en tres columnas los
-  números tienen que empezar a la misma altura.
-*/
-.empresa-hechos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
-  gap: 14px;
-  width: 100%;
-  max-width: 900px;
-  margin-top: 10px;
-}
-
-.empresa-hecho {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 20px 22px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.72);
+  padding: clamp(22px, 2.6vw, 36px);
+  border-radius: clamp(22px, 2.4vw, 32px);
+  background: var(--arena);
   border: 1px solid var(--border-subtle);
-  text-align: left;
 }
 
-.empresa-hecho dt {
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.25rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-  color: var(--green-accessible);
-}
-
-.empresa-hecho dd {
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--text-secondary);
-}
-
-/* ── Los tres momentos del turno ───────────────────────────────────── */
-
-/*
-  Aquí la numeración sí dice algo: el conductor abre turno, transmite y
-  cierra turno, y no hay forma de hacerlo en otro orden. Si algún día
-  estas tarjetas dejan de ser una secuencia, el número se cae con ellas.
-*/
-.empresa-pasos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-  gap: 18px;
-  counter-reset: paso;
-}
-
-.empresa-paso {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: clamp(24px, 2.4vw, 32px);
-  border-radius: 24px;
-  background: var(--surface);
-  border: 1px solid var(--divider);
-  box-shadow: 0 22px 50px -34px rgba(11, 22, 40, 0.34);
-}
-
-.empresa-paso::before {
-  counter-increment: paso;
-  content: counter(paso);
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--green-tint);
-  color: var(--green-accessible);
-  font-size: 14px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-
-.empresa-paso h3 {
+.empresa-ficha h2 {
   font-family: var(--font-display);
   font-size: var(--step-h3);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
   font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.empresa-paso p {
-  font-size: var(--step-body);
-  line-height: 1.55;
-  color: var(--text-secondary);
-}
-
-/* ── Las dos aplicaciones, sobre tinta ─────────────────────────────── */
-
-.empresa-apps {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
-  gap: 18px;
-}
-
-.empresa-app {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: clamp(26px, 2.6vw, 36px);
-  border-radius: 26px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-glass);
-}
-
-.empresa-app h3 {
-  font-family: var(--font-display);
-  font-size: var(--step-h3);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.empresa-app > p {
-  font-size: var(--step-body);
-  line-height: 1.55;
-  color: var(--text-white-dim);
+  max-width: 22ch;
 }
 
 .empresa-lista {
   display: flex;
   flex-direction: column;
-  gap: 11px;
+  gap: 13px;
   list-style: none;
 }
 
 .empresa-lista li {
   position: relative;
-  padding-left: 26px;
+  padding-left: 28px;
   font-size: var(--step-body);
   line-height: 1.5;
-  color: var(--text-white-dim);
-}
-
-/* La marca de la lista es tipografía, no un icono: un `•` con color de
-   marca pesa lo justo y no añade una petición ni un SVG más al HTML. */
-.empresa-lista li::before {
-  content: '▸';
-  position: absolute;
-  left: 4px;
-  top: 0;
-  color: var(--green);
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-/* El texto literal que sale en la pantalla de la app. Hereda el color del
-   panel en el que esté —tinta o papel— y sólo sube de peso: lo que lo
-   separa de lo que contamos nosotros es el énfasis, no un color nuevo. */
-.empresa-cita {
-  font-family: var(--font-family);
-  font-size: 0.95em;
-  font-weight: 700;
-  color: inherit;
-}
-
-/* ── Cuando algo falla ─────────────────────────────────────────────── */
-
-.empresa-fallos {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-  gap: 18px;
-}
-
-.empresa-fallo {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: clamp(24px, 2.4vw, 32px);
-  border-radius: 24px;
-  background: var(--surface);
-  border: 1px solid var(--divider);
-}
-
-.empresa-fallo h3 {
-  font-family: var(--font-display);
-  font-size: var(--step-h3);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.empresa-fallo p {
-  font-size: var(--step-body);
-  line-height: 1.55;
   color: var(--text-secondary);
 }
 
-/* El rótulo de arriba de cada tarjeta: lo que el conductor ve cuando pasa
-   eso. El color lo pone el modificador, que es el mismo semáforo de la
-   app: ámbar para lo que se recupera solo, rojo para lo que se corta. */
-.empresa-marca {
-  align-self: flex-start;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+/* La marca de la lista es tipografía, no un icono: un carácter con color
+   de marca pesa lo justo y no añade una petición ni un SVG más. */
+.empresa-lista li::before {
+  content: '✓';
+  position: absolute;
+  left: 2px;
+  top: 0;
+  color: var(--green-accessible);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
 }
 
-.empresa-marca--espera {
-  background: var(--warn-light);
-  color: var(--warn);
+/* El texto literal que sale en la pantalla del panel. Hereda el color de
+   donde esté y sólo sube de peso: lo que lo separa de lo que contamos
+   nosotros es el énfasis, no un color nuevo. */
+.empresa-cita {
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
-.empresa-marca--corta {
-  background: var(--error-light);
-  color: var(--error);
-}
-
-/* ── La llamada final, compartida con la portada ───────────────────── */
-
-.empresa-llamada {
+.empresa-piloto {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  text-align: center;
+  gap: 4px;
+  padding-top: 18px;
+  border-top: 1px solid var(--divider);
 }
 
-.empresa-llamada h2 {
+.empresa-piloto span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+}
+
+.empresa-piloto strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── El panel de control, en pequeño ───────────────────────────────── */
+
+/*
+  Un recorte de la app de escritorio: la barra, las cuatro pestañas con
+  sus cuentas y cuatro buses de la flota de pruebas. Los números cuadran
+  entre sí como cuadran en el panel de verdad —«En línea» cuenta los que
+  transmiten aunque estén ocultos, por eso 3 y no 2— y las placas son las
+  de la base de datos de pruebas, no unas inventadas para la foto.
+
+  Es una imagen, y se anuncia como tal: `role="img"` con su descripción.
+  Un lector de pantalla no tiene por qué leer una tabla de mentira.
+*/
+.consola {
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  box-shadow: 0 18px 40px -30px rgba(11, 22, 40, 0.5);
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+}
+
+.consola-barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 14px;
+  background: var(--ink);
+  color: var(--text-white);
+}
+
+.consola-barra span:first-child {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+.consola-barra span:last-child {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-white-dim);
+}
+
+.consola-pestanas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 14px 0;
+}
+
+.consola-pestanas span {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* La pestaña abierta, con el azul que en el panel marca lo que el
+   operador tiene seleccionado. */
+.consola-pestanas .es-activa {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--electric-blue);
+}
+
+.consola-flota {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px 14px;
+  list-style: none;
+}
+
+.consola-flota li {
+  display: grid;
+  grid-template-columns: 8px minmax(0, auto) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: 12px;
+  border: 1px solid var(--divider);
+}
+
+.consola-flota b {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+}
+
+.consola-estado {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.consola-punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bus-ghost);
+}
+
+.consola-punto--linea {
+  background: var(--green);
+}
+
+/* «PERMITIDO» / «OCULTO»: el interruptor con el que la empresa decide qué
+   ve el pasajero. Es lo único de la ficha que es una decisión y no un
+   estado, así que es lo único que lleva color de acción. */
+.consola-visible {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--green-accessible);
+}
+
+.consola-visible--oculto {
+  color: var(--coral);
+}
+
+/* La fila abierta en la ficha del operador. Mismo azul que la pestaña. */
+.consola-flota .es-elegida {
+  border-color: rgba(37, 99, 235, 0.45);
+  background: rgba(37, 99, 235, 0.05);
+}
+
+/* ── La columna de la derecha: los datos ───────────────────────────── */
+
+.empresa-solicitud {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.empresa-solicitud h1 {
   font-family: var(--font-display);
   font-size: var(--step-h2);
   line-height: 0.98;
   letter-spacing: -0.035em;
   font-weight: 700;
-  max-width: 18ch;
 }
 
-.empresa-llamada p {
+.empresa-solicitud > p {
   font-size: var(--step-lead);
   line-height: 1.5;
   color: var(--text-secondary);
   max-width: var(--measure);
 }
 
-/* ── La ficha de contacto ──────────────────────────────────────────── */
+/* El formulario va desnudo sobre el panel: la ficha blanca que llevaba
+   antes competía con la de la izquierda y la pantalla acababa siendo dos
+   tarjetas mirándose. Aquí el que tiene marco es el producto. */
+.contact-form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-/*
-  `.companies-info` viene de empresas.css y allí su `h2` no tiene tamaño:
-  `.section-title` sólo está definida dentro de `.section-head`, así que el
-  titular caía al de por defecto del navegador. Se le da aquí, que es donde
-  vive ahora el bloque.
-*/
-.companies-info h2 {
-  font-family: var(--font-display);
-  font-size: var(--step-h2);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-label {
+  font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  color: var(--text-primary);
+  font-size: 15px;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.form-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* El foco no se marca sólo con el borde: un píxel de color es lo primero
+   que se pierde con la pantalla al sol, que es donde se llena esto. */
+.form-input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(0, 168, 89, 0.16);
+}
+
+.form-submit-btn {
+  margin-top: 2px;
+  padding: 16px;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.form-submit-btn:hover {
+  background: #00C267;
+  transform: translateY(-2px);
+}
+
+/* Un envío que falla lo dice donde el usuario está mirando: justo encima
+   del botón que acaba de tocar. */
+.form-error {
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--coral-light);
+  border: 1px solid rgba(232, 106, 94, 0.36);
+  color: #8C2F26;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.form-error[hidden] {
+  display: none;
+}
+
+/* El aviso de recibido lo enseña y lo esconde el atributo `hidden`, no una
+   clase aparte: un solo interruptor, el que el navegador ya entiende. */
+.form-success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: clamp(30px, 4vw, 46px);
+  border-radius: 26px;
+  background: var(--green-tint);
+  border: 1px solid rgba(0, 168, 89, 0.28);
+}
+
+.form-success-message[hidden] {
+  display: none;
+}
+
+.form-success-message h3 {
+  color: var(--ink);
+  font-size: var(--step-h3);
+}
+
+.form-success-message p {
+  color: var(--text-secondary);
+  font-size: var(--step-body);
+  line-height: 1.5;
+  max-width: 44ch;
+}
+
+.form-success-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* La salida de siempre para el que no quiere llenar un formulario. */
+.whatsapp-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  background: #25D366;
+  color: #06301A;
+  font-size: 14px;
+  font-weight: 700;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.whatsapp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px -12px rgba(37, 211, 102, 0.6);
+}
+
+/* En un teléfono la fila no da para las cuatro columnas y «Sin señal»
+   partía en dos líneas. Se cae el texto del estado, que es el dato que ya
+   lleva el punto de color al lado; lo que no se cae es la placa ni el
+   permiso, que es lo que la fila viene a contar. */
+@media (max-width: 420px) {
+  .consola-estado {
+    display: none;
+  }
+
+  /* Con una columna menos, la que se estira pasa a ser la de la placa: si
+     no, el permiso se queda pegado a la placa y la fila se lee torcida. */
+  .consola-flota li {
+    grid-template-columns: 8px minmax(0, 1fr) auto;
+  }
 }

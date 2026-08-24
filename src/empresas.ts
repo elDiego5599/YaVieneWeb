@@ -3,10 +3,10 @@
  *
  * La página que lee una empresa de transporte antes de decidir si conecta
  * su flota. No tiene mapa, ni teléfono en marcha, ni scrollytelling: es
- * texto, tres tarjetas y el formulario, así que carga el CSS común y sólo
- * las tres piezas que de verdad usa —la isla de navegación, las
- * apariciones al entrar en pantalla y el formulario—, no el paquete
- * entero de la portada.
+ * una explicación, un recorte del panel de control y el formulario, así
+ * que carga sólo las tres piezas que de verdad usa —la isla de
+ * navegación, las apariciones al entrar en pantalla y el formulario—, no
+ * el paquete entero de la portada.
  *
  * `phone-simulator.css` se queda fuera por lo mismo: aquí no hay ningún
  * teléfono que vestir.
@@ -17,6 +17,11 @@ import './css/variables.css';
 import './css/base.css';
 import './css/layout.css';
 import './css/components.css';
+
+/* El CSS de esta página no entra en `components.css`: sólo se usa aquí, y
+   metiéndolo en el índice común lo pagaban también la portada y las
+   legales. Va después, así que en la cascada sigue siendo el último. */
+import './css/componentes/empresas-pagina.css';
 import './css/animations.css';
 import './css/accesibilidad.css';
 

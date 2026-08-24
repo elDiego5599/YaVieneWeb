@@ -5,9 +5,18 @@
    encajonada en una banda central. */
 
 .panel {
-  /* La isla de navegación va fija arriba: sin este margen, un salto de
-     anclaje deja el arranque de la sección debajo de la isla. */
-  scroll-margin-top: 96px;
+  /*
+    Dónde para un salto de anclaje. Justo el hueco entre paneles: el panel
+    de destino arranca pegado al borde de arriba y encima sólo queda la
+    franja de fondo, no el final del panel anterior. Con la isla flotando
+    —que no tapa el ancho entero— esa tira del panel de arriba se veía como
+    media sección de sobra, y la de destino empezaba ya cortada.
+
+    Que la isla quede por encima del arranque del panel no estorba: lo que
+    hay ahí es el relleno de `.panel-inner`, más alto que la isla, así que
+    el título entra siempre por debajo.
+  */
+  scroll-margin-top: var(--panel-gap);
   position: relative;
   margin: 0 var(--gutter) var(--panel-gap);
   border-radius: var(--panel-radius);

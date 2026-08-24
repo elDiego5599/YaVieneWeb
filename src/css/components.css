@@ -10,7 +10,9 @@
    cualquier línea de sitio cambia lo que se ve en pantalla.
 
    El empaquetador funde los @import en un único fichero al construir,
-   así que esto no cuesta ninguna petición de más.
+   así que esto no cuesta ninguna petición de más. Por lo mismo, lo que
+   sólo usa una página no entra en esta lista: `empresas-pagina.css` se
+   carga desde `src/empresas.ts` y así el resto del sitio no lo paga.
    ===================================== */
 
 @import './componentes/nav.css';
@@ -19,7 +21,6 @@
 @import './componentes/problema.css';
 @import './componentes/pasos.css';
 @import './componentes/empresas.css';
-@import './componentes/empresas-pagina.css';
 @import './componentes/pie.css';
 @import './componentes/caribe.css';
 @import './componentes/mapa.css';

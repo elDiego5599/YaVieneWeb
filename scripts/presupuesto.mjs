@@ -32,11 +32,15 @@ const TOPES = {
  *  latin-ext, la imagen para redes) no entra en esta cuenta porque en esa
  *  visita no se pide. */
 const NO_ENTRA_EN_LA_PRIMERA_VISITA = [
-  /^(privacidad|terminos|404)\.html$/,
+  /^(privacidad|terminos|404|empresas)\.html$/,
   /latin-ext-[^/]*\.woff2$/,
   /^og\.png$/,
   /^logo\.svg$/,
   /^(hoja|404|accesibilidad)-[^/]*\.js$/,
+  // El CSS de /empresas.html va en su propio fichero desde que salió del
+  // índice común: la portada no lo pide. El de `accesibilidad` sí entra,
+  // que ahí es donde el empaquetador dejó la hoja compartida.
+  /^empresas-[^/]*\.(js|css)$/,
 ];
 
 function recorrer(dir, base = '') {

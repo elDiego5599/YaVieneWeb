@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ya Viene para empresas</title>
   <meta name="description"
-    content="Conecta la flota de tu empresa de transporte a Ya Viene: el conductor lleva la app en su celular y tus buses salen en el mapa de los pasajeros, sin instalar nada en el vehículo." />
+    content="Conecta la flota de tu empresa de transporte a Ya Viene: el GPS va montado en el bus, tus buses salen en el mapa de los pasajeros y tú los ves desde el panel de control." />
   <link rel="canonical" href="%VITE_SITE_URL%/empresas.html" />
   <meta name="robots" content="index, follow" />
 
@@ -19,7 +19,7 @@
   <meta property="og:url" content="%VITE_SITE_URL%/empresas.html" />
   <meta property="og:title" content="Ya Viene para empresas — Conecta tu flota" />
   <meta property="og:description"
-    content="El conductor abre la app al empezar el turno y el bus aparece en el mapa de los pasajeros. Sin instalar nada en el vehículo." />
+    content="El GPS va montado en el bus y la posición aparece en el mapa de los pasajeros. Tú ves la flota entera desde el panel de control." />
   <meta property="og:image" content="%VITE_SITE_URL%/og.png" />
   <meta property="og:image:secure_url" content="%VITE_SITE_URL%/og.png" />
   <meta property="og:image:type" content="image/png" />
@@ -31,7 +31,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Ya Viene para empresas — Conecta tu flota" />
   <meta name="twitter:description"
-    content="El conductor abre la app al empezar el turno y el bus aparece en el mapa de los pasajeros." />
+    content="El GPS va montado en el bus y la posición aparece en el mapa de los pasajeros." />
   <meta name="twitter:image" content="%VITE_SITE_URL%/og.png" />
 
   <meta name="theme-color" content="#0B1628" />
@@ -51,7 +51,8 @@
       href="./src/assets/fonts/bricolage-grotesque-latin.woff2" />
 
   <!-- Esta página no lleva ni mapa ni teléfono en marcha: su arranque es
-       mucho más corto que el de la portada. Ver src/empresas.ts. -->
+       mucho más corto que el de la portada, y su CSS viaja con ella en vez
+       de ir en el paquete común. Ver src/empresas.ts. -->
   <script type="module" src="/src/empresas.ts"></script>
 </head>
 
@@ -104,185 +105,92 @@
 
   <main id="contenido">
 
-    <!-- ============ APERTURA ============ -->
-    <section class="panel panel--sun">
-      <div class="panel-dots" aria-hidden="true"></div>
-
-      <div class="panel-inner empresa-hero">
-        <span class="tracked-eyebrow eyebrow--verde">PARA EMPRESAS</span>
-        <h1>Tu flota en el mapa, sin instalar nada en los buses</h1>
-        <p class="empresa-hero-lead">El conductor abre la app en su celular al empezar el turno y el bus
-          aparece en el mapa de los pasajeros. La posición, el rumbo y la velocidad se publican solos;
-          tú los ves en el panel de control, ruta por ruta.</p>
-
-        <div class="empresa-acciones">
-          <a href="#solicitar" class="btn-primary btn-green">Solicitar la conexión</a>
-          <a href="https://wa.me/573004438626" target="_blank" rel="noopener" class="btn-outline">Hablemos
-            por WhatsApp</a>
-        </div>
-
-        <p class="empresa-nota">Ya en pruebas con Sobusa y sus 6 rutas reales de Barranquilla.</p>
-
-        <dl class="empresa-hechos">
-          <div class="empresa-hecho">
-            <dt>1 s</dt>
-            <dd>Cada cuánto se lee la posición del bus. También cada dos metros recorridos: lo que
-              ocurra antes.</dd>
-          </div>
-          <div class="empresa-hecho">
-            <dt>1.000</dt>
-            <dd>Posiciones que el teléfono guarda cuando se queda sin datos, y que reenvía en cuanto
-              vuelve la señal.</dd>
-          </div>
-          <div class="empresa-hecho">
-            <dt>0</dt>
-            <dd>Aparatos que hay que montar en el vehículo. Sólo el celular que el conductor ya lleva
-              encima.</dd>
-          </div>
-        </dl>
-      </div>
-    </section>
-
-
-    <!-- ============ EL TURNO ============ -->
-    <section class="panel panel--papel" id="turno">
-      <div class="panel-inner">
-        <header class="section-head reveal">
-          <span class="tracked-eyebrow eyebrow--verde">EL TURNO</span>
-          <h2 class="section-title">Tres pantallas, de principio a fin</h2>
-          <p class="section-lead">Todo lo que el conductor tiene que hacer con la app cabe en un turno:
-            abrirlo, dejar el teléfono trabajando y cerrarlo.</p>
-        </header>
-
-        <div class="empresa-pasos">
-          <article class="empresa-paso reveal">
-            <h3>Asignación de turno</h3>
-            <p>El conductor elige el <span class="empresa-cita">Bus asignado</span> y la
-              <span class="empresa-cita">Ruta a cubrir</span> en dos listas, y pulsa
-              <span class="empresa-cita">INICIAR TRANSMISIÓN</span>. No hay nada más que configurar.</p>
-          </article>
-
-          <article class="empresa-paso reveal" data-reveal-delay="100">
-            <h3>Turno en curso</h3>
-            <p>La pantalla enseña el tiempo transcurrido, el estado de la transmisión GPS y el de la
-              sincronización. El aviso permanente de Android deja la app trabajando aunque el teléfono
-              se guarde o se apague la pantalla.</p>
-          </article>
-
-          <article class="empresa-paso reveal" data-reveal-delay="200">
-            <h3>Cerrar turno</h3>
-            <p>Un botón, <span class="empresa-cita">CERRAR TURNO</span>. La transmisión se detiene y el
-              bus deja de verse en el mapa de los pasajeros hasta el turno siguiente.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- ============ LAS DOS APLICACIONES ============ -->
-    <section class="panel panel--ink" id="aplicaciones">
-      <div class="panel-dots" aria-hidden="true"></div>
-
-      <div class="panel-inner">
-        <header class="section-head reveal">
-          <span class="tracked-eyebrow eyebrow--ambar">DOS APLICACIONES</span>
-          <h2 class="section-title">Una para el conductor,<br />otra para la oficina</h2>
-          <p class="section-lead">La del conductor sólo publica dónde está el bus. La de la oficina es
-            desde donde se administra la flota y se decide qué ve el pasajero.</p>
-        </header>
-
-        <div class="empresa-apps">
-          <article class="empresa-app reveal">
-            <h3>Ya Viene Conductor</h3>
-            <p>Va en el celular del conductor y hace una sola cosa.</p>
-            <ul class="empresa-lista">
-              <li>Turno con bus y ruta elegidos de una lista: nada de escribir coordenadas ni de
-                aprenderse una pantalla.</li>
-              <li>Transmite en segundo plano, con el aviso
-                <span class="empresa-cita">Transmitiendo ubicación del bus…</span> a la vista.</li>
-              <li>Cada posición espera confirmación del servidor, y el estado se lee en la pantalla:
-                <span class="empresa-cita">Transmitiendo y confirmado</span>,
-                <span class="empresa-cita">Conectado, esperando ACK</span> o
-                <span class="empresa-cita">GPS activo, sin conexión</span>.</li>
-              <li>Si detecta una aplicación de ubicación falsa, corta la transmisión.</li>
-            </ul>
-          </article>
-
-          <article class="empresa-app reveal" data-reveal-delay="150">
-            <h3>Control de flota</h3>
-            <p>El panel desde el que la oficina ve la flota entera sobre el mismo mapa que ven los
-              pasajeros.</p>
-            <ul class="empresa-lista">
-              <li>Buscador por placa, ruta o conductor.</li>
-              <li>Cada bus con su estado: <span class="empresa-cita">En línea</span> cuando está
-                transmitiendo, <span class="empresa-cita">Sin señal</span> cuando no.</li>
-              <li>Alta de buses y de rutas desde el propio panel: la placa, la ruta que cubre, y listo.</li>
-              <li>Un bus se puede ocultar: tú lo sigues viendo, los pasajeros no.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- ============ CUANDO ALGO FALLA ============ -->
-    <section class="panel panel--papel" id="fallos">
-      <div class="panel-inner">
-        <header class="section-head reveal">
-          <span class="tracked-eyebrow eyebrow--verde">LO QUE YA ESTÁ RESUELTO</span>
-          <h2 class="section-title">Qué pasa cuando el turno se tuerce</h2>
-          <p class="section-lead">Un bus se mete debajo de un puente, el celular se queda sin datos o
-            alguien prueba suerte con un GPS falso. Los tres casos están escritos en la app.</p>
-        </header>
-
-        <div class="empresa-fallos">
-          <article class="empresa-fallo reveal">
-            <span class="empresa-marca empresa-marca--espera">Se fue la señal</span>
-            <h3>No se pierde nada</h3>
-            <p>Las posiciones se guardan en el propio teléfono, hasta mil, y se reintentan cada diez
-              segundos en lotes de veinte. Sólo se borran del teléfono cuando el servidor confirma que
-              las recibió.</p>
-          </article>
-
-          <article class="empresa-fallo reveal" data-reveal-delay="100">
-            <span class="empresa-marca empresa-marca--espera">Se cayó la conexión</span>
-            <h3>Se reconecta sola</h3>
-            <p>Cada quince segundos la app comprueba si sigue conectada y, si no, vuelve a conectarse.
-              Mientras tanto el GPS no se detiene: sigue leyendo y guardando.</p>
-          </article>
-
-          <article class="empresa-fallo reveal" data-reveal-delay="200">
-            <span class="empresa-marca empresa-marca--corta">GPS falso</span>
-            <h3>La transmisión se bloquea</h3>
-            <p>Si el sistema detecta una aplicación de ubicación falsa, la pantalla se pone en rojo con
-              <span class="empresa-cita">TRANSMISIÓN BLOQUEADA</span>, el incidente queda reportado al
-              centro de control y el bus deja de transmitir.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- ============ SOLICITAR LA CONEXIÓN ============ -->
+    <!--
+      Una sola pantalla. Antes eran cinco paneles que contaban el turno del
+      conductor: elegir bus, transmitir, cerrar turno. Ese producto no
+      existe —el GPS va montado en el vehículo y no hay app de conductor—,
+      así que en vez de reescribir la historia entera se quedó lo que una
+      empresa necesita para decidir: qué es esto, qué ve desde la oficina y
+      dónde deja su teléfono.
+    -->
     <section class="panel panel--papel" id="solicitar">
-      <div class="panel-inner panel-inner--ancho companies-grid">
+      <div class="panel-inner panel-inner--ancho empresa-consulta">
 
-        <div class="companies-info reveal">
-          <span class="tracked-eyebrow eyebrow--verde">CONECTA TU FLOTA</span>
-          <h2>Déjanos tus datos y lo vemos contigo.</h2>
-          <p>Conectar una flota se acuerda empresa por empresa: cuántos buses, qué rutas y desde cuándo.
-            Escríbenos por WhatsApp o deja aquí tu teléfono y te llamamos.</p>
+        <div class="empresa-ficha reveal">
+          <span class="tracked-eyebrow eyebrow--verde">PARA EMPRESAS</span>
+          <h2>Tus buses en el mapa, y la flota entera en una pantalla</h2>
 
-          <a href="https://wa.me/573004438626" target="_blank" rel="noopener" class="whatsapp-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.159.57 4.184 1.564 5.938l-1.664 6.082 6.221-1.632c1.705.93 3.655 1.467 5.727 1.467 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12z" />
-            </svg>
-            Hablemos por WhatsApp
-          </a>
+          <!--
+            El panel de control de verdad, recortado. Las placas salen de la
+            flota de pruebas y las cuentas cuadran entre ellas: «En línea»
+            son los que están transmitiendo, oculto o no, por eso hay tres
+            con uno de ellos escondido para el pasajero.
+          -->
+          <div class="consola" role="img"
+            aria-label="Panel de control de flota: cuatro buses, tres transmitiendo y uno sin señal;
+                        el bus WNP-659 transmite pero está oculto para los pasajeros.">
+            <div class="consola-barra">
+              <span>CONTROL DE FLOTA</span>
+              <span>06:42:31</span>
+            </div>
+
+            <div class="consola-pestanas" aria-hidden="true">
+              <span class="es-activa">Todos 4</span>
+              <span>En Línea 3</span>
+              <span>Ocultos 1</span>
+              <span>Sin Señal 1</span>
+            </div>
+
+            <ul class="consola-flota" aria-hidden="true">
+              <li class="es-elegida">
+                <span class="consola-punto consola-punto--linea"></span>
+                <b>SFA-482</b>
+                <span class="consola-estado">En línea</span>
+                <span class="consola-visible">PERMITIDO</span>
+              </li>
+              <li>
+                <span class="consola-punto consola-punto--linea"></span>
+                <b>TUH-513</b>
+                <span class="consola-estado">En línea</span>
+                <span class="consola-visible">PERMITIDO</span>
+              </li>
+              <li>
+                <span class="consola-punto"></span>
+                <b>DMV-238</b>
+                <span class="consola-estado">Sin señal</span>
+                <span class="consola-visible">PERMITIDO</span>
+              </li>
+              <li>
+                <span class="consola-punto consola-punto--linea"></span>
+                <b>WNP-659</b>
+                <span class="consola-estado">En línea</span>
+                <span class="consola-visible consola-visible--oculto">OCULTO</span>
+              </li>
+            </ul>
+          </div>
+
+          <ul class="empresa-lista">
+            <li>El GPS va montado en el vehículo. No hay app de conductor, ni turno que abrir, ni
+              celular del que dependa que el bus se vea.</li>
+            <li>Cada posición llega firmada por el equipo del bus, y el servidor la confirma o la
+              rechaza: velocidad imposible, hora torcida o salto de coordenadas no entran.</li>
+            <li>Desde el panel ves la flota sobre el mismo mapa que ven los pasajeros, ruta por ruta,
+              con cada bus <span class="empresa-cita">En línea</span> o
+              <span class="empresa-cita">Sin señal</span>.</li>
+            <li>Un bus se puede ocultar: tú lo sigues viendo en el panel, los pasajeros no.</li>
+          </ul>
+
+          <p class="empresa-piloto">
+            <span>EN MOVIMIENTO CON</span>
+            <strong>Sobusa · 6 rutas reales de Barranquilla</strong>
+          </p>
         </div>
 
-        <div class="reveal" data-reveal-delay="150">
+        <div class="empresa-solicitud reveal" data-reveal-delay="120">
+          <h1>Conecta tu flota</h1>
+          <p>Cuántos buses tienes y qué rutas cubren se ve empresa por empresa. Déjanos tus datos y
+            te llamamos.</p>
+
           <form id="contact-form" class="contact-form-card">
             <div class="form-group">
               <label class="form-label" for="nombre">Nombre</label>
@@ -310,6 +218,14 @@
             <h3>¡Solicitud recibida!</h3>
             <p>Te contactaremos pronto para contarte cómo conectar tus buses a la red YaViene.</p>
           </div>
+
+          <a href="https://wa.me/573004438626" target="_blank" rel="noopener" class="whatsapp-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.159.57 4.184 1.564 5.938l-1.664 6.082 6.221-1.632c1.705.93 3.655 1.467 5.727 1.467 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12z" />
+            </svg>
+            Hablemos por WhatsApp
+          </a>
         </div>
 
       </div>
