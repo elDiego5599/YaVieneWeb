@@ -7,12 +7,34 @@
   <title>Ya Viene — Tu bus en tiempo real en Barranquilla</title>
   <meta name="description"
     content="Ya Viene: mira tu bus moverse en el mapa de Barranquilla en tiempo real y recibe un aviso automático antes de que llegue a tu parada." />
+  <link rel="canonical" href="%VITE_SITE_URL%/" />
 
-  <!-- Open Graph / Meta Social -->
+  <!-- Open Graph / Meta Social.
+       La imagen tiene que ser PNG y con medidas declaradas: WhatsApp,
+       LinkedIn y X no dibujan un SVG, y sin ancho y alto la tarjeta se
+       cae al formato pequeño. `VITE_SITE_URL` va vacía mientras no haya
+       dominio; el día que lo haya, la ruta pasa a absoluta sin tocar
+       ninguna etiqueta. -->
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Ya Viene" />
+  <meta property="og:locale" content="es_CO" />
+  <meta property="og:url" content="%VITE_SITE_URL%/" />
   <meta property="og:title" content="Ya Viene — Tu bus en tiempo real en Barranquilla" />
-  <meta property="og:description" content="Mira tu bus en el mapa en vivo y recibe un aviso antes de que llegue." />
-  <meta property="og:image" content="/logo.svg" />
+  <meta property="og:description"
+    content="Mira el bus moverse en el mapa y te avisamos antes de que llegue el tuyo. Seis rutas reales de Barranquilla." />
+  <meta property="og:image" content="%VITE_SITE_URL%/og.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt"
+    content="Ya Viene: ¿Cuánto falta para tu bus? Barranquilla, seis rutas reales." />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Ya Viene — Tu bus en tiempo real en Barranquilla" />
+  <meta name="twitter:description"
+    content="Mira el bus moverse en el mapa y te avisamos antes de que llegue el tuyo." />
+  <meta name="twitter:image" content="%VITE_SITE_URL%/og.png" />
+
   <meta name="theme-color" content="#0B1628" />
 
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
@@ -56,9 +78,10 @@
           <nav class="nav-island-links" aria-label="Navegación principal">
             <a href="#problema" class="nav-link">El problema</a>
             <a href="#solucion" class="nav-link">Cómo funciona</a>
+            <a href="#ciudad" class="nav-link">Para la ciudad</a>
             <a href="#empresas" class="nav-link">Para empresas</a>
           </nav>
-          <a href="#solucion" class="nav-island-cta">Ver la app</a>
+          <a href="#mapa" class="nav-island-cta">Probar el mapa</a>
         </div>
       </div>
 
@@ -69,64 +92,11 @@
     </div>
   </header>
 
-  <!--
-    Las tres curvas de MapPatternPainter, tal cual: routeA, routeB y routeC
-    con sus mismos números sobre un lienzo de 1000 x 1000. Se definen una
-    vez y cada panel las estira a su tamaño, que es exactamente lo que hace
-    el painter con el canvas que le toque.
-
-    `vector-effect` mantiene el trazo en 1,5 px aunque el panel sea ancho y
-    bajo; sin eso, estirar el lienzo estira también la línea.
-  -->
-  <svg width="0" height="0" aria-hidden="true" focusable="false" class="trama-molde">
-    <defs>
-      <g id="trama-rutas" fill="none" stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" vector-effect="non-scaling-stroke">
-        <path d="M-20 160 C250 80 380 300 620 220 C800 160 880 340 1020 280" />
-        <path d="M120 -10 C60 180 280 260 220 480" />
-        <path d="M-20 740 C180 660 400 880 620 780 C800 700 900 860 1020 800" />
-      </g>
-      <g id="trama-rutas-datos" fill="none" stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" vector-effect="non-scaling-stroke">
-        <path d="M-30 420 C170 360 260 500 460 430 S760 280 1030 360" />
-        <path d="M-20 670 C180 590 360 760 560 670 S820 560 1030 620" />
-        <circle cx="460" cy="430" r="6" fill="currentColor" stroke="none" />
-        <circle cx="560" cy="670" r="6" fill="currentColor" stroke="none" />
-      </g>
-      <g id="trama-rutas-problema" fill="none" stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" vector-effect="non-scaling-stroke">
-        <path d="M-40 300 C160 220 300 380 500 300 S820 220 1040 300" />
-        <path d="M-40 700 C180 610 340 780 540 690 S820 600 1040 700" />
-      </g>
-      <g id="trama-rutas-solucion" fill="none" stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" vector-effect="non-scaling-stroke">
-        <path d="M-40 260 C180 180 340 340 540 260 S820 180 1040 260" />
-        <path d="M-40 760 C180 680 360 830 560 740 S820 660 1040 760" />
-        <circle cx="540" cy="260" r="8" fill="currentColor" stroke="none" />
-        <circle cx="560" cy="740" r="8" fill="currentColor" stroke="none" />
-      </g>
-      <g id="trama-rutas-anatomia" fill="none" stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" vector-effect="non-scaling-stroke">
-        <path d="M-30 240 C190 340 340 120 520 270 S820 460 1030 320" />
-        <path d="M-30 790 C220 680 400 900 610 730 S850 610 1030 760" />
-      </g>
-      <g id="trama-rutas-empresas" fill="none" stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" vector-effect="non-scaling-stroke">
-        <path d="M-40 300 C180 220 320 360 520 290 S820 220 1040 300" />
-        <path d="M-40 520 C180 450 360 590 560 510 S820 450 1040 520" />
-        <path d="M-40 760 C200 680 360 820 580 750 S820 680 1040 760" />
-      </g>
-    </defs>
-  </svg>
-
   <main id="contenido">
 
     <!-- ============ HERO ============ -->
     <section class="panel panel--sun hero-panel" id="hero">
-      <div class="panel-dots" aria-hidden="true">
-        <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
-          focusable="false"><use href="#trama-rutas" /></svg>
-      </div>
+      <div class="panel-dots" aria-hidden="true"></div>
 
       <div class="panel-inner hero-grid">
 
@@ -630,10 +600,7 @@
 
     <!-- ============ FRANJA DE DATOS ============ -->
     <section class="panel panel--ink panel--sangre stats-panel" aria-label="Estado del piloto">
-      <div class="panel-dots" aria-hidden="true">
-        <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
-          focusable="false"><use href="#trama-rutas-datos" /></svg>
-      </div>
+      <div class="panel-dots" aria-hidden="true"></div>
       <div class="panel-inner panel-inner--ancho tight stats-grid">
         <div class="stat reveal">
           <span class="stat-value">6</span>
@@ -672,10 +639,7 @@
       del reloj sigue la escala de la app: verde, ámbar, coral.
     -->
     <section class="panel panel--arena" id="problema" data-clima="sol">
-      <div class="panel-dots" aria-hidden="true">
-        <svg class="panel-lineas" viewBox="0 0 1000 1000" preserveAspectRatio="none"
-          focusable="false"><use href="#trama-rutas-problema" /></svg>
-      </div>
+      <div class="panel-dots" aria-hidden="true"></div>
 
       <div class="pista pista--reloj" data-reloj-pista>
         <div class="escena">
@@ -688,8 +652,7 @@
               </div>
 
               <p class="problema-lead problema-beat" data-beat="0.02">
-                El bus puede tardar 3 minutos o 30, y no hay forma de saberlo hasta que aparece — o no
-                aparece.
+                El bus puede tardar 3 minutos o 30, y no hay forma de saberlo hasta que aparece.
               </p>
 
               <div class="problema-clima problema-beat" data-beat="0.34">
@@ -805,8 +768,6 @@
       gesto del que habla su texto.
     -->
     <section class="panel panel--mint panel--sangre" id="solucion">
-      <span class="costura costura--abajo costura--ink" aria-hidden="true"></span>
-
       <div class="pista pista--pasos" data-pasos-pista>
         <div class="escena">
           <div class="panel-inner panel-inner--ancho pasos-escena">
@@ -814,8 +775,8 @@
               <div class="pasos-portada" data-pasos-portada>
                 <span class="tracked-eyebrow eyebrow--verde">LA SOLUCIÓN</span>
                 <h2 class="section-title">Tres toques<br />y ya sabes</h2>
-                <p class="section-lead">No hay cuenta que crear ni nada que configurar: abres, marcas dónde
-                  esperas y eliges la ruta. De ahí en adelante la app trabaja sola.</p>
+                <p class="section-lead">Entras una vez —con Google o con tu correo— y ya no vuelves a esa
+                  pantalla: marcas dónde esperas, eliges la ruta y de ahí en adelante la app trabaja sola.</p>
                 <p class="solucion-nota">Y puedes guardar el teléfono: el aviso llega con Ya Viene en segundo plano.</p>
               </div>
 
@@ -1201,8 +1162,8 @@
                 <span class="pasos-tab-barra"><span class="pasos-tab-avance"></span></span>
               </button>
               <button class="pasos-tab" type="button"
-                aria-label="Ir a: Ruta" tabindex="-1" data-pasos-tab="1">
-                <span class="pasos-tab-nombre">Ruta</span>
+                aria-label="Ir a: Elige tu ruta" tabindex="-1" data-pasos-tab="1">
+                <span class="pasos-tab-nombre">Elige tu ruta</span>
                 <span class="pasos-tab-barra"><span class="pasos-tab-avance"></span></span>
               </button>
               <button class="pasos-tab" type="button"
@@ -1225,6 +1186,134 @@
         </div>
       </div>
     </section>
+
+
+    <!-- ============ EL MAPA, EN VIVO ============
+      Hasta aquí la página enseña teléfonos y el que mira los mira. Esta
+      sección se toca: las seis rutas de Sobusa, el radio de aviso de un
+      kilómetro y el texto exacto de la notificación, a tamaño de
+      escritorio y con el mando en la mano del visitante. Lo único
+      simulado son los buses, y lo dice encima del mapa.
+    -->
+    <section class="panel panel--ink panel--sangre" id="mapa">
+      <div class="panel-inner panel-inner--ancho mapa-inner">
+        <header class="mapa-cabecera">
+          <span class="tracked-eyebrow eyebrow--verde">PRUÉBALO AQUÍ</span>
+          <h2 class="section-title">Marca dónde esperas<br>y mira quién viene.</h2>
+          <p class="section-lead">Elige una de las seis rutas y toca el mapa donde te
+            paras normalmente. Cuando un bus entre en tu kilómetro, salta el mismo
+            aviso que le llega al teléfono.</p>
+        </header>
+
+        <div class="mapa-tablero" data-mapa-vivo>
+          <div class="mapa-columna mapa-columna--rutas">
+            <h3 class="mapa-rotulo">Las seis rutas</h3>
+            <div class="mv-rutas" data-mapa-rutas role="group"
+              aria-label="Rutas disponibles"></div>
+          </div>
+
+          <div class="mapa-lienzo" data-mapa-lienzo>
+            <svg class="mapa-svg" data-mapa-svg role="img"
+              aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
+            <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
+            <p class="mapa-credito">© OpenStreetMap · © CARTO</p>
+          </div>
+
+          <div class="mapa-columna mapa-columna--lectura">
+            <div class="mapa-lectura" data-mapa-lectura>
+              <span class="mapa-rotulo">Bus más cercano</span>
+              <span class="mapa-lectura-bus" data-mapa-bus></span>
+              <span class="mapa-lectura-metros" data-mapa-metros></span>
+              <span class="mapa-lectura-pie" data-mapa-lectura-pie>en línea recta hasta tu punto</span>
+            </div>
+
+            <!-- Las dos líneas las escribe mapa-vivo.ts con el mismo texto
+                 que arma la notificación en la app. -->
+            <div class="mapa-aviso" data-mapa-aviso role="status" aria-live="polite">
+              <div class="mapa-aviso-icono" aria-hidden="true">
+                <img src="/logo.svg" alt="" width="20" height="20">
+              </div>
+              <div class="mapa-aviso-texto">
+                <span class="mapa-aviso-app">Ya Viene · ahora</span>
+                <strong class="mapa-aviso-titulo" data-mapa-aviso-titulo></strong>
+                <span class="mapa-aviso-cuerpo" data-mapa-aviso-cuerpo></span>
+              </div>
+            </div>
+
+            <p class="mapa-honesto">
+              <strong data-mapa-pie></strong>
+              Las rutas, los kilómetros y el kilómetro de aviso son los de la app.
+              Los dos buses de esta página van simulados: aquí no hay un conductor
+              con el teléfono encendido.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EL ÁREA METROPOLITANA ============
+      La única sección que no le habla ni al pasajero ni al operador, sino
+      a quien tiene que autorizar todo esto. Cada dato de aquí sale del
+      repositorio: lo que el conductor publica, lo que el pasajero nunca
+      manda, lo que guarda la cuenta y lo que no hay que comprar.
+    -->
+    <section class="panel panel--arena" id="ciudad">
+      <div class="panel-inner panel-inner--ancho amb-inner">
+        <header class="amb-cabecera reveal">
+          <span class="tracked-eyebrow eyebrow--verde">PARA EL ÁREA METROPOLITANA</span>
+          <h2 class="section-title">Saber dónde van los buses<br>no tiene que costar una flota de equipos.</h2>
+          <p class="section-lead">Ya Viene no le pide a la ciudad comprar nada ni entregar
+            datos de nadie. Esto es lo que hay debajo, sin letra pequeña.</p>
+        </header>
+
+        <div class="amb-rejilla">
+          <article class="amb-card reveal">
+            <span class="amb-card-cifra">$0</span>
+            <h3>en equipos nuevos</h3>
+            <p>El GPS es el celular que el conductor ya lleva encima. No hay aparato que
+              comprar, instalar en el bus ni reponer cuando se dañe. La empresa entra con
+              lo que tiene.</p>
+          </article>
+
+          <article class="amb-card reveal" data-reveal-delay="80">
+            <span class="amb-card-cifra">1</span>
+            <h3>panel para ver la flota</h3>
+            <p>Los buses en vivo sobre el mapa, ruta por ruta, desde el navegador. Es una
+              de las tres piezas del sistema: la app del pasajero, la del conductor y el
+              panel de control.</p>
+          </article>
+
+          <article class="amb-card reveal" data-reveal-delay="160">
+            <span class="amb-card-cifra">0</span>
+            <h3>ubicaciones de pasajeros almacenadas</h3>
+            <p>El teléfono del pasajero sólo le dice al servidor «quiero esta ruta». Dónde
+              está esa persona no sale del aparato: la distancia y el aviso se calculan
+              dentro del celular, con una notificación local.</p>
+          </article>
+
+          <article class="amb-card reveal" data-reveal-delay="240">
+            <span class="amb-card-cifra">2</span>
+            <h3>datos por cuenta: correo y nombre</h3>
+            <p>Eso es todo lo que guarda una cuenta. Sin analítica, sin rastreo de
+              terceros, sin publicidad. Ni siquiera la ruta que elegiste sobrevive al
+              cierre de la app: se pregunta cada vez.</p>
+          </article>
+        </div>
+
+        <div class="amb-cierre reveal">
+          <div class="amb-cierre-texto">
+            <h3>Qué hay hoy, de verdad</h3>
+            <p>Seis rutas de Sobusa trazadas y medidas, las tres aplicaciones funcionando
+              y un piloto en marcha. La posición del bus viaja por infraestructura propia
+              —MQTT, un puente en Node y WebSocket— y no por un servicio ajeno.</p>
+          </div>
+          <a href="https://wa.me/573004438626" target="_blank" rel="noopener" class="btn-primary btn-green">
+            Hablemos del piloto
+          </a>
+        </div>
+      </div>
+    </section>
+
 
     <!-- ============ EMPRESAS & CONTACT ============ -->
     <section class="panel panel--ink" id="empresas">
@@ -1294,7 +1383,8 @@
       <h2>La ciudad se mueve contigo.</h2>
       <p>Menos adivinar, más llegar. Ya Viene convierte cada ruta de Barranquilla en una respuesta en tiempo real.</p>
       <div class="footer-actions">
-        <a href="#solucion" class="btn-primary btn-green">Explorar la app</a>
+        <a href="#mapa" class="btn-primary btn-green">Probar el mapa en vivo</a>
+        <a href="https://wa.me/573004438626" target="_blank" rel="noopener" class="btn-outline">Escribirnos por WhatsApp</a>
       </div>
       <p class="footer-cta-note">En movimiento con Sobusa y sus 6 rutas reales.</p>
     </div>
@@ -1313,11 +1403,13 @@
           <span>Explora</span>
           <a href="#problema">El problema</a>
           <a href="#solucion">Cómo funciona</a>
+          <a href="#mapa">El mapa en vivo</a>
         </div>
         <div class="footer-nav-group">
           <span>Conecta</span>
+          <a href="#ciudad">Para la ciudad</a>
           <a href="#empresas">Para empresas</a>
-          <a href="#empresas">Únete a la beta</a>
+          <a href="https://wa.me/573004438626" target="_blank" rel="noopener">WhatsApp</a>
         </div>
       </nav>
 
@@ -1331,8 +1423,8 @@
     <div class="footer-bottom">
       <p>© 2026 YaViene · Barranquilla, Colombia</p>
       <div class="footer-legal-links">
-        <a href="#">Términos</a>
-        <a href="#">Privacidad</a>
+        <a href="/terminos.html">Términos</a>
+        <a href="/privacidad.html">Privacidad</a>
       </div>
     </div>
   </footer>

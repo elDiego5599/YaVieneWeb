@@ -43,39 +43,114 @@ const PORTADA_FIN = 0.17;
 const PORTADA_FUNDE = 0.8;
 const PRIMERO_DESDE = 0.3;
 
+/**
+ * Tope del desenfoque de entrada, en píxeles, y el escalón con el que se
+ * mueve.
+ *
+ * Aquí está la diferencia entre ir a sesenta cuadros y no ir. Un `filter`
+ * obliga al navegador a volver a pintar todo lo que hay debajo, y un
+ * bloque de estos son mil ciento ochenta por seiscientos ochenta y cinco
+ * píxeles con un teléfono y un mapa dentro. Si el valor cambia en cada
+ * cuadro —y en un cruce hay dos bloques a la vez— no hay máquina que lo
+ * aguante. Así que el desenfoque va sólo sobre la columna de texto, que
+ * es pequeña, y a saltos de un píxel: cinco repintados por cruce en vez
+ * de noventa. El teléfono cruza con opacidad y desplazamiento, que son
+ * las dos cosas que la tarjeta gráfica hace gratis.
+ */
+const BORROSO_MAX = 5;
+
+/**
+ * Cuánto tiene que cambiar un valor para que valga la pena escribirlo.
+ *
+ * Escribir en `style` no es gratis aunque el valor sea el mismo: cada
+ * asignación pasa por el analizador de CSS y ensucia el estilo del
+ * elemento. En un cruce hay cinco bloques por cuatro propiedades cada
+ * uno, sesenta veces por segundo. Redondeando a medio píxel y a un uno
+ * por ciento de opacidad, la mayoría de los cuadros no escribe nada: se
+ * ve igual y el navegador se queda tranquilo.
+ */
+const PASO_PX = 0.5;
+const PASO_OPACIDAD = 0.01;
+const PASO_BARRA = 1;
+
+const cuantizar = (v: number, paso: number): number => Math.round(v / paso) * paso;
+
+/** Las piezas de un momento, buscadas una vez y no en cada cuadro. */
+interface Momento {
+  raiz: HTMLElement;
+  cuerpo: HTMLElement | null;
+  toma: HTMLElement | null;
+  pestana: HTMLElement | null;
+  barra: HTMLElement | null;
+  /** Lo último que se le puso, para no repetir escrituras inútiles. */
+  borroso: number;
+  movil: boolean;
+  opacidad: number;
+  x: number;
+  tomaX: number;
+  visible: boolean;
+  activo: boolean;
+  tabActiva: boolean;
+  avance: number;
+}
+
 export class Pasos {
   private readonly portada: HTMLElement;
-  private readonly pasos: HTMLElement[];
+  private readonly momentos: Momento[];
   private readonly riel: HTMLElement | null;
-  private readonly pestanas: HTMLElement[];
   private readonly pista: HTMLElement;
   private soltar: (() => void) | null = null;
   private reposo = -1;
+  private portadaBorrosa = -1;
+  private portadaIrse = -1;
+  private rielVisible = false;
 
   /** Le dice a main.ts qué teléfono está quieto y le toca moverse. */
   alReposo: ((indice: number) => void) | null = null;
 
   constructor(pista: HTMLElement) {
     const portada = pista.querySelector<HTMLElement>('[data-pasos-portada]');
-    this.pasos = Array.from(pista.querySelectorAll<HTMLElement>('[data-paso]'));
-    if (!portada || this.pasos.length === 0) throw new Error('Pasos: faltan piezas');
+    const pasos = Array.from(pista.querySelectorAll<HTMLElement>('[data-paso]'));
+    if (!portada || pasos.length === 0) throw new Error('Pasos: faltan piezas');
     this.pista = pista;
     this.portada = portada;
     this.riel = pista.querySelector<HTMLElement>('.pasos-riel');
-    this.pestanas = Array.from(pista.querySelectorAll<HTMLElement>('[data-pasos-tab]'));
 
-    pista.style.setProperty('--tramos', String(this.pasos.length + 1));
+    const pestanas = Array.from(pista.querySelectorAll<HTMLElement>('[data-pasos-tab]'));
+    this.momentos = pasos.map((raiz, i) => ({
+      raiz,
+      cuerpo: raiz.querySelector<HTMLElement>('.paso-cuerpo'),
+      toma: raiz.querySelector<HTMLElement>('.paso-toma'),
+      pestana: pestanas[i] ?? null,
+      barra: pestanas[i]?.querySelector<HTMLElement>('.pasos-tab-avance') ?? null,
+      borroso: -1,
+      movil: false,
+      opacidad: -1,
+      x: NaN,
+      tomaX: NaN,
+      visible: true,
+      activo: false,
+      tabActiva: false,
+      avance: -1,
+    }));
+
+    // Un tramo por momento. Con el tramo de sobra que había antes, la
+    // sección pedía casi ocho pantallas de scroll para cinco ideas: la
+    // portada ya tiene su propio arranque y el último momento se queda
+    // puesto hasta que la sección sale, así que no hace falta pagar un
+    // tramo entero por ese remate.
+    pista.style.setProperty('--tramos', String(pasos.length));
 
     // Sin animaciones no hay cinta que valga: los momentos se apilan en el
     // flujo normal —lo arma el CSS— y aquí sólo hay que quitarles el
     // maquillaje para que no queden invisibles.
     if (sinMovimiento()) {
       this.portada.removeAttribute('style');
-      for (const paso of this.pasos) paso.removeAttribute('style');
+      for (const paso of pasos) paso.removeAttribute('style');
       return;
     }
 
-    this.pestanas.forEach((pestana, i) => {
+    pestanas.forEach((pestana, i) => {
       pestana.addEventListener('click', () => this.irA(i));
     });
 
@@ -84,26 +159,42 @@ export class Pasos {
 
   /** Lleva el scroll al centro del descanso de un momento. */
   private irA(indice: number): void {
-    const ancho = (1 - PORTADA_FIN) / this.pasos.length;
+    const ancho = (1 - PORTADA_FIN) / this.momentos.length;
     scrollDePista(this.pista, PORTADA_FIN + ancho * (indice + 0.5));
   }
 
   private pintar(p: number): void {
     // La portada no se desvanece de lado: se acerca hasta pasarse de
     // largo, como si la página entrara dentro de ella.
-    const irse = entre(p, 0.03, PORTADA_FIN * PORTADA_FUNDE);
-    this.portada.style.opacity = String(1 - irse);
-    this.portada.style.transform = `scale(${1 + irse * 0.34}) translateY(${irse * -24}px)`;
-    this.portada.style.filter = irse > 0 ? `blur(${irse * 14}px)` : 'none';
-    this.portada.style.visibility = irse >= 1 ? 'hidden' : 'visible';
+    const irse = cuantizar(entre(p, 0.03, PORTADA_FIN * PORTADA_FUNDE), PASO_OPACIDAD);
+    if (irse !== this.portadaIrse) {
+      this.portadaIrse = irse;
+      this.portada.style.opacity = String(1 - irse);
+      this.portada.style.transform = `scale(${1 + irse * 0.34}) translateY(${irse * -24}px)`;
+      this.portada.style.visibility = irse >= 1 ? 'hidden' : 'visible';
+    }
+    // Mismo trato que los momentos: el desenfoque va a saltos para no
+    // repintar el titular entero sesenta veces por segundo.
+    const portadaBorrosa = irse >= 1 ? 0 : Math.round(irse * 12);
+    if (portadaBorrosa !== this.portadaBorrosa) {
+      this.portadaBorrosa = portadaBorrosa;
+      this.portada.style.filter = portadaBorrosa > 0 ? `blur(${portadaBorrosa}px)` : 'none';
+    }
 
-    this.riel?.classList.toggle('is-visible', irse > 0.6);
+    // El riel es la salida de emergencia de la sección: si aparece a
+    // mitad de la portada, el que no quiera leer los cinco momentos ya
+    // puede saltar al que le interese en vez de bajar a ciegas.
+    const rielVisible = irse > 0.14;
+    if (rielVisible !== this.rielVisible) {
+      this.rielVisible = rielVisible;
+      this.riel?.classList.toggle('is-visible', rielVisible);
+    }
 
-    const n = this.pasos.length;
+    const n = this.momentos.length;
     const ancho = (1 - PORTADA_FIN) / n;
     let reposo = -1;
 
-    this.pasos.forEach((paso, i) => {
+    this.momentos.forEach((m, i) => {
       const inicio = PORTADA_FIN + ancho * i;
       const fin = inicio + ancho;
 
@@ -117,31 +208,68 @@ export class Pasos {
 
       // Un solo eje y un solo sentido: entra por la derecha, se planta,
       // sale por la izquierda.
-      const x = VIAJE * (1 - entra) - VIAJE * sale;
-      const opacidad = entra * (1 - sale);
-      const desenfoque = 12 * (1 - entra) + 12 * sale;
+      const x = cuantizar(VIAJE * (1 - entra) - VIAJE * sale, PASO_PX);
+      const opacidad = cuantizar(entra * (1 - sale), PASO_OPACIDAD);
       const quieto = entra > 0.995 && sale < 0.005;
+      const oculto = opacidad <= 0.001;
 
-      paso.style.opacity = String(opacidad);
-      paso.style.transform = quieto ? 'none' : `translate3d(${x.toFixed(2)}px, 0, 0)`;
-      paso.style.filter = desenfoque > 0.4 ? `blur(${desenfoque.toFixed(2)}px)` : 'none';
-      paso.style.visibility = opacidad <= 0.001 ? 'hidden' : 'visible';
-      paso.classList.toggle('is-activo', opacidad > 0.5);
+      if (opacidad !== m.opacidad) {
+        m.opacidad = opacidad;
+        m.raiz.style.opacity = String(opacidad);
+      }
+      // `quieto` entra en la cuenta porque al pararse hay que cambiar el
+      // `translate3d` por `none` y soltar la capa de composición.
+      const parado = quieto ? NaN : x;
+      if (!Object.is(parado, m.x)) {
+        m.x = parado;
+        m.raiz.style.transform = quieto ? 'none' : `translate3d(${x}px, 0, 0)`;
+      }
+      if (oculto === m.visible) {
+        m.visible = !oculto;
+        m.raiz.style.visibility = oculto ? 'hidden' : 'visible';
+      }
+
+      // El aviso a la tarjeta gráfica se da al empezar a moverse y se
+      // retira al pararse: dejarlo puesto en los cinco bloques a la vez
+      // reserva memoria de vídeo para nada.
+      const movil = !quieto && !oculto;
+      if (movil !== m.movil) {
+        m.movil = movil;
+        m.raiz.style.willChange = movil ? 'transform, opacity' : 'auto';
+      }
+
+      // El desenfoque, a saltos y sólo sobre el texto. Ver BORROSO_MAX.
+      const borroso = oculto ? 0 : Math.round(((1 - entra) + sale) * BORROSO_MAX);
+      if (m.cuerpo && borroso !== m.borroso) {
+        m.borroso = borroso;
+        m.cuerpo.style.filter = borroso > 0 ? `blur(${borroso}px)` : 'none';
+      }
+
+      const activo = opacidad > 0.5;
+      if (activo !== m.activo) {
+        m.activo = activo;
+        m.raiz.classList.toggle('is-activo', activo);
+      }
 
       // El teléfono viaja un poco más que su texto: al cruzarse, la mano
       // que lleva el aparato va por delante de la frase que lo explica.
-      const toma = paso.querySelector<HTMLElement>('.paso-toma');
-      if (toma) {
-        const extra = x * 0.34;
-        toma.style.transform = quieto ? 'none' : `translate3d(${extra.toFixed(2)}px, 0, 0)`;
+      if (m.toma) {
+        const extra = quieto ? NaN : cuantizar(x * 0.34, PASO_PX);
+        if (!Object.is(extra, m.tomaX)) {
+          m.tomaX = extra;
+          m.toma.style.transform = quieto ? 'none' : `translate3d(${extra}px, 0, 0)`;
+        }
       }
 
-      const avance = entre(p, inicio, fin);
-      const pestana = this.pestanas[i];
-      if (pestana) {
-        pestana.classList.toggle('is-activa', avance > 0 && avance < 1);
-        const barra = pestana.querySelector<HTMLElement>('.pasos-tab-avance');
-        if (barra) barra.style.setProperty('--avance', `${(avance * 100).toFixed(1)}%`);
+      const avance = cuantizar(entre(p, inicio, fin) * 100, PASO_BARRA);
+      if (avance !== m.avance) {
+        m.avance = avance;
+        const tabActiva = avance > 0 && avance < 100;
+        if (tabActiva !== m.tabActiva) {
+          m.tabActiva = tabActiva;
+          m.pestana?.classList.toggle('is-activa', tabActiva);
+        }
+        m.barra?.style.setProperty('--avance', `${avance}%`);
       }
 
       if (quieto) reposo = i;

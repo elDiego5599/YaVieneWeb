@@ -5,6 +5,9 @@
    encajonada en una banda central. */
 
 .panel {
+  /* La isla de navegación va fija arriba: sin este margen, un salto de
+     anclaje deja el arranque de la sección debajo de la isla. */
+  scroll-margin-top: 96px;
   position: relative;
   margin: 0 var(--gutter) var(--panel-gap);
   border-radius: var(--panel-radius);
@@ -61,31 +64,6 @@
   max-width: var(--content-wide);
 }
 
-/*
-  Costura. Entre dos bandas pegadas el corte de color es una raya recta que
-  parte la página en dos; esto disuelve el borde inferior de la banda en el
-  color de quien viene detrás. Se pinta por encima del fondo y por debajo
-  del contenido (`.panel-inner` va en z-index 1).
-*/
-.costura {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: clamp(70px, 8vw, 140px);
-  z-index: 0;
-  pointer-events: none;
-}
-
-.costura--abajo {
-  bottom: 0;
-  background: linear-gradient(180deg, transparent, var(--costura-color, #FFFCF7));
-}
-
-.costura--arriba {
-  top: 0;
-  background: linear-gradient(0deg, transparent, var(--costura-color, #FFFCF7));
-}
-
 .panel-inner.tight {
   padding-top: clamp(36px, 4vw, 64px);
   padding-bottom: clamp(36px, 4vw, 64px);
@@ -127,12 +105,6 @@
   otra las derechas, y la posición de cada una es lo que le falta al centro
   de la baldosa —(17, 34)— para caer donde el painter pone el punto.
 
-  Y encima van las tres curvas del painter —routeA, routeB y routeC—, que es
-  lo que convierte la retícula en un mapa: puntos sueltos son textura de
-  plantilla, puntos con rutas cruzándolos son una ciudad. Viven dentro de
-  este mismo elemento, así que comparten opacidad y desvanecido y no hay que
-  cuadrar dos capas por separado.
-
   El color es `currentColor`, así que la trama sale blanca sobre los paneles
   de tinta y azul marino sobre los claros, sin repetir la regla.
 */
@@ -153,16 +125,6 @@
     rgba(0, 0, 0, 0.45) 76%, transparent 100%);
   -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 42%, #000 40%,
     rgba(0, 0, 0, 0.45) 76%, transparent 100%);
-}
-
-.panel-lineas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  /* Se estiran al panel, igual que el painter estira sus curvas al canvas
-     que le toque: en uno ancho y bajo la ruta sale tendida, y está bien. */
-  color: inherit;
 }
 
 /* Sobre tinta el punto blanco pesa más que el azul sobre beige. */
@@ -219,11 +181,6 @@
 }
 
 
-/* La costura que baja al azul del panel de empresas. */
-.costura--ink {
-  --costura-color: var(--navy);
-}
-
 /* ── Pista y escena: el andamio del scrollytelling ────────────────────
    Una pista es un bloque de varias pantallas de alto con una escena
    pegada dentro. Mientras la pista cruza la ventana la escena se queda
@@ -244,9 +201,15 @@
 /* La solución pide más scroll por momento que las demás pistas: en la
    mitad de cada turno el teléfono se queda quieto haciendo su demo, y ese
    descanso tiene que durar lo que dura la demo. Si el tramo fuera corto,
-   la cinta se llevaría la animación a media frase. */
+   la cinta se llevaría la animación a media frase.
+
+   Aun así, con cinco momentos esto son casi cinco pantallas: es la parte
+   más larga de la página con diferencia y el que llega a ella no sabe
+   cuánto le queda. Por eso el tramo se aprieta hasta lo que aguanta la
+   demo —unos cuarenta por ciento de pantalla de descanso— y el riel de
+   pestañas aparece enseguida para poder saltar. */
 .pista--pasos {
-  --paso: 112vh;
+  --paso: 76vh;
 }
 
 .escena {

@@ -18,6 +18,7 @@ import './css/phone-simulator.css';
 import './css/animations.css';
 
 import { ContactForm } from './contact-form';
+import { MapaVivo } from './mapa-vivo';
 import { NavIsland } from './nav-island';
 import { PasoDemo } from './paso-demo';
 import { Pasos } from './pasos';
@@ -66,6 +67,10 @@ const arrancar = (): void => {
 
   const problema = document.querySelector<HTMLElement>('#problema');
   if (problema) new ProblemWeather(problema);
+
+  // El mapa jugable: la única parte de la página que se toca.
+  const tablero = document.querySelector<HTMLElement>('[data-mapa-vivo]');
+  if (tablero) new MapaVivo(tablero);
 
   /*
     Las tres secciones que se recorren en vez de leerse de un golpe. Cada

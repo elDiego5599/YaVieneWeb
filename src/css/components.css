@@ -999,7 +999,7 @@
 .problema-lead {
   max-width: 30ch;
   font-family: var(--font-display);
-  font-size: clamp(23px, 2.9vw, 38px);
+  font-size: clamp(26px, 3.5vw, 46px);
   font-weight: 700;
   line-height: 1.18;
   letter-spacing: -0.03em;
@@ -1021,14 +1021,14 @@
 }
 
 .problema-clima-titulo {
-  font-size: var(--step-h3);
+  font-size: clamp(19px, 1.6vw, 26px);
   font-weight: 800;
   letter-spacing: -0.025em;
 }
 
 .weather-text {
-  font-size: var(--step-body);
-  line-height: 1.55;
+  font-size: clamp(16px, 1.2vw, 19px);
+  line-height: 1.6;
   color: var(--text-secondary);
 }
 
@@ -1036,10 +1036,10 @@
    La barra coral a la izquierda lo ata a la regla de arriba. */
 .problema-coste {
   max-width: 46ch;
-  padding-left: 16px;
+  padding-left: 18px;
   border-left: 2px solid rgba(232, 106, 94, 0.45);
-  font-size: var(--step-body);
-  line-height: 1.55;
+  font-size: clamp(16px, 1.2vw, 19px);
+  line-height: 1.6;
   color: var(--text-secondary);
 }
 
@@ -1156,21 +1156,31 @@
     /* A propósito descuadrado: el texto pesa un poco más que el reloj y
        el reloj se va contra el borde derecho, que es lo que le quita a la
        sección la simetría de dos columnas iguales. */
-    grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
-    gap: clamp(40px, 5vw, 96px);
+    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+    gap: clamp(36px, 4vw, 78px);
     justify-items: start;
   }
 
+  /* Pegado al borde derecho el reloj se salía del campo de lectura: se
+     corre hacia dentro hasta quedar en el eje de la esfera, no en el del
+     panel. */
   .problema-escena .reloj {
     justify-self: end;
+    transform: translateX(calc(-1 * clamp(12px, 4.5vw, 92px)));
   }
+}
+
+/* La sección es la que abre el argumento de la página: el titular sube
+   medio escalón sobre el resto para que se lea antes que la esfera. */
+.problema-texto .section-title {
+  font-size: clamp(2.3rem, 1.2rem + 3.9vw, 4.5rem);
 }
 
 .problema-texto {
   display: flex;
   flex-direction: column;
-  gap: clamp(20px, 2.4vw, 34px);
-  max-width: 48ch;
+  gap: clamp(22px, 2.7vw, 40px);
+  max-width: 52ch;
 }
 
 /* Cada golpe de texto entra cuando el reloj llega a su altura. Aparecen y
@@ -1198,7 +1208,7 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: min(100%, clamp(272px, 33vw, 460px));
+  width: min(100%, clamp(290px, 40vw, 560px));
   aspect-ratio: 1;
   color: var(--green);
   transition: color 0.9s var(--ease-out-cubic);
@@ -1305,7 +1315,7 @@
 /* Del mismo corte que el número grande de la app: fino, enorme y con las
    cifras del mismo ancho para que no baile al contar. */
 .reloj-tiempo {
-  font-size: clamp(44px, 6.4vw, 88px);
+  font-size: clamp(46px, 7.4vw, 104px);
   font-weight: 300;
   line-height: 1;
   letter-spacing: -0.045em;
@@ -1319,7 +1329,7 @@
 }
 
 .reloj-unidad {
-  font-size: clamp(10px, 0.9vw, 12px);
+  font-size: clamp(10px, 1vw, 14px);
   font-weight: 800;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -1360,7 +1370,10 @@
 .paso {
   grid-area: 1 / 1;
   align-self: center;
-  will-change: transform, opacity, filter;
+  /* El aviso de capa lo pone y lo quita `pasos.ts` mientras el bloque
+     viaja: dejarlo fijo en los seis reserva memoria de vídeo todo el rato
+     y, con `filter` dentro, obliga al navegador a tener siempre a mano una
+     capa capaz de desenfocar el teléfono y el mapa enteros. */
 }
 
 /* ── La portada ──
@@ -1371,6 +1384,7 @@
   flex-direction: column;
   align-items: center;
   justify-self: center;
+  will-change: transform, opacity;
   gap: clamp(18px, 2vw, 30px);
   text-align: center;
   transform-origin: 50% 50%;
@@ -1501,7 +1515,6 @@
    claro del riel se funde con el fondo y el aparato pierde el canto. */
 .paso-toma {
   position: relative;
-  will-change: transform;
   display: grid;
   place-items: center;
   justify-self: center;
@@ -2362,4 +2375,603 @@
     align-items: center;
     justify-content: space-between;
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   EL MAPA, EN VIVO
+   ══════════════════════════════════════════════════════════════════════
+   La única parte de la página que se toca. Va sobre tinta porque el
+   mosaico de Barranquilla es claro: puesto sobre oscuro deja de parecer
+   una ilustración de fondo y pasa a parecer lo que es, una pantalla
+   encendida.
+
+   Tres columnas: las rutas a la izquierda, el mapa en el centro y la
+   lectura a la derecha. El mapa manda —conserva la proporción del
+   mosaico, 1284×1982, para no recortar ninguna terminal— y las dos
+   columnas se le acomodan. */
+.mapa-inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 3.4vw, 52px);
+}
+
+.mapa-cabecera {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 46ch;
+}
+
+.mapa-tablero {
+  display: grid;
+  gap: clamp(18px, 2vw, 32px);
+  justify-content: center;
+  align-items: start;
+}
+
+@media (min-width: 1060px) {
+  .mapa-tablero {
+    grid-template-columns: minmax(230px, 290px) auto minmax(250px, 320px);
+  }
+}
+
+.mapa-columna {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.mapa-rotulo {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── El lienzo ── */
+.mapa-lienzo {
+  position: relative;
+  /* La proporción del mosaico, para que quepa la ciudad entera. */
+  aspect-ratio: 1284 / 1982;
+  height: clamp(420px, 74vh, 720px);
+  border-radius: 26px;
+  overflow: hidden;
+  background: #EDE7DE;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.7);
+}
+
+.mapa-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: manipulation;
+}
+
+/* Los trazos van en píxeles de pantalla, no en unidades del mosaico: así
+   la ruta se ve del mismo grosor con el mapa grande y con el mapa
+   pequeño, que es como se dibuja un mapa de verdad. */
+.mv-casing,
+.mv-activa {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.mv-casing {
+  stroke: #FFFFFF;
+  stroke-width: 7;
+  stroke-opacity: 0.95;
+}
+
+.mv-activa {
+  stroke: var(--green);
+  stroke-width: 3.4;
+}
+
+.mv-terminales circle {
+  fill: #FFFFFF;
+  stroke: var(--green);
+  stroke-width: 2.6;
+  vector-effect: non-scaling-stroke;
+}
+
+/* El kilómetro del aviso, dibujado a escala real sobre el mapa. */
+.mv-radio {
+  fill: rgba(0, 168, 89, 0.1);
+  stroke: rgba(0, 168, 89, 0.55);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 5;
+  vector-effect: non-scaling-stroke;
+  transition: r 0.25s var(--ease-out-cubic);
+}
+
+.mv-bus,
+.mv-pin {
+  pointer-events: none;
+}
+
+.mv-pin {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.28));
+}
+
+.mapa-toque {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  padding: 7px 15px;
+  border-radius: 999px;
+  background: rgba(11, 22, 40, 0.82);
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease-out-cubic);
+}
+
+/* En cuanto el visitante toca, la instrucción sobra. */
+.mapa-tablero.es-tocado .mapa-toque {
+  opacity: 0;
+}
+
+.mapa-credito {
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  font-size: 9.5px;
+  letter-spacing: 0.02em;
+  color: rgba(15, 23, 42, 0.55);
+  pointer-events: none;
+}
+
+/* ── Las rutas ── */
+.mv-rutas {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.mv-ruta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 10px;
+  padding: 11px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.72);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.mv-ruta:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+}
+
+.mv-ruta[aria-pressed='true'] {
+  background: rgba(0, 168, 89, 0.16);
+  border-color: rgba(0, 168, 89, 0.55);
+  color: #FFFFFF;
+}
+
+.mv-ruta-nombre {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.mv-ruta-km {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.mv-ruta[aria-pressed='true'] .mv-ruta-km {
+  color: var(--green);
+}
+
+.mv-ruta-datos {
+  grid-column: 1 / -1;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+/* ── La lectura ── */
+.mapa-lectura {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 18px 20px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  transition: border-color var(--transition-normal), background var(--transition-normal);
+}
+
+.mapa-lectura.es-cerca {
+  border-color: rgba(0, 168, 89, 0.5);
+  background: rgba(0, 168, 89, 0.1);
+}
+
+.mapa-lectura .mapa-rotulo {
+  margin-bottom: 6px;
+}
+
+.mapa-lectura-bus {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* Del mismo corte que el número grande de la app. */
+.mapa-lectura-metros {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 3.6vw, 54px);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: #FFFFFF;
+  transition: color var(--transition-normal);
+}
+
+.mapa-lectura.es-cerca .mapa-lectura-metros {
+  color: #4ADE80;
+}
+
+.mapa-lectura-pie {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+/* ── El aviso ──
+   La misma notificación que sale en el teléfono, con las dos líneas que
+   arma la app. Aparece cuando un bus entra en el kilómetro y se queda. */
+.mapa-aviso {
+  display: flex;
+  gap: 11px;
+  padding: 13px 15px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 34px -18px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  transform: translateY(-10px) scale(0.97);
+  visibility: hidden;
+  transition:
+    opacity 0.35s var(--ease-out-cubic),
+    transform 0.45s var(--ease-spring),
+    visibility 0.35s;
+}
+
+.mapa-aviso.is-on {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+}
+
+.mapa-aviso-icono {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--green-tint);
+}
+
+.mapa-aviso-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mapa-aviso-app {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-text-secondary);
+}
+
+.mapa-aviso-titulo {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--app-text-primary);
+}
+
+.mapa-aviso-cuerpo {
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--app-text-secondary);
+}
+
+.mapa-honesto {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.mapa-honesto strong {
+  display: block;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+@media (max-width: 1059px) {
+  /* Apilado manda el mapa primero: es lo que hay que tocar. */
+  .mapa-lienzo {
+    height: min(72vh, 560px);
+    justify-self: center;
+  }
+
+  .mapa-columna--rutas {
+    order: 3;
+  }
+
+  .mv-rutas {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+  }
+
+  .mv-rutas::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mv-ruta {
+    flex: 0 0 auto;
+    width: 210px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   EL ÁREA METROPOLITANA
+   ══════════════════════════════════════════════════════════════════════
+   Cuatro cifras y lo que significan. Las tarjetas van limpias —papel,
+   borde fino y nada más— porque lo que tiene que destacar es el número,
+   no el adorno de la tarjeta. */
+.amb-inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(30px, 3.4vw, 54px);
+}
+
+.amb-cabecera {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 54ch;
+}
+
+.amb-rejilla {
+  display: grid;
+  gap: clamp(12px, 1.4vw, 20px);
+  grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
+}
+
+.amb-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: clamp(20px, 2vw, 28px);
+  border: 1px solid var(--divider);
+  border-radius: 22px;
+  background: var(--surface);
+}
+
+.amb-card-cifra {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 3.6vw, 56px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: var(--green-accessible);
+  font-variant-numeric: tabular-nums;
+}
+
+.amb-card h3 {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--text-primary);
+}
+
+.amb-card p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.amb-cierre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(18px, 2.4vw, 40px);
+  padding: clamp(22px, 2.4vw, 34px) clamp(24px, 2.8vw, 40px);
+  border-radius: 24px;
+  background: var(--green-tint);
+}
+
+.amb-cierre-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 62ch;
+}
+
+.amb-cierre-texto h3 {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 1.8vw, 27px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.amb-cierre-texto p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LAS PÁGINAS DE LETRA PEQUEÑA
+   ══════════════════════════════════════════════════════════════════════
+   Términos y privacidad. Una columna, tipografía de la casa y nada más:
+   estas dos páginas se leen, no se recorren. La medida se queda corta a
+   propósito —lo que peor se lee de un documento legal es una línea de
+   ciento veinte caracteres— y los títulos van en la display para que se
+   note que son de la misma casa que la portada. */
+.legal-body {
+  background: var(--arena);
+  color: var(--text-primary);
+}
+
+.legal-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 660px;
+  margin: 0 auto;
+  padding: clamp(22px, 3vw, 40px) var(--gutter) 0;
+}
+
+.legal-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+}
+
+.legal-volver {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--green-accessible);
+}
+
+.legal-volver:hover {
+  text-decoration: underline;
+}
+
+.legal-hoja {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 660px;
+  margin: 0 auto;
+  padding: clamp(30px, 4vw, 56px) var(--gutter) clamp(40px, 5vw, 80px);
+}
+
+.legal-fecha {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.legal-hoja h1 {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 5.4vw, 62px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+
+.legal-hoja h2 {
+  margin-top: clamp(20px, 2.4vw, 34px);
+  font-family: var(--font-display);
+  font-size: clamp(19px, 1.8vw, 25px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.legal-hoja p,
+.legal-lista li {
+  font-size: 16px;
+  line-height: 1.68;
+  color: var(--text-secondary);
+}
+
+.legal-entrada {
+  font-size: 18px !important;
+  line-height: 1.6 !important;
+  color: var(--text-primary) !important;
+}
+
+.legal-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.legal-lista li::marker {
+  color: var(--green-accessible);
+}
+
+.legal-hoja strong {
+  color: var(--text-primary);
+}
+
+.legal-hoja a,
+.legal-pie a {
+  color: var(--green-accessible);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.legal-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 22px var(--gutter) clamp(34px, 4vw, 56px);
+  border-top: 1px solid var(--divider);
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+/* El punto marcado se salió del alcance de la ruta: el número deja de ser
+   una cuenta atrás y pasa a ser un dato, y se pinta como tal. */
+.mapa-lectura.es-fuera .mapa-lectura-metros {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.mapa-lectura.es-fuera .mapa-lectura-pie {
+  color: var(--amber);
 }

@@ -352,8 +352,10 @@ export class PhoneMap {
     this.busTs = ts;
     while (this.busNodes.length < ts.length) {
       const node = PhoneMap.makeBus();
-      // Debajo del pin: el pin es del usuario y manda.
-      this.markersEl.insertBefore(node, this.pinNode);
+      // Encima del pin. El pin es del usuario, pero es un punto quieto y
+      // el bus es la noticia: debajo, el disco del pin se lo comía justo
+      // en el momento en que hay que verlo llegar.
+      this.markersEl.appendChild(node);
       this.busNodes.push(node);
     }
     this.busNodes.forEach((node, i) => {

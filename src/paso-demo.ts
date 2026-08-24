@@ -76,7 +76,7 @@ export class PasoDemo {
     if (sinMovimiento()) {
       this.quieta = true;
       this.mapa.showPin(true);
-      this.colocarBuses(this.guion === 4 ? [1600] : [380, 820]);
+      this.colocarBuses(this.guion === 4 ? [1600] : [480, 920]);
       this.mapa.showBuses(true);
       this.mudo(this.guion === 4);
       return;
@@ -269,7 +269,7 @@ export class PasoDemo {
       this.texto('chip-text', 'Con tu ubicación: 2 buses cerca');
       const accion = this.el('chip-action');
       if (accion) accion.hidden = false;
-      this.colocarBuses([380, 820]);
+      this.colocarBuses([480, 920]);
       this.mapa.showBuses(true);
       this.moverBuses();
     });
