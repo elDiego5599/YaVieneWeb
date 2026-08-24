@@ -1,0 +1,78 @@
+/* ── CARIBE ──────────────────────────────────────────────
+
+   Una capa de color que se aplica encima de varias secciones a la vez. Por eso va después de todas ellas.
+
+   Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
+   Se carga desde ahí y **el orden importa**: hay reglas que se pisan
+   entre secciones a propósito, así que mover este `@import` de sitio
+   cambia lo que se ve. Si haces una regla nueva que no se aplica, mira
+   primero si más abajo en el orden de carga hay otra con la misma
+   especificidad. Es el fallo que más veces ha pasado en esta base.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── Experimento `prueba`: geometría y color del Caribe ──────────────
+   La primera escena queda intacta. Estas capas llevan a las secciones
+   siguientes la energía de Barranquilla —bloques de color, cielo, mango y
+   formas de ventana— sin convertir la landing en una postal turística. */
+.stats-panel {
+  background-image:
+    linear-gradient(90deg, var(--green) 0 25%, #11A9C7 25% 50%, var(--amber) 50% 75%, var(--coral) 75% 100%),
+    radial-gradient(720px circle at 12% 0%, rgba(0, 168, 89, 0.22), transparent 60%),
+    radial-gradient(680px circle at 92% 100%, rgba(255, 193, 7, 0.14), transparent 58%),
+    linear-gradient(160deg, var(--navy) 0%, var(--ink) 55%, var(--ink-deep) 100%);
+  background-size: 100% 4px, 100% 100%, 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0, 0 0, 0 0;
+  background-repeat: no-repeat;
+}
+
+#solucion {
+  background:
+    radial-gradient(560px circle at 8% 14%, rgba(17, 169, 199, 0.18), transparent 68%),
+    radial-gradient(520px circle at 94% 86%, rgba(232, 106, 94, 0.2), transparent 68%),
+    linear-gradient(125deg, #E6F7F0 0%, #FFF8E1 50%, #FBE7E4 100%);
+}
+
+/* La sección que pide algo va sobre papel, no sobre tinta. Justo encima
+   está el mapa, que toma la ventana entera en oscuro: dos fondos de tinta
+   seguidos hacen que el formulario parezca un trozo más del mapa. En claro
+   la ficha se lee como lo que es —algo que se rellena— y el pie recoge el
+   calor de la marca al final. El papel tira a verde frío para no repetir
+   el arena del problema ni la crema del pie. */
+#empresas {
+  margin-bottom: 0;
+  border: 1px solid rgba(11, 22, 40, 0.07);
+  box-shadow: none;
+}
+
+#empresas .tracked-eyebrow {
+  font-size: clamp(14px, 1.15vw, 18px);
+  letter-spacing: 0.2em;
+  /* El ámbar de la marca no se sostiene sobre papel: mismo sitio y mismo
+     peso, pero en el verde que sí pasa contraste. */
+  color: var(--green-accessible);
+}
+
+#empresas .companies-info p {
+  color: var(--text-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stats-panel,
+  #solucion {
+    animation: none !important;
+  }
+}
+
+@media (min-width: 760px) {
+  .footer-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 1.2fr) minmax(160px, 0.7fr);
+    align-items: start;
+    gap: clamp(38px, 5vw, 86px);
+  }
+
+  .footer-bottom {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

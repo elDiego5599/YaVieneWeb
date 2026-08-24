@@ -1,0 +1,142 @@
+/* ── LEGALES ──────────────────────────────────────────────
+
+   Términos y privacidad.
+
+   Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
+   Se carga desde ahí y **el orden importa**: hay reglas que se pisan
+   entre secciones a propósito, así que mover este `@import` de sitio
+   cambia lo que se ve. Si haces una regla nueva que no se aplica, mira
+   primero si más abajo en el orden de carga hay otra con la misma
+   especificidad. Es el fallo que más veces ha pasado en esta base.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ══════════════════════════════════════════════════════════════════════
+   LAS PÁGINAS DE LETRA PEQUEÑA
+   ══════════════════════════════════════════════════════════════════════
+   Términos y privacidad. Una columna, tipografía de la casa y nada más:
+   estas dos páginas se leen, no se recorren. La medida se queda corta a
+   propósito —lo que peor se lee de un documento legal es una línea de
+   ciento veinte caracteres— y los títulos van en la display para que se
+   note que son de la misma casa que la portada. */
+.legal-body {
+  background: var(--arena);
+  color: var(--text-primary);
+}
+
+.legal-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 660px;
+  margin: 0 auto;
+  padding: clamp(22px, 3vw, 40px) var(--gutter) 0;
+}
+
+.legal-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+}
+
+.legal-volver {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--green-accessible);
+}
+
+.legal-volver:hover {
+  text-decoration: underline;
+}
+
+.legal-hoja {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 660px;
+  margin: 0 auto;
+  padding: clamp(30px, 4vw, 56px) var(--gutter) clamp(40px, 5vw, 80px);
+}
+
+.legal-fecha {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.legal-hoja h1 {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 5.4vw, 62px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+
+.legal-hoja h2 {
+  margin-top: clamp(20px, 2.4vw, 34px);
+  font-family: var(--font-display);
+  font-size: clamp(19px, 1.8vw, 25px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.legal-hoja p,
+.legal-lista li {
+  font-size: 16px;
+  line-height: 1.68;
+  color: var(--text-secondary);
+}
+
+.legal-entrada {
+  font-size: 18px !important;
+  line-height: 1.6 !important;
+  color: var(--text-primary) !important;
+}
+
+.legal-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.legal-lista li::marker {
+  color: var(--green-accessible);
+}
+
+.legal-hoja strong {
+  color: var(--text-primary);
+}
+
+.legal-hoja a,
+.legal-pie a {
+  color: var(--green-accessible);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.legal-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 22px var(--gutter) clamp(34px, 4vw, 56px);
+  border-top: 1px solid var(--divider);
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}

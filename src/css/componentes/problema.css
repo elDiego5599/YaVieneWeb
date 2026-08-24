@@ -1,0 +1,502 @@
+/* ── PROBLEMA ──────────────────────────────────────────────
+
+   La franja de datos, las tarjetas del problema y el reloj.
+
+   Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
+   Se carga desde ahí y **el orden importa**: hay reglas que se pisan
+   entre secciones a propósito, así que mover este `@import` de sitio
+   cambia lo que se ve. Si haces una regla nueva que no se aplica, mira
+   primero si más abajo en el orden de carga hay otra con la misma
+   especificidad. Es el fallo que más veces ha pasado en esta base.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── Franja de datos ───────────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 20px;
+}
+
+@media (min-width: 860px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.2rem + 2.4vw, 3rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--amber);
+}
+
+.stat-label {
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: var(--text-white-dim);
+}
+
+/* ── Rejilla de tarjetas (problema) ────────────────────────────────── */
+#problema {
+  background:
+    radial-gradient(860px circle at 78% 16%, rgba(255, 193, 7, 0.14), transparent 58%),
+    linear-gradient(180deg, #FFFFFF 0%, #FFF9EF 100%);
+  background-size: 180% 180%, 100% 100%;
+  background-position: 0% 50%, 50% 50%;
+  animation: panel-gradient-respiro 10s ease-in-out infinite alternate;
+  transition: background 0.7s var(--ease-out-cubic);
+}
+
+#problema .escena::before,
+#problema .escena::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#problema .escena::before {
+  z-index: 0;
+  background:
+    radial-gradient(620px circle at 72% 12%, rgba(255, 193, 7, 0.28), transparent 60%),
+    linear-gradient(135deg, rgba(255, 248, 225, 0.9) 0%, rgba(255, 255, 255, 0.2) 54%,
+      rgba(251, 231, 228, 0.5) 100%);
+  opacity: 1;
+  background-size: 180% 180%, 180% 180%;
+  background-position: 0% 50%, 50% 50%;
+  animation: clima-gradient-respiro 9s ease-in-out infinite alternate;
+  transition: opacity 0.65s var(--ease-out-cubic);
+}
+
+#problema .escena::after {
+  z-index: 1;
+  background:
+    radial-gradient(520px circle at 76% 14%, rgba(15, 35, 63, 0.2), transparent 64%),
+    linear-gradient(138deg, rgba(15, 35, 63, 0.14), transparent 58%);
+  opacity: 0;
+  background-size: 180% 180%, 180% 180%;
+  background-position: 100% 50%, 50% 50%;
+  animation: clima-gradient-respiro 9s ease-in-out infinite alternate-reverse;
+  transition: opacity 0.5s var(--ease-out-cubic);
+}
+
+#problema[data-clima='lluvia'] {
+  background:
+    radial-gradient(760px circle at 74% 8%, rgba(37, 99, 235, 0.16), transparent 62%),
+    linear-gradient(180deg, #F1F6FC 0%, #E6EEF8 58%, #F7FAFC 100%);
+}
+
+#problema[data-clima='lluvia'] .escena::before {
+  opacity: 0;
+  animation: none;
+}
+
+#problema[data-clima='sol'] .escena::before {
+  animation: clima-gradient-respiro 9s ease-in-out infinite alternate,
+    clima-luz-respiro 9s ease-in-out infinite alternate;
+}
+
+#problema[data-clima='lluvia'] .escena::after {
+  opacity: 1;
+}
+
+#problema .panel-dots {
+  z-index: 1;
+}
+
+#problema .panel-inner {
+  z-index: 2;
+}
+
+.clima-word {
+  appearance: none;
+  border: 0;
+  padding: 0 1px;
+  border-radius: 0;
+  background: transparent;
+  font: inherit;
+  font-family: var(--font-display);
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  transition:
+    color var(--transition-normal),
+    text-shadow var(--transition-normal),
+    transform 0.38s var(--ease-spring);
+}
+
+.clima-word--sol {
+  color: var(--warn);
+}
+
+.clima-word--lluvia {
+  color: var(--electric-blue);
+}
+
+.clima-word.is-active {
+  transform: translateY(-1px);
+  text-shadow: 0 5px 16px rgba(11, 22, 40, 0.14);
+}
+
+.clima-word:hover {
+  transform: translateY(-2px);
+}
+
+.clima-word:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 6px;
+  border-radius: 6px;
+}
+
+/* La frase que carga el peso: casi tamaño de titular, y con el ancho de
+   lectura corto para que se lea de golpe y no como párrafo. */
+.problema-lead {
+  max-width: 30ch;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.5vw, 46px);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  color: var(--ink);
+}
+
+.problema-clima {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(14px, 1.6vw, 22px);
+}
+
+.problema-clima-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 56ch;
+}
+
+.problema-clima-titulo {
+  font-size: clamp(19px, 1.6vw, 26px);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.weather-text {
+  font-size: clamp(16px, 1.2vw, 19px);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* El coste va al final y en voz baja: es la consecuencia, no la noticia.
+   La barra coral a la izquierda lo ata a la regla de arriba. */
+.problema-coste {
+  max-width: 46ch;
+  padding-left: 18px;
+  border-left: 2px solid rgba(232, 106, 94, 0.45);
+  font-size: clamp(16px, 1.2vw, 19px);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Sin tarjeta detrás, el cuadro de color volvía a parecer una: el icono
+   se queda en un disco discreto que sólo sirve de ancla al párrafo. */
+.card-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  margin-top: 2px;
+}
+
+.card-icon.amber {
+  background: var(--amber-tint);
+  color: var(--warn);
+  transition: background var(--transition-normal), color var(--transition-normal);
+}
+
+.weather-icon {
+  position: relative;
+}
+
+.weather-icon__rain {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  opacity: 0;
+  transform: scale(0.58) translateY(-3px) rotate(-8deg);
+  transform-origin: 50% 50%;
+  transition: opacity 0.3s ease, transform 0.55s var(--ease-spring);
+}
+
+.weather-icon__sun {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  transform-origin: 50% 50%;
+  transition: opacity 0.3s ease, transform 0.55s var(--ease-spring);
+}
+
+#problema[data-clima='lluvia'] .weather-icon {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--electric-blue);
+}
+
+#problema[data-clima='lluvia'] .weather-icon__sun {
+  opacity: 0;
+  transform: scale(0.58) rotate(42deg);
+}
+
+#problema[data-clima='lluvia'] .weather-icon__rain {
+  opacity: 1;
+  transform: scale(1) translateY(0) rotate(0deg);
+  animation: weather-icon-in 0.55s var(--ease-spring) both;
+}
+
+/* El texto también cambia de clima: si el icono pasa a lluvia y el párrafo
+   sigue hablando de calor, el guiño se cae solo. Las dos versiones ocupan la
+   misma celda de rejilla, así que la tarjeta mide siempre lo que la más larga
+   y no da un salto al alternar. `visibility` va además de `opacity` para que
+   el lector de pantalla lea una sola. */
+.weather-text {
+  display: grid;
+}
+
+.weather-text > span {
+  grid-area: 1 / 1;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+#problema[data-clima='sol'] .weather-text__lluvia,
+#problema[data-clima='lluvia'] .weather-text__sol {
+  visibility: hidden;
+  opacity: 0;
+}
+
+#problema[data-clima='sol'] .weather-text__sol,
+#problema[data-clima='lluvia'] .weather-text__lluvia {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+.panel--mint {
+  background-size: 180% 180%;
+  animation: panel-gradient-respiro 10s ease-in-out infinite alternate;
+}
+
+.solucion-nota {
+  padding-left: 16px;
+  border-left: 2px solid var(--green);
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--green-accessible);
+}
+
+/* ── El problema: el texto a un lado, el reloj al otro ─────────────────
+   La sección se recorre. A la izquierda el texto se va sumando —primero
+   la frase, después el clima, al final el coste—; a la derecha el reloj
+   va de cero a treinta minutos. Nada se mueve de sitio: lo único que
+   cambia es cuánto hay escrito y qué hora marca. */
+.problema-escena {
+  display: grid;
+  gap: clamp(30px, 4vw, 72px);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  justify-items: center;
+}
+
+@media (min-width: 900px) {
+  .problema-escena {
+    /* A propósito descuadrado: el texto pesa un poco más que el reloj y
+       el reloj se va contra el borde derecho, que es lo que le quita a la
+       sección la simetría de dos columnas iguales. */
+    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+    gap: clamp(36px, 4vw, 78px);
+    justify-items: start;
+  }
+
+  /* Pegado al borde derecho el reloj se salía del campo de lectura: se
+     corre hacia dentro hasta quedar en el eje de la esfera, no en el del
+     panel. */
+  .problema-escena .reloj {
+    justify-self: end;
+    transform: translateX(calc(-1 * clamp(12px, 4.5vw, 92px)));
+  }
+}
+
+/* La sección es la que abre el argumento de la página: el titular sube
+   medio escalón sobre el resto para que se lea antes que la esfera. */
+.problema-texto .section-title {
+  font-size: clamp(2.3rem, 1.2rem + 3.9vw, 4.5rem);
+}
+
+.problema-texto {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(22px, 2.7vw, 40px);
+  max-width: 52ch;
+}
+
+/* Cada golpe de texto entra cuando el reloj llega a su altura. Aparecen y
+   se quedan: al final de la sección está el texto entero, como siempre. */
+.problema-beat {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.6s var(--ease-out-cubic),
+    transform 0.6s var(--ease-out-cubic);
+}
+
+.problema-beat.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── El reloj ──
+   Esfera de 300 grados, con hueco abajo: si cerrara el círculo el treinta
+   caería encima del cero y no se sabría si empieza o acaba. La aguja
+   larga marca el recorrido; el segundero da una vuelta por minuto, que es
+   lo que lo hace parecer un reloj andando y no una barra de progreso.
+   El color sigue la escala de la app: verde, ámbar, coral. */
+.reloj {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, clamp(290px, 40vw, 560px));
+  aspect-ratio: 1;
+  color: var(--green);
+  transition: color 0.9s var(--ease-out-cubic);
+}
+
+.reloj[data-urgencia='rato'] {
+  color: var(--warn);
+}
+
+.reloj[data-urgencia='harto'] {
+  color: var(--coral);
+}
+
+.reloj-halo {
+  position: absolute;
+  inset: 10%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 46%, currentColor, transparent 66%);
+  opacity: 0.12;
+  filter: blur(22px);
+  transition: opacity 0.9s ease;
+  pointer-events: none;
+}
+
+.reloj[data-urgencia='harto'] .reloj-halo {
+  opacity: 0.26;
+}
+
+.reloj-esfera {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.reloj-marcas line {
+  stroke: rgba(11, 22, 40, 0.2);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.reloj-marcas .reloj-marca--larga {
+  stroke: rgba(11, 22, 40, 0.38);
+  stroke-width: 2.4;
+}
+
+/* Los dos únicos números escritos en la esfera son los de la frase. */
+.reloj-cifra {
+  fill: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.reloj-riel,
+.reloj-avance {
+  fill: none;
+  stroke-width: 9;
+  stroke-linecap: round;
+  /* Arranca a las siete: 150 grados antes de las doce. */
+  transform: rotate(-240deg);
+  transform-origin: 140px 140px;
+  transform-box: view-box;
+}
+
+.reloj-riel {
+  stroke: rgba(11, 22, 40, 0.08);
+  stroke-dasharray: 575.96 691.15;
+}
+
+.reloj-avance {
+  stroke: currentColor;
+  transition: stroke 0.9s var(--ease-out-cubic);
+}
+
+.reloj-aguja,
+.reloj-segundero {
+  transform-origin: 140px 140px;
+  transform-box: view-box;
+}
+
+/* El botón que monta la punta del arco: es la aguja de los minutos, pero
+   por fuera, para que el centro se quede libre para la lectura. */
+.reloj-aguja circle {
+  fill: currentColor;
+  stroke: #FFFFFF;
+  stroke-width: 3.5;
+}
+
+.reloj-segundero line {
+  stroke: var(--text-muted);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.reloj-lectura {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Del mismo corte que el número grande de la app: fino, enorme y con las
+   cifras del mismo ancho para que no baile al contar. */
+.reloj-tiempo {
+  font-size: clamp(46px, 7.4vw, 104px);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+  color: var(--navy);
+}
+
+.reloj-tiempo i {
+  font-style: normal;
+  opacity: 0.26;
+}
+
+.reloj-unidad {
+  font-size: clamp(10px, 1vw, 14px);
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
