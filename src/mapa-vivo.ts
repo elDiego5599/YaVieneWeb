@@ -57,9 +57,9 @@ const MUESTRAS = 420;
 const nuevo = <K extends keyof SVGElementTagNameMap>(tag: K): SVGElementTagNameMap[K] =>
   document.createElementNS(SVG_NS, tag);
 
-/** Redondeo de `bus_labels.dart`: cerca al metro, lejos a la decena. */
+/** Redondeo de la lectura pública: cambia de cien en cien metros. */
 const redondear = (m: number): number =>
-  m < 100 ? Math.max(10, Math.round(m)) : Math.round(m / 10) * 10;
+  Math.max(100, Math.round(m / 100) * 100);
 
 /** Lectura de distancia de la app: metros hasta el kilómetro, después km. */
 const legible = (m: number): string =>
@@ -86,7 +86,6 @@ export class MapaVivo {
   private readonly lecturaBus: HTMLElement;
   private readonly lecturaMetros: HTMLElement;
   private readonly lecturaPie: HTMLElement;
-  private readonly pieRuta: HTMLElement;
 
   private readonly casing: SVGPathElement;
   private readonly activa: SVGPathElement;
@@ -122,7 +121,6 @@ export class MapaVivo {
     this.lecturaBus = req<HTMLElement>(raiz, '[data-mapa-bus]');
     this.lecturaMetros = req<HTMLElement>(raiz, '[data-mapa-metros]');
     this.lecturaPie = req<HTMLElement>(raiz, '[data-mapa-lectura-pie]');
-    this.pieRuta = req<HTMLElement>(raiz, '[data-mapa-pie]');
 
     // La C16 Calle 72 Uninorte es la que abre el resto de la página.
     this.ruta = YV_RUTAS.rutas.find(r => r.id === 'R-106') ?? YV_RUTAS.rutas[0];
@@ -309,7 +307,6 @@ export class MapaVivo {
     for (const boton of this.lista.querySelectorAll<HTMLElement>('[data-ruta]')) {
       boton.setAttribute('aria-pressed', String(boton.dataset.ruta === id));
     }
-    this.pieRuta.textContent = `${ruta.nombre} · ${ruta.terminalA} → ${ruta.terminalB}`;
 
     this.dibujarTerminales();
     // Al cambiar de ruta el punto de espera se queda donde estaba, pero su

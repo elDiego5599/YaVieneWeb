@@ -29,12 +29,17 @@ import { PhoneMap } from './phone-map';
 import { PhoneSimulator } from './phone-simulator';
 import { ProblemWeather } from './problem-weather';
 import { Reloj } from './reloj';
+import { saltosDeMenu } from './salto';
 import { ScrollEffects } from './scroll-effects';
 import { sinMovimiento } from './scrolly';
 
 const arrancar = (): void => {
   // Apariciones al entrar en pantalla: no depende de nada más.
   new ScrollEffects();
+
+  // Los enlaces internos cruzan por encima de las dos pistas; sin esto la
+  // travesía reproduce sus historias a toda velocidad. Ver salto.ts.
+  saltosDeMenu();
 
   const isla = document.querySelector<HTMLElement>('.nav-island');
   const botonIsla = isla?.querySelector<HTMLButtonElement>('.nav-island-toggle');
@@ -123,6 +128,23 @@ const arrancar = (): void => {
     });
   }
 };
+
+/*
+  El scroll suave se enciende al final, cuando ya no queda nada por
+  colocar. Mientras la página se monta, el alto del documento todavía
+  cambia, y el navegador puede tener que corregir la posición que
+  restauró al recargar: sin esta espera esa corrección se veía como un
+  viaje al fondo y una subida de un segundo. El porqué largo está en
+  base.css, junto a la regla.
+*/
+const encenderScrollSuave = (): void => {
+  requestAnimationFrame(() => {
+    document.documentElement.classList.add('scroll-suave');
+  });
+};
+
+if (document.readyState === 'complete') encenderScrollSuave();
+else window.addEventListener('load', encenderScrollSuave, { once: true });
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', arrancar, { once: true });

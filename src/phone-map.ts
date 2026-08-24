@@ -204,11 +204,26 @@ export class PhoneMap {
 
   /* ---------- Marcadores ---------- */
 
-  /** Cápsula roja: la misma geometría que createFlatTransitMarker(). */
+  /**
+   * Cápsula roja: la misma geometría que createFlatTransitMarker(). Va
+   * dentro de un halo que sólo se ve cuando el bus está elegido: es la
+   * capa 'bus-selected-halo-layer' de map_widget.dart, con su dorado y su
+   * filo claro.
+   *
+   * El 34 no es a ojo. En la app la cápsula se ve a unos 28 px —lo dice
+   * map_markers.dart— y al elegirse crece a 1,25, o sea 35 px de largo;
+   * el halo mide 20 de radio, algo más que su medio largo. Aquí la
+   * cápsula mide 60, medio largo 30, así que el halo va a 34: la misma
+   * relación. Lo que no se copia es el `circleBlur`: un filtro de
+   * desenfoque por bus, repintado cuadro a cuadro, cuesta más de lo que
+   * aporta, así que el borde se suaviza bajando la opacidad.
+   */
   private static makeBus(): SVGGElement {
     const g = nuevo('g');
     g.setAttribute('class', 'map-bus');
     g.innerHTML = `
+      <circle class="map-bus-halo" r="34" fill="#FFC72C" stroke="#FFF3C4"
+              stroke-width="2.6"/>
       <g class="map-bus-art">
         <rect x="-16" y="-30" width="32" height="60" rx="16" fill="url(#busBody)"/>
         <ellipse cx="0" cy="-15.6" rx="11.5" ry="7.8" fill="#FFFFFF" opacity="0.3"
@@ -400,6 +415,19 @@ export class PhoneMap {
 
   showBuses(on: boolean): void {
     for (const n of this.busNodes) n.classList.toggle('is-on', on);
+  }
+
+  /**
+   * El bus al que la hoja le sigue el rastro. `null` los deja a todos sin
+   * marcar, que es como están mientras nadie ha tocado ninguno.
+   */
+  setBusElegido(indice: number | null): void {
+    this.busNodes.forEach((n, i) => n.classList.toggle('is-elegida', i === indice));
+  }
+
+  /** El nodo de un bus, para que el guion pueda poner el dedo encima. */
+  nodoBus(indice: number): SVGGElement | null {
+    return this.busNodes[indice] ?? null;
   }
 
   showRoute(on: boolean): void {

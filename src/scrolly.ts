@@ -35,6 +35,26 @@ export function tramo(p: number, n: number): { indice: number; dentro: number } 
 export const sinMovimiento = (): boolean =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/*
+  Un salto del menú son cuatro o cinco mil píxeles de scroll suave en medio
+  segundo, y por el camino se cruzan las dos pistas enteras. El muestreo por
+  cuadro las obedece: el reloj daba su vuelta completa y los tres momentos
+  cruzaban de golpe, todo en ese medio segundo, y se llegaba al destino con
+  las transiciones CSS a mitad de camino. Eso es lo que se veía «saltado».
+
+  Mientras dura el viaje las pistas no se recalculan, y al parar se mide
+  cada una exactamente una vez: se llega con la escena ya colocada, sin
+  haberla visto correr. Quién congela y quién suelta está en salto.ts.
+*/
+let congeladas = false;
+const medidores = new Set<() => void>();
+
+export function congelarPistas(valor: boolean): void {
+  if (congeladas === valor) return;
+  congeladas = valor;
+  if (!valor) for (const medir of medidores) medir();
+}
+
 /** El alto real de la escena pegada; si no hay, se supone una ventana. */
 const altoEscena = (pista: HTMLElement): number => {
   const escena = pista.firstElementChild as HTMLElement | null;
@@ -59,6 +79,7 @@ export function seguirPista(
 
   const medir = (): void => {
     pedido = 0;
+    if (congeladas) return;
     const caja = pista.getBoundingClientRect();
     const recorrido = caja.height - altoEscena(pista);
     const p = recorrido <= 0 ? 0 : limitar(-caja.top / recorrido);
@@ -76,12 +97,14 @@ export function seguirPista(
 
   window.addEventListener('scroll', pedir, { passive: true });
   window.addEventListener('resize', pedir);
+  medidores.add(medir);
   medir();
 
   return () => {
     if (pedido) cancelAnimationFrame(pedido);
     window.removeEventListener('scroll', pedir);
     window.removeEventListener('resize', pedir);
+    medidores.delete(medir);
   };
 }
 

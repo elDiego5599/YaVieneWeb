@@ -11,8 +11,16 @@
  *   empty-no-position  → eta_bottom_sheet.dart
  *   manual + pin       → location_status_chip.dart
  *   empty-no-route     → eta_bottom_sheet.dart
- *   selector           → search_pill_bar.dart
+ *   selector vacío     → route_selector_sheet.dart
+ *   lista de empresas  → route_selector_sheet.dart
+ *   lista de rutas     → route_selector_sheet.dart
+ *   selector completo  → route_selector_sheet.dart
  *   manual-near + ETA  → eta_bottom_sheet.dart
+ *
+ * El selector no es un cartel: se abre vacío y se llena a golpe de dedo,
+ * y la ruta que entra en el hueco es la que el guion acaba de elegir de la
+ * lista —una distinta en cada vuelta, las seis de Sobusa por turno—, no
+ * una escrita a mano en el HTML.
  *
  * Nada de lo que muestra está inventado: las rutas y sus kilómetros salen
  * de rutas.json (vía PhoneMap) y el radio de aviso es el de
@@ -54,11 +62,75 @@ const VACIOS = {
     icono: 'ruta',
     titulo: 'Escoge empresa y ruta',
     sub: 'Para ver los buses, toca la barra de arriba y elige la empresa y su ruta'
+  },
+  /*
+    Con ruta puesta y buses en el mapa, la hoja todavía no dice ninguna
+    distancia: primero hay que decirle a cuál. Es el estado
+    'empty-pick-bus' de eta_bottom_sheet.dart, y la landing se lo saltaba
+    —enseñaba el número del más cercano sin que nadie hubiera elegido
+    nada, que es justo lo que la app no hace—.
+  */
+  elegirBus: {
+    icono: 'toque',
+    titulo: 'Toca un bus en el mapa',
+    sub: 'Selecciona un bus para darle seguimiento'
   }
 } as const;
 
+/**
+ * Los dos huecos del selector sin nada elegido. Los textos son los que
+ * pone route_selector_sheet.dart cuando `selectedCompany` o
+ * `selectedRoute` vienen nulos.
+ */
+const VACIO_SELECT = {
+  empresa: 'Selecciona una empresa',
+  ruta: 'Selecciona una ruta'
+} as const;
+
+/**
+ * La empresa de la prueba. No sale de rutas.json —ahí sólo están las
+ * rutas— sino de que las seis son de Sobusa, que es lo que dicen la app y
+ * la propia landing. El subtítulo es el literal del selector.
+ */
+const EMPRESA = { nombre: 'Sobusa', sub: 'Empresa de transporte masivo' } as const;
+
+/**
+ * Las empresas que enseña la lista. Sobusa es la del piloto y es siempre la
+ * que se elige; las otras tres son las que mueven Barranquilla, y están
+ * porque una lista de una sola fila no es una lista —el paso de elegir
+ * empresa no se entendería—. Van en orden alfabético, sin trato de favor.
+ *
+ * Cada insignia lleva los colores de su empresa, no un color de relleno:
+ * el verde y rojo de Sobusa, el verde y amarillo de Coolitoral, el azul de
+ * Sodis y el navy de Transmetro. Son los tokens de la casa, sin colores
+ * nuevos. El rojo sale de --error porque es el único rojo pleno que hay en
+ * variables.css; aquí no significa error, es la tinta de la marca.
+ */
+const EMPRESAS = [
+  { nombre: 'Coolitoral', fondo: 'var(--green)', tinta: 'var(--amber)' },
+  { nombre: 'Sobusa', fondo: 'var(--green)', tinta: 'var(--error)' },
+  { nombre: 'Sodis', fondo: 'var(--electric-blue)', tinta: '#FFFFFF' },
+  { nombre: 'Transmetro', fondo: 'var(--navy)', tinta: '#FFFFFF' }
+] as const;
+
+const CONECTORES = new Set(['de', 'del', 'la', 'el', 'los', 'las', 'y']);
+
+/**
+ * _companyInitials(): la primera palabra y la siguiente que no sea un
+ * conector; si sólo hay una, sus dos primeras letras.
+ */
+function inicialesEmpresa(nombre: string): string {
+  const palabras = nombre.trim().split(/\s+/).filter(p => p.length > 0);
+  if (palabras.length === 0) return '?';
+  const claves = palabras.filter(p => !CONECTORES.has(p.toLowerCase()));
+  if (claves.length === 0) return palabras[0][0].toUpperCase();
+  if (claves.length === 1) return claves[0].slice(0, 2).toUpperCase();
+  return (claves[0][0] + claves[1][0]).toUpperCase();
+}
+
 type ClaveChip = keyof typeof CHIPS;
 type ClaveVacio = keyof typeof VACIOS;
+type ClaveSelect = keyof typeof VACIO_SELECT;
 
 export class PhoneSimulator {
   private readonly map: PhoneMap;
@@ -113,8 +185,26 @@ export class PhoneSimulator {
    * después de que el guion arme el aviso: primero se pulsa el botón y
    * después llega la notificación, que es el orden que tiene en la app.
    */
+  /**
+   * El bus al que la hoja le sigue el rastro, por su sitio en `buses`.
+   * Mientras es `null` la hoja está en 'Toca un bus en el mapa'. Una vez
+   * elegido no cambia aunque otro se ponga más cerca: la app sigue al que
+   * tocaste, no al más próximo.
+   */
+  private busElegido: number | null = null;
+
+  /*
+    Dónde nace cada bus manda sobre todo el tramo final del guion: a 46 m/s,
+    cada metro de más son 22 ms de demo. El primero arrancaba 1350 m detrás
+    del punto de espera y llegaba al kilómetro —el radio del aviso— a los
+    17,3 s, cuando el dedo acababa de armarlo; la notificación salía casi
+    encima del toque y parecía que el aviso sólo se puede poner cuando el
+    bus ya lo tienes ahí. Con 1450 el kilómetro cae a los 19,4 s: el dedo
+    arma a 1,3 km y quedan cinco segundos y medio de espera con el número
+    bajando, que es justo lo que hay que enseñar.
+  */
   private readonly buses: EstadoBus[] = [
-    { placa: 'B-042', nace: 1350, ritmo: 1, t: 0 },
+    { placa: 'B-042', nace: 1450, ritmo: 1, t: 0 },
     { placa: 'B-055', nace: 2250, ritmo: 0.78, t: 0 }
   ];
 
@@ -126,8 +216,16 @@ export class PhoneSimulator {
    */
   private static readonly RUTA_INICIAL = 'R-106';
 
+  /** Las vistas que la app dibuja como diálogo y no como hoja. */
+  private static readonly VISTAS_SELECTOR = new Set(['selector', 'companies', 'routes']);
+
+  /** Fracción de la ventana que se come el desvanecido de abajo. */
+  private static readonly RESGUARDO = 0.18;
+
   private indiceRuta = 0;
   private avisoActivo = false;
+  /** Lo que mide la tarjeta del selector; las listas se dibujan con ella. */
+  private altoTarjeta = 0;
   /** Cierre del ciclo en curso: nada nuevo debe volver a asomarse. */
   private cerrando = false;
   private rutaActual: RutaLanding;
@@ -147,6 +245,7 @@ export class PhoneSimulator {
     this.indiceRuta = arranque === -1 ? 0 : arranque;
     this.rutaActual = this.rutas[this.indiceRuta];
     this.pintarRutas();
+    this.pintarEmpresas();
     this.play();
   }
 
@@ -190,6 +289,40 @@ export class PhoneSimulator {
   }
 
   /**
+   * La lista de empresas, también con los datos y no a mano: la insignia
+   * lleva las iniciales y el color que le sacaría el selector a cada
+   * nombre. El id que alimenta ese color es el nombre en minúsculas, que
+   * es como está el de Sobusa.
+   */
+  private pintarEmpresas(): void {
+    const lista = this.el('company-list');
+    if (!lista) return;
+    const carril = document.createElement('div');
+    carril.className = 'sheet-lista-inner';
+    carril.append(
+      ...EMPRESAS.map(empresa => {
+        const fila = document.createElement('div');
+        fila.className = 'app-tile';
+        // El dedo del guion siempre busca la misma: la del piloto.
+        if (empresa.nombre === EMPRESA.nombre) fila.dataset.el = 'tile-empresa';
+        fila.innerHTML = `
+          <span class="app-tile-icon app-tile-icon--empresa"></span>
+          <span class="app-tile-body">
+            <span class="app-tile-title"></span>
+          </span>
+          <span class="app-tile-chevron" aria-hidden="true">›</span>`;
+        const insignia = fila.querySelector<HTMLElement>('.app-tile-icon')!;
+        insignia.textContent = inicialesEmpresa(empresa.nombre);
+        insignia.style.background = empresa.fondo;
+        insignia.style.color = empresa.tinta;
+        fila.querySelector('.app-tile-title')!.textContent = empresa.nombre;
+        return fila;
+      })
+    );
+    lista.replaceChildren(carril);
+  }
+
+  /**
    * Deja a la vista la fila de la ruta que se va a elegir. Si ya se ve, no
    * se mueve nada: una lista que se desplaza sin necesidad se nota falsa.
    */
@@ -202,16 +335,30 @@ export class PhoneSimulator {
     if (!lista || !carril || !fila) return;
 
     // El alto de la ventana es el de la lista; el desborde es lo que hay
-    // que subir para que la fila termine dentro, con su margen debajo.
+    // que subir para que la fila termine dentro. Y no basta con que entre:
+    // el desvanecido de abajo se come el último trozo de la ventana, así
+    // que la fila tiene que terminar por encima de él o el dedo acabaría
+    // tocando una fila medio borrada. Si para eso hay que llegar al final
+    // del carril, mejor: allí ya no hay desvanecido que la tape.
     const ventana = lista.clientHeight;
+    const tope = Math.max(0, carril.offsetHeight - ventana);
     const fin = fila.offsetTop + fila.offsetHeight;
-    const sobra = fin - ventana;
-    if (sobra <= 0) return;
-    const tope = carril.offsetHeight - ventana;
-    const empuje = Math.min(sobra, Math.max(0, tope));
+    const empuje = Math.min(tope, Math.max(0, fin - ventana * (1 - PhoneSimulator.RESGUARDO)));
+    this.marcarBordes(lista, empuje, tope);
+    if (empuje === 0) return;
     this.a(560, () => {
       carril.style.transform = `translateY(${-empuje}px)`;
     });
+  }
+
+  /**
+   * Los dos desvanecidos de la ventana, cada uno por el lado por el que la
+   * lista sigue de verdad. Es lo que hace la sombra de desplazamiento de
+   * cualquier lista: aparece cuando hay algo escondido y no antes.
+   */
+  private marcarBordes(lista: HTMLElement, empuje: number, tope: number): void {
+    lista.classList.toggle('hay-arriba', empuje > 0.5);
+    lista.classList.toggle('hay-abajo', tope - empuje > 0.5);
   }
 
   /**
@@ -220,34 +367,40 @@ export class PhoneSimulator {
    * delataría el truco.
    */
   private reiniciarLista(): void {
-    const carril = this.el('route-list')?.querySelector<HTMLElement>('.sheet-lista-inner');
-    if (!carril) return;
+    const lista = this.el('route-list');
+    const carril = lista?.querySelector<HTMLElement>('.sheet-lista-inner');
+    if (!lista || !carril) return;
     carril.style.transition = 'none';
     carril.style.transform = 'translateY(0)';
     void carril.offsetHeight;
     carril.style.transition = '';
+    // Arriba del todo: no hay nada escondido por encima, y sí por debajo.
+    lista.classList.remove('hay-arriba');
+    lista.classList.add('hay-abajo');
   }
 
   /**
    * El alto de la hoja, animado. Es el AnimatedSize del selector: sin él
    * la hoja cambia de tamaño de golpe en cada paso y el mockup se siente
    * armado a cortes en vez de manejado por alguien.
+   *
+   * Dentro del selector no cambia: route_selector_sheet.dart mide la
+   * tarjeta principal una sola vez —`_cardHeight`— y dibuja las dos listas
+   * con esa misma altura, así que el diálogo se queda quieto mientras se
+   * entra y se sale de ellas. Aquí igual: se guarda lo que midió la vista
+   * del selector, que es siempre la primera que se abre, y las listas la
+   * heredan.
    */
   private ajustarAlto(): void {
     const activa = this.vistas.find(v => v.classList.contains('active'));
     if (!activa) return;
-    this.vistasEl.style.height = `${activa.offsetHeight}px`;
-  }
-
-  /**
-   * Escalón "peek" de eta_bottom_sheet.dart: la hoja se recoge y deja ver
-   * más mapa. En la app se llega arrastrando el asa; aquí lo hace el guion
-   * a mitad del tramo en vivo, cuando lo interesante es el bus y no el
-   * texto.
-   */
-  private setPeek(puesto: boolean): void {
-    this.sheetEl.classList.toggle('is-peek', puesto);
-    this.ajustarAlto();
+    const vista = activa.dataset.view ?? '';
+    if (vista === 'selector') this.altoTarjeta = activa.offsetHeight;
+    const alto =
+      PhoneSimulator.VISTAS_SELECTOR.has(vista) && this.altoTarjeta > 0
+        ? this.altoTarjeta
+        : activa.offsetHeight;
+    this.vistasEl.style.height = `${alto}px`;
   }
 
   /* ---------- Utilidades ---------- */
@@ -272,9 +425,43 @@ export class PhoneSimulator {
     if (nodo) nodo.textContent = valor;
   }
 
+  /**
+   * Cambia de vista y, con ella, de superficie. Las tres vistas del
+   * selector no son contenido dentro de la hoja de distancia: en la app
+   * son un diálogo encima del mapa, con su Material blanco y su velo. Por
+   * eso el vestido y el velo se deciden aquí y no repartidos por el guion
+   * —una sola línea que decidir, y nunca se quedan puestos de más.
+   */
   private mostrarVista(vista: string): void {
     for (const v of this.vistas) v.classList.toggle('active', v.dataset.view === vista);
+    const enSelector = PhoneSimulator.VISTAS_SELECTOR.has(vista);
+    this.sheetEl.classList.toggle('es-selector', enSelector);
+    this.el('scrim')?.classList.toggle('is-on', enSelector);
     this.ajustarAlto();
+  }
+
+  /**
+   * Los dos huecos del selector y el botón de abajo. Vacío el hueco va
+   * apagado y sin subtítulo; puesto se enciende. El botón espera a la
+   * ruta: hasta que la haya es el disabled del ElevatedButton, con su
+   * texto y su gris.
+   */
+  private setSelector(empresa: boolean, ruta: RutaLanding | null): void {
+    this.setSelect('empresa', empresa ? EMPRESA.nombre : null, EMPRESA.sub);
+    this.setSelect('ruta', ruta ? ruta.nombre : null, ruta ? `${ruta.terminalA} ↔ ${ruta.terminalB}` : '');
+    const boton = this.el('launch');
+    if (!boton) return;
+    boton.textContent = ruta ? 'Ver buses en vivo' : 'Selecciona una ruta para continuar';
+    boton.classList.toggle('app-launch--vacio', ruta === null);
+  }
+
+  private setSelect(cual: ClaveSelect, titulo: string | null, sub: string): void {
+    this.el(`sel-${cual}`)?.classList.toggle('is-activa', titulo !== null);
+    this.texto(`sel-${cual}-title`, titulo ?? VACIO_SELECT[cual]);
+    const nodo = this.el(`sel-${cual}-sub`);
+    if (!nodo) return;
+    nodo.textContent = titulo === null ? '' : sub;
+    nodo.hidden = titulo === null;
   }
 
   private a(ms: number, fn: () => void): void {
@@ -306,7 +493,7 @@ export class PhoneSimulator {
    * InkWell. Es lo que hace que la vista siguiente se lea como respuesta a
    * un dedo y no como la diapositiva que venía a continuación.
    */
-  private toqueSobre(nodo: HTMLElement | null | undefined): void {
+  private toqueSobre(nodo: Element | null | undefined): void {
     if (!nodo) return;
     const caja = nodo.getBoundingClientRect();
     const marco = this.raiz.getBoundingClientRect();
@@ -400,8 +587,10 @@ export class PhoneSimulator {
 
     this.setPildora(null);
     this.setChip('locating');
-    this.setPeek(false);
     this.setVacio('sinPunto');
+    this.setSelector(false, null);
+    this.busElegido = null;
+    this.map.setBusElegido(null);
     this.sheetEl.classList.remove('hidden-sheet');
     this.reiniciarFichas();
     this.reiniciarLista();
@@ -422,49 +611,89 @@ export class PhoneSimulator {
       this.setVacio('sinRuta');
     });
 
-    // El pasajero toca la barra: empresa y después ruta. Cada vista va
+    // El pasajero toca la barra y se abre el selector, vacío: dos huecos
+    // apagados y un botón que todavía no deja pasar. Cada vista va
     // precedida de su toque, con el mismo cuarto de segundo de por medio.
     this.a(3100, () => this.toqueSobre(this.el('pill')));
-    this.a(3340, () => this.mostrarVista('companies'));
+    this.a(3340, () => this.mostrarVista('selector'));
 
-    this.a(4500, () => this.toqueSobre(this.el('tile-empresa')));
-    this.a(4740, () => {
+    // Primero la empresa, que es el orden que impone la app: con el hueco
+    // de empresa vacío, tocar el de ruta no abre nada.
+    this.a(4300, () => this.toqueSobre(this.el('sel-empresa')));
+    this.a(4540, () => this.mostrarVista('companies'));
+    this.a(5400, () => this.toqueSobre(this.el('tile-empresa')));
+    this.a(5640, () => {
+      this.mostrarVista('selector');
+      this.setSelector(true, null);
+    });
+
+    // Y ahora sí la ruta. La lista se abre por la fila que toca —cada
+    // vuelta elige una distinta de las seis— y termina de acomodarse en
+    // 560 ms; el dedo llega después, ya con la fila quieta y a la vista.
+    this.a(6500, () => this.toqueSobre(this.el('sel-ruta')));
+    this.a(6740, () => {
       this.mostrarVista('routes');
       this.desplazarLista();
     });
+    this.a(8100, () => this.toqueSobre(this.filaDeRuta()));
 
-    // La lista termina de acomodarse en 560 ms; el dedo llega después, ya
-    // con la fila quieta y a la vista.
-    this.a(6100, () => this.toqueSobre(this.filaDeRuta()));
+    // La ruta elegida vuelve al selector y se ve entrar en su hueco: se
+    // enciende el ícono, aparecen las dos terminales debajo y el botón de
+    // abajo deja de estar deshabilitado. Ése es el remate del selector, y
+    // por eso el dedo espera a que se lea antes de pulsarlo.
+    this.a(8340, () => {
+      this.mostrarVista('selector');
+      this.setSelector(true, this.rutaActual);
+    });
+    this.a(9400, () => this.toqueSobre(this.el('launch')));
 
-    // Ruta elegida: aparece el trazado, la píldora cambia y entran los buses.
-    this.a(6360, () => {
+    // "Ver buses en vivo": se va el diálogo, aparece el trazado, la píldora
+    // cambia y entran los buses.
+    this.a(9660, () => {
       this.map.showRoute(true);
       this.setPildora(this.rutaActual);
       this.enVivo();
     });
 
-    // Con los buses ya rodando la hoja se recoge un escalón y deja ver el
-    // mapa entero, que es lo interesante mientras el número baja.
-    this.a(9200, () => this.setPeek(true));
+    // Y aquí va el paso que faltaba: la hoja no dice ninguna distancia
+    // hasta que alguien elige un bus. El dedo va al que viene por delante
+    // —que es el que elegiría cualquiera— y sólo entonces sale el número.
+    // El toque se calcula en el momento, no antes: el bus se está moviendo
+    // y su sitio en pantalla no es el mismo que hace un segundo.
+    this.a(11400, () => {
+      const cerca = this.masCercano();
+      if (cerca !== null) this.toqueSobre(this.map.nodoBus(cerca));
+    });
+    this.a(11640, () => {
+      const cerca = this.masCercano();
+      if (cerca !== null) this.seguirBus(cerca);
+    });
 
-    // El pasajero arma el aviso. La hoja vuelve entera justo después, y
-    // para entonces el primer bus está cruzando el kilómetro: el botón se
-    // pulsa, la hoja sube y la notificación sale, en ese orden.
-    this.a(12100, () => this.toqueSobre(this.el('alert-btn')));
-    this.a(12360, () => {
+    // El pasajero arma el aviso, y lo arma sobre la tarjeta completa: la
+    // franja de color, "ruta - placa" y el número, todo a la vista. Antes
+    // aquí la hoja se recogía a su escalón "peek" para enseñar más mapa, y
+    // el momento importante —la franja pasando a ámbar, la notificación
+    // saliendo— ocurría en una tarjeta que ya no decía a qué bus se refería.
+    //
+    // El cuándo también dice algo. El aviso se arma a 1,3 km, con el bus
+    // todavía lejos y la franja verde: así se ve que esto se deja puesto
+    // de antemano y el teléfono avisa solo. Iba a los 17,1 s, con el bus
+    // ya casi en el kilómetro, y la notificación salía tan pegada al toque
+    // que parecía dispararla el dedo. Los dos segundos que se le quitan
+    // aquí son los que la tarjeta lleva en pantalla desde que salió el
+    // número (11,64 s): el mismo respiro que hay entre los demás toques.
+    this.a(13600, () => this.toqueSobre(this.el('alert-btn')));
+    this.a(13860, () => {
       this.setAviso(true);
       // El detalle sólo aparece con el aviso puesto, igual que en la app:
       // mientras hay distancia y no hay aviso, la hoja no dice nada.
       this.avisoActivo = true;
       this.setDetalle('Puedes cambiar de aplicación; no cierres Ya Viene del todo');
     });
-    this.a(14200, () => this.setPeek(false));
-
     // El ciclo no corta: primero se recoge lo que sobra —el aviso flotante,
     // el detalle— y después la app se disuelve. Cuando vuelve a entrar ya
     // está recolocada, así que no se ve nada saltar.
-    this.a(21400, () => {
+    this.a(26400, () => {
       this.cerrando = true;
       this.escena?.querySelector('[data-escena="notif"]')?.classList.remove('is-on');
       this.setDetalle('');
@@ -472,12 +701,12 @@ export class PhoneSimulator {
       // cada capa se apaga con la transición que ya tenía.
       this.map.showBuses(false);
     });
-    this.a(22000, () => {
+    this.a(27000, () => {
       this.map.showRoute(false);
       this.map.showPin(false);
       this.raiz.classList.add('is-cerrando');
     });
-    this.a(23000, () => this.play());
+    this.a(28000, () => this.play());
   }
 
   /**
@@ -525,13 +754,28 @@ export class PhoneSimulator {
     }
   }
 
+  /**
+   * "Ver buses en vivo": entran los buses y la hoja pide que se elija uno.
+   * La distancia no sale todavía —no hay a qué medirla— y por eso el
+   * cronómetro de la hoja tampoco arranca aquí.
+   */
   private enVivo(): void {
-    this.mostrarVista('eta');
     this.setChip('cerca');
-    this.setDetalle('Buscando la posición del bus…');
+    this.setDetalle('');
     this.colocarBuses();
     this.map.showBuses(true);
+    this.setVacio('elegirBus');
     this.arrancarBuses();
+  }
+
+  /** El dedo toca un bus: a partir de aquí la hoja le sigue el rastro. */
+  private seguirBus(indice: number): void {
+    this.busElegido = indice;
+    this.map.setBusElegido(indice);
+    this.mostrarVista('eta');
+    this.setDetalle('Buscando la posición del bus…');
+    this.actualizarEta();
+    this.etaId ??= window.setInterval(() => this.actualizarEta(), 1000);
   }
 
   /* ---------- Distancia (espeja _metricParts/_urgencyColor) ---------- */
@@ -547,22 +791,29 @@ export class PhoneSimulator {
     return 'var(--green)';
   }
 
-  /** El bus que la hoja sigue: el más próximo por delante del pin. */
-  private masCercano(): { bus: EstadoBus; metros: number } | null {
+  /**
+   * Metros que le faltan a un bus para llegar al pin, sobre el recorrido y
+   * no en línea recta: el bus tiene que pasar por la vía, no cruzar por
+   * encima de las manzanas.
+   */
+  private metrosHastaPin(bus: EstadoBus): number | null {
     const largo = this.map.metrosDeRuta;
     if (!largo) return null;
-    let elegido: EstadoBus | null = null;
+    return ((this.pinT - bus.t + 1) % 1) * largo;
+  }
+
+  /** El más próximo por delante del pin: el que el dedo va a tocar. */
+  private masCercano(): number | null {
+    let elegido: number | null = null;
     let cerca = Infinity;
-    for (const b of this.buses) {
-      // Distancia sobre el recorrido, no en línea recta: el bus tiene que
-      // pasar por la vía, no cruzar por encima de las manzanas.
-      const metros = ((this.pinT - b.t + 1) % 1) * largo;
-      if (metros < cerca) {
+    this.buses.forEach((b, i) => {
+      const metros = this.metrosHastaPin(b);
+      if (metros !== null && metros < cerca) {
         cerca = metros;
-        elegido = b;
+        elegido = i;
       }
-    }
-    return elegido ? { bus: elegido, metros: cerca } : null;
+    });
+    return elegido;
   }
 
   /**
@@ -570,15 +821,16 @@ export class PhoneSimulator {
    * fps y al metro, los dígitos cambiaban tan rápido que no se leían.
    */
   private actualizarEta(): void {
-    const cerca = this.masCercano();
-    if (cerca === null) return;
+    if (this.busElegido === null) return;
+    const bus = this.buses[this.busElegido];
+    const crudo = bus === undefined ? null : this.metrosHastaPin(bus);
+    if (bus === undefined || crudo === null) return;
 
-    const crudo = cerca.metros;
     const metros = crudo < 100 ? Math.max(10, Math.round(crudo)) : Math.round(crudo / 10) * 10;
     const [valor, unidad] = this.partesMetrica(metros);
 
     // bus_labels.dart: routePlateLabel() arma "ruta - placa".
-    this.texto('eta-route', `${this.rutaActual.nombre} - ${cerca.bus.placa}`);
+    this.texto('eta-route', `${this.rutaActual.nombre} - ${bus.placa}`);
 
     // Con distancia en pantalla y sin aviso puesto, la app no muestra
     // detalle: el número ya lo dice todo.
@@ -586,7 +838,7 @@ export class PhoneSimulator {
 
     this.texto('eta-value', valor);
     this.texto('eta-unit', unidad);
-    this.notificacion(cerca.bus.placa, metros);
+    this.notificacion(bus.placa, metros);
     const barra = this.el('eta-bar');
     if (barra) barra.style.background = this.colorUrgencia(metros);
   }
@@ -617,8 +869,9 @@ export class PhoneSimulator {
   }
 
   private arrancarBuses(): void {
-    this.actualizarEta();
-    this.etaId ??= window.setInterval(() => this.actualizarEta(), 1000);
+    // El reloj de la distancia lo enciende seguirBus(): los buses ruedan
+    // desde que aparecen, pero no hay número que refrescar hasta que se
+    // elige uno.
     if (this.animId !== null) return;
 
     let previo: number | null = null;
