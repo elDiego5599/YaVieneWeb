@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#0B1628" />
+  <title>Ruta no encontrada · Ya Viene</title>
+  <link rel="icon" type="image/svg+xml" href="./logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0B1628;
+      --ink-deep: #060D1F;
+      --navy: #14274E;
+      --green: #00A859;
+      --green-soft: #DDF6EA;
+      --amber: #FFC107;
+      --coral: #E86A5E;
+      --muted: rgba(11, 22, 40, 0.62);
+      --display: 'Bricolage Grotesque', system-ui, sans-serif;
+      --body: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 78% 12%, rgba(0, 168, 89, 0.08), transparent 27rem),
+        radial-gradient(circle at 12% 88%, rgba(255, 193, 7, 0.1), transparent 28rem),
+        #F8FAFC;
+      font-family: var(--body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.5;
+      background-image: radial-gradient(rgba(20, 39, 78, 0.12) 1.3px, transparent 1.8px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(135deg, black, transparent 72%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .page-shell {
+      display: flex;
+      flex-direction: column;
+      width: min(1440px, calc(100% - 32px));
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 22px 0 24px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 0 clamp(4px, 2vw, 28px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-family: var(--display);
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+    }
+
+    .brand img {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      box-shadow: 0 8px 18px rgba(0, 168, 89, 0.22);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: rgba(11, 22, 40, 0.52);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 5px rgba(0, 168, 89, 0.12);
+    }
+
+    .error-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
+      align-items: center;
+      gap: clamp(38px, 7vw, 120px);
+      width: min(1220px, 100%);
+      margin: auto;
+      padding: clamp(64px, 9vh, 120px) clamp(4px, 2vw, 28px);
+    }
+
+    .copy { max-width: 620px; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--coral);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: '';
+      width: 26px;
+      height: 2px;
+      border-radius: 2px;
+      background: currentColor;
+    }
+
+    h1 {
+      max-width: 10ch;
+      margin: 20px 0 22px;
+      font-family: var(--display);
+      font-size: clamp(3.8rem, 7vw, 7.6rem);
+      line-height: 0.86;
+      letter-spacing: -0.07em;
+    }
+
+    h1 .number {
+      display: block;
+      color: var(--green);
+      font-size: 0.78em;
+      letter-spacing: -0.09em;
+    }
+
+    h1 em {
+      color: var(--navy);
+      font-style: normal;
+    }
+
+    .lede {
+      max-width: 47ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.35vw, 1.2rem);
+      line-height: 1.65;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 0 23px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 800;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+
+    .button:hover { transform: translateY(-2px); }
+
+    .button:focus-visible {
+      outline: 3px solid rgba(0, 168, 89, 0.35);
+      outline-offset: 4px;
+    }
+
+    .button-primary {
+      color: #06301A;
+      background: var(--green);
+      box-shadow: 0 14px 26px -15px rgba(0, 168, 89, 0.8);
+    }
+
+    .button-primary:hover { box-shadow: 0 18px 30px -14px rgba(0, 168, 89, 0.9); }
+
+    .button-secondary {
+      border-color: rgba(11, 22, 40, 0.15);
+      background: rgba(255, 255, 255, 0.62);
+      color: var(--ink);
+    }
+
+    .note {
+      margin: 28px 0 0;
+      color: rgba(11, 22, 40, 0.46);
+      font-size: 12px;
+    }
+
+    .note strong { color: var(--green); }
+
+    .map-scene {
+      position: relative;
+      min-height: clamp(370px, 52vh, 560px);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at 76% 20%, rgba(0, 168, 89, 0.25), transparent 30%),
+        radial-gradient(circle at 22% 90%, rgba(255, 193, 7, 0.14), transparent 34%),
+        linear-gradient(145deg, #152F52, var(--ink-deep));
+      box-shadow: 0 34px 70px -38px rgba(11, 22, 40, 0.72);
+      isolation: isolate;
+    }
+
+    .map-scene::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.22;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.7) 1px, transparent 1.7px);
+      background-size: 26px 26px;
+      mask-image: linear-gradient(135deg, black, transparent 82%);
+    }
+
+    .map-caption {
+      position: absolute;
+      top: 26px;
+      left: 28px;
+      z-index: 2;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .route-art {
+      position: absolute;
+      inset: 11% 4% 9%;
+      width: 92%;
+      height: 80%;
+    }
+
+    .route-main {
+      fill: none;
+      stroke: #43E28B;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 14 12;
+      animation: route-drift 12s linear infinite;
+    }
+
+    .route-secondary {
+      fill: none;
+      stroke: rgba(109, 211, 232, 0.38);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-dasharray: 2 15;
+    }
+
+    .route-node { fill: var(--green); stroke: #E6FFF0; stroke-width: 3; }
+    .route-node--amber { fill: var(--amber); }
+
+    .bus-marker {
+      position: absolute;
+      top: 31%;
+      left: 56%;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border: 7px solid rgba(67, 226, 139, 0.18);
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25), 0 0 28px rgba(0, 168, 89, 0.62);
+      animation: bus-breathe 3.8s ease-in-out infinite;
+    }
+
+    .bus-marker::before {
+      content: '';
+      width: 15px;
+      height: 19px;
+      border-radius: 5px 5px 4px 4px;
+      background: var(--navy);
+      box-shadow: inset 0 5px 0 rgba(255, 255, 255, 0.8), inset 0 -4px 0 var(--amber);
+    }
+
+    .pin {
+      position: absolute;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 5px solid rgba(255, 255, 255, 0.16);
+      border-radius: 50%;
+      background: var(--coral);
+      box-shadow: 0 0 22px rgba(232, 106, 94, 0.46);
+    }
+
+    .pin::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+    .pin--start { top: 67%; left: 21%; }
+    .pin--end { top: 16%; right: 16%; background: var(--amber); box-shadow: 0 0 22px rgba(255, 193, 7, 0.42); }
+
+    .live-card {
+      position: absolute;
+      right: 25px;
+      bottom: 24px;
+      z-index: 3;
+      display: grid;
+      gap: 4px;
+      width: min(250px, calc(100% - 50px));
+      padding: 16px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      background: rgba(8, 18, 39, 0.72);
+      box-shadow: 0 18px 38px rgba(2, 8, 22, 0.25);
+      backdrop-filter: blur(14px);
+    }
+
+    .live-card small {
+      color: rgba(255, 255, 255, 0.56);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .live-card strong { color: #fff; font-size: 15px; }
+    .live-card span { color: #72E9A4; font-size: 12px; font-weight: 700; }
+
+    .footer-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 0 clamp(4px, 2vw, 28px);
+      color: rgba(11, 22, 40, 0.4);
+      font-size: 11px;
+    }
+
+    @keyframes route-drift { to { stroke-dashoffset: -520; } }
+    @keyframes bus-breathe { 0%, 100% { transform: scale(0.96); } 50% { transform: scale(1.08); } }
+
+    @media (max-width: 820px) {
+      .page-shell { width: min(100% - 24px, 620px); padding-top: 16px; }
+      .status { display: none; }
+      .error-layout { grid-template-columns: 1fr; gap: 44px; padding: 64px 0 44px; }
+      .copy { max-width: 100%; }
+      h1 { max-width: 9ch; font-size: clamp(3.7rem, 15vw, 6.8rem); }
+      .map-scene { min-height: 360px; border-radius: 26px; }
+      .footer-line { flex-direction: column; gap: 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Volver a Ya Viene">
+        <img src="./logo.svg" alt="" />
+        <span>YA VIENE</span>
+      </a>
+      <span class="status"><span class="status-dot" aria-hidden="true"></span> Barranquilla · ruta en vivo</span>
+    </header>
+
+    <main class="error-layout">
+      <section class="copy" aria-labelledby="error-title">
+        <span class="eyebrow">Ruta no encontrada</span>
+        <h1 id="error-title"><span class="number">404</span>Este bus se fue <em>por otra ruta.</em></h1>
+        <p class="lede">La página que buscas no está en este recorrido. Volvamos a la terminal y encuentra tu ruta otra vez.</p>
+        <div class="actions">
+          <a class="button button-primary" href="./">Volver al inicio</a>
+          <a class="button button-secondary" href="./#solucion">Ver cómo funciona</a>
+        </div>
+        <p class="note"><strong>Tranquilo:</strong> Barranquilla sigue moviéndose.</p>
+      </section>
+
+      <section class="map-scene" aria-label="Ruta perdida en el mapa de Ya Viene">
+        <span class="map-caption">Última ubicación conocida</span>
+        <svg class="route-art" viewBox="0 0 640 440" aria-hidden="true" focusable="false">
+          <path class="route-secondary" d="M12 112 C130 40 178 156 286 116 S450 54 632 138" />
+          <path class="route-secondary" d="M-8 360 C128 292 194 410 308 326 S462 256 660 320" />
+          <path class="route-main" d="M76 348 C120 288 144 276 202 286 S272 348 332 286 S356 142 438 126 S516 160 572 92" />
+          <circle class="route-node" cx="76" cy="348" r="9" />
+          <circle class="route-node route-node--amber" cx="572" cy="92" r="9" />
+          <circle class="route-node" cx="332" cy="286" r="7" />
+        </svg>
+        <span class="pin pin--start" aria-hidden="true"></span>
+        <span class="pin pin--end" aria-hidden="true"></span>
+        <span class="bus-marker" aria-hidden="true"></span>
+        <div class="live-card">
+          <small>C16 · Calle 72 — Uninorte</small>
+          <strong>La ruta tomó otro camino</strong>
+          <span>Pero puedes volver a empezar →</span>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer-line">
+      <span>Ya Viene · Barranquilla, Colombia</span>
+      <span>Tu ruta, cuando importa.</span>
+    </footer>
+  </div>
+</body>
+
+</html>

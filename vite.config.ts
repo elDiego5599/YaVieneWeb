@@ -17,6 +17,7 @@ export default defineConfig({
       // arrastrar los tipos de Node sólo para resolver tres nombres.
       input: {
         index: 'index.html',
+        404: '404.html',
         privacidad: 'privacidad.html',
         terminos: 'terminos.html'
       }
