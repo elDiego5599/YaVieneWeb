@@ -61,6 +61,49 @@ const altoEscena = (pista: HTMLElement): number => {
   return escena?.offsetHeight || window.innerHeight;
 };
 
+/*
+  El scroll no manda del todo sobre el reloj de la escena.
+
+  Engancharlo uno a uno es lo correcto mientras se lee a velocidad de
+  lectura, y deja de serlo en cuanto alguien tira del dedo o de la rueda:
+  mil quinientos píxeles en cuatro cuadros son la historia entera en
+  sesenta milisegundos, y lo que se ve no es una animación rápida sino un
+  borrón. Los tres momentos de «Cómo funciona» entran, se plantan y salen
+  sin que dé tiempo a distinguir ninguno de los tres.
+
+  Con esto la escena tiene su propio paso, y hay dos maneras de que el
+  scroll se le adelante:
+
+  · Se le adelanta un poco. Entonces la escena avanza a `RITMO_MAX` como
+    mucho, se queda atrás a propósito y sigue corriendo un momento después
+    de que el scroll se pare, hasta alcanzarlo. Ese rezago es el que hace
+    que un tirón corto se vea entero en vez de pasar de largo. Para que no
+    crezca sin fin, pasado `SALTO` la escena acelera —`RECUPERA`— hasta
+    ponerse a tiro otra vez.
+
+  · Se le adelanta mucho. Perseguir un scroll que va al triple acaba
+    enseñando la escena de un sitio donde ya no estás, y eso es peor que
+    no animar: entre `RAPIDO_DESDE` y `RAPIDO_HASTA` la dosificación se
+    va soltando, y por encima la escena aparece directamente donde toca.
+    Si vas tan deprisa, es que no ibas a mirarla.
+
+  Lo que decide cuál de las dos es la velocidad del scroll, y se mide
+  suavizada —`TAU_VEL`— para que un cuadro suelto no cambie de modo: un
+  salto de barra de desplazamiento no debe dejar la pista en modo rápido
+  para el arrastre tranquilo que venga después.
+
+  Las cifras van en avance de pista, no en píxeles, para que sigan
+  valiendo aunque la pista cambie de alto: `RITMO_MAX` deja la historia
+  completa en algo más de dos segundos, y `SALTO` es aproximadamente media
+  ventana de rezago en las pistas de esta página.
+*/
+const RITMO_MAX = 0.45;
+const SALTO = 0.12;
+const RECUPERA = 6;
+const RAPIDO_DESDE = 0.7;
+const RAPIDO_HASTA = 1.4;
+const TAU_VEL = 0.08;
+
 /**
  * Sigue el avance de una pista y avisa cuando cambia.
  *
@@ -74,15 +117,29 @@ export function seguirPista(
   pista: HTMLElement,
   alAvanzar: (p: number) => void
 ): () => void {
-  let pedido = 0;
-  let ultimo = Number.NaN;
+  // Con las animaciones desactivadas no hay nada que dosificar: la escena
+  // va donde diga el scroll y punto.
+  const amortigua = !sinMovimiento();
 
-  const medir = (): void => {
-    pedido = 0;
-    if (congeladas) return;
+  let pedido = 0;
+  /** Último avance entregado a la escena. */
+  let ultimo = Number.NaN;
+  /** El avance que está pintado, que no siempre es el que pide el scroll. */
+  let mostrado = Number.NaN;
+  /** El que pedía el scroll en el cuadro anterior, para sacar la velocidad. */
+  let metaPrevia = Number.NaN;
+  /** Velocidad del scroll suavizada, en avance de pista por segundo. */
+  let velocidad = 0;
+  let ultimoMs = 0;
+
+  /** El avance que pide el scroll ahora mismo. */
+  const objetivo = (): number => {
     const caja = pista.getBoundingClientRect();
     const recorrido = caja.height - altoEscena(pista);
-    const p = recorrido <= 0 ? 0 : limitar(-caja.top / recorrido);
+    return recorrido <= 0 ? 0 : limitar(-caja.top / recorrido);
+  };
+
+  const entregar = (p: number): void => {
     // Medio milésimo de avance no mueve un píxel en pantalla; no vale la
     // pena repintar por él.
     if (Math.abs(p - ultimo) < 0.0005) return;
@@ -90,21 +147,73 @@ export function seguirPista(
     alAvanzar(p);
   };
 
+  /** Sin perseguir a nadie: la escena se planta donde diga el scroll. */
+  const colocar = (): void => {
+    ultimoMs = 0;
+    velocidad = 0;
+    mostrado = objetivo();
+    metaPrevia = mostrado;
+    entregar(mostrado);
+  };
+
+  const cuadro = (ahora: number): void => {
+    pedido = 0;
+    if (congeladas) return;
+
+    const meta = objetivo();
+
+    if (!Number.isFinite(mostrado) || !amortigua) {
+      mostrado = meta;
+      metaPrevia = meta;
+      entregar(mostrado);
+      return;
+    }
+
+    // Un cuadro perdido —una pestaña en segundo plano, un repintado
+    // pesado— no puede valer por medio segundo de avance: el tope de dt
+    // convierte el parón en un cuadro normal en vez de en un tirón.
+    const dt = ultimoMs ? Math.min(0.05, (ahora - ultimoMs) / 1000) : 0;
+    ultimoMs = ahora;
+
+    if (dt > 0) {
+      const bruta = Math.abs(meta - metaPrevia) / dt;
+      velocidad += (bruta - velocidad) * Math.min(1, dt / TAU_VEL);
+    }
+    metaPrevia = meta;
+
+    const falta = meta - mostrado;
+    const pendiente = Math.abs(falta);
+
+    // Lo que se deja avanzar en este cuadro: el ritmo de siempre, más lo
+    // que haga falta para recortar el rezago que ya pasó de `SALTO`.
+    const tope = (RITMO_MAX + Math.max(0, pendiente - SALTO) * RECUPERA) * dt;
+    // Y cuánto de ese tope se deja de aplicar porque el scroll va rápido:
+    // 0 es dosificar del todo, 1 es ir donde diga el scroll sin más.
+    const suelta = suavizar(entre(velocidad, RAPIDO_DESDE, RAPIDO_HASTA));
+    const paso = tope + (pendiente - tope) * suelta;
+
+    if (pendiente <= paso) mostrado = meta;
+    else mostrado += Math.sign(falta) * paso;
+
+    entregar(mostrado);
+    if (mostrado !== meta) pedir();
+  };
+
   const pedir = (): void => {
     if (pedido) return;
-    pedido = requestAnimationFrame(medir);
+    pedido = requestAnimationFrame(cuadro);
   };
 
   window.addEventListener('scroll', pedir, { passive: true });
   window.addEventListener('resize', pedir);
-  medidores.add(medir);
-  medir();
+  medidores.add(colocar);
+  colocar();
 
   return () => {
     if (pedido) cancelAnimationFrame(pedido);
     window.removeEventListener('scroll', pedir);
     window.removeEventListener('resize', pedir);
-    medidores.delete(medir);
+    medidores.delete(colocar);
   };
 }
 
