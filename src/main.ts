@@ -29,12 +29,17 @@ import { PhoneMap } from './phone-map';
 import { PhoneSimulator } from './phone-simulator';
 import { ProblemWeather } from './problem-weather';
 import { Reloj } from './reloj';
+import { saltosDeMenu } from './salto';
 import { ScrollEffects } from './scroll-effects';
 import { sinMovimiento } from './scrolly';
 
 const arrancar = (): void => {
   // Apariciones al entrar en pantalla: no depende de nada más.
   new ScrollEffects();
+
+  // Los enlaces internos cruzan por encima de las dos pistas; sin esto la
+  // travesía reproduce sus historias a toda velocidad. Ver salto.ts.
+  saltosDeMenu();
 
   const isla = document.querySelector<HTMLElement>('.nav-island');
   const botonIsla = isla?.querySelector<HTMLButtonElement>('.nav-island-toggle');

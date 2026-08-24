@@ -193,8 +193,18 @@ export class PhoneSimulator {
    */
   private busElegido: number | null = null;
 
+  /*
+    Dónde nace cada bus manda sobre todo el tramo final del guion: a 46 m/s,
+    cada metro de más son 22 ms de demo. El primero arrancaba 1350 m detrás
+    del punto de espera y llegaba al kilómetro —el radio del aviso— a los
+    17,3 s, cuando el dedo acababa de armarlo; la notificación salía casi
+    encima del toque y parecía que el aviso sólo se puede poner cuando el
+    bus ya lo tienes ahí. Con 1450 el kilómetro cae a los 19,4 s: el dedo
+    arma a 1,3 km y quedan cinco segundos y medio de espera con el número
+    bajando, que es justo lo que hay que enseñar.
+  */
   private readonly buses: EstadoBus[] = [
-    { placa: 'B-042', nace: 1350, ritmo: 1, t: 0 },
+    { placa: 'B-042', nace: 1450, ritmo: 1, t: 0 },
     { placa: 'B-055', nace: 2250, ritmo: 0.78, t: 0 }
   ];
 
@@ -664,8 +674,16 @@ export class PhoneSimulator {
     // aquí la hoja se recogía a su escalón "peek" para enseñar más mapa, y
     // el momento importante —la franja pasando a ámbar, la notificación
     // saliendo— ocurría en una tarjeta que ya no decía a qué bus se refería.
-    this.a(17100, () => this.toqueSobre(this.el('alert-btn')));
-    this.a(17360, () => {
+    //
+    // El cuándo también dice algo. El aviso se arma a 1,3 km, con el bus
+    // todavía lejos y la franja verde: así se ve que esto se deja puesto
+    // de antemano y el teléfono avisa solo. Iba a los 17,1 s, con el bus
+    // ya casi en el kilómetro, y la notificación salía tan pegada al toque
+    // que parecía dispararla el dedo. Los dos segundos que se le quitan
+    // aquí son los que la tarjeta lleva en pantalla desde que salió el
+    // número (11,64 s): el mismo respiro que hay entre los demás toques.
+    this.a(13600, () => this.toqueSobre(this.el('alert-btn')));
+    this.a(13860, () => {
       this.setAviso(true);
       // El detalle sólo aparece con el aviso puesto, igual que en la app:
       // mientras hay distancia y no hay aviso, la hoja no dice nada.
