@@ -991,28 +991,6 @@
   display: none;
 }
 
-/*
-  Escalón "peek". La hoja de la app tiene tres alturas —colapsada, peek y
-  expandida— y se pasa de una a otra arrastrando el asa; en peek deja sólo
-  el número y el botón, "menos relleno vertical porque ya no lleva
-  identidad ni detalle", dice eta_bottom_sheet.dart. Es lo que se hace
-  aquí: se van la línea de "ruta - placa" y el detalle, la hoja baja y
-  aparece más mapa. El guion lo usa a mitad del tramo en vivo, que es
-  justo lo que hace cualquiera cuando quiere ver por dónde va el bus.
-*/
-.phone-sheet.is-peek .eta-route,
-.phone-sheet.is-peek .eta-detail {
-  display: none;
-}
-
-.phone-sheet.is-peek .eta-strip {
-  margin-top: calc(-4 * var(--u));
-}
-
-.phone-sheet.is-peek .app-cta {
-  margin-top: calc(14 * var(--u));
-}
-
 /* Botón de aviso: 60 de alto, píldora completa, verde de marca; con el
    aviso puesto pasa al verde profundo. */
 .app-cta {
@@ -1077,16 +1055,17 @@
 }
 
 /*
-  La hoja del selector es un Material blanco, no la superficie arena de la
-  hoja de distancia, y lleva encima el mismo patrón de calles del drawer
-  pintado en navy —MapPatternPainter(color: primaryDeep)—, tan tenue que
-  sólo se nota de cerca. Se reproduce la retícula de puntos: 34 pt de paso,
-  el mismo que la hoja de ETA, que ya lo trae de la regla base: aquí sólo
-  cambia el color de debajo.
+  Todas las hojas comparten superficie: la arena de .phone-sheet con el
+  patrón de calles del drawer en navy —MapPatternPainter(color: primaryDeep)—.
+  Antes el selector iba en Material blanco y la hoja de distancia en arena,
+  como en la app; pero puestos uno al lado del otro en la landing, los cinco
+  teléfonos parecían de dos productos distintos. Se unificó en arena aquí y
+  también en route_selector_sheet.dart, así que el espejo sigue siendo fiel.
+  Lo único propio de esta regla es el relleno y la elevación: elevation 16
+  con shadowColor 0x6614274E, que la app sí le da al selector y no a la hoja.
 */
 .phone-sheet--fija {
   padding: calc(16 * var(--u)) calc(24 * var(--u)) calc(24 * var(--u));
-  background-color: #FFFFFF;
   border-radius: calc(32 * var(--u)) calc(32 * var(--u)) 0 0;
   /* elevation: 16 con shadowColor 0x6614274E. */
   box-shadow: 0 calc(-6 * var(--u)) calc(30 * var(--u)) rgba(20, 39, 78, 0.22);
@@ -1257,8 +1236,8 @@
   que ya lo anima `.sheet-views`.
 */
 .phone-sheet.es-selector {
-  background-color: #FFFFFF;
-  /* elevation: 16 con shadowColor 0x6614274E. */
+  /* Sólo cambia la elevación: el color ya es el mismo en las dos vistas.
+     elevation: 16 con shadowColor 0x6614274E. */
   box-shadow: 0 calc(-6 * var(--u)) calc(30 * var(--u)) rgba(20, 39, 78, 0.22);
 }
 

@@ -393,17 +393,6 @@ export class PhoneSimulator {
     this.vistasEl.style.height = `${alto}px`;
   }
 
-  /**
-   * Escalón "peek" de eta_bottom_sheet.dart: la hoja se recoge y deja ver
-   * más mapa. En la app se llega arrastrando el asa; aquí lo hace el guion
-   * a mitad del tramo en vivo, cuando lo interesante es el bus y no el
-   * texto.
-   */
-  private setPeek(puesto: boolean): void {
-    this.sheetEl.classList.toggle('is-peek', puesto);
-    this.ajustarAlto();
-  }
-
   /* ---------- Utilidades ---------- */
 
   private el(nombre: string): HTMLElement | null {
@@ -588,7 +577,6 @@ export class PhoneSimulator {
 
     this.setPildora(null);
     this.setChip('locating');
-    this.setPeek(false);
     this.setVacio('sinPunto');
     this.setSelector(false, null);
     this.busElegido = null;
@@ -671,13 +659,11 @@ export class PhoneSimulator {
       if (cerca !== null) this.seguirBus(cerca);
     });
 
-    // Con los buses ya rodando la hoja se recoge un escalón y deja ver el
-    // mapa entero, que es lo interesante mientras el número baja.
-    this.a(14200, () => this.setPeek(true));
-
-    // El pasajero arma el aviso. La hoja vuelve entera justo después, y
-    // para entonces el primer bus está cruzando el kilómetro: el botón se
-    // pulsa, la hoja sube y la notificación sale, en ese orden.
+    // El pasajero arma el aviso, y lo arma sobre la tarjeta completa: la
+    // franja de color, "ruta - placa" y el número, todo a la vista. Antes
+    // aquí la hoja se recogía a su escalón "peek" para enseñar más mapa, y
+    // el momento importante —la franja pasando a ámbar, la notificación
+    // saliendo— ocurría en una tarjeta que ya no decía a qué bus se refería.
     this.a(17100, () => this.toqueSobre(this.el('alert-btn')));
     this.a(17360, () => {
       this.setAviso(true);
@@ -686,8 +672,6 @@ export class PhoneSimulator {
       this.avisoActivo = true;
       this.setDetalle('Puedes cambiar de aplicación; no cierres Ya Viene del todo');
     });
-    this.a(19200, () => this.setPeek(false));
-
     // El ciclo no corta: primero se recoge lo que sobra —el aviso flotante,
     // el detalle— y después la app se disuelve. Cuando vuelve a entrar ya
     // está recolocada, así que no se ve nada saltar.
