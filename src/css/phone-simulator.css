@@ -1318,6 +1318,14 @@
   pointer-events: none;
 }
 
+/* Sobre la hoja —blanca o crema— una onda blanca no se ve: era un toque
+   que ocurría y no se notaba. Ahí va en tinta, que además es lo que hace
+   de verdad un InkWell de Material sobre una superficie clara. */
+.phone-toque--tinta {
+  background: rgba(11, 22, 40, 0.14);
+  box-shadow: 0 0 0 calc(2 * var(--u)) rgba(11, 22, 40, 0.18);
+}
+
 .phone-toque.is-on {
   animation: paso-toque 0.62s var(--ease-out-cubic);
 }
@@ -1375,7 +1383,12 @@
   transform: none;
 }
 
-/* El hundido del dedo: lo que hace un InkWell al recibir el toque. */
+/* El hundido del dedo: lo que hace un InkWell al recibir el toque. La
+   píldora y las fichas del selector entran en la lista porque el guion del
+   hero también las toca: sin el hundido, la vista cambiaba sola y el
+   mockup parecía pasar diapositivas en vez de responder a un dedo. */
+.app-pill,
+.app-tile,
 .app-select,
 .app-launch,
 .app-cta {
@@ -1386,6 +1399,8 @@
     box-shadow 0.25s var(--ease-out-cubic);
 }
 
+.app-pill.is-pulsado,
+.app-tile.is-pulsado,
 .app-select.is-pulsado,
 .app-launch.is-pulsado,
 .app-cta.is-pulsado {

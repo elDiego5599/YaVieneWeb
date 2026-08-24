@@ -160,11 +160,14 @@ export class PasoDemo {
 
   /* ---------- El dedo ---------- */
 
-  private toqueEn(x: number, y: number): void {
+  private toqueEn(x: number, y: number, sobreClaro = false): void {
     const nodo = this.el('toque');
     if (!nodo) return;
     nodo.style.left = `${x}px`;
     nodo.style.top = `${y}px`;
+    // Blanco sobre el mapa, tinta sobre la hoja: sobre blanco la onda
+    // blanca no se veía y el toque pasaba sin que se notara.
+    nodo.classList.toggle('phone-toque--tinta', sobreClaro);
     // Reiniciar la animación pide un reflujo entre quitar y poner la clase.
     nodo.classList.remove('is-on');
     void nodo.offsetWidth;
@@ -186,7 +189,8 @@ export class PasoDemo {
     const k = encajeDe(this.pantalla);
     this.toqueEn(
       (caja.left - marco.left + caja.width / 2) / k,
-      (caja.top - marco.top + caja.height / 2) / k
+      (caja.top - marco.top + caja.height / 2) / k,
+      objetivo.closest('.phone-sheet') !== null
     );
     objetivo.classList.add('is-pulsado');
     this.a(240, () => objetivo.classList.remove('is-pulsado'));
