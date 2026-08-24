@@ -1463,20 +1463,6 @@
   box-shadow: 0 12px 26px var(--green-glow);
 }
 
-/* Los dos últimos momentos no son toques: no llevan número, llevan
-   nombre. Es la misma marca de sitio sin mentir sobre la cuenta. */
-.paso-etiqueta {
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid rgba(0, 168, 89, 0.3);
-  color: var(--green-accessible);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
 .paso-titulo {
   font-family: var(--font-display);
   font-size: clamp(2rem, 1.1rem + 2.8vw, 3.6rem);
@@ -1533,73 +1519,21 @@
   position: relative;
 }
 
-/* ── Las seis rutas, en el último momento ──
-   Es la única pieza con la que se puede jugar: al tocar una fila, el mapa
-   del teléfono de al lado redibuja su recorrido. */
-.paso-rutas {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.paso-ruta {
-  display: flex;
-  align-items: baseline;
-  gap: 4px 10px;
-  flex-wrap: wrap;
-  width: 100%;
-  padding: 9px 12px;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  color: var(--text-muted);
-  transition:
-    background var(--transition-fast),
-    color var(--transition-fast);
-}
-
-.paso-ruta:hover {
-  background: rgba(11, 22, 40, 0.05);
-}
-
-.paso-ruta.is-activa {
-  background: var(--surface);
-  color: var(--text-secondary);
-  box-shadow: var(--shadow-sm);
-}
-
-.paso-ruta-nombre {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
-  color: var(--app-text-disabled);
-  transition: color var(--transition-fast);
-}
-
-.paso-ruta.is-activa .paso-ruta-nombre {
-  color: var(--ink);
-}
-
-.paso-ruta-datos {
-  font-size: 12.5px;
-  font-variant-numeric: tabular-nums;
-}
-
 /* ── El riel ──
    Índice y barra de avance a la vez: el momento activo se llena mientras
-   dura y tocar uno lleva la página hasta su tramo. Sólo aparece cuando la
-   portada ya se fue; antes no hay nada que indexar. */
+   dura y tocar uno lleva la página hasta su tramo. Aparece en cuanto la
+   portada empieza a irse y ya no se vuelve a esconder: un índice que
+   parpadea al subir y bajar es peor que no tenerlo.
+
+   Con tres momentos, repartir el ancho entero entre tres columnas deja
+   unas pestañas larguísimas con el nombre perdido a la izquierda. Se les
+   pone tope y se centra el grupo: quedan las tres juntas debajo del
+   momento, que es donde se leen como un índice. */
 .pasos-riel {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 18px 10px;
+  grid-template-columns: repeat(3, minmax(0, 210px));
+  justify-content: center;
+  gap: 18px 18px;
   padding-top: clamp(18px, 2vw, 26px);
   border-top: 1px solid rgba(11, 22, 40, 0.1);
   opacity: 0;
@@ -1619,8 +1553,8 @@
 /* En un teléfono no cabe la sección entera con el mockup a tamaño de
    escaparate: el momento se apila —frase arriba, aparato abajo— y todo
    encoge lo justo para que quepa de una pantalla sin scroll interno. El
-   riel se queda en cinco columnas pero pierde los nombres: lo que hace
-   falta ahí es saber por dónde va la cinta, no leer un índice. */
+   riel conserva sus columnas pero pierde los nombres: lo que hace falta
+   ahí es saber por dónde va la cinta, no leer un índice. */
 @media (max-width: 759px) {
   .pasos-pila {
     min-height: clamp(300px, 58vh, 470px);
@@ -1642,23 +1576,8 @@
     font-size: 0.875rem;
   }
 
-  /* Las seis rutas son la lista más larga de la sección y la que decide
-     cuánto mide la cinta entera. En vertical se aprietan: mismo texto,
-     menos aire. */
-  .paso-ruta {
-    gap: 1px 8px;
-    padding: 5px 10px;
-  }
-
-  .paso-ruta-nombre {
-    font-size: 13px;
-  }
-
-  .paso-ruta-datos {
-    font-size: 11.5px;
-  }
-
   .pasos-riel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0 8px;
   }
 
@@ -1679,7 +1598,7 @@
   font-size: clamp(14px, 1.05vw, 16px);
   font-weight: 700;
   letter-spacing: -0.2px;
-  text-align: left;
+  text-align: center;
   color: var(--text-muted);
   transition: color var(--transition-normal);
 }
@@ -1840,16 +1759,18 @@
   box-shadow: 0 16px 30px -12px rgba(37, 211, 102, 0.6);
 }
 
+/* Ficha blanca sobre el papel de la sección. El cristal esmerilado que
+   llevaba antes vivía de tener tinta debajo; sobre claro sólo era un gris
+   sucio con dos filtros caros encima. */
 .contact-form-card {
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: clamp(26px, 3vw, 38px);
   border-radius: 26px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-glass);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  box-shadow: 0 26px 60px -34px rgba(11, 22, 40, 0.38);
 }
 
 .form-group {
@@ -1862,28 +1783,34 @@
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--text-white-dim);
+  color: var(--text-secondary);
 }
 
 .form-input {
   width: 100%;
   padding: 14px 16px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid var(--border-glass);
-  color: var(--text-white);
+  background: #FBFDFC;
+  border: 1px solid var(--divider);
+  color: var(--text-primary);
   font-size: 15px;
-  transition: border-color var(--transition-fast), background var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .form-input::placeholder {
-  color: var(--text-white-sub);
+  color: var(--text-muted);
 }
 
+/* El foco no se marca sólo con el borde: un píxel de color es lo primero
+   que se pierde con la pantalla al sol, que es donde se llena esto. */
 .form-input:focus {
   outline: none;
   border-color: var(--green);
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(0, 168, 89, 0.16);
 }
 
 .form-submit-btn {
@@ -1913,8 +1840,8 @@
   text-align: center;
   padding: clamp(30px, 4vw, 46px);
   border-radius: 26px;
-  background: rgba(0, 168, 89, 0.12);
-  border: 1px solid rgba(0, 168, 89, 0.35);
+  background: var(--green-tint);
+  border: 1px solid rgba(0, 168, 89, 0.28);
 }
 
 .form-success-message[hidden] {
@@ -1927,9 +1854,9 @@
   margin-bottom: 14px;
   padding: 12px 16px;
   border-radius: 14px;
-  background: rgba(232, 106, 94, 0.14);
-  border: 1px solid rgba(232, 106, 94, 0.4);
-  color: #FBE7E4;
+  background: rgba(232, 106, 94, 0.1);
+  border: 1px solid rgba(232, 106, 94, 0.36);
+  color: #8C2F26;
   font-size: 14px;
   font-weight: 600;
   line-height: 1.45;
@@ -1940,12 +1867,12 @@
 }
 
 .form-success-message h3 {
-  color: var(--text-white);
+  color: var(--ink);
   font-size: var(--step-h3);
 }
 
 .form-success-message p {
-  color: var(--text-white-dim);
+  color: var(--text-secondary);
   font-size: var(--step-body);
   line-height: 1.5;
   max-width: 44ch;
@@ -2193,173 +2120,34 @@
     linear-gradient(125deg, #E6F7F0 0%, #FFF8E1 50%, #FBE7E4 100%);
 }
 
+/* La sección que pide algo va sobre papel, no sobre tinta. Justo encima
+   está el mapa, que toma la ventana entera en oscuro: dos fondos de tinta
+   seguidos hacen que el formulario parezca un trozo más del mapa. En claro
+   la ficha se lee como lo que es —algo que se rellena— y el pie recoge el
+   calor de la marca al final. El papel tira a verde frío para no repetir
+   el arena del problema ni la crema del pie. */
 #empresas {
-  background:
-    radial-gradient(620px circle at 8% 8%, rgba(17, 169, 199, 0.28), transparent 62%),
-    radial-gradient(560px circle at 92% 92%, rgba(232, 106, 94, 0.24), transparent 62%),
-  linear-gradient(145deg, #123B59 0%, var(--ink) 52%, var(--ink-deep) 100%);
   margin-bottom: 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(11, 22, 40, 0.07);
   box-shadow: none;
-}
-
-#empresas > .panel-inner {
-  z-index: 2;
 }
 
 #empresas .tracked-eyebrow {
   font-size: clamp(14px, 1.15vw, 18px);
   letter-spacing: 0.2em;
+  /* El ámbar de la marca no se sostiene sobre papel: mismo sitio y mismo
+     peso, pero en el verde que sí pasa contraste. */
+  color: var(--green-accessible);
 }
 
 #empresas .companies-info p {
-  color: rgba(255, 255, 255, 0.82);
-  text-shadow: 0 1px 14px rgba(3, 10, 24, 0.42);
-}
-
-
-.panel-mosaico {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  display: grid;
-  grid-template-columns: repeat(16, minmax(0, 1fr));
-  grid-template-rows: repeat(7, minmax(0, 1fr));
-  grid-auto-flow: dense;
-  gap: clamp(5px, 0.75vw, 11px);
-  padding: clamp(18px, 3vw, 48px);
-  pointer-events: none;
-  opacity: 1;
-}
-
-.panel-mosaico span {
-  --cell-color: 17, 169, 199;
-  --pulse-delay: 0s;
-  position: relative;
-  min-width: 0;
-  min-height: 0;
-  border: 1px solid rgba(var(--cell-color), 0.24);
-  border-radius: 3px;
-  background: linear-gradient(145deg, rgba(var(--cell-color), 0.8), rgba(var(--cell-color), 0.12));
-  box-shadow: 0 0 0 rgba(var(--cell-color), 0);
-  opacity: 0;
-  transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.94);
-  will-change: opacity, transform, box-shadow;
-  animation: none;
-}
-
-.panel-mosaico span:nth-child(5n + 2) {
-  --cell-color: 0, 168, 89;
-  grid-column: span 2;
-}
-
-.panel-mosaico span:nth-child(7n + 3) {
-  --cell-color: 255, 193, 7;
-  grid-row: span 2;
-}
-
-.panel-mosaico span:nth-child(9n + 5) {
-  --cell-color: 232, 106, 94;
-  grid-column: span 2;
-  grid-row: span 2;
-}
-
-.panel-mosaico span:nth-child(11n + 7) {
-  --cell-color: 109, 211, 232;
-  --shift-y: 4px;
-}
-
-/* Sólo un puñado de piezas participa en cada vuelta. Al estar separadas
-   por la trama, el siguiente destello puede aparecer en cualquier zona. */
-.panel-mosaico span:nth-child(2),
-.panel-mosaico span:nth-child(6),
-.panel-mosaico span:nth-child(9),
-.panel-mosaico span:nth-child(13),
-.panel-mosaico span:nth-child(17),
-.panel-mosaico span:nth-child(21),
-.panel-mosaico span:nth-child(24),
-.panel-mosaico span:nth-child(28),
-.panel-mosaico span:nth-child(32),
-.panel-mosaico span:nth-child(36),
-.panel-mosaico span:nth-child(40),
-.panel-mosaico span:nth-child(43),
-.panel-mosaico span:nth-child(47),
-.panel-mosaico span:nth-child(51),
-.panel-mosaico span:nth-child(54),
-.panel-mosaico span:nth-child(57),
-.panel-mosaico span:nth-child(59),
-.panel-mosaico span:nth-child(60) {
-  animation: mosaico-celda-respiro 24s ease-in-out infinite;
-  animation-delay: var(--pulse-delay);
-}
-
-.panel-mosaico span:nth-child(2) { --pulse-delay: 0s; }
-.panel-mosaico span:nth-child(6) { --pulse-delay: -1.3s; }
-.panel-mosaico span:nth-child(9) { --pulse-delay: -2.6s; }
-.panel-mosaico span:nth-child(13) { --pulse-delay: -3.9s; }
-.panel-mosaico span:nth-child(17) { --pulse-delay: -5.2s; }
-.panel-mosaico span:nth-child(21) { --pulse-delay: -6.5s; }
-.panel-mosaico span:nth-child(24) { --pulse-delay: -7.8s; }
-.panel-mosaico span:nth-child(28) { --pulse-delay: -9.1s; }
-.panel-mosaico span:nth-child(32) { --pulse-delay: -10.4s; }
-.panel-mosaico span:nth-child(36) { --pulse-delay: -11.7s; }
-.panel-mosaico span:nth-child(40) { --pulse-delay: -13s; }
-.panel-mosaico span:nth-child(43) { --pulse-delay: -14.3s; }
-.panel-mosaico span:nth-child(47) { --pulse-delay: -15.6s; }
-.panel-mosaico span:nth-child(51) { --pulse-delay: -16.9s; }
-.panel-mosaico span:nth-child(54) { --pulse-delay: -18.2s; }
-.panel-mosaico span:nth-child(57) { --pulse-delay: -19.5s; }
-.panel-mosaico span:nth-child(59) { --pulse-delay: -20.8s; }
-.panel-mosaico span:nth-child(60) { --pulse-delay: -22.1s; }
-
-@keyframes mosaico-celda-respiro {
-  0%, 100% {
-    opacity: 0;
-    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.94);
-    box-shadow: 0 0 0 rgba(var(--cell-color), 0);
-  }
-  48% {
-    opacity: 0;
-    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.96);
-  }
-  56% {
-    opacity: 0.04;
-    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.975);
-    box-shadow: 0 0 3px rgba(var(--cell-color), 0.04);
-  }
-  62% {
-    opacity: 0.32;
-    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.995);
-    box-shadow: 0 0 11px rgba(var(--cell-color), 0.16);
-  }
-  67% {
-    opacity: 0.64;
-    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(1);
-    box-shadow: 0 0 21px rgba(var(--cell-color), 0.3), 0 0 6px rgba(255, 255, 255, 0.09);
-  }
-  72% {
-    opacity: 0.22;
-    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.98);
-    box-shadow: 0 0 8px rgba(var(--cell-color), 0.1);
-  }
-  78% {
-    opacity: 0;
-    transform: translate(var(--shift-x, 0), var(--shift-y, 0)) scale(0.95);
-    box-shadow: 0 0 0 rgba(var(--cell-color), 0);
-  }
+  color: var(--text-secondary);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .stats-panel,
-  #solucion,
-  #empresas {
+  #solucion {
     animation: none !important;
-  }
-
-  .panel-mosaico span {
-    animation: none !important;
-    opacity: 0;
-    transform: none;
   }
 }
 
@@ -2745,97 +2533,6 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   EL ÁREA METROPOLITANA
-   ══════════════════════════════════════════════════════════════════════
-   Cuatro cifras y lo que significan. Las tarjetas van limpias —papel,
-   borde fino y nada más— porque lo que tiene que destacar es el número,
-   no el adorno de la tarjeta. */
-.amb-inner {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(30px, 3.4vw, 54px);
-}
-
-.amb-cabecera {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  max-width: 54ch;
-}
-
-.amb-rejilla {
-  display: grid;
-  gap: clamp(12px, 1.4vw, 20px);
-  grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
-}
-
-.amb-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: clamp(20px, 2vw, 28px);
-  border: 1px solid var(--divider);
-  border-radius: 22px;
-  background: var(--surface);
-}
-
-.amb-card-cifra {
-  font-family: var(--font-display);
-  font-size: clamp(40px, 3.6vw, 56px);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.05em;
-  color: var(--green-accessible);
-  font-variant-numeric: tabular-nums;
-}
-
-.amb-card h3 {
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 1.3;
-  letter-spacing: -0.015em;
-  color: var(--text-primary);
-}
-
-.amb-card p {
-  font-size: 14.5px;
-  line-height: 1.6;
-  color: var(--text-secondary);
-}
-
-.amb-cierre {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(18px, 2.4vw, 40px);
-  padding: clamp(22px, 2.4vw, 34px) clamp(24px, 2.8vw, 40px);
-  border-radius: 24px;
-  background: var(--green-tint);
-}
-
-.amb-cierre-texto {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-width: 62ch;
-}
-
-.amb-cierre-texto h3 {
-  font-family: var(--font-display);
-  font-size: clamp(20px, 1.8vw, 27px);
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  color: var(--ink);
-}
-
-.amb-cierre-texto p {
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--text-secondary);
-}
-
-/* ══════════════════════════════════════════════════════════════════════
    LAS PÁGINAS DE LETRA PEQUEÑA
    ══════════════════════════════════════════════════════════════════════
    Términos y privacidad. Una columna, tipografía de la casa y nada más:
@@ -2964,6 +2661,218 @@
   border-top: 1px solid var(--divider);
   font-size: 13.5px;
   color: var(--text-secondary);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LA PÁGINA QUE NO EXISTE
+   ══════════════════════════════════════════════════════════════════════
+   El 404 no es un chiste ni un mapa de adorno: es la regla de la app
+   aplicada a una dirección. Cuando un bus lleva cinco minutos sin
+   reportar, la app no enseña su última posición como si fuera la de
+   ahora —la apaga al gris de los buses mudos y dice que no sabe—, y aquí
+   pasa lo mismo. De ahí el número en ese gris exacto, de ahí el fondo
+   oscuro del mapa en vez de la arena de las páginas legales, y de ahí que
+   lo único que se ofrezca sea una lista de sitios que sí existen. */
+.err-body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(900px circle at 8% -10%, rgba(0, 168, 89, 0.16), transparent 60%),
+    radial-gradient(700px circle at 100% 108%, rgba(20, 39, 78, 0.9), transparent 62%),
+    var(--ink-deep);
+  color: var(--text-white);
+}
+
+.err-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  padding: clamp(22px, 3vw, 40px) var(--gutter) 0;
+}
+
+.err-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--text-white);
+}
+
+.err-volver {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+.err-volver:hover {
+  text-decoration: underline;
+}
+
+.err-hoja {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  padding: clamp(34px, 6vh, 76px) var(--gutter) clamp(30px, 4vw, 52px);
+}
+
+/* El mismo gris al que la app apaga un bus que dejó de reportar. Grande
+   pero apagado: es el dato, no el titular. */
+.err-codigo {
+  font-family: var(--font-display);
+  font-size: clamp(78px, 15vw, 148px);
+  font-weight: 800;
+  line-height: 0.82;
+  letter-spacing: -0.05em;
+  color: var(--app-text-disabled);
+  opacity: 0.58;
+}
+
+.err-hoja h1 {
+  max-width: 15ch;
+  font-family: var(--font-display);
+  font-size: clamp(32px, 5vw, 54px);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  color: var(--text-white);
+  text-wrap: balance;
+}
+
+.err-entrada {
+  max-width: 58ch;
+  font-size: 16.5px;
+  line-height: 1.66;
+  color: var(--text-white-dim);
+}
+
+.err-entrada em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--app-text-disabled);
+}
+
+/* La dirección que falló, tal cual llegó. Sirve para ver de un vistazo si
+   el enlace venía mal escrito, así que va en monoespaciada y entera. */
+.err-pedida {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+  margin-top: clamp(8px, 1.4vh, 18px);
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.err-pedida-rotulo {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-white-sub);
+}
+
+.err-pedida code {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 14px;
+  color: var(--text-white);
+  overflow-wrap: anywhere;
+}
+
+/* Lo que sí existe. Filas con una raya entre medias, como un tablero de
+   salidas: se recorren de un vistazo y cada una dice a dónde lleva. */
+.err-indice {
+  display: flex;
+  flex-direction: column;
+  margin-top: clamp(14px, 2.6vh, 30px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.err-indice-rotulo {
+  padding: 16px 0 10px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.err-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  padding: 15px 8px 15px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-white);
+  transition:
+    padding-left var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.err-fila strong {
+  font-size: 16.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.err-fila span {
+  font-size: 14px;
+  color: var(--text-white-sub);
+}
+
+.err-fila:hover,
+.err-fila:focus-visible {
+  padding-left: 10px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.err-fila:hover strong {
+  color: var(--green);
+}
+
+.err-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px var(--gutter) clamp(28px, 4vw, 48px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 13.5px;
+  color: var(--text-white-sub);
+}
+
+.err-pie a {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.err-pie a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 559px) {
+  .err-fila {
+    flex-direction: column;
+    gap: 3px;
+  }
 }
 
 /* El punto marcado se salió del alcance de la ruta: el número deja de ser

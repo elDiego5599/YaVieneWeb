@@ -18,6 +18,7 @@ import './css/phone-simulator.css';
 import './css/animations.css';
 
 import { ContactForm } from './contact-form';
+import { encajarEscena } from './encaje';
 import { MapaVivo } from './mapa-vivo';
 import { NavIsland } from './nav-island';
 import { PasoDemo } from './paso-demo';
@@ -26,8 +27,8 @@ import { PhoneMap } from './phone-map';
 import { PhoneSimulator } from './phone-simulator';
 import { ProblemWeather } from './problem-weather';
 import { Reloj } from './reloj';
-import { RutasLista } from './rutas-lista';
 import { ScrollEffects } from './scroll-effects';
+import { sinMovimiento } from './scrolly';
 
 const arrancar = (): void => {
   // Apariciones al entrar en pantalla: no depende de nada más.
@@ -73,22 +74,31 @@ const arrancar = (): void => {
   if (tablero) new MapaVivo(tablero);
 
   /*
-    Las tres secciones que se recorren en vez de leerse de un golpe. Cada
+    Las dos secciones que se recorren en vez de leerse de un golpe. Cada
     una mide su propia pista; si la suya no está en la página, se salta.
+
+    Antes de nada, que quepan: una escena pegada más alta que la ventana
+    deja fuera lo de abajo y no hay forma de llegar a ello, ni bajando ni
+    subiendo. Con las animaciones desactivadas no hay escena pegada que
+    valga —el contenido se lee de arriba abajo—, así que ahí no aplica.
   */
+  if (!sinMovimiento()) {
+    for (const escena of document.querySelectorAll<HTMLElement>('.escena')) {
+      encajarEscena(escena);
+    }
+  }
+
   const pistaReloj = document.querySelector<HTMLElement>('[data-reloj-pista]');
   if (pistaReloj) new Reloj(pistaReloj);
 
   /*
-    La solución: cinco momentos sobre una cinta, cada uno con su propio
+    La solución: tres momentos sobre una cinta, cada uno con su propio
     teléfono. Los mapas son el mismo mosaico y las mismas seis polilíneas
     del hero, uno por momento, porque cada guion mueve su bus a su ritmo.
 
-    Los cuatro primeros llevan demo; el quinto no, porque ahí quien manda
-    es la lista de rutas de al lado. `Pasos` avisa cuál está quieto en el
-    centro y sólo ése se anima: así la sección nunca tiene más de un bucle
-    corriendo, y la animación se ve entera antes de dar paso a la
-    siguiente.
+    `Pasos` avisa cuál está quieto en el centro y sólo ése se anima: así
+    la sección nunca tiene más de un bucle corriendo, y la animación se
+    ve entera antes de dar paso a la siguiente.
   */
   const pistaPasos = document.querySelector<HTMLElement>('[data-pasos-pista]');
   if (pistaPasos) {
@@ -101,14 +111,7 @@ const arrancar = (): void => {
       const lienzo = paso.querySelector<HTMLElement>('.phone-map');
       if (!capa || !lienzo || !Number.isFinite(numero)) continue;
 
-      const mapa = new PhoneMap(capa, lienzo);
-      if (numero === 5) {
-        const lista = paso.querySelector<HTMLElement>('[data-rutas-lista]');
-        if (lista) new RutasLista(lista, mapa);
-        else mapa.showRoute(true);
-        continue;
-      }
-      demos.set(numero - 1, new PasoDemo(paso, mapa, numero));
+      demos.set(numero - 1, new PasoDemo(paso, new PhoneMap(capa, lienzo), numero));
     }
 
     pasos.alReposo = (indice) => {

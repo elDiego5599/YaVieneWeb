@@ -29,7 +29,13 @@ export class ScrollEffects {
           observador.unobserve(el);
         }
       },
-      { threshold: 0.15 }
+      /*
+        Basta con que asome por encima del último décimo de pantalla. Con
+        un umbral por fracción del elemento —un 15%, pongamos— una tarjeta
+        más alta que la ventana no llega nunca a ese porcentaje y se queda
+        invisible para siempre; pasa con el zoom del navegador puesto.
+      */
+      { threshold: 0, rootMargin: '0px 0px -10% 0px' }
     );
 
     for (const el of elementos) this.observer.observe(el);

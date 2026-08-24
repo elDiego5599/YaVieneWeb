@@ -1,3 +1,4 @@
+import { encajeDe } from './encaje';
 import type { PhoneMap } from './phone-map';
 import { sinMovimiento } from './scrolly';
 
@@ -6,13 +7,13 @@ import { sinMovimiento } from './scrolly';
  *
  * Los mockups de la sección no son fotos: cada uno repite en bucle el
  * gesto del que habla su texto —marcar el punto, elegir la ruta, armar el
- * aviso, quedarse sin señal—. El guion no inventa nada: las pantallas son
- * las mismas del hero y cada frase sale de la app (`location_status_chip`,
+ * aviso—. El guion no inventa nada: las pantallas son las mismas del hero
+ * y cada frase sale de la app (`location_status_chip`,
  * `route_selector_sheet`, `eta_bottom_sheet`, `bus_notification_service`).
  *
  * Sólo corre el que se está viendo. `pasos.ts` avisa cuál es el momento
  * activo y aquí se enciende ése y se apagan los demás, así la sección no
- * mantiene cuatro bucles y cuatro `requestAnimationFrame` a la vez.
+ * mantiene tres bucles y tres `requestAnimationFrame` a la vez.
  */
 
 /** La C16, la misma ruta que enseñan el hero y el selector. */
@@ -36,7 +37,6 @@ const MIRA_Y = 0.44;
 
 export class PasoDemo {
   private readonly pantalla: HTMLElement;
-  private readonly capa: SVGSVGElement | null;
   private readonly mapa: PhoneMap;
   private readonly guion: number;
 
@@ -58,7 +58,6 @@ export class PasoDemo {
     if (!pantalla) throw new Error('PasoDemo: el momento no trae teléfono');
 
     this.pantalla = pantalla;
-    this.capa = paso.querySelector<SVGSVGElement>('.routes-svg-layer');
     this.mapa = mapa;
     this.guion = guion;
 
@@ -76,9 +75,8 @@ export class PasoDemo {
     if (sinMovimiento()) {
       this.quieta = true;
       this.mapa.showPin(true);
-      this.colocarBuses(this.guion === 4 ? [1600] : [480, 920]);
+      this.colocarBuses([480, 920]);
       this.mapa.showBuses(true);
-      this.mudo(this.guion === 4);
       return;
     }
 
@@ -167,19 +165,31 @@ export class PasoDemo {
     nodo.classList.add('is-on');
   }
 
+  /*
+    Los rectángulos llegan en píxeles de pantalla y `left`/`top` se
+    escriben en los del elemento. Mientras la escena quepa en la ventana
+    son los mismos; cuando no cabe va encogida, y entre unos y otros hay
+    el factor que dice `--encaje`. Sin dividir, el dedo cae fuera del
+    botón que dice estar tocando.
+  */
   private toqueSobre(nombre: string): void {
     const objetivo = this.el(nombre);
     if (!objetivo) return;
     const caja = objetivo.getBoundingClientRect();
     const marco = this.pantalla.getBoundingClientRect();
-    this.toqueEn(caja.left - marco.left + caja.width / 2, caja.top - marco.top + caja.height / 2);
+    const k = encajeDe(this.pantalla);
+    this.toqueEn(
+      (caja.left - marco.left + caja.width / 2) / k,
+      (caja.top - marco.top + caja.height / 2) / k
+    );
     objetivo.classList.add('is-pulsado');
     this.a(240, () => objetivo.classList.remove('is-pulsado'));
   }
 
   private toqueEnMapa(fx: number, fy: number): void {
     const marco = this.pantalla.getBoundingClientRect();
-    this.toqueEn(marco.width * fx, marco.height * fy);
+    const k = encajeDe(this.pantalla);
+    this.toqueEn((marco.width * fx) / k, (marco.height * fy) / k);
   }
 
   /* ---------- Los buses ---------- */
@@ -215,16 +225,11 @@ export class PasoDemo {
     this.cuadro = requestAnimationFrame(paso);
   }
 
-  private mudo(callado: boolean): void {
-    this.capa?.classList.toggle('es-mudo', callado);
-  }
-
   /* ---------- Reposo: la foto con la que arranca cada bucle ---------- */
 
   private reposo(): void {
     this.mapa.showPin(false);
     this.mapa.showBuses(false);
-    this.mudo(false);
     this.prender('chip', false);
     this.prender('scrim', false);
     this.prender('sheet', false);
@@ -252,7 +257,6 @@ export class PasoDemo {
     if (this.guion === 1) this.guionPunto();
     else if (this.guion === 2) this.guionRuta();
     else if (this.guion === 3) this.guionAviso();
-    else if (this.guion === 4) this.guionMudo();
   }
 
   /* ---------- 1. Fija tu punto de espera ---------- */
@@ -370,27 +374,5 @@ export class PasoDemo {
     this.el('alert-btn')?.classList.toggle('active', puesto);
     this.texto('alert-label', puesto ? 'AVISO ACTIVADO' : 'AVISARME CUANDO ESTÉ CERCA');
     this.icono('aviso', puesto ? 'visto' : 'campana');
-  }
-
-  /* ---------- 4. Cuando el bus se calla ---------- */
-
-  private guionMudo(): void {
-    this.mapa.showPin(true);
-    this.colocarBuses([1600]);
-    this.mapa.showBuses(true);
-    this.moverBuses();
-
-    this.a(2600, () => {
-      // Deja de reportar: se queda donde estaba y se apaga a gris.
-      this.pararBuses();
-      this.mudo(true);
-    });
-    this.a(3100, () => this.prender('sheet', true));
-    this.a(7600, () => {
-      this.prender('sheet', false);
-      this.mapa.showBuses(false);
-      this.mapa.showPin(false);
-    });
-    this.a(8500, () => this.ciclo());
   }
 }

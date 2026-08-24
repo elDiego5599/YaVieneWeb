@@ -1,5 +1,5 @@
 /**
- * Las dos páginas de letra pequeña.
+ * Las páginas sueltas: privacidad, términos y la que no existe.
  *
  * No llevan JavaScript propio: esto existe sólo para que el empaquetador
  * les junte y versione el mismo CSS que la portada, en vez de que cada

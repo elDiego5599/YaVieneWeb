@@ -9,7 +9,7 @@ import { entre, scrollDePista, seguirPista, sinMovimiento } from './scrolly';
  * momento entra por la derecha, se planta en el centro y sale por la
  * izquierda para que llegue el siguiente. Todo viaja en la misma
  * dirección, que es lo que hace que se lea como una cosa después de otra
- * y no como cinco tarjetas iguales apiladas.
+ * y no como tres tarjetas iguales apiladas.
  *
  * Lo importante es el descanso: en la mitad de su turno el momento se
  * queda completamente quieto, y ése es el rato en el que el teléfono hace
@@ -64,7 +64,7 @@ const BORROSO_MAX = 5;
  *
  * Escribir en `style` no es gratis aunque el valor sea el mismo: cada
  * asignación pasa por el analizador de CSS y ensucia el estilo del
- * elemento. En un cruce hay cinco bloques por cuatro propiedades cada
+ * elemento. En un cruce hay tres bloques por cuatro propiedades cada
  * uno, sesenta veces por segundo. Redondeando a medio píxel y a un uno
  * por ciento de opacidad, la mayoría de los cuadros no escribe nada: se
  * ve igual y el navegador se queda tranquilo.
@@ -135,7 +135,7 @@ export class Pasos {
     }));
 
     // Un tramo por momento. Con el tramo de sobra que había antes, la
-    // sección pedía casi ocho pantallas de scroll para cinco ideas: la
+    // sección pedía casi ocho pantallas de scroll para tres ideas: la
     // portada ya tiene su propio arranque y el último momento se queda
     // puesto hasta que la sección sale, así que no hace falta pagar un
     // tramo entero por ese remate.
@@ -182,9 +182,11 @@ export class Pasos {
     }
 
     // El riel es la salida de emergencia de la sección: si aparece a
-    // mitad de la portada, el que no quiera leer los cinco momentos ya
-    // puede saltar al que le interese en vez de bajar a ciegas.
-    const rielVisible = irse > 0.14;
+    // mitad de la portada, el que no quiera leer los tres momentos ya
+    // puede saltar al que le interese en vez de bajar a ciegas. Y una vez
+    // puesto se queda: al volver hacia arriba desaparecía, y un índice que
+    // se esconde justo cuando el que mira duda es un índice inútil.
+    const rielVisible = this.rielVisible || irse > 0.14;
     if (rielVisible !== this.rielVisible) {
       this.rielVisible = rielVisible;
       this.riel?.classList.toggle('is-visible', rielVisible);
@@ -230,7 +232,7 @@ export class Pasos {
       }
 
       // El aviso a la tarjeta gráfica se da al empezar a moverse y se
-      // retira al pararse: dejarlo puesto en los cinco bloques a la vez
+      // retira al pararse: dejarlo puesto en los tres bloques a la vez
       // reserva memoria de vídeo para nada.
       const movil = !quieto && !oculto;
       if (movil !== m.movil) {

@@ -84,6 +84,17 @@
   background: linear-gradient(180deg, var(--green-tint) 0%, #F2FBF6 100%);
 }
 
+/* Papel: blanco con un punto de verde frío y dos luces muy bajas. Es el
+   fondo de lo que se lee de cerca —una ficha, un formulario— y no se pisa
+   ni con el arena del problema ni con la crema del pie. */
+.panel--papel {
+  background:
+    radial-gradient(680px circle at 4% 0%, rgba(0, 168, 89, 0.13), transparent 62%),
+    radial-gradient(620px circle at 98% 100%, rgba(17, 169, 199, 0.1), transparent 60%),
+    linear-gradient(158deg, #FFFFFF 0%, #F3F8F5 54%, #E9F1ED 100%);
+  color: var(--text-primary);
+}
+
 .panel--ink {
   background:
     radial-gradient(720px circle at 12% 0%, rgba(0, 168, 89, 0.22), transparent 60%),
@@ -222,11 +233,18 @@
 }
 
 /* Dentro de la escena el aire vertical lo pone la ventana, no el relleno
-   de siempre del panel: con aquel no cabría la escena en una pantalla. */
+   de siempre del panel: con aquel no cabría la escena en una pantalla.
+
+   Y si aun así no cabe —zoom del navegador, portátil de pantalla baja—,
+   `--encaje` la encoge hasta que quepa. Es `zoom` y no `scale`: vuelve a
+   maquetar en pequeño, así que el texto se sigue leyendo nítido. Quien
+   lo calcula es `encaje.ts`; mientras la escena quepa, vale 1 y aquí no
+   pasa nada. */
 .escena .panel-inner {
   width: 100%;
   padding-top: clamp(20px, 3.2vh, 44px);
   padding-bottom: clamp(20px, 3.2vh, 44px);
+  zoom: var(--encaje, 1);
 }
 
 /*
