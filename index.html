@@ -310,7 +310,7 @@
 
                 <!-- Píldora de búsqueda + chip de ubicación. -->
                 <div class="phone-topbar">
-                  <div class="app-pill">
+                  <div class="app-pill" data-el="pill">
                     <span class="app-pill-btn">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                         stroke-linecap="round">
@@ -404,7 +404,7 @@
                          "SO", y el color sale de la paleta de marca por la
                          suma de los códigos de su id ("sobusa" → 653, y
                          653 % 6 cae en el verde accesible). -->
-                    <div class="app-tile">
+                    <div class="app-tile" data-el="tile-empresa">
                       <span class="app-tile-icon app-tile-icon--empresa">SO</span>
                       <span class="app-tile-body">
                         <span class="app-tile-title">Sobusa</span>
@@ -456,6 +456,13 @@
                   </div>
                   </div>
                 </div>
+
+                <!--
+                  El dedo del guion: se coloca sobre lo que va a tocar y
+                  lanza la onda. Entre toque y toque no está en ninguna
+                  parte, así que no estorba a nada de lo que hay debajo.
+                -->
+                <span class="phone-toque" data-el="toque" aria-hidden="true"></span>
 
                 <div class="phone-gesture"></div>
               </div>
