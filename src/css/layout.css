@@ -5,6 +5,9 @@
    encajonada en una banda central. */
 
 .panel {
+  /* La isla de navegación va fija arriba: sin este margen, un salto de
+     anclaje deja el arranque de la sección debajo de la isla. */
+  scroll-margin-top: 96px;
   position: relative;
   margin: 0 var(--gutter) var(--panel-gap);
   border-radius: var(--panel-radius);
@@ -29,8 +32,8 @@
   por ancho que sea, el ojo ve dónde termina. Estas dejan el margen y el
   radio y toman la ventana entera, así la página alterna tarjeta y banda en
   vez de apilar seis veces la misma forma. Sólo lo llevan las secciones que
-  cargan color o producto —la franja de datos, el visor y empresas—; el
-  hero y las dos del medio siguen flotando, que es lo que hace el contraste.
+  cargan color o producto —la franja de datos, la solución y empresas—; el
+  hero y el problema siguen flotando, que es lo que hace el contraste.
 */
 .panel--sangre {
   margin-left: 0;
@@ -61,31 +64,6 @@
   max-width: var(--content-wide);
 }
 
-/*
-  Costura. Entre dos bandas pegadas el corte de color es una raya recta que
-  parte la página en dos; esto disuelve el borde inferior de la banda en el
-  color de quien viene detrás. Se pinta por encima del fondo y por debajo
-  del contenido (`.panel-inner` va en z-index 1).
-*/
-.costura {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: clamp(70px, 8vw, 140px);
-  z-index: 0;
-  pointer-events: none;
-}
-
-.costura--abajo {
-  bottom: 0;
-  background: linear-gradient(180deg, transparent, var(--costura-color, #FFFCF7));
-}
-
-.costura--arriba {
-  top: 0;
-  background: linear-gradient(0deg, transparent, var(--costura-color, #FFFCF7));
-}
-
 .panel-inner.tight {
   padding-top: clamp(36px, 4vw, 64px);
   padding-bottom: clamp(36px, 4vw, 64px);
@@ -97,13 +75,56 @@
   background: var(--surface);
 }
 
-/* Superficie técnica: blanco roto #F8FAFC bajo la trama de puntos. */
+/*
+  El fondo del hero. Era un #F8FAFC plano —blanco azulado de laboratorio,
+  de una sola pieza— y con la trama encima acababa pareciendo la sala de
+  espera de una consulta. Ahora es luz en vez de pintura: blanco limpio
+  arriba, que es donde caen la isla de navegación y el titular y donde el
+  texto necesita el contraste entero, y hacia abajo se va calentando hasta
+  la crema de la app —`--arena`, la misma superficie que llevan las hojas
+  del teléfono—, con un halo verde detrás del grupo de aparatos y dos
+  respiros de azul marino en las esquinas altas para que el blanco no se
+  lea liso.
+
+  El halo va abajo y no en el centro a propósito: es lo que despega los
+  teléfonos del fondo ahora que el fondo también tira a cálido, y de paso
+  ata el hero al verde de la marca sin teñir el titular.
+
+  El resto de paneles claros —`papel`, `mint`— van hacia el verde frío;
+  éste es el único que va hacia el cálido, y por eso la apertura no se
+  confunde con ninguna de las secciones que vienen después.
+*/
 .panel--sun {
-  background-color: #F8FAFC;
+  background-color: #F0E8DA;
+  background-image:
+    /* La luz sobre el titular. Va la primera —encima de todo lo demás—
+       porque su trabajo es despejar el centro: el texto necesita el
+       blanco entero debajo y el resto de la capa puede ser cálido. */
+    radial-gradient(1180px 720px at 50% 18%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0) 68%),
+    /* El halo verde detrás del grupo de teléfonos. */
+    radial-gradient(1200px 760px at 50% 96%, rgba(0, 168, 89, 0.22), rgba(0, 168, 89, 0) 62%),
+    /* Dos respiros en las esquinas altas, los dos de la paleta: el azul
+       marino de la marca a la derecha y el coral a la izquierda. A esta
+       saturación no se leen como color, sólo como que la esquina no es
+       igual que el centro. */
+    radial-gradient(900px 520px at 97% -8%, rgba(20, 39, 78, 0.12), rgba(20, 39, 78, 0) 66%),
+    radial-gradient(820px 480px at 2% 0%, rgba(232, 106, 94, 0.11), rgba(232, 106, 94, 0) 66%),
+    linear-gradient(180deg, #FBF4E9 0%, #F6EEE1 46%, #EFE5D5 100%);
 }
 
 .panel--mint {
   background: linear-gradient(180deg, var(--green-tint) 0%, #F2FBF6 100%);
+}
+
+/* Papel: blanco con un punto de verde frío y dos luces muy bajas. Es el
+   fondo de lo que se lee de cerca —una ficha, un formulario— y no se pisa
+   ni con el arena del problema ni con la crema del pie. */
+.panel--papel {
+  background:
+    radial-gradient(680px circle at 4% 0%, rgba(0, 168, 89, 0.13), transparent 62%),
+    radial-gradient(620px circle at 98% 100%, rgba(17, 169, 199, 0.1), transparent 60%),
+    linear-gradient(158deg, #FFFFFF 0%, #F3F8F5 54%, #E9F1ED 100%);
+  color: var(--text-primary);
 }
 
 .panel--ink {
@@ -127,12 +148,6 @@
   otra las derechas, y la posición de cada una es lo que le falta al centro
   de la baldosa —(17, 34)— para caer donde el painter pone el punto.
 
-  Y encima van las tres curvas del painter —routeA, routeB y routeC—, que es
-  lo que convierte la retícula en un mapa: puntos sueltos son textura de
-  plantilla, puntos con rutas cruzándolos son una ciudad. Viven dentro de
-  este mismo elemento, así que comparten opacidad y desvanecido y no hay que
-  cuadrar dos capas por separado.
-
   El color es `currentColor`, así que la trama sale blanca sobre los paneles
   de tinta y azul marino sobre los claros, sin repetir la regla.
 */
@@ -155,14 +170,10 @@
     rgba(0, 0, 0, 0.45) 76%, transparent 100%);
 }
 
-.panel-lineas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  /* Se estiran al panel, igual que el painter estira sus curvas al canvas
-     que le toque: en uno ancho y bajo la ruta sale tendida, y está bien. */
-  color: inherit;
+/* Sobre el hero la trama baja un punto: el fondo ya tiene degradado y
+   halo, y a 0,07 los puntos volvían a leerse como rejilla de plantilla. */
+.panel--sun .panel-dots {
+  opacity: 0.05;
 }
 
 /* Sobre tinta el punto blanco pesa más que el azul sobre beige. */
@@ -219,16 +230,11 @@
 }
 
 
-/* La costura que baja al azul del panel de empresas. */
-.costura--ink {
-  --costura-color: var(--navy);
-}
-
 /* ── Pista y escena: el andamio del scrollytelling ────────────────────
    Una pista es un bloque de varias pantallas de alto con una escena
    pegada dentro. Mientras la pista cruza la ventana la escena se queda
    quieta y lo que cambia es lo que hay dentro: el reloj corre, los pasos
-   se acercan, el visor pasa de una pieza a otra. `--tramos` dice cuántos
+   se relevan de uno en uno. `--tramos` dice cuántos
    momentos tiene y `--paso` cuánto scroll cuesta cada uno.
 
    Cuidado con `overflow` en cualquier antepasado: `hidden` convierte al
@@ -241,6 +247,20 @@
   height: calc(var(--tramos) * var(--paso) + 100vh);
 }
 
+/* La solución pide más scroll por momento que las demás pistas: en la
+   mitad de cada turno el teléfono se queda quieto haciendo su demo, y ese
+   descanso tiene que durar lo que dura la demo. Si el tramo fuera corto,
+   la cinta se llevaría la animación a media frase.
+
+   Aun así, con cinco momentos esto son casi cinco pantallas: es la parte
+   más larga de la página con diferencia y el que llega a ella no sabe
+   cuánto le queda. Por eso el tramo se aprieta hasta lo que aguanta la
+   demo —unos cuarenta por ciento de pantalla de descanso— y el riel de
+   pestañas aparece enseguida para poder saltar. */
+.pista--pasos {
+  --paso: 76vh;
+}
+
 .escena {
   position: sticky;
   top: 0;
@@ -251,11 +271,18 @@
 }
 
 /* Dentro de la escena el aire vertical lo pone la ventana, no el relleno
-   de siempre del panel: con aquel no cabría la escena en una pantalla. */
+   de siempre del panel: con aquel no cabría la escena en una pantalla.
+
+   Y si aun así no cabe —zoom del navegador, portátil de pantalla baja—,
+   `--encaje` la encoge hasta que quepa. Es `zoom` y no `scale`: vuelve a
+   maquetar en pequeño, así que el texto se sigue leyendo nítido. Quien
+   lo calcula es `encaje.ts`; mientras la escena quepa, vale 1 y aquí no
+   pasa nada. */
 .escena .panel-inner {
   width: 100%;
   padding-top: clamp(20px, 3.2vh, 44px);
   padding-bottom: clamp(20px, 3.2vh, 44px);
+  zoom: var(--encaje, 1);
 }
 
 /*

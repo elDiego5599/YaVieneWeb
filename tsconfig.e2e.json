@@ -1,0 +1,14 @@
+{
+  /* Las pruebas de navegador y el script del presupuesto corren en Node,
+     no en el navegador, así que necesitan sus tipos. Van en un fichero
+     aparte a propósito: el tsconfig principal sigue sin `@types/node`, y
+     así `src/` y `vite.config.ts` no pueden tirar de `fs` ni de `process`
+     por descuido — lo que se escriba ahí tiene que funcionar en el
+     navegador o en el empaquetador, que es donde se ejecuta. */
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+  },
+  "include": ["e2e", "playwright.config.ts"]
+}

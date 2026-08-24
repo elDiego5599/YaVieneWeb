@@ -1,0 +1,64 @@
+name: YaVieneWeb CI
+
+on:
+  push:
+    branches: [main, prueba]
+  pull_request:
+    branches: [main]
+
+jobs:
+  landing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests de humo
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # El peso de una página se va de las manos de a poco: una fuente
+      # aquí, una librería allá. Esto falla en cuanto la build se pasa de
+      # los topes, así que el commit que la engordó queda señalado.
+      - name: Presupuesto de peso
+        run: npm run presupuesto
+
+      # Chromium tarda en bajar, así que se guarda en caché entre
+      # ejecuciones y sólo se vuelve a descargar si cambia la versión de
+      # Playwright que hay en el package-lock.
+      - name: Caché de Chromium
+        uses: actions/cache@v4
+        id: cache-navegador
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Instalar Chromium
+        if: steps.cache-navegador.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      # Un navegador de verdad abriendo las cuatro páginas en móvil y en
+      # escritorio: errores de consola, peticiones colgando, desbordes
+      # laterales y el esqueleto accesible. Son los fallos que no se ven
+      # leyendo el código.
+      - name: Pruebas de navegador
+        run: npm run test:e2e
+
+      - name: Guardar el informe si algo falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informe-playwright
+          path: playwright-report/
+          retention-days: 7

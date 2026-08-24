@@ -1,0 +1,186 @@
+/* ── EMPRESAS ──────────────────────────────────────────────
+
+   El bloque para empresas y su formulario.
+
+   Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
+   Se carga desde ahí y **el orden importa**: hay reglas que se pisan
+   entre secciones a propósito, así que mover este `@import` de sitio
+   cambia lo que se ve. Si haces una regla nueva que no se aplica, mira
+   primero si más abajo en el orden de carga hay otra con la misma
+   especificidad. Es el fallo que más veces ha pasado en esta base.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── Empresas y formulario ─────────────────────────────────────────── */
+.companies-grid {
+  display: grid;
+  gap: clamp(36px, 5vw, 64px);
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .companies-grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  }
+}
+
+.companies-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.companies-info p {
+  font-size: var(--step-lead);
+  line-height: 1.5;
+  color: var(--text-white-dim);
+}
+
+.whatsapp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 26px;
+  border-radius: 999px;
+  background: #25D366;
+  color: #06301A;
+  font-size: 15px;
+  font-weight: 700;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.whatsapp-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px -12px rgba(37, 211, 102, 0.6);
+}
+
+/* Ficha blanca sobre el papel de la sección. El cristal esmerilado que
+   llevaba antes vivía de tener tinta debajo; sobre claro sólo era un gris
+   sucio con dos filtros caros encima. */
+.contact-form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: clamp(26px, 3vw, 38px);
+  border-radius: 26px;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  box-shadow: 0 26px 60px -34px rgba(11, 22, 40, 0.38);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #FBFDFC;
+  border: 1px solid var(--divider);
+  color: var(--text-primary);
+  font-size: 15px;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.form-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* El foco no se marca sólo con el borde: un píxel de color es lo primero
+   que se pierde con la pantalla al sol, que es donde se llena esto. */
+.form-input:focus {
+  outline: none;
+  border-color: var(--green);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(0, 168, 89, 0.16);
+}
+
+.form-submit-btn {
+  margin-top: 6px;
+  padding: 16px;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.form-submit-btn:hover {
+  background: #00C267;
+  transform: translateY(-2px);
+}
+
+/* El aviso de recibido lo enseña y lo esconde el atributo `hidden`, no una
+   clase aparte: un solo interruptor, el que el navegador ya entiende. */
+.form-success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: clamp(30px, 4vw, 46px);
+  border-radius: 26px;
+  background: var(--green-tint);
+  border: 1px solid rgba(0, 168, 89, 0.28);
+}
+
+.form-success-message[hidden] {
+  display: none;
+}
+
+/* Un envío que falla lo dice donde el usuario está mirando: justo encima
+   del botón que acaba de tocar. */
+.form-error {
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(232, 106, 94, 0.1);
+  border: 1px solid rgba(232, 106, 94, 0.36);
+  color: #8C2F26;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.form-error[hidden] {
+  display: none;
+}
+
+.form-success-message h3 {
+  color: var(--ink);
+  font-size: var(--step-h3);
+}
+
+.form-success-message p {
+  color: var(--text-secondary);
+  font-size: var(--step-body);
+  line-height: 1.5;
+  max-width: 44ch;
+}
+
+.form-success-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+}

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacidad — Ya Viene</title>
+  <meta name="description" content="Qué datos recoge Ya Viene, qué se queda en tu teléfono y qué no sale de él." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0B1628" />
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+
+    <!--
+      Las dos familias ya no vienen de Google: viven en `src/assets/fonts/` y
+      se declaran en `src/css/fonts.css`. Se precargan aquí porque el <head>
+      es lo primero que lee el navegador; si esperásemos a que el CSS las
+      descubriera, el texto parpadearía con la fuente de sistema. `crossorigin`
+      es obligatorio aunque el fichero sea propio: las fuentes siempre se piden
+      en modo anónimo y sin él la precarga se descarta y se descarga dos veces.
+    -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="./src/assets/fonts/plus-jakarta-sans-latin.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="./src/assets/fonts/bricolage-grotesque-latin.woff2" />
+
+  <script type="module" src="/src/hoja.ts"></script>
+</head>
+
+<body class="legal-body">
+
+  <!-- Primer tabulador de la página: manda directo al contenido y se
+       salta la navegación. Vive fuera de cuadro hasta que recibe el
+       foco, así que con el ratón no se ve nunca. -->
+  <a class="saltar-al-contenido" href="#contenido">Saltar al contenido</a>
+
+  <header class="legal-top">
+    <a class="legal-marca" href="/">
+      <img src="/logo.svg" alt="" width="30" height="30" />
+      <span>YA VIENE</span>
+    </a>
+    <a class="legal-volver" href="/">Volver a la página</a>
+  </header>
+
+  <main id="contenido" class="legal-hoja">
+    <p class="legal-fecha">Actualizado el 23 de agosto de 2026</p>
+    <h1>Privacidad</h1>
+    <p class="legal-entrada">Ya Viene es una aplicación para saber por dónde va tu bus. Para
+      eso necesita muy poco, y lo poco que necesita casi todo se queda dentro de tu
+      teléfono. Esta página dice exactamente qué es cada cosa.</p>
+
+    <h2>Lo que guarda tu cuenta</h2>
+    <p>Dos datos: tu correo electrónico y el nombre que se muestra. Nada más. Puedes
+      entrar con tu correo y una contraseña o con tu cuenta de Google; las cuentas las
+      administra Firebase Authentication, de Google, y la contraseña nunca la vemos
+      nosotros.</p>
+
+    <h2>Tu ubicación no sale del teléfono</h2>
+    <p>La app te pide permiso de ubicación para dos cosas: centrar el mapa donde estás y
+      calcular cuántos metros te separan del bus. Las dos se hacen dentro del aparato.</p>
+    <p>Lo único que tu teléfono le pide al servidor es «mándame las posiciones de esta
+      ruta». Dónde estás tú no viaja en esa petición, no se guarda en ningún servidor y
+      no se comparte con la empresa de transporte ni con nadie más.</p>
+
+    <h2>El aviso lo calcula tu propio teléfono</h2>
+    <p>Cuando activas el aviso, la app compara tu posición con la del bus mientras lo ves
+      moverse, y cuando entra en un kilómetro a la redonda lanza una notificación local
+      —la crea el teléfono, no la manda un servidor—. La app no usa ningún servicio de
+      mensajería push.</p>
+
+    <h2>Sin analítica, sin rastreo, sin publicidad</h2>
+    <p>La aplicación no incluye herramientas de analítica, de perfiles de uso ni de
+      publicidad, y no vende ni cede datos a terceros. Tampoco guarda un historial de tus
+      viajes: ni la ruta ni la empresa que elegiste sobreviven al cierre de la app, se
+      preguntan otra vez cada vez que la abres. Lo único que se queda guardado en el
+      teléfono es el punto de espera que hayas marcado a mano, para no tener que volver a
+      marcarlo.</p>
+
+    <h2>Lo que sí viaja: la posición del bus</h2>
+    <p>El que manda datos es el conductor. Al registrarse deja su nombre, su teléfono y la
+      ruta que cubre, y mientras tiene el turno abierto su aplicación publica la posición,
+      el rumbo y la velocidad del bus. Eso es un vehículo de servicio público en su
+      recorrido, y es lo que hace posible que tú lo veas en el mapa.</p>
+
+    <h2>Con quién se apoya la app</h2>
+    <ul class="legal-lista">
+      <li><strong>Firebase (Google)</strong> — el registro y el inicio de sesión.</li>
+      <li><strong>OpenStreetMap y CARTO</strong> — las imágenes del mapa. Se descargan
+        como cualquier imagen de una página; no llevan quién eres.</li>
+      <li><strong>Servidores propios</strong> — las posiciones de los buses pasan por
+        infraestructura nuestra, no por un servicio ajeno.</li>
+    </ul>
+
+    <h2>Borrar tu cuenta</h2>
+    <p>Escríbenos por WhatsApp al 300 443 8626 y la eliminamos junto con el correo y el
+      nombre asociados. Como no guardamos nada más tuyo, con eso no queda nada.</p>
+
+    <h2>Cambios</h2>
+    <p>Si algo de esto cambia, cambia también esta página y su fecha. Ya Viene está en
+      pruebas y todavía crece; lo que no va a cambiar es la parte de arriba: tu ubicación
+      se queda en tu teléfono.</p>
+  </main>
+
+  <footer class="legal-pie">
+    <p>¿Alguna duda con esto? Escríbenos por
+      <a href="https://wa.me/573004438626" target="_blank" rel="noopener">WhatsApp</a>.</p>
+    <p><a href="/terminos.html">Términos</a> · <a href="/privacidad.html">Privacidad</a></p>
+  </footer>
+</body>
+
+</html>

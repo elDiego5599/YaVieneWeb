@@ -1,0 +1,496 @@
+/* ── PASOS ──────────────────────────────────────────────
+
+   La solución contada momento a momento, con su riel y su teléfono.
+
+   Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
+   Se carga desde ahí y **el orden importa**: hay reglas que se pisan
+   entre secciones a propósito, así que mover este `@import` de sitio
+   cambia lo que se ve. Si haces una regla nueva que no se aplica, mira
+   primero si más abajo en el orden de carga hay otra con la misma
+   especificidad. Es el fallo que más veces ha pasado en esta base.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── La solución: la app, momento a momento ───────────────────────────
+   Una sola sección para lo que antes iba en dos. Todo vive en la misma
+   celda de la rejilla: al entrar sólo está el titular, a tamaño de
+   portada; al bajar, el titular se abre y detrás entra el primer momento.
+
+   Cada momento son dos columnas —el texto a la izquierda, el teléfono a la
+   derecha— y se relevan cruzando hacia la izquierda: el que llega viene
+   del margen izquierdo, desenfocado, y se asienta; el que se va sigue
+   hacia allá. Las dos columnas no viajan lo mismo —el teléfono va más
+   corto—, y ese desfase es lo que da la profundidad. */
+.pasos-escena {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(26px, 3vw, 46px);
+}
+
+/* La cinta no usa todo el panel: con el teléfono plantado en el centro,
+   un contenedor de 1680 dejaría media pantalla muerta a la derecha. El
+   riel de abajo sí lo usa entero, y ese contraste de anchos es parte de
+   lo que evita que la sección parezca dos líneas rectas. */
+.pasos-pila {
+  display: grid;
+  width: 100%;
+  max-width: min(100%, 1180px);
+  margin-inline: auto;
+  min-height: clamp(420px, 64vh, 660px);
+  align-items: center;
+}
+
+.pasos-portada,
+.paso {
+  grid-area: 1 / 1;
+  align-self: center;
+  /* El aviso de capa lo pone y lo quita `pasos.ts` mientras el bloque
+     viaja: dejarlo fijo en los seis reserva memoria de vídeo todo el rato
+     y, con `filter` dentro, obliga al navegador a tener siempre a mano una
+     capa capaz de desenfocar el teléfono y el mapa enteros. */
+}
+
+/* ── La portada ──
+   Centrada y del tamaño de un titular de apertura: es lo único que hay en
+   pantalla cuando la sección empieza, así que no compite con nada. */
+.pasos-portada {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-self: center;
+  will-change: transform, opacity;
+  gap: clamp(18px, 2vw, 30px);
+  text-align: center;
+  transform-origin: 50% 50%;
+}
+
+.pasos-portada .section-title {
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 1rem + 9vw, 9rem);
+  font-weight: 800;
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+}
+
+.pasos-portada .section-lead {
+  max-width: 44ch;
+  font-size: clamp(1.15rem, 0.9rem + 1.05vw, 1.9rem);
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+/* Centrada, la barra verde no puede ir al costado: pasa a ser un filo
+   arriba, que es lo que sí acompaña a un texto centrado. */
+.pasos-portada .solucion-nota {
+  max-width: 42ch;
+  padding: clamp(12px, 1.2vw, 18px) 0 0;
+  border-left: 0;
+  border-top: 2px solid var(--green);
+  font-size: clamp(1rem, 0.9rem + 0.45vw, 1.25rem);
+}
+
+/* ── Cada momento ── */
+.paso {
+  display: grid;
+  gap: clamp(24px, 3vw, 60px);
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+  transform-origin: 50% 50%;
+}
+
+/* Dos columnas partidas por la mitad. El teléfono se centra en la
+   segunda, así que queda a la derecha del texto pero cerca del eje de la
+   página, que es donde se mira. Y baja un poco respecto a la frase, para
+   que las dos cosas no arranquen a la misma altura como en una tabla.
+
+   Ojo con `justify-self` aquí: la regla base de `.paso-toma` está más
+   abajo en este mismo fichero y lo pone en `center`. Como tienen la
+   misma especificidad, gana la última, y cualquier valor que se ponga
+   dentro de esta consulta de medios no llega a aplicarse nunca. */
+@media (min-width: 920px) {
+  .paso {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    justify-items: start;
+  }
+
+  .paso-toma {
+    margin-top: clamp(24px, 5vh, 76px);
+  }
+}
+
+.paso-cuerpo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(12px, 1.4vw, 20px);
+  max-width: 48ch;
+}
+
+.paso-numero {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--green);
+  color: var(--text-white);
+  font-size: 18px;
+  font-weight: 800;
+  box-shadow: 0 12px 26px var(--green-glow);
+}
+
+.paso-titulo {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.1rem + 2.8vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+}
+
+.paso-texto {
+  max-width: 42ch;
+  font-size: var(--step-lead);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.paso-texto em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--bus-ghost);
+}
+
+/* El apunte: la letra pequeña de esa misma pantalla. Va más
+   apagado que el texto, porque es letra pequeña, no titular. */
+.paso-nota {
+  max-width: 42ch;
+  padding-left: 16px;
+  border-left: 2px solid rgba(0, 168, 89, 0.34);
+  font-size: var(--step-body);
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* ── La columna del teléfono ──
+   Un halo detrás para despegarlo del degradado menta: sin él, el titanio
+   claro del riel se funde con el fondo y el aparato pierde el canto. */
+.paso-toma {
+  position: relative;
+  display: grid;
+  place-items: center;
+  justify-self: center;
+}
+
+.paso-toma::before {
+  content: '';
+  position: absolute;
+  inset: -6% -16%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(20, 39, 78, 0.18), transparent 74%);
+  filter: blur(14px);
+}
+
+.paso-toma > * {
+  position: relative;
+}
+
+/* ── El aviso del tercer momento ──
+   La notificación no se dibuja dentro de la pantalla: sale del aparato y
+   se queda flotando fuera, que es la misma tarjeta del hero
+   —`.scene-card`— y aquí sólo hay que decirle dónde ponerse. Es más fiel
+   a lo que hace la app: el aviso llega con Ya Viene cerrada, así que
+   enseñarlo dentro del teléfono era enseñarlo en el sitio equivocado.
+
+   Va arriba y a la derecha, asomada por el hombro del aparato. Arriba
+   porque es de donde salen las notificaciones de verdad en Android —una
+   heads-up entra por el borde de arriba, no por el pie— y porque abajo
+   está la hoja con el número de metros, que es lo único que no se puede
+   tapar. A la derecha porque la columna del texto queda a la izquierda y
+   cruzarla sería poner una tarjeta encima de un párrafo.
+
+   Monta un tercio del ancho del teléfono en vez de quedarse entera fuera:
+   de la banda libre que hay a la derecha —unos 260 px hasta el margen de
+   la página— sólo salen 150 útiles después del respiro, y una tarjeta de
+   150 parte el título en cinco líneas. Apoyándose en el hombro se lee
+   como una idea que sale del aparato, que es exactamente lo que es.
+
+   Va después de `.paso-toma > *`, que si no le gana el
+   `position: relative`. */
+.scene-card--paso {
+  position: absolute;
+  /* Por encima de la hoja y del chip del teléfono, que llegan a 50: el
+     marco no abre contexto de apilado, así que sus piezas compiten con
+     ésta de tú a tú. */
+  z-index: 60;
+  top: clamp(16px, 4%, 34px);
+  bottom: auto;
+  /* Negativo: el borde derecho de la tarjeta cae fuera del teléfono. El
+     tope de -190 px es lo que hay hasta el margen de la página con la
+     ventana en 1200, que es donde empieza a mandar esta regla. */
+  right: clamp(-190px, -13vw, -104px);
+  left: auto;
+  width: max-content;
+  max-width: clamp(228px, 20vw, 286px);
+}
+
+/* Entra y sale como las del hero, y además baja un poco al entrar: es una
+   heads-up, y una heads-up cae desde arriba. El deslizamiento va en
+   `translate` —la propiedad suelta— porque el `transform` se lo lleva la
+   levitación de `.animate-float-delayed` y dos reglas peleándose por la
+   misma propiedad no se ven. Sin JavaScript —o sin animaciones— se queda
+   puesta, que es la foto con la que termina el momento. */
+.es-guion .scene-card--paso {
+  opacity: 0;
+  filter: blur(3px);
+  translate: 0 -12px;
+  transition: opacity 0.45s ease, filter 0.45s ease,
+    translate 0.5s var(--ease-out-cubic);
+}
+
+.es-guion .scene-card--paso.is-on {
+  opacity: 1;
+  filter: blur(0);
+  translate: 0 0;
+}
+
+/* Por debajo de 1200 px no hay banda libre a la derecha: el teléfono se
+   encoge pero el margen de la página se encoge más. La tarjeta sigue
+   arriba y a la derecha —el sitio no cambia, que es lo que hace que se
+   reconozca— pero se mide contra el ancho de la ventana en vez de contra
+   el carril, y monta un poco más sobre el aparato. Sigue sin tocar la
+   hoja del número, que es la regla que manda. Y hay que devolverle el
+   `display`, porque las del hero se esconden por debajo de 860 y ésta no
+   está en el hero. */
+@media (max-width: 1199px) {
+  .scene-card--paso {
+    top: 4%;
+    right: clamp(-136px, -11vw, -46px);
+    max-width: min(214px, 56vw);
+    padding: 10px 13px;
+    gap: 9px;
+  }
+
+  /* La tarjeta encoge con el aparato. Si se queda del tamaño de escritorio
+     mientras el teléfono baja de 300 a 230 px, deja de ser un aviso que
+     sale del móvil y pasa a ser un cartel puesto encima: a 1000 px de
+     ventana llegaba a montar el 78 % del ancho de la pantalla. Con el
+     cuerpo un punto más chico se queda en poco más de un tercio, que es
+     donde se sigue leyendo como lo que es. */
+  .scene-card--paso .notif-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+  }
+
+  .scene-card--paso strong {
+    font-size: 11.5px;
+  }
+
+  .scene-card--paso span {
+    font-size: 10.5px;
+  }
+}
+
+@media (max-width: 860px) {
+  .scene-card--paso {
+    display: flex;
+  }
+}
+
+/* ── El riel ──
+   Índice y barra de avance a la vez: el momento activo se llena mientras
+   dura y tocar uno lleva la página hasta su tramo. Aparece en cuanto la
+   portada empieza a irse y ya no se vuelve a esconder: un índice que
+   parpadea al subir y bajar es peor que no tenerlo.
+
+   Con tres momentos, repartir el ancho entero entre tres columnas deja
+   unas pestañas larguísimas con el nombre perdido a la izquierda. Se les
+   pone tope y se centra el grupo: quedan las tres juntas debajo del
+   momento, que es donde se leen como un índice. */
+.pasos-riel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 210px));
+  justify-content: center;
+  gap: 18px 18px;
+  padding-top: clamp(18px, 2vw, 26px);
+  border-top: 1px solid rgba(11, 22, 40, 0.1);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition:
+    opacity 0.5s var(--ease-out-cubic),
+    transform 0.5s var(--ease-out-cubic);
+}
+
+.pasos-riel.is-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+/* En un teléfono no cabe la sección entera con el mockup a tamaño de
+   escaparate: el momento se apila —frase arriba, aparato abajo— y todo
+   encoge lo justo para que quepa de una pantalla sin scroll interno. El
+   riel conserva sus columnas pero pierde los nombres: lo que hace falta
+   ahí es saber por dónde va la cinta, no leer un índice. */
+@media (max-width: 759px) {
+  .pasos-pila {
+    min-height: clamp(300px, 58vh, 470px);
+  }
+
+  .paso {
+    gap: clamp(16px, 4vw, 26px);
+  }
+
+  .paso-titulo {
+    font-size: clamp(1.55rem, 1.05rem + 2.4vw, 2.1rem);
+  }
+
+  .paso-texto {
+    font-size: var(--step-body);
+  }
+
+  .paso-nota {
+    font-size: 0.875rem;
+  }
+
+  .pasos-riel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 8px;
+  }
+
+  .pasos-tab-nombre {
+    display: none;
+  }
+}
+
+.pasos-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(14px, 1.05vw, 16px);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  text-align: center;
+  color: var(--text-muted);
+  transition: color var(--transition-normal);
+}
+
+.pasos-tab:hover,
+.pasos-tab.is-activa {
+  color: var(--ink);
+}
+
+.pasos-tab-barra {
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(11, 22, 40, 0.12);
+  overflow: hidden;
+}
+
+.pasos-tab-avance {
+  display: block;
+  /* Lo pone pasos.ts con lo que lleva recorrido el tramo. */
+  width: var(--avance, 0%);
+  height: 100%;
+  border-radius: 999px;
+  background: var(--green);
+}
+
+/*
+  Sin animaciones: fuera la pila, fuera el maquillaje. Los momentos y los
+  golpes de texto del problema se leen de arriba abajo como una lista de
+  toda la vida, y el riel sobra porque ya no hay nada que recorrer.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .problema-beat {
+    opacity: 1;
+    transform: none;
+  }
+
+  .pasos-pila {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(44px, 5vw, 84px);
+    min-height: 0;
+  }
+
+  .pasos-portada,
+  .paso {
+    grid-area: auto;
+  }
+
+  .pasos-riel {
+    display: none;
+  }
+}
+
+@keyframes weather-icon-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.58) translateY(-3px) rotate(-8deg);
+  }
+  72% {
+    opacity: 1;
+    transform: scale(1.08) translateY(0) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes panel-gradient-respiro {
+  0% {
+    background-position: 0% 50%, 50% 50%, 50% 50%;
+  }
+  100% {
+    background-position: 100% 50%, 50% 50%, 50% 50%;
+  }
+}
+
+@keyframes clima-gradient-respiro {
+  0% {
+    background-position: 0% 50%, 50% 50%;
+  }
+  100% {
+    background-position: 100% 50%, 50% 50%;
+  }
+}
+
+@keyframes clima-luz-respiro {
+  0%, 100% {
+    opacity: 0.78;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes footer-gradient-respiro {
+  0% {
+    background-size: 135% 135%, 115% 115%, 100% 100%;
+  }
+  100% {
+    background-size: 155% 155%, 132% 132%, 100% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #problema .escena::before,
+  #problema .escena::after,
+  #problema,
+  .weather-text > span,
+  .panel--mint,
+  .site-footer {
+    animation: none !important;
+    transition: none !important;
+  }
+}

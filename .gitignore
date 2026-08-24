@@ -10,3 +10,9 @@ dist/
 # Cachés de Python del generador del mapa
 __pycache__/
 *.pyc
+
+# Resultados de las pruebas de navegador
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

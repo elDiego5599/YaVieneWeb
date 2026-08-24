@@ -97,14 +97,25 @@ export class PhoneSimulator {
   private readonly radioAvisoM = 1000;
 
   /**
-   * Un bus urbano va sobre los 40 km/h en corredor. A 12 m/s el número
-   * de la hoja baja de a ~12 metros por segundo: se lee sin marearse.
+   * Ritmo del bus simulado, en metros por segundo. No es una medida: es el
+   * que deja contar la historia entera —el bus se acerca, entra al
+   * kilómetro, dispara el aviso— dentro de un bucle que se mira de pie y
+   * sin querer. A 12 m/s, que era el ritmo real de un bus en corredor, el
+   * número de la hoja tardaba treinta segundos en bajar de 1,1 a 1,0 km:
+   * la pantalla parecía congelada. Es el mismo criterio que ya siguen la
+   * demo de los momentos y el mapa de "pruébalo aquí".
    */
-  private readonly metrosPorSegundo = 12;
+  private readonly metrosPorSegundo = 46;
 
+  /**
+   * A qué distancia por detrás del punto de espera nace cada uno. El
+   * primero nace donde nace para que cruce el kilómetro un segundo y pico
+   * después de que el guion arme el aviso: primero se pulsa el botón y
+   * después llega la notificación, que es el orden que tiene en la app.
+   */
   private readonly buses: EstadoBus[] = [
-    { placa: 'B-042', nace: 1150, ritmo: 1, t: 0 },
-    { placa: 'B-055', nace: 2100, ritmo: 0.78, t: 0 }
+    { placa: 'B-042', nace: 1350, ritmo: 1, t: 0 },
+    { placa: 'B-055', nace: 2250, ritmo: 0.78, t: 0 }
   ];
 
   /**
@@ -270,6 +281,54 @@ export class PhoneSimulator {
     this.relojes.push(window.setTimeout(fn, ms));
   }
 
+  /* ---------- El dedo ---------- */
+
+  /**
+   * Coloca el punto del dedo y lanza la onda. Las coordenadas van en
+   * fracciones de la pantalla, no en píxeles: la razón entre dos cajas no
+   * cambia aunque la escena se esté dibujando encogida, así que no hay que
+   * saber en qué escala está el teléfono para acertar el sitio.
+   */
+  private toqueEn(fx: number, fy: number, sobreClaro = false): void {
+    const nodo = this.el('toque');
+    if (!nodo) return;
+    nodo.style.left = `${fx * 100}%`;
+    nodo.style.top = `${fy * 100}%`;
+    nodo.classList.toggle('phone-toque--tinta', sobreClaro);
+    // Reiniciar la animación pide un reflujo entre quitar y poner la clase.
+    nodo.classList.remove('is-on');
+    void nodo.offsetWidth;
+    nodo.classList.add('is-on');
+  }
+
+  /**
+   * Toca un elemento del mockup: la onda encima y, debajo, el hundido del
+   * InkWell. Es lo que hace que la vista siguiente se lea como respuesta a
+   * un dedo y no como la diapositiva que venía a continuación.
+   */
+  private toqueSobre(nodo: HTMLElement | null | undefined): void {
+    if (!nodo) return;
+    const caja = nodo.getBoundingClientRect();
+    const marco = this.raiz.getBoundingClientRect();
+    if (marco.width === 0 || marco.height === 0) return;
+    this.toqueEn(
+      (caja.left - marco.left + caja.width / 2) / marco.width,
+      (caja.top - marco.top + caja.height / 2) / marco.height,
+      nodo.closest('.phone-sheet') !== null
+    );
+    nodo.classList.add('is-pulsado');
+    this.a(240, () => nodo.classList.remove('is-pulsado'));
+  }
+
+  /** La fila de la ruta que el guion está a punto de elegir. */
+  private filaDeRuta(): HTMLElement | null {
+    return (
+      this.el('route-list')?.querySelector<HTMLElement>(
+        `[data-ruta="${this.rutaActual.id}"]`
+      ) ?? null
+    );
+  }
+
   /* ---------- Superficies de la app ---------- */
 
   /** Píldora de búsqueda: los dos textos de search_pill_bar.dart. */
@@ -353,44 +412,59 @@ export class PhoneSimulator {
     // —`ajustarAlto()` lee `offsetHeight`— y se perdería el desvanecido.
     requestAnimationFrame(() => this.raiz.classList.remove('is-cerrando'));
 
-    // Aparece el punto de espera con su radio "cerca de ti".
-    this.a(1800, () => {
+    // El pasajero toca el mapa y ahí queda el punto de espera con su radio
+    // "cerca de ti". El toque va antes que el pin —240 ms antes— porque es
+    // lo que lo provoca: al revés se leería como que el pin apareció solo.
+    this.a(1300, () => this.toqueEn(this.miraX, this.miraY));
+    this.a(1540, () => {
       this.setChip('manual');
       this.map.showPin(true);
       this.setVacio('sinRuta');
     });
 
-    // El pasajero toca la barra: empresa y después ruta.
-    this.a(4200, () => this.mostrarVista('companies'));
-    this.a(5600, () => {
+    // El pasajero toca la barra: empresa y después ruta. Cada vista va
+    // precedida de su toque, con el mismo cuarto de segundo de por medio.
+    this.a(3100, () => this.toqueSobre(this.el('pill')));
+    this.a(3340, () => this.mostrarVista('companies'));
+
+    this.a(4500, () => this.toqueSobre(this.el('tile-empresa')));
+    this.a(4740, () => {
       this.mostrarVista('routes');
       this.desplazarLista();
     });
 
+    // La lista termina de acomodarse en 560 ms; el dedo llega después, ya
+    // con la fila quieta y a la vista.
+    this.a(6100, () => this.toqueSobre(this.filaDeRuta()));
+
     // Ruta elegida: aparece el trazado, la píldora cambia y entran los buses.
-    this.a(7400, () => {
+    this.a(6360, () => {
       this.map.showRoute(true);
       this.setPildora(this.rutaActual);
       this.enVivo();
     });
 
-    // A mitad del tramo en vivo la hoja se recoge un escalón y vuelve: el
-    // mapa se abre justo cuando los buses ya están rodando.
-    this.a(11800, () => this.setPeek(true));
-    this.a(17200, () => this.setPeek(false));
+    // Con los buses ya rodando la hoja se recoge un escalón y deja ver el
+    // mapa entero, que es lo interesante mientras el número baja.
+    this.a(9200, () => this.setPeek(true));
 
-    this.a(19000, () => {
+    // El pasajero arma el aviso. La hoja vuelve entera justo después, y
+    // para entonces el primer bus está cruzando el kilómetro: el botón se
+    // pulsa, la hoja sube y la notificación sale, en ese orden.
+    this.a(12100, () => this.toqueSobre(this.el('alert-btn')));
+    this.a(12360, () => {
       this.setAviso(true);
       // El detalle sólo aparece con el aviso puesto, igual que en la app:
       // mientras hay distancia y no hay aviso, la hoja no dice nada.
       this.avisoActivo = true;
       this.setDetalle('Puedes cambiar de aplicación; no cierres Ya Viene del todo');
     });
+    this.a(14200, () => this.setPeek(false));
 
     // El ciclo no corta: primero se recoge lo que sobra —el aviso flotante,
     // el detalle— y después la app se disuelve. Cuando vuelve a entrar ya
     // está recolocada, así que no se ve nada saltar.
-    this.a(27000, () => {
+    this.a(21400, () => {
       this.cerrando = true;
       this.escena?.querySelector('[data-escena="notif"]')?.classList.remove('is-on');
       this.setDetalle('');
@@ -398,12 +472,12 @@ export class PhoneSimulator {
       // cada capa se apaga con la transición que ya tenía.
       this.map.showBuses(false);
     });
-    this.a(27600, () => {
+    this.a(22000, () => {
       this.map.showRoute(false);
       this.map.showPin(false);
       this.raiz.classList.add('is-cerrando');
     });
-    this.a(28600, () => this.play());
+    this.a(23000, () => this.play());
   }
 
   /**

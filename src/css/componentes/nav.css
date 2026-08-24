@@ -1,0 +1,351 @@
+/* ── NAV ──────────────────────────────────────────────
+
+   La isla de navegación: el pliegue, el botón que abre y la versión ancha.
+
+   Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
+   Se carga desde ahí y **el orden importa**: hay reglas que se pisan
+   entre secciones a propósito, así que mover este `@import` de sitio
+   cambia lo que se ve. Si haces una regla nueva que no se aplica, mira
+   primero si más abajo en el orden de carga hay otra con la misma
+   especificidad. Es el fallo que más veces ha pasado en esta base.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── Cabecera: la isla de navegación ───────────────────────────────
+
+   La barra es una píldora del azul navy de la marca que en reposo sólo
+   enseña la identidad. Al acercar el puntero, al enfocarla con el teclado
+   o al tocar su botón, se abre en horizontal y saca los enlaces y el CTA;
+   al salir, se cierra sola.
+
+   Aquí no hay `:hover` ni `:focus-within` que abran nada. Los tuvo, y de
+   ahí venía el fallo: al pulsar la ✕ el puntero sigue encima y el foco
+   dentro, así que el CSS la reabría en el mismo fotograma mientras el
+   JavaScript la daba por cerrada; el icono decía una cosa y la píldora
+   otra. Ahora abrir y cerrar es una sola clase, `is-open`, y quien la pone
+   y la quita es nav-island.ts —incluidos el puntero y el foco—. Un solo
+   sitio decide, así que no hay dos estados que puedan discrepar.
+
+   La apertura se anima con `grid-template-columns` de 0fr a 1fr: el menú
+   nunca necesita un ancho fijo, así que cambiar un enlace no obliga a
+   volver a calcular ningún número a mano.
+   ───────────────────────────────────────────────────────────────────── */
+
+.site-header {
+  position: sticky;
+  top: var(--gutter);
+  z-index: 100;
+  margin: var(--gutter) auto 0;
+  width: calc(100% - var(--gutter) * 2);
+  max-width: var(--content-max);
+  display: flex;
+  justify-content: center;
+  /* La cabecera ocupa todo el ancho pero sólo la píldora recibe el
+     puntero: lo que quede a los lados sigue siendo la página. */
+  pointer-events: none;
+}
+
+.nav-island {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 16px;
+  border-radius: 999px;
+  background: linear-gradient(152deg, #1D3565 0%, var(--navy) 46%, #0D1B38 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 16px 36px -14px rgba(6, 13, 31, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  transition:
+    box-shadow var(--transition-smooth),
+    transform var(--transition-smooth);
+}
+
+.nav-island.is-open {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 26px 54px -16px rgba(6, 13, 31, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.nav-island-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  color: var(--text-white);
+}
+
+.nav-island-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px -3px var(--green-glow);
+}
+
+/* ── El pliegue ────────────────────────────────────────────────────── */
+
+/* En móvil el menú no cabe al lado de la marca: se despliega como un
+   panel debajo de la píldora, con el mismo azul. */
+.nav-island-reveal {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  padding: 10px;
+  border-radius: 24px;
+  background: linear-gradient(160deg, #1D3565 0%, var(--navy) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 48px -18px rgba(6, 13, 31, 0.7);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.97);
+  transform-origin: 50% 0;
+  transition:
+    opacity var(--transition-normal),
+    transform 0.45s var(--ease-spring),
+    visibility 0s linear 0.3s;
+}
+
+.nav-island.is-open > .nav-island-reveal {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  transition-delay: 0s;
+}
+
+.nav-island-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-island-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/*
+  El enlace no cambia de fondo de golpe: el fondo es un pseudo-elemento que
+  crece desde el 80 % hasta su tamaño. Un rectángulo que se enciende y se
+  apaga es un cambio de color; uno que se abre es un gesto, y es lo que
+  separa una barra normal de una que se siente cara.
+*/
+.nav-link {
+  position: relative;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-white-dim);
+  transition: color var(--transition-fast);
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.12);
+  opacity: 0;
+  transform: scale(0.8);
+  transition:
+    opacity 0.22s var(--ease-out-cubic),
+    transform 0.34s var(--ease-spring);
+}
+
+.nav-link:hover,
+.nav-link:focus-visible {
+  color: var(--text-white);
+}
+
+.nav-link:hover::before,
+.nav-link:focus-visible::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.nav-island-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: var(--green);
+  color: var(--text-white);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  /* El brillo interior de arriba es lo que hace que un botón lleno se lea
+     como una pieza física y no como un rectángulo de color. */
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    0 8px 20px -8px var(--green-glow);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+/*
+  El hover no levanta el botón. Levantarlo lo sacaba de su hueco: entre el
+  CTA y el borde de la píldora hay 8 px, y un desplazamiento de 1 px con
+  una sombra de 26 px de difuminado la cruzaba por abajo y se veía el verde
+  chorreando fuera del navy. Aquí el brillo se queda dentro: el fondo sube
+  medio tono y el filo de arriba se abre. Es el botón el que se enciende,
+  no la píldora la que se mancha.
+*/
+.nav-island-cta:hover,
+.nav-island-cta:focus-visible {
+  /* Sin verde nuevo: el mismo #00A859 con un velo de blanco encima. */
+  background-image: linear-gradient(rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
+  box-shadow:
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 6px 14px -8px var(--green-glow);
+}
+
+/* ── El botón que abre y cierra ────────────────────────────────────── */
+
+.nav-island-toggle {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    transform 0.28s var(--ease-spring);
+}
+
+.nav-island-toggle:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.06);
+}
+
+.nav-island-toggle:active {
+  transform: scale(0.94);
+}
+
+.nav-island-toggle:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+
+/* Dos trazos que se cruzan al abrir: sin íconos de más, es el mismo
+   elemento cambiando de forma. */
+.nav-island-grip,
+.nav-island-grip::before {
+  content: '';
+  display: block;
+  width: 15px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--text-white);
+  transition: transform 0.4s var(--ease-spring);
+}
+
+.nav-island-grip {
+  position: relative;
+  transform: translateY(-3px);
+}
+
+.nav-island-grip::before {
+  position: absolute;
+  top: 6px;
+  left: 0;
+}
+
+.nav-island.is-open .nav-island-grip {
+  transform: translateY(0) rotate(45deg);
+}
+
+.nav-island.is-open .nav-island-grip::before {
+  transform: translateY(-6px) rotate(-90deg);
+}
+
+/* ── En pantalla ancha: se despliega en horizontal ─────────────────── */
+
+@media (min-width: 880px) {
+  .nav-island-reveal {
+    position: static;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    /* El pliegue: de 0fr a 1fr, con el contenido recortado mientras dura. */
+    display: grid;
+    grid-template-columns: 0fr;
+    transition: grid-template-columns 0.55s var(--ease-out-cubic);
+  }
+
+  .nav-island.is-open > .nav-island-reveal {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-island-inner {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
+    padding-left: 6px;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease-out-cubic);
+  }
+
+  .nav-island.is-open .nav-island-inner {
+    opacity: 1;
+    transition-delay: 0.12s;
+  }
+
+  .nav-island-links {
+    flex-direction: row;
+    gap: 2px;
+  }
+
+  /* Con puntero el despliegue es el hover: el botón se queda como pista
+     visual de que la píldora se abre, y sigue funcionando al tocarlo. */
+  .nav-island.is-open .nav-island-grip {
+    transform: translateY(0) rotate(45deg);
+  }
+}
+
+/* Sin animación: la isla se queda abierta y no se mueve nada. */
+@media (prefers-reduced-motion: reduce) {
+  .nav-island-reveal,
+  .nav-island-inner,
+  .nav-island-grip,
+  .nav-island-grip::before {
+    transition: none;
+  }
+
+  .nav-island-reveal {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  .nav-island-toggle {
+    display: none;
+  }
+
+  @media (min-width: 880px) {
+    .nav-island-reveal {
+      grid-template-columns: 1fr;
+    }
+
+    .nav-island-inner {
+      opacity: 1;
+    }
+  }
+}

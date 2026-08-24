@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esta dirección no existe — Ya Viene</title>
+  <meta name="description" content="La dirección que pediste no está en Ya Viene. Aquí está lo que sí existe." />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#0B1628" />
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+
+    <!--
+      Las dos familias ya no vienen de Google: viven en `src/assets/fonts/` y
+      se declaran en `src/css/fonts.css`. Se precargan aquí porque el <head>
+      es lo primero que lee el navegador; si esperásemos a que el CSS las
+      descubriera, el texto parpadearía con la fuente de sistema. `crossorigin`
+      es obligatorio aunque el fichero sea propio: las fuentes siempre se piden
+      en modo anónimo y sin él la precarga se descarta y se descarga dos veces.
+    -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="./src/assets/fonts/plus-jakarta-sans-latin.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="./src/assets/fonts/bricolage-grotesque-latin.woff2" />
+
+  <script type="module" src="/src/hoja.ts"></script>
+</head>
+
+<!--
+  El 404 de una app que sabe decir «no sé».
+
+  Cuando un bus lleva cinco minutos sin reportar, la app no enseña su
+  última posición como si fuera la de ahora: lo apaga al gris de
+  `bus_marker.dart` y dice que no sabe. Esta página es esa misma regla
+  aplicada a una dirección que no existe —de ahí el gris del número y de
+  ahí el texto—, y por eso no hay mapa de adorno ni ruta inventada: no
+  habría nada de verdad que dibujar.
+-->
+
+<body class="err-body">
+
+  <!-- Primer tabulador de la página: manda directo al contenido y se
+       salta la navegación. Vive fuera de cuadro hasta que recibe el
+       foco, así que con el ratón no se ve nunca. -->
+  <a class="saltar-al-contenido" href="#contenido">Saltar al contenido</a>
+
+  <header class="err-top">
+    <a class="err-marca" href="/">
+      <img src="/logo.svg" alt="" width="30" height="30" />
+      <span>YA VIENE</span>
+    </a>
+    <a class="err-volver" href="/">Volver a la página</a>
+  </header>
+
+  <main id="contenido" class="err-hoja">
+    <p class="err-codigo" aria-hidden="true">404</p>
+    <h1>No sabemos dónde está esta página.</h1>
+    <p class="err-entrada">Cuando un bus lleva cinco minutos sin reportar, la app no te
+      enseña su última posición como si fuera la de ahora: lo marca <em>sin señal</em> y
+      te dice que no sabe. Con las direcciones hacemos lo mismo.</p>
+
+    <p class="err-pedida">
+      <span class="err-pedida-rotulo">Dirección pedida</span>
+      <code data-ruta-pedida>—</code>
+    </p>
+
+    <nav class="err-indice" aria-label="Lo que sí existe">
+      <span class="err-indice-rotulo">Lo que sí existe</span>
+
+      <a class="err-fila" href="/#mapa">
+        <strong>El mapa en vivo</strong>
+        <span>Las seis rutas de Sobusa, para tocarlas</span>
+      </a>
+      <a class="err-fila" href="/#solucion">
+        <strong>Cómo funciona la app</strong>
+        <span>El punto de espera, la ruta y el aviso</span>
+      </a>
+      <a class="err-fila" href="/#empresas">
+        <strong>Para empresas de transporte</strong>
+        <span>Conectar una flota sin comprar equipos</span>
+      </a>
+      <a class="err-fila" href="/privacidad.html">
+        <strong>Privacidad</strong>
+        <span>Qué se guarda y qué no sale de tu teléfono</span>
+      </a>
+    </nav>
+  </main>
+
+  <footer class="err-pie">
+    <span>Ya Viene · Barranquilla</span>
+    <a href="https://wa.me/573004438626" target="_blank" rel="noopener">Escribirnos por WhatsApp</a>
+  </footer>
+
+  <script type="module">
+    /*
+      La dirección que falló es un dato de verdad y ayuda a saber si el
+      enlace venía mal escrito. Va por `textContent`, nunca por `innerHTML`:
+      lo que hay en la barra lo escribe cualquiera.
+    */
+    const hueco = document.querySelector('[data-ruta-pedida]');
+    if (hueco) hueco.textContent = location.pathname + location.search;
+  </script>
+</body>
+
+</html>

@@ -18,6 +18,7 @@
  * matriz cambia al hacer scroll, los marcadores se iban a la deriva.
  */
 
+import { encajeDe } from './encaje';
 import { YV_RUTAS } from './data/rutas-landing';
 import type { MapaBase, Punto, RutaLanding } from './types';
 
@@ -172,12 +173,26 @@ export class PhoneMap {
   /* ---------- Escala ---------- */
 
   /**
+   * Lo que mide el mapa en píxeles propios, no en los de la pantalla.
+   *
+   * Los dos son lo mismo salvo cuando la escena va encogida para caber
+   * en la ventana; entonces el rectángulo viene ya reducido y hay que
+   * deshacerlo, o el bus y el pin —que se dibujan en píxeles del
+   * teléfono— saldrían del tamaño que tendrían sin encoger.
+   */
+  private caja(): { width: number; height: number } {
+    const rect = this.host.getBoundingClientRect();
+    const k = encajeDe(this.host);
+    return { width: rect.width / k, height: rect.height / k };
+  }
+
+  /**
    * Cuántas unidades del mosaico ocupa un píxel de pantalla. Con
    * `slice` el SVG se escala por el lado que más aumento necesita, así
    * que manda el menor de los dos cocientes.
    */
   private medir(): void {
-    const rect = this.host.getBoundingClientRect();
+    const rect = this.caja();
     if (rect.width > 0 && rect.height > 0) {
       this.unitsPerPx = Math.min(this.lienzo.w / rect.width, this.lienzo.h / rect.height);
     }
@@ -279,7 +294,7 @@ export class PhoneMap {
    * queda el otro fuera de cuadro.
    */
   tVisible(fx: number, fy: number, atras: number[] = [], muestras = 360): number {
-    const rect = this.host.getBoundingClientRect();
+    const rect = this.caja();
     if (!this.largo || rect.width === 0 || rect.height === 0) return 0.5;
 
     // De fracción de pantalla a unidades del mosaico. Con `slice` el
@@ -352,8 +367,10 @@ export class PhoneMap {
     this.busTs = ts;
     while (this.busNodes.length < ts.length) {
       const node = PhoneMap.makeBus();
-      // Debajo del pin: el pin es del usuario y manda.
-      this.markersEl.insertBefore(node, this.pinNode);
+      // Encima del pin. El pin es del usuario, pero es un punto quieto y
+      // el bus es la noticia: debajo, el disco del pin se lo comía justo
+      // en el momento en que hay que verlo llegar.
+      this.markersEl.appendChild(node);
       this.busNodes.push(node);
     }
     this.busNodes.forEach((node, i) => {

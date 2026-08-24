@@ -1,0 +1,378 @@
+/* ── MAPA ──────────────────────────────────────────────
+
+   El mapa en vivo: lienzo, rutas, lectura y aviso.
+
+   Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
+   Se carga desde ahí y **el orden importa**: hay reglas que se pisan
+   entre secciones a propósito, así que mover este `@import` de sitio
+   cambia lo que se ve. Si haces una regla nueva que no se aplica, mira
+   primero si más abajo en el orden de carga hay otra con la misma
+   especificidad. Es el fallo que más veces ha pasado en esta base.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ══════════════════════════════════════════════════════════════════════
+   EL MAPA, EN VIVO
+   ══════════════════════════════════════════════════════════════════════
+   La única parte de la página que se toca. Va sobre tinta porque el
+   mosaico de Barranquilla es claro: puesto sobre oscuro deja de parecer
+   una ilustración de fondo y pasa a parecer lo que es, una pantalla
+   encendida.
+
+   Tres columnas: las rutas a la izquierda, el mapa en el centro y la
+   lectura a la derecha. El mapa manda —conserva la proporción del
+   mosaico, 1284×1982, para no recortar ninguna terminal— y las dos
+   columnas se le acomodan. */
+.mapa-inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 3.4vw, 52px);
+}
+
+.mapa-cabecera {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 46ch;
+}
+
+.mapa-tablero {
+  display: grid;
+  gap: clamp(18px, 2vw, 32px);
+  justify-content: center;
+  align-items: start;
+}
+
+@media (min-width: 1060px) {
+  .mapa-tablero {
+    grid-template-columns: minmax(230px, 290px) auto minmax(250px, 320px);
+  }
+}
+
+.mapa-columna {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.mapa-rotulo {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── El lienzo ── */
+.mapa-lienzo {
+  position: relative;
+  /* La proporción del mosaico, para que quepa la ciudad entera. */
+  aspect-ratio: 1284 / 1982;
+  height: clamp(420px, 74vh, 720px);
+  border-radius: 26px;
+  overflow: hidden;
+  background: #EDE7DE;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.7);
+}
+
+.mapa-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: manipulation;
+}
+
+/* Los trazos van en píxeles de pantalla, no en unidades del mosaico: así
+   la ruta se ve del mismo grosor con el mapa grande y con el mapa
+   pequeño, que es como se dibuja un mapa de verdad. */
+.mv-casing,
+.mv-activa {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.mv-casing {
+  stroke: #FFFFFF;
+  stroke-width: 7;
+  stroke-opacity: 0.95;
+}
+
+.mv-activa {
+  stroke: var(--green);
+  stroke-width: 3.4;
+}
+
+.mv-terminales circle {
+  fill: #FFFFFF;
+  stroke: var(--green);
+  stroke-width: 2.6;
+  vector-effect: non-scaling-stroke;
+}
+
+/* El kilómetro del aviso, dibujado a escala real sobre el mapa. */
+.mv-radio {
+  fill: rgba(0, 168, 89, 0.1);
+  stroke: rgba(0, 168, 89, 0.55);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 5;
+  vector-effect: non-scaling-stroke;
+  transition: r 0.25s var(--ease-out-cubic);
+}
+
+.mv-bus,
+.mv-pin {
+  pointer-events: none;
+}
+
+.mv-pin {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.28));
+}
+
+.mapa-toque {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  padding: 7px 15px;
+  border-radius: 999px;
+  background: rgba(11, 22, 40, 0.82);
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease-out-cubic);
+}
+
+/* En cuanto el visitante toca, la instrucción sobra. */
+.mapa-tablero.es-tocado .mapa-toque {
+  opacity: 0;
+}
+
+.mapa-credito {
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  font-size: 9.5px;
+  letter-spacing: 0.02em;
+  color: rgba(15, 23, 42, 0.55);
+  pointer-events: none;
+}
+
+/* ── Las rutas ── */
+.mv-rutas {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.mv-ruta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 10px;
+  padding: 11px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.72);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.mv-ruta:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+}
+
+.mv-ruta[aria-pressed='true'] {
+  background: rgba(0, 168, 89, 0.16);
+  border-color: rgba(0, 168, 89, 0.55);
+  color: #FFFFFF;
+}
+
+.mv-ruta-nombre {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.mv-ruta-km {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.mv-ruta[aria-pressed='true'] .mv-ruta-km {
+  color: var(--green);
+}
+
+.mv-ruta-datos {
+  grid-column: 1 / -1;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+/* ── La lectura ── */
+.mapa-lectura {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 18px 20px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  transition: border-color var(--transition-normal), background var(--transition-normal);
+}
+
+.mapa-lectura.es-cerca {
+  border-color: rgba(0, 168, 89, 0.5);
+  background: rgba(0, 168, 89, 0.1);
+}
+
+.mapa-lectura .mapa-rotulo {
+  margin-bottom: 6px;
+}
+
+.mapa-lectura-bus {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* Del mismo corte que el número grande de la app. */
+.mapa-lectura-metros {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 3.6vw, 54px);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: #FFFFFF;
+  transition: color var(--transition-normal);
+}
+
+.mapa-lectura.es-cerca .mapa-lectura-metros {
+  color: #4ADE80;
+}
+
+.mapa-lectura-pie {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+/* ── El aviso ──
+   La misma notificación que sale en el teléfono, con las dos líneas que
+   arma la app. Aparece cuando un bus entra en el kilómetro y se queda. */
+.mapa-aviso {
+  display: flex;
+  gap: 11px;
+  padding: 13px 15px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 34px -18px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  transform: translateY(-10px) scale(0.97);
+  visibility: hidden;
+  transition:
+    opacity 0.35s var(--ease-out-cubic),
+    transform 0.45s var(--ease-spring),
+    visibility 0.35s;
+}
+
+.mapa-aviso.is-on {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+}
+
+.mapa-aviso-icono {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--green-tint);
+}
+
+.mapa-aviso-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mapa-aviso-app {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-text-secondary);
+}
+
+.mapa-aviso-titulo {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--app-text-primary);
+}
+
+.mapa-aviso-cuerpo {
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--app-text-secondary);
+}
+
+.mapa-honesto {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.mapa-honesto strong {
+  display: block;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+@media (max-width: 1059px) {
+  /* Apilado manda el mapa primero: es lo que hay que tocar. */
+  .mapa-lienzo {
+    height: min(72vh, 560px);
+    justify-self: center;
+  }
+
+  .mapa-columna--rutas {
+    order: 3;
+  }
+
+  .mv-rutas {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+  }
+
+  .mv-rutas::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mv-ruta {
+    flex: 0 0 auto;
+    width: 210px;
+  }
+}

@@ -1,0 +1,70 @@
+/* ── BOTONES ──────────────────────────────────────────────
+
+   Los botones. Se usan en toda la página, no sólo aquí al lado.
+
+   Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
+   Se carga desde ahí y **el orden importa**: hay reglas que se pisan
+   entre secciones a propósito, así que mover este `@import` de sitio
+   cambia lo que se ve. Si haces una regla nueva que no se aplica, mira
+   primero si más abajo en el orden de carga hay otra con la misma
+   especificidad. Es el fallo que más veces ha pasado en esta base.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── Botones ───────────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--text-white);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  /* La línea de luz de arriba es lo que hace que un botón lleno se lea como
+     una pieza física y no como un rectángulo de color. */
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), var(--shadow-md);
+}
+
+.btn-green {
+  background: var(--green);
+  padding: 16px 30px;
+  font-size: 15px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 12px 26px -10px var(--green-glow);
+}
+
+.btn-green:hover {
+  background: var(--green-accessible);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 18px 34px -10px var(--green-glow);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 28px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(11, 22, 40, 0.16);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn-outline:hover {
+  border-color: rgba(11, 22, 40, 0.32);
+  background: var(--surface);
+  transform: translateY(-2px);
+}

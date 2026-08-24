@@ -1,0 +1,219 @@
+/* ── PIE ──────────────────────────────────────────────
+
+   El pie de página y su llamada final.
+
+   Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
+   Se carga desde ahí y **el orden importa**: hay reglas que se pisan
+   entre secciones a propósito, así que mover este `@import` de sitio
+   cambia lo que se ve. Si haces una regla nueva que no se aplica, mira
+   primero si más abajo en el orden de carga hay otra con la misma
+   especificidad. Es el fallo que más veces ha pasado en esta base.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── Pie ─────────────────────────────────────────────────────────────
+   Un cierre con la energía de la marca: CTA grande arriba y la información
+   útil debajo, sin repetir el botón de WhatsApp de la sección empresarial. */
+.site-footer {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin: 0;
+  padding: clamp(58px, 8vw, 112px) clamp(24px, 5vw, 78px) 24px;
+  border: 0;
+  border-radius: 0;
+  background:
+    radial-gradient(640px circle at 50% 112%, rgba(255, 193, 7, 0.38), transparent 64%),
+    radial-gradient(980px circle at 50% 122%, rgba(232, 106, 94, 0.52), transparent 68%),
+    linear-gradient(180deg, #FFFDF8 0%, #FFF5EC 48%, #FBE7E4 100%);
+  background-size: 135% 135%, 115% 115%, 100% 100%;
+  background-position: 50% 100%, 50% 100%, 50% 50%;
+  animation: footer-gradient-respiro 10s ease-in-out infinite alternate;
+  color: var(--text-primary);
+}
+
+.site-footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.28;
+  background-image: radial-gradient(rgba(11, 22, 40, 0.16) 1px, transparent 1px);
+  background-size: 18px 18px;
+  mask-image: linear-gradient(90deg, transparent, black 16%, black 84%, transparent);
+}
+
+.footer-cta,
+.footer-grid,
+.footer-bottom {
+  position: relative;
+  z-index: 1;
+  max-width: var(--content-max);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.footer-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  text-align: center;
+}
+
+.footer-cta h2 {
+  max-width: 12ch;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 7vw, 7.4rem);
+  font-weight: 800;
+  line-height: 0.88;
+  letter-spacing: -0.065em;
+}
+
+.footer-cta > p:not(.footer-cta-note) {
+  max-width: 56ch;
+  color: var(--text-secondary);
+  font-size: clamp(17px, 1.45vw, 22px);
+  line-height: 1.45;
+}
+
+.footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.footer-actions .btn-outline {
+  border-color: rgba(11, 22, 40, 0.2);
+  background: rgba(255, 255, 255, 0.48);
+  color: var(--text-primary);
+}
+
+.footer-actions .btn-outline:hover {
+  border-color: rgba(11, 22, 40, 0.38);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.footer-cta-note {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.footer-grid {
+  display: grid;
+  gap: 42px;
+  margin-top: clamp(74px, 10vw, 142px);
+  padding-top: 34px;
+  border-top: 1px solid rgba(11, 22, 40, 0.14);
+}
+
+.footer-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 11px;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.footer-brand img {
+  border-radius: 50%;
+  box-shadow: 0 8px 18px -7px var(--green-glow);
+}
+
+.footer-intro p,
+.footer-status p {
+  color: var(--text-secondary);
+  font-size: var(--step-body);
+  line-height: 1.55;
+}
+
+.footer-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+}
+
+.footer-nav-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 11px;
+}
+
+.footer-nav-group > span,
+.footer-status > span {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.footer-nav a,
+.footer-legal-links a {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.footer-nav a:hover,
+.footer-nav a:focus-visible,
+.footer-legal-links a:hover,
+.footer-legal-links a:focus-visible {
+  color: var(--text-primary);
+  transform: translateX(2px);
+}
+
+.footer-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding-left: 24px;
+  border-left: 1px solid rgba(11, 22, 40, 0.14);
+}
+
+.footer-status strong {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.5vw, 34px);
+  letter-spacing: -0.04em;
+}
+
+.footer-status p {
+  max-width: 22ch;
+  font-size: 14px;
+}
+
+.footer-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 54px;
+  padding-top: 19px;
+  border-top: 1px solid rgba(11, 22, 40, 0.14);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.footer-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.footer-legal-links a {
+  font-size: 12px;
+}
