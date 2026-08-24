@@ -33,14 +33,15 @@
 /* ── Las dos columnas ──────────────────────────────────────────────── */
 
 /*
-  Explicación y formulario, uno al lado del otro. `start` y no `center`:
-  las dos columnas miden distinto y alineadas por el centro la ficha
-  quedaba flotando media pantalla más abajo que su titular.
+  Explicación y formulario, uno al lado del otro. El formulario es más
+  corto que la ficha, así que va centrado contra ella: pegado arriba
+  dejaba un hueco largo debajo y la pantalla se veía descolgada por la
+  derecha. En una columna —el móvil— el centrado no pinta nada.
 */
 .empresa-consulta {
   display: grid;
   gap: clamp(28px, 4vw, 60px);
-  align-items: start;
+  align-items: center;
 }
 
 @media (min-width: 1000px) {
@@ -51,16 +52,18 @@
 
 /* ── La columna de la izquierda ────────────────────────────────────── */
 
-/* Arena, el fondo de la app, sobre el papel del panel: la ficha se lee
-   como una pieza de producto y no como otro párrafo de la página. */
+/* La única pieza con marco de la página, ahora que la sección va a sangre
+   y no hay panel debajo. Blanca sobre la crema del fondo, con el reparto de
+   la propia app: superficie blanca fuera, arena dentro del producto. */
 .empresa-ficha {
   display: flex;
   flex-direction: column;
   gap: 22px;
   padding: clamp(22px, 2.6vw, 36px);
   border-radius: clamp(22px, 2.4vw, 32px);
-  background: var(--arena);
-  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  box-shadow: 0 30px 70px -50px rgba(11, 22, 40, 0.55);
 }
 
 .empresa-ficha h2 {
@@ -109,27 +112,6 @@
   color: var(--text-primary);
 }
 
-.empresa-piloto {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-top: 18px;
-  border-top: 1px solid var(--divider);
-}
-
-.empresa-piloto span {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  color: var(--text-muted);
-}
-
-.empresa-piloto strong {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
 /* ── El panel de control, en pequeño ───────────────────────────────── */
 
 /*
@@ -144,7 +126,7 @@
 */
 .consola {
   border-radius: 16px;
-  background: var(--surface);
+  background: var(--arena);
   border: 1px solid var(--divider);
   box-shadow: 0 18px 40px -30px rgba(11, 22, 40, 0.5);
   overflow: hidden;
@@ -206,6 +188,7 @@
 
 .consola-flota li {
   display: grid;
+  background: var(--surface);
   grid-template-columns: 8px minmax(0, auto) minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
@@ -403,7 +386,9 @@
   font-weight: 700;
 }
 
-/* La salida de siempre para el que no quiere llenar un formulario. */
+/* La salida de siempre para el que no quiere llenar un formulario. Vive al
+   pie de la ficha, donde antes iba el rótulo del piloto: quien lee la
+   explicación y no quiere formulario tiene ahí mismo por dónde escribir. */
 .whatsapp-btn {
   align-self: flex-start;
   display: inline-flex;
