@@ -1340,7 +1340,12 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
-/* La hoja blanca de abajo. */
+/*
+  La hoja de abajo. Va en arena, la misma superficie que el selector de ruta
+  y la hoja de distancia: los tres teléfonos del hero se ven de una sola vez
+  y con esta en blanco parecían dos productos distintos. El cambio está
+  también en login_screen.dart, así que el espejo sigue siendo fiel.
+*/
 .login-hoja {
   position: relative;
   z-index: 1;
@@ -1349,7 +1354,7 @@
   flex-direction: column;
   align-items: stretch;
   padding: calc(28 * var(--u)) calc(28 * var(--u)) calc(30 * var(--u));
-  background: #FFFFFF;
+  background: var(--arena);
   border-radius: calc(36 * var(--u)) calc(36 * var(--u)) 0 0;
   box-shadow: 0 calc(-10 * var(--u)) calc(32 * var(--u)) rgba(20, 39, 78, 0.1);
 }
