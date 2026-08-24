@@ -30,6 +30,7 @@ import { PhoneSimulator } from './phone-simulator';
 import { ProblemWeather } from './problem-weather';
 import { Reloj } from './reloj';
 import { saltosDeMenu } from './salto';
+import { encenderScrollSuave } from './scroll-suave';
 import { ScrollEffects } from './scroll-effects';
 import { sinMovimiento } from './scrolly';
 
@@ -129,22 +130,9 @@ const arrancar = (): void => {
   }
 };
 
-/*
-  El scroll suave se enciende al final, cuando ya no queda nada por
-  colocar. Mientras la página se monta, el alto del documento todavía
-  cambia, y el navegador puede tener que corregir la posición que
-  restauró al recargar: sin esta espera esa corrección se veía como un
-  viaje al fondo y una subida de un segundo. El porqué largo está en
-  base.css, junto a la regla.
-*/
-const encenderScrollSuave = (): void => {
-  requestAnimationFrame(() => {
-    document.documentElement.classList.add('scroll-suave');
-  });
-};
-
-if (document.readyState === 'complete') encenderScrollSuave();
-else window.addEventListener('load', encenderScrollSuave, { once: true });
+// El scroll suave se enciende al final, cuando ya no queda nada por
+// colocar. El porqué está en scroll-suave.ts y en base.css.
+encenderScrollSuave();
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', arrancar, { once: true });

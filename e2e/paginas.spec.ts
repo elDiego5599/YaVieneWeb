@@ -7,6 +7,7 @@ import { test, expect, type Page, type ConsoleMessage } from '@playwright/test';
 
 const PAGINAS = [
   { ruta: '/', nombre: 'portada' },
+  { ruta: '/empresas.html', nombre: 'empresas' },
   { ruta: '/privacidad.html', nombre: 'privacidad' },
   { ruta: '/terminos.html', nombre: 'términos' },
   { ruta: '/404.html', nombre: 'error 404' },

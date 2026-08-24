@@ -52,10 +52,6 @@
   color: var(--green-accessible);
 }
 
-#empresas .companies-info p {
-  color: var(--text-secondary);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .stats-panel,
   #solucion {

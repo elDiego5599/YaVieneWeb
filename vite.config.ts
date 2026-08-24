@@ -14,7 +14,7 @@ import { defineConfig, type Plugin } from 'vite';
   rutas relativas es inválido para el protocolo, y un `robots.txt` que
   apunta a un sitemap que no resuelve es peor que no tenerlo.
 */
-const PAGINAS = ['/', '/privacidad.html', '/terminos.html'];
+const PAGINAS = ['/', '/empresas.html', '/privacidad.html', '/terminos.html'];
 
 function seoDeRaiz(): Plugin {
   let sitio = '';
@@ -22,6 +22,28 @@ function seoDeRaiz(): Plugin {
   return {
     name: 'yaviene-seo-raiz',
     apply: 'build',
+
+    /*
+      El canonical no se escribe en el HTML con `%VITE_SITE_URL%`, se escribe
+      aquí. Motivo: Vite trata el `href` de un `<link>` como un recurso, y con
+      la variable vacía `%VITE_SITE_URL%/empresas.html` queda en la ruta
+      relativa `/empresas.html` — que existe —, así que la copia a /assets con
+      hash y apunta la etiqueta a la copia. Escrito desde el plugin, o es una
+      URL absoluta (que Vite no toca) o no está: un canonical sin dominio no
+      le sirve a nadie.
+    */
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html, ctx) {
+        const ruta = ctx.path === '/index.html' ? '/' : ctx.path;
+        const etiqueta = /[^\S\n]*<link rel="canonical"[^>]*>\n?/;
+        if (!etiqueta.test(html)) return html;
+        return html.replace(
+          etiqueta,
+          sitio ? `  <link rel="canonical" href="${sitio}${ruta}" />\n` : ''
+        );
+      }
+    },
 
     configResolved(config) {
       // `config.env` ya trae las VITE_* cargadas del `.env`, así que no hace
@@ -33,7 +55,7 @@ function seoDeRaiz(): Plugin {
       if (!sitio) {
         this.warn(
           'VITE_SITE_URL está vacía: no se generan robots.txt ni sitemap.xml, ' +
-            'y las etiquetas og:/canonical quedan en rutas relativas. ' +
+            'las etiquetas og: quedan en rutas relativas y el canonical no se escribe. ' +
             'Rellénala en .env antes de publicar.'
         );
         return;
@@ -78,6 +100,9 @@ export default defineConfig({
   // Los tests de humo montan el formulario real: necesitan un DOM.
   test: {
     environment: 'happy-dom',
+    // Sólo los de humo: e2e/ es de Playwright y Vitest se atraganta con su
+    // `test.describe` al recogerlo.
+    include: ['tests/**/*.test.ts'],
   },
   build: {
     outDir: 'dist',
@@ -90,9 +115,10 @@ export default defineConfig({
       // pie apuntan a documentos de verdad, y si no se declaran aquí el
       // empaquetador sólo construye la portada.
       // Rutas relativas a la raíz del proyecto: así no hace falta
-      // arrastrar los tipos de Node sólo para resolver tres nombres.
+      // arrastrar los tipos de Node sólo para resolver unos nombres.
       input: {
         index: 'index.html',
+        empresas: 'empresas.html',
         404: '404.html',
         privacidad: 'privacidad.html',
         terminos: 'terminos.html'

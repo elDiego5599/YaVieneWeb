@@ -1,0 +1,331 @@
+/* ── EMPRESAS (PÁGINA) ─────────────────────────────────────
+
+   La página `/empresas.html`: la que se abre cuando una empresa de
+   transporte quiere saber qué tiene que hacer para que sus buses salgan
+   en el mapa. La portada sólo deja el aviso y el enlace.
+
+   Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
+   Se carga desde ahí y **el orden importa**: hay reglas que se pisan
+   entre secciones a propósito, así que mover este `@import` de sitio
+   cambia lo que se ve. Si haces una regla nueva que no se aplica, mira
+   primero si más abajo en el orden de carga hay otra con la misma
+   especificidad. Es el fallo que más veces ha pasado en esta base.
+
+   Nada de aquí cuelga de un `#id`: la portada y esta página comparten
+   la llamada final y las dos tienen que poder usar las mismas clases.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── El menú, estando ya en la página ──────────────────────────────── */
+
+/*
+  El enlace que apunta a donde ya estás. `aria-current` no es decorativo:
+  es lo que dice el lector de pantalla, y aquí sólo se le añade lo que ve
+  el que mira. Reutiliza el fondo del `:hover` a menos opacidad, así que
+  al pasar el puntero por encima sigue notándose la diferencia.
+*/
+.nav-link[aria-current='page'] {
+  color: var(--text-white);
+}
+
+.nav-link[aria-current='page']::before {
+  opacity: 1;
+  transform: scale(1);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* ── Apertura ──────────────────────────────────────────────────────── */
+
+.empresa-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  text-align: center;
+}
+
+.empresa-hero h1 {
+  font-family: var(--font-display);
+  font-size: var(--step-h2);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  max-width: 20ch;
+}
+
+.empresa-hero-lead {
+  font-size: var(--step-lead);
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-width: var(--measure);
+}
+
+.empresa-nota {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.empresa-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+/*
+  Las tres cifras de debajo del titular. Son datos del código de la app
+  del conductor, no adornos: el intervalo del GPS, el tamaño del búfer y
+  la espera del ACK. Van en dígitos tabulares porque en tres columnas los
+  números tienen que empezar a la misma altura.
+*/
+.empresa-hechos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+  gap: 14px;
+  width: 100%;
+  max-width: 900px;
+  margin-top: 10px;
+}
+
+.empresa-hecho {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 22px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--border-subtle);
+  text-align: left;
+}
+
+.empresa-hecho dt {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--green-accessible);
+}
+
+.empresa-hecho dd {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+/* ── Los tres momentos del turno ───────────────────────────────────── */
+
+/*
+  Aquí la numeración sí dice algo: el conductor abre turno, transmite y
+  cierra turno, y no hay forma de hacerlo en otro orden. Si algún día
+  estas tarjetas dejan de ser una secuencia, el número se cae con ellas.
+*/
+.empresa-pasos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 18px;
+  counter-reset: paso;
+}
+
+.empresa-paso {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: clamp(24px, 2.4vw, 32px);
+  border-radius: 24px;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  box-shadow: 0 22px 50px -34px rgba(11, 22, 40, 0.34);
+}
+
+.empresa-paso::before {
+  counter-increment: paso;
+  content: counter(paso);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--green-tint);
+  color: var(--green-accessible);
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.empresa-paso h3 {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.empresa-paso p {
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* ── Las dos aplicaciones, sobre tinta ─────────────────────────────── */
+
+.empresa-apps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 18px;
+}
+
+.empresa-app {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: clamp(26px, 2.6vw, 36px);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+}
+
+.empresa-app h3 {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.empresa-app > p {
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--text-white-dim);
+}
+
+.empresa-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  list-style: none;
+}
+
+.empresa-lista li {
+  position: relative;
+  padding-left: 26px;
+  font-size: var(--step-body);
+  line-height: 1.5;
+  color: var(--text-white-dim);
+}
+
+/* La marca de la lista es tipografía, no un icono: un `•` con color de
+   marca pesa lo justo y no añade una petición ni un SVG más al HTML. */
+.empresa-lista li::before {
+  content: '▸';
+  position: absolute;
+  left: 4px;
+  top: 0;
+  color: var(--green);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* El texto literal que sale en la pantalla de la app. Hereda el color del
+   panel en el que esté —tinta o papel— y sólo sube de peso: lo que lo
+   separa de lo que contamos nosotros es el énfasis, no un color nuevo. */
+.empresa-cita {
+  font-family: var(--font-family);
+  font-size: 0.95em;
+  font-weight: 700;
+  color: inherit;
+}
+
+/* ── Cuando algo falla ─────────────────────────────────────────────── */
+
+.empresa-fallos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 18px;
+}
+
+.empresa-fallo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: clamp(24px, 2.4vw, 32px);
+  border-radius: 24px;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+}
+
+.empresa-fallo h3 {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.empresa-fallo p {
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* El rótulo de arriba de cada tarjeta: lo que el conductor ve cuando pasa
+   eso. El color lo pone el modificador, que es el mismo semáforo de la
+   app: ámbar para lo que se recupera solo, rojo para lo que se corta. */
+.empresa-marca {
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.empresa-marca--espera {
+  background: var(--warn-light);
+  color: var(--warn);
+}
+
+.empresa-marca--corta {
+  background: var(--error-light);
+  color: var(--error);
+}
+
+/* ── La llamada final, compartida con la portada ───────────────────── */
+
+.empresa-llamada {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.empresa-llamada h2 {
+  font-family: var(--font-display);
+  font-size: var(--step-h2);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  max-width: 18ch;
+}
+
+.empresa-llamada p {
+  font-size: var(--step-lead);
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-width: var(--measure);
+}
+
+/* ── La ficha de contacto ──────────────────────────────────────────── */
+
+/*
+  `.companies-info` viene de empresas.css y allí su `h2` no tiene tamaño:
+  `.section-title` sólo está definida dentro de `.section-head`, así que el
+  titular caía al de por defecto del navegador. Se le da aquí, que es donde
+  vive ahora el bloque.
+*/
+.companies-info h2 {
+  font-family: var(--font-display);
+  font-size: var(--step-h2);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+}
