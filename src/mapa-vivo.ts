@@ -38,8 +38,12 @@ const SALIDA_M = [1850, 4300];
  * Ritmo del bus simulado, en metros por segundo. No sale de ningún dato:
  * es el que deja ver el aviso entrar y salir sin que haya que esperar el
  * viaje entero. Por eso la sección avisa de que el bus va simulado.
+ *
+ * Va despacio a propósito: lo que se está enseñando es cómo el bus se
+ * acerca, entra al kilómetro y dispara el aviso, y eso hay que poder
+ * seguirlo con la vista sin volver a mirar.
  */
-const RITMO_M_S = 165;
+const RITMO_M_S = 110;
 
 /** Tamaño en pantalla de los marcadores, a cualquier tamaño de mapa. */
 const BUS_PX = 30;
