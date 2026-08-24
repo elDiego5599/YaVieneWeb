@@ -780,11 +780,26 @@
   max-width: min(var(--carril), 290px);
 }
 
-.notif-icon {
+/*
+  Va con el `.scene-card` delante a propósito. La regla de al lado
+  —`.scene-card span`— vale (0,1,1) y ésta, con la clase sola, valía
+  (0,1,0): en la tarjeta del hero el icono es un `div` y se salvaba, pero
+  en la del tercer momento es un `span` y perdía las dos declaraciones que
+  importan. Se quedaba en `display: block`, con lo que `place-items` no
+  hacía nada y el dibujo caía en la esquina de arriba a la izquierda del
+  cuadro verde, y heredaba el `color` del texto secundario, con lo que la
+  campana salía en tinta translúcida en vez de en blanco.
+
+  Con la clase precedida del contenedor sube a (0,2,0) y gana siempre, sea
+  `span` o `div`. El `margin-top` se devuelve a cero por lo mismo: lo
+  ponía la regla del texto y desnivelaba el cuadro dos píxeles.
+*/
+.scene-card .notif-icon {
   display: grid;
   place-items: center;
   width: 32px;
   height: 32px;
+  margin-top: 0;
   border-radius: 10px;
   background: var(--green);
   color: #fff;
@@ -1564,18 +1579,25 @@
 
 /* ── El aviso del tercer momento ──
    La notificación no se dibuja dentro de la pantalla: sale del aparato y
-   se queda flotando a su derecha, que es la misma tarjeta del hero
+   se queda flotando fuera, que es la misma tarjeta del hero
    —`.scene-card`— y aquí sólo hay que decirle dónde ponerse. Es más fiel
    a lo que hace la app: el aviso llega con Ya Viene cerrada, así que
    enseñarlo dentro del teléfono era enseñarlo en el sitio equivocado.
 
-   Flota entera fuera del aparato, sin montarse encima, que es como están
-   las dos del hero: allí se apartan del escenario `--aire` píxeles y por
-   eso se leen como algo que ocurre al lado del teléfono y no como un
-   parche pegado a la pantalla. Aquí el hueco es lo que sobra de la
-   columna —el teléfono va pegado a su principio—, así que el apartado y
-   el ancho crecen con la ventana pero sin llegar nunca a pasarse de la
-   mitad de página. Va después de `.paso-toma > *`, que si no le gana el
+   Va arriba y a la derecha, asomada por el hombro del aparato. Arriba
+   porque es de donde salen las notificaciones de verdad en Android —una
+   heads-up entra por el borde de arriba, no por el pie— y porque abajo
+   está la hoja con el número de metros, que es lo único que no se puede
+   tapar. A la derecha porque la columna del texto queda a la izquierda y
+   cruzarla sería poner una tarjeta encima de un párrafo.
+
+   Monta un tercio del ancho del teléfono en vez de quedarse entera fuera:
+   de la banda libre que hay a la derecha —unos 260 px hasta el margen de
+   la página— sólo salen 150 útiles después del respiro, y una tarjeta de
+   150 parte el título en cinco líneas. Apoyándose en el hombro se lee
+   como una idea que sale del aparato, que es exactamente lo que es.
+
+   Va después de `.paso-toma > *`, que si no le gana el
    `position: relative`. */
 .scene-card--paso {
   position: absolute;
@@ -1583,42 +1605,72 @@
      marco no abre contexto de apilado, así que sus piezas compiten con
      ésta de tú a tú. */
   z-index: 60;
-  top: 16%;
-  left: calc(100% + clamp(10px, 1.4vw, 26px));
+  top: clamp(16px, 4%, 34px);
+  bottom: auto;
+  /* Negativo: el borde derecho de la tarjeta cae fuera del teléfono. El
+     tope de -190 px es lo que hay hasta el margen de la página con la
+     ventana en 1200, que es donde empieza a mandar esta regla. */
+  right: clamp(-190px, -13vw, -104px);
+  left: auto;
   width: max-content;
-  /* El tope es el que deja el sitio libre en el peor caso —920 px, con la
-     columna en su mínimo—: por encima de esto la tarjeta se saldría del
-     panel, que va recortado. */
-  max-width: clamp(180px, 17vw, 272px);
+  max-width: clamp(228px, 20vw, 286px);
 }
 
-/* Entra y sale como las del hero: sólo opacidad y desenfoque, que el
-   `transform` se lo lleva la levitación. Sin JavaScript —o sin
-   animaciones— se queda puesta, que es la foto con la que termina el
-   momento. */
+/* Entra y sale como las del hero, y además baja un poco al entrar: es una
+   heads-up, y una heads-up cae desde arriba. El deslizamiento va en
+   `translate` —la propiedad suelta— porque el `transform` se lo lleva la
+   levitación de `.animate-float-delayed` y dos reglas peleándose por la
+   misma propiedad no se ven. Sin JavaScript —o sin animaciones— se queda
+   puesta, que es la foto con la que termina el momento. */
 .es-guion .scene-card--paso {
   opacity: 0;
   filter: blur(3px);
-  transition: opacity 0.45s ease, filter 0.45s ease;
+  translate: 0 -12px;
+  transition: opacity 0.45s ease, filter 0.45s ease,
+    translate 0.5s var(--ease-out-cubic);
 }
 
 .es-guion .scene-card--paso.is-on {
   opacity: 1;
   filter: blur(0);
+  translate: 0 0;
 }
 
-/* En una columna no hay costado que valga: el teléfono se centra, se hace
-   pequeño y la tarjeta pasa a cruzarlo por arriba, sobresaliendo por los
-   dos lados. Va sobre el mapa y no sobre la hoja porque abajo está el
-   número, que es lo que hay que poder leer. Y hay que devolverle el
+/* Por debajo de 1200 px no hay banda libre a la derecha: el teléfono se
+   encoge pero el margen de la página se encoge más. La tarjeta sigue
+   arriba y a la derecha —el sitio no cambia, que es lo que hace que se
+   reconozca— pero se mide contra el ancho de la ventana en vez de contra
+   el carril, y monta un poco más sobre el aparato. Sigue sin tocar la
+   hoja del número, que es la regla que manda. Y hay que devolverle el
    `display`, porque las del hero se esconden por debajo de 860 y ésta no
    está en el hero. */
-@media (max-width: 919px) {
+@media (max-width: 1199px) {
   .scene-card--paso {
-    top: 8%;
-    left: 50%;
-    translate: -50% 0;
-    max-width: min(268px, 76vw);
+    top: 4%;
+    right: clamp(-136px, -11vw, -46px);
+    max-width: min(214px, 56vw);
+    padding: 10px 13px;
+    gap: 9px;
+  }
+
+  /* La tarjeta encoge con el aparato. Si se queda del tamaño de escritorio
+     mientras el teléfono baja de 300 a 230 px, deja de ser un aviso que
+     sale del móvil y pasa a ser un cartel puesto encima: a 1000 px de
+     ventana llegaba a montar el 78 % del ancho de la pantalla. Con el
+     cuerpo un punto más chico se queda en poco más de un tercio, que es
+     donde se sigue leyendo como lo que es. */
+  .scene-card--paso .notif-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+  }
+
+  .scene-card--paso strong {
+    font-size: 11.5px;
+  }
+
+  .scene-card--paso span {
+    font-size: 10.5px;
   }
 }
 
