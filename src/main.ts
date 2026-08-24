@@ -10,6 +10,7 @@
  * a medias con referencias nulas por dentro.
  */
 
+import './css/fonts.css';
 import './css/variables.css';
 import './css/base.css';
 import './css/layout.css';

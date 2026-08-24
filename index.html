@@ -101,11 +101,32 @@
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
 
   <!-- Typography: Bricolage Grotesque (titulares) + Plus Jakarta Sans (texto e interfaz) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap"
-    rel="stylesheet" />
+    <!--
+      El mapa de Barranquilla es el elemento LCP de la portada, pero el
+      navegador no lo ve en el HTML: lo pinta `phone-map.ts` dentro de un <svg>
+      ya arrancado el JS. Sin esta línea su descarga empieza ~16 ms tarde en
+      local y bastante más en una red real. Vite reescribe el href al nombre
+      con hash durante el build, así que la ruta de origen es la correcta aquí.
+    -->
+    <link
+      rel="preload"
+      as="image"
+      href="./src/assets/map/barranquilla.webp"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    <!--
+      Las dos familias ya no vienen de Google: viven en `src/assets/fonts/` y
+      se declaran en `src/css/fonts.css`. Se precargan aquí porque el <head>
+      es lo primero que lee el navegador; si esperásemos a que el CSS las
+      descubriera, el texto parpadearía con la fuente de sistema. `crossorigin`
+      es obligatorio aunque el fichero sea propio: las fuentes siempre se piden
+      en modo anónimo y sin él la precarga se descarta y se descarga dos veces.
+    -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="./src/assets/fonts/plus-jakarta-sans-latin.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="./src/assets/fonts/bricolage-grotesque-latin.woff2" />
 
   <!-- El CSS y el JS los junta el empaquetador desde src/main.ts. -->
   <script type="module" src="/src/main.ts"></script>
@@ -182,22 +203,30 @@
 
           <!-- 1. Bus Arriba a la Derecha (Sobusa) -->
           <div class="scene-bus scene-bus--sobusa animate-float-slow">
-            <img src="./src/assets/buses/sobusa.webp" alt="Sobusa" class="scene-bus-img" />
+            <img src="./src/assets/buses/sobusa.webp" alt="Sobusa"
+              width="448" height="560" decoding="async"
+              class="scene-bus-img" />
           </div>
 
           <!-- 2. Bus Medio a la Izquierda (Azul / Transmetro / Universidades) -->
           <div class="scene-bus scene-bus--transmetro animate-float-delayed">
-            <img src="./src/assets/buses/transmetro.webp" alt="Ruta Universidades" class="scene-bus-img" />
+            <img src="./src/assets/buses/transmetro.webp" alt="Ruta Universidades"
+              width="448" height="560" decoding="async"
+              class="scene-bus-img" />
           </div>
 
           <!-- 3. Bus Medio a la Derecha (Sodetrans) -->
           <div class="scene-bus scene-bus--sodis animate-float-slow">
-            <img src="./src/assets/buses/sodis.webp" alt="Sodetrans" class="scene-bus-img" />
+            <img src="./src/assets/buses/sodis.webp" alt="Sodetrans"
+              width="448" height="560" decoding="async"
+              class="scene-bus-img" />
           </div>
 
           <!-- 4. Bus Abajo a la Izquierda (Coolitoral) -->
           <div class="scene-bus scene-bus--coolitoral animate-float-delayed">
-            <img src="./src/assets/buses/coolitoral.webp" alt="Coolitoral" class="scene-bus-img" />
+            <img src="./src/assets/buses/coolitoral.webp" alt="Coolitoral"
+              width="448" height="560" decoding="async"
+              class="scene-bus-img" />
           </div>
 
           <!-- 5. Etiqueta flotante: Ruta Activa (Arriba a la Izquierda) -->

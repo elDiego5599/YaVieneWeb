@@ -10,11 +10,18 @@
   <meta name="theme-color" content="#0B1628" />
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap"
-    rel="stylesheet" />
+    <!--
+      Las dos familias ya no vienen de Google: viven en `src/assets/fonts/` y
+      se declaran en `src/css/fonts.css`. Se precargan aquí porque el <head>
+      es lo primero que lee el navegador; si esperásemos a que el CSS las
+      descubriera, el texto parpadearía con la fuente de sistema. `crossorigin`
+      es obligatorio aunque el fichero sea propio: las fuentes siempre se piden
+      en modo anónimo y sin él la precarga se descarta y se descarga dos veces.
+    -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="./src/assets/fonts/plus-jakarta-sans-latin.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="./src/assets/fonts/bricolage-grotesque-latin.woff2" />
 
   <script type="module" src="/src/hoja.ts"></script>
 </head>

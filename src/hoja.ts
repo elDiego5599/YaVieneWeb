@@ -7,6 +7,7 @@
  * cambie.
  */
 
+import './css/fonts.css';
 import './css/variables.css';
 import './css/base.css';
 import './css/layout.css';
