@@ -1483,11 +1483,15 @@
   transform-origin: 50% 50%;
 }
 
-/* Dos columnas partidas por la mitad. El teléfono se pega al principio de
-   la segunda, así que su borde cae justo en el eje de la página: queda a
-   la derecha del texto pero prácticamente en el centro, que es donde se
-   mira. Y baja un poco respecto a la frase, para que las dos cosas no
-   arranquen a la misma altura como en una tabla. */
+/* Dos columnas partidas por la mitad. El teléfono se centra en la
+   segunda, así que queda a la derecha del texto pero cerca del eje de la
+   página, que es donde se mira. Y baja un poco respecto a la frase, para
+   que las dos cosas no arranquen a la misma altura como en una tabla.
+
+   Ojo con `justify-self` aquí: la regla base de `.paso-toma` está más
+   abajo en este mismo fichero y lo pone en `center`. Como tienen la
+   misma especificidad, gana la última, y cualquier valor que se ponga
+   dentro de esta consulta de medios no llega a aplicarse nunca. */
 @media (min-width: 920px) {
   .paso {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -1495,7 +1499,6 @@
   }
 
   .paso-toma {
-    justify-self: start;
     margin-top: clamp(24px, 5vh, 76px);
   }
 }
