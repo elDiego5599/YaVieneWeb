@@ -57,9 +57,9 @@ const MUESTRAS = 420;
 const nuevo = <K extends keyof SVGElementTagNameMap>(tag: K): SVGElementTagNameMap[K] =>
   document.createElementNS(SVG_NS, tag);
 
-/** Redondeo de `bus_labels.dart`: cerca al metro, lejos a la decena. */
+/** Redondeo de la lectura pública: cambia de cien en cien metros. */
 const redondear = (m: number): number =>
-  m < 100 ? Math.max(10, Math.round(m)) : Math.round(m / 10) * 10;
+  Math.max(100, Math.round(m / 100) * 100);
 
 /** Lectura de distancia de la app: metros hasta el kilómetro, después km. */
 const legible = (m: number): string =>
