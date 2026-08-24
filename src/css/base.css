@@ -7,9 +7,28 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/*
+  El scroll suave no se enciende hasta que la página está montada, y esto
+  no es un adorno: al recargar, el navegador devuelve la posición antes de
+  que el CSS acabe de aplicarse. En ese instante el documento aún mide de
+  otra manera —en desarrollo, ocho veces más—, así que la posición que
+  restaura se sale del papel y queda pegada al final; cuando el CSS entra
+  y el alto se corrige, el navegador tiene que subir hasta donde estabas.
+  Con `smooth` puesto desde el principio, ese arreglo se veía: la página
+  se iba al fondo y volvía subiendo un segundo entero.
+
+  Así que arranca en `auto` —la corrección ocurre en un fotograma y no se
+  ve— y main.ts pone la clase cuando ya ha cargado todo. Para entonces
+  quien pulse un enlace del menú sigue teniendo su scroll suave, que es
+  para lo que estaba.
+*/
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   font-size: 16px;
+}
+
+html.scroll-suave {
+  scroll-behavior: smooth;
 }
 
 /* El color lo pone cada panel. El fondo del documento sólo se ve por las

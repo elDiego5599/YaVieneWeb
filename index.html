@@ -304,7 +304,7 @@
                     </div>
 
                     <span class="sheet-label">EMPRESA</span>
-                    <div class="app-select">
+                    <div class="app-select is-activa">
                       <span class="app-select-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
                           stroke-linecap="round" stroke-linejoin="round">
@@ -327,7 +327,7 @@
                     </div>
 
                     <span class="sheet-label">RUTA</span>
-                    <div class="app-select">
+                    <div class="app-select is-activa">
                       <span class="app-select-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
                           stroke-linecap="round" stroke-linejoin="round">
@@ -377,6 +377,11 @@
                 <div class="phone-map" id="phone-map">
                   <svg class="routes-svg-layer" id="phone-routes"></svg>
                 </div>
+
+                <!-- El barrier del showGeneralDialog. En los teléfonos
+                     quietos está siempre puesto; aquí entra y sale con el
+                     selector, que es lo que hace en la app. -->
+                <div class="phone-scrim phone-scrim--vivo" data-el="scrim"></div>
 
                 <!-- Barra de estado de Android: la app dibuja debajo. -->
                 <div class="phone-status">
@@ -486,35 +491,93 @@
                     </div>
                   </div>
 
-                  <div class="sheet-view" data-view="companies">
+                  <!--
+                    El selector de route_selector_sheet.dart, el mismo que
+                    enseñan quietos el teléfono de al lado y el segundo
+                    momento de la solución. Aquí no está posando: los dos
+                    huecos empiezan vacíos y el guion los va llenando —la
+                    empresa primero y después la ruta que sale de la lista—,
+                    que es de donde saca el botón su "Ver buses en vivo".
+                  -->
+                  <div class="sheet-view" data-view="selector">
+                    <div class="sheet-selector">
+                      <div class="sheet-head">
+                        <span class="sheet-head-title">Elige tu ruta</span>
+                      </div>
+
+                      <span class="sheet-label">EMPRESA</span>
+                      <div class="app-select" data-el="sel-empresa">
+                        <span class="app-select-icon">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3.5 20.5V9.5l7-3.5" />
+                            <path d="M10.5 20.5V4.6a1.6 1.6 0 0 1 1.6-1.6h6.3A1.6 1.6 0 0 1 20 4.6v15.9" />
+                            <path d="M2 20.5h20" />
+                            <path d="M13.5 7.5h3M13.5 11.5h3M13.5 15.5h3" />
+                          </svg>
+                        </span>
+                        <span class="app-select-body">
+                          <span class="app-select-title" data-el="sel-empresa-title">Selecciona una empresa</span>
+                          <span class="app-select-sub" data-el="sel-empresa-sub" hidden></span>
+                        </span>
+                        <span class="app-select-chevron">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9.5 5l7 7l-7 7" />
+                          </svg>
+                        </span>
+                      </div>
+
+                      <span class="sheet-label">RUTA</span>
+                      <div class="app-select" data-el="sel-ruta">
+                        <span class="app-select-icon">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 18h4a4 4 0 0 0 4-4V10a4 4 0 0 1 4-4h4" />
+                            <path d="M17 3l3 3l-3 3" />
+                            <circle cx="5" cy="18" r="2" />
+                          </svg>
+                        </span>
+                        <span class="app-select-body">
+                          <span class="app-select-title" data-el="sel-ruta-title">Selecciona una ruta</span>
+                          <span class="app-select-sub" data-el="sel-ruta-sub" hidden></span>
+                        </span>
+                        <span class="app-select-chevron">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9.5 5l7 7l-7 7" />
+                          </svg>
+                        </span>
+                      </div>
+
+                      <!-- Deshabilitado mientras no haya ruta, con el texto
+                           que lleva el botón en ese estado. -->
+                      <div class="app-launch app-launch--vacio" data-el="launch">Selecciona una ruta para continuar</div>
+                    </div>
+                  </div>
+
+                  <div class="sheet-view sheet-view--lista" data-view="companies">
                     <div class="sheet-head">
                       <span class="sheet-back">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                           stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M15 5l-7 7l7 7" />
+                          <path d="M20 12H4M10 6l-6 6l6 6" />
                         </svg>
                       </span>
                       <span class="sheet-head-title">Selecciona una empresa</span>
                     </div>
-                    <!-- Iniciales e insignia como en el selector: "Sobusa" da
-                         "SO", y el color sale de la paleta de marca por la
-                         suma de los códigos de su id ("sobusa" → 653, y
-                         653 % 6 cae en el verde accesible). -->
-                    <div class="app-tile" data-el="tile-empresa">
-                      <span class="app-tile-icon app-tile-icon--empresa">SO</span>
-                      <span class="app-tile-body">
-                        <span class="app-tile-title">Sobusa</span>
-                      </span>
-                      <span class="app-tile-chevron" aria-hidden="true">›</span>
-                    </div>
+                    <!-- Las empresas las escribe phone-simulator.ts, con las
+                         iniciales y el color que sacaría el selector de cada
+                         una: no están copiadas aquí. -->
+                    <div class="sheet-lista" data-el="company-list"></div>
                   </div>
 
-                  <div class="sheet-view" data-view="routes">
+                  <div class="sheet-view sheet-view--lista" data-view="routes">
                     <div class="sheet-head">
                       <span class="sheet-back">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                           stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M15 5l-7 7l7 7" />
+                          <path d="M20 12H4M10 6l-6 6l6 6" />
                         </svg>
                       </span>
                       <span class="sheet-head-title">Selecciona una ruta</span>
@@ -563,6 +626,7 @@
                 <div class="phone-gesture"></div>
               </div>
             </div>
+            <p class="map-credit">Mapa base © OpenStreetMap · © CARTO</p>
           </div>
 
           <!--
@@ -686,9 +750,7 @@
             </div>
           </div>
 
-        </div>
-
-        <p class="map-credit">Mapa base © OpenStreetMap · © CARTO</p>
+          </div>
 
         <p class="solo-lectores">
           La demostración muestra la app: primero localiza tu ubicación, luego
@@ -1013,7 +1075,7 @@
                             <span class="sheet-head-title">Elige tu ruta</span>
                           </div>
                           <span class="sheet-label">EMPRESA</span>
-                          <div class="app-select" data-el="sel-empresa">
+                          <div class="app-select is-activa" data-el="sel-empresa">
                             <span class="app-select-icon">
                               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
                                 stroke-linecap="round" stroke-linejoin="round">
@@ -1035,7 +1097,7 @@
                             </span>
                           </div>
                           <span class="sheet-label">RUTA</span>
-                          <div class="app-select" data-el="sel-ruta">
+                          <div class="app-select is-activa" data-el="sel-ruta">
                             <span class="app-select-icon">
                               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
                                 stroke-linecap="round" stroke-linejoin="round">
@@ -1206,10 +1268,12 @@
               aria-label="Rutas disponibles"></div>
           </div>
 
-          <div class="mapa-lienzo" data-mapa-lienzo>
-            <svg class="mapa-svg" data-mapa-svg role="img"
-              aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
-            <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
+          <div class="mapa-lienzo-columna">
+            <div class="mapa-lienzo" data-mapa-lienzo>
+              <svg class="mapa-svg" data-mapa-svg role="img"
+                aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
+              <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
+            </div>
             <p class="mapa-credito">© OpenStreetMap · © CARTO</p>
           </div>
 

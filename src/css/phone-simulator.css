@@ -393,6 +393,64 @@
   filter: drop-shadow(0 2px 3px rgba(20, 39, 78, 0.4));
 }
 
+/*
+  El halo del bus elegido: la capa dorada de map_widget.dart. Ahí late con
+  un temporizador cada 900 ms que sólo pone dos juegos de valores y deja
+  que la transición del estilo haga el medio; aquí el vaivén es el mismo
+  —0,8 y 1,35 del radio, opacidades 0,68 y 0,22, filo 1 y 0,3— en una
+  animación de 1,8 s, que es el ciclo entero.
+
+  Se escala en vez de cambiar el radio: mover `r` obliga a rehacer la
+  geometría en cada cuadro, y encima de un mapa que ya está repintando dos
+  buses eso se nota. `transform-box: fill-box` pone el origen en el centro
+  del propio círculo, que es donde va el bus.
+*/
+.map-bus-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease-out-cubic);
+}
+
+.map-bus.is-elegida .map-bus-halo {
+  animation: bus-halo 1.8s var(--ease-out-cubic) infinite;
+}
+
+/* Elegido, el ícono va a 1,25 y sin elegir a 1: los dos tamaños de la
+   expresión `iconSize` del SymbolLayer. */
+.map-bus-art {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.map-bus.is-elegida .map-bus-art {
+  transform: scale(1.25);
+}
+
+@keyframes bus-halo {
+  0%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.68;
+    stroke-opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.35);
+    opacity: 0.22;
+    stroke-opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-bus.is-elegida .map-bus-halo {
+    animation: none;
+    opacity: 0.55;
+  }
+}
+
 .map-pin {
   filter: drop-shadow(0 3px 4px rgba(20, 39, 78, 0.32));
 }
@@ -566,21 +624,40 @@
 
 /* ── Hoja inferior: eta_bottom_sheet.dart ──────────────────────────── */
 
-/* La hoja de eta_bottom_sheet.dart. */
+/*
+  La hoja de eta_bottom_sheet.dart. El color es AppColors.arena: no es un
+  tono elegido para la landing, es el de la app, y por eso la hoja se ve
+  más cálida que el blanco del selector.
+
+  Encima va el MapPatternPainter que la app pinta dentro (línea 303 de
+  eta_bottom_sheet.dart, en navy): la retícula de puntos cada 34, con las
+  filas alternas desplazadas 12, radio 1,6, al 6 %. Faltaba, y es lo que
+  le quitaba a la hoja la textura de mapa que tiene en el teléfono. Las
+  curvas del patrón se miden contra el alto del Material, que aquí lo pone
+  el contenido, así que no se copian: se quedan los puntos.
+*/
 .phone-sheet {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 32;
-  background: var(--arena);
+  background-color: var(--arena);
+  background-image:
+    radial-gradient(circle at calc(30 * var(--u)) calc(17 * var(--u)),
+      rgba(20, 39, 78, 0.06) calc(1.6 * var(--u)), transparent calc(1.7 * var(--u))),
+    radial-gradient(circle at calc(18 * var(--u)) calc(51 * var(--u)),
+      rgba(20, 39, 78, 0.06) calc(1.6 * var(--u)), transparent calc(1.7 * var(--u)));
+  background-size: calc(34 * var(--u)) calc(68 * var(--u));
+  background-position: 0 calc(11 * var(--u));
   border-radius: calc(32 * var(--u)) calc(32 * var(--u)) 0 0;
   box-shadow: 0 calc(-8 * var(--u)) calc(32 * var(--u)) rgba(20, 39, 78, 0.08);
   padding: calc(14 * var(--u)) 0 calc(26 * var(--u));
   overflow: hidden;
   transform: translateY(0);
   transition: transform 0.52s var(--ease-out-cubic),
-    opacity 0.5s var(--ease-out-cubic);
+    opacity 0.5s var(--ease-out-cubic),
+    background-color 0.3s var(--ease-out-cubic);
 }
 
 /*
@@ -697,27 +774,52 @@
   display: block;
 }
 
+/* `maxLines: 1` con `TextOverflow.ellipsis`: en la app el título nunca
+   parte, y "Selecciona una empresa" es justo el que se pasa de ancho. */
 .sheet-head-title {
+  flex: 1;
+  min-width: 0;
   font-size: calc(28 * var(--u));
   font-weight: 800;
   letter-spacing: calc(-0.5 * var(--u));
   color: var(--app-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Tres fichas justas y las siguientes desvaneciéndose: así se lee que la
-   lista sigue, sin cortar una ficha por la mitad. */
 /*
-  La lista es una ventana: caben poco más de tres rutas de las seis. Como
-  cada ciclo elige una distinta, casi siempre hay que bajar para llegar a
-  ella, y eso es lo que se ve — el desplazamiento no es un adorno, es el
-  camino hasta la fila que se va a tocar. El empujón lo calcula
-  phone-simulator.ts midiendo la fila.
+  La lista es una ventana: caben cuatro rutas de las seis. Como cada ciclo
+  elige una distinta, casi siempre hay que bajar para llegar a ella, y eso
+  es lo que se ve — el desplazamiento no es un adorno, es el camino hasta
+  la fila que se va a tocar. El empujón lo calcula phone-simulator.ts
+  midiendo la fila.
+
+  Los bordes desvanecidos dicen que la lista sigue, y sólo por el lado por
+  el que de verdad sigue: sin eso la primera fila aparecía cortada a
+  cuchillo al desplazar, y la última se quedaba medio borrada para siempre
+  aunque ya no hubiera nada debajo. Las dos clases las pone el guion, que
+  es quien sabe dónde quedó el carril.
 */
 .sheet-lista {
-  max-height: calc(196 * var(--u));
+  --desvanece-arriba: 0%;
+  --desvanece-abajo: 0%;
+
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(180deg, #000 0 78%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 0 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg,
+    transparent 0, #000 var(--desvanece-arriba),
+    #000 calc(100% - var(--desvanece-abajo)), transparent 100%);
+  mask-image: linear-gradient(180deg,
+    transparent 0, #000 var(--desvanece-arriba),
+    #000 calc(100% - var(--desvanece-abajo)), transparent 100%);
+}
+
+.sheet-lista.hay-arriba {
+  --desvanece-arriba: 13%;
+}
+
+.sheet-lista.hay-abajo {
+  --desvanece-abajo: 18%;
 }
 
 .sheet-lista-inner {
@@ -726,6 +828,25 @@
   position: relative;
   transform: translateY(0);
   transition: transform 0.62s var(--ease-out-cubic);
+}
+
+/*
+  Las dos listas ocupan la tarjeta entera, que es lo que hace la app:
+  _buildListView() las dibuja dentro de un SizedBox con la altura que midió
+  de la tarjeta principal, y la lista va en un Expanded. Así el diálogo no
+  encoge al entrar en la lista y volver a salir —el alto lo manda siempre
+  el selector, lo pone `ajustarAlto()`—, y la ventana de filas es lo que
+  sobra bajo la cabecera en vez de una franja de alto fijo.
+*/
+.sheet-view--lista.active {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sheet-view--lista .sheet-lista {
+  flex: 1;
+  min-height: 0;
 }
 
 /* Fila de lista: _compactTile() del selector. */
@@ -768,10 +889,11 @@
   color: var(--green);
 }
 
-/* Empresa: insignia de iniciales con color determinístico. La suma de los
-   códigos de "sobusa" cae en el azul eléctrico de la paleta. */
+/* Empresa: insignia de iniciales. El color no se escribe aquí porque no
+   es uno: cada empresa trae el suyo desde phone-simulator.ts. Esto es
+   sólo el respaldo por si alguna llegara sin marca. */
 .app-tile-icon--empresa {
-  background: var(--electric-blue);
+  background: var(--navy);
   color: #FFFFFF;
 }
 
@@ -929,7 +1051,7 @@
   display: none;
 }
 
-/* ============ LAS DOS PANTALLAS QUIETAS DE LOS LATERALES ============ */
+/* ============ EL SELECTOR DE RUTA Y LA PANTALLA DE ENTRADA ============ */
 
 /*
   Los teléfonos de los lados no se animan ni responden: son la portada de
@@ -937,9 +1059,14 @@
   central, para que a cualquier zoom sigan siendo nítidas y midan lo que
   miden en el aparato de verdad. Cada número de aquí abajo sale de
   route_selector_sheet.dart y de login_screen.dart.
+
+  El selector no se quedó en la vitrina: la demo del hero y el segundo
+  momento de la solución lo abren de verdad, así que estas reglas las
+  comparten los cinco teléfonos. Las que sólo valen para el que se mueve
+  van más abajo, en su propio bloque.
 */
 
-/* ── Izquierda: el selector de ruta ────────────────────────────────── */
+/* ── El selector de ruta ───────────────────────────────────────────── */
 
 /* El barrier de showGeneralDialog(): Color(0x66000000). */
 .phone-scrim {
@@ -954,21 +1081,12 @@
   hoja de distancia, y lleva encima el mismo patrón de calles del drawer
   pintado en navy —MapPatternPainter(color: primaryDeep)—, tan tenue que
   sólo se nota de cerca. Se reproduce la retícula de puntos: 34 pt de paso,
-  filas alternas desplazadas 12, radio 1,6, al 6 % de opacidad. Las tres
-  curvas del patrón se miden contra el alto del Material, que aquí lo pone
-  el contenido, así que no se copian: se quedan los puntos, que son los que
-  dan la textura.
+  el mismo que la hoja de ETA, que ya lo trae de la regla base: aquí sólo
+  cambia el color de debajo.
 */
 .phone-sheet--fija {
   padding: calc(16 * var(--u)) calc(24 * var(--u)) calc(24 * var(--u));
   background-color: #FFFFFF;
-  background-image:
-    radial-gradient(circle at calc(30 * var(--u)) calc(17 * var(--u)),
-      rgba(20, 39, 78, 0.06) calc(1.6 * var(--u)), transparent calc(1.7 * var(--u))),
-    radial-gradient(circle at calc(18 * var(--u)) calc(51 * var(--u)),
-      rgba(20, 39, 78, 0.06) calc(1.6 * var(--u)), transparent calc(1.7 * var(--u)));
-  background-size: calc(34 * var(--u)) calc(68 * var(--u));
-  background-position: 0 calc(11 * var(--u));
   border-radius: calc(32 * var(--u)) calc(32 * var(--u)) 0 0;
   /* elevation: 16 con shadowColor 0x6614274E. */
   box-shadow: 0 calc(-6 * var(--u)) calc(30 * var(--u)) rgba(20, 39, 78, 0.22);
@@ -1003,7 +1121,13 @@
   margin-bottom: calc(20 * var(--u));
 }
 
-/* _PremiumSelectorTile, en su estado activo: los dos ya elegidos. */
+/*
+  _PremiumSelectorTile. Sin elegir es un hueco apagado —borde divisor fino,
+  ícono gris sobre gris, título en el texto deshabilitado y sin subtítulo—
+  y al elegir se enciende: el borde engorda y toma el navy, el ícono pasa
+  al verde sobre su tinte y el título a tinta. Es el `isActive` del widget,
+  y lo que separa un mockup posado de uno que está eligiendo.
+*/
 .app-select {
   display: flex;
   align-items: center;
@@ -1011,8 +1135,15 @@
   padding: calc(16 * var(--u));
   background: #FFFFFF;
   border-radius: calc(20 * var(--u));
-  border: calc(1.5 * var(--u)) solid rgba(20, 39, 78, 0.2);
+  border: calc(1 * var(--u)) solid var(--divider);
   box-shadow: 0 calc(4 * var(--u)) calc(12 * var(--u)) rgba(20, 39, 78, 0.04);
+  transition: border-color 0.24s var(--ease-out-cubic),
+    border-width 0.24s var(--ease-out-cubic);
+}
+
+.app-select.is-activa {
+  border-width: calc(1.5 * var(--u));
+  border-color: rgba(20, 39, 78, 0.2);
 }
 
 .app-select-icon {
@@ -1022,6 +1153,14 @@
   display: grid;
   place-items: center;
   border-radius: calc(14 * var(--u));
+  /* AppColors.surfaceMuted mientras no hay nada elegido. */
+  background: #F1F5F9;
+  color: var(--app-text-disabled);
+  transition: background-color 0.24s var(--ease-out-cubic),
+    color 0.24s var(--ease-out-cubic);
+}
+
+.app-select.is-activa .app-select-icon {
   background: var(--green-tint);
   color: var(--green);
 }
@@ -1043,12 +1182,18 @@
   font-size: calc(16 * var(--u));
   font-weight: 800;
   letter-spacing: calc(-0.4 * var(--u));
-  color: var(--app-text-primary);
+  color: var(--app-text-disabled);
+  transition: color 0.24s var(--ease-out-cubic);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.app-select.is-activa .app-select-title {
+  color: var(--app-text-primary);
+}
+
+/* Sin elegir el hueco no tiene subtítulo: el widget lo pasa nulo. */
 .app-select-sub {
   margin-top: calc(2 * var(--u));
   font-size: calc(12 * var(--u));
@@ -1085,9 +1230,64 @@
   font-size: calc(16 * var(--u));
   font-weight: 800;
   letter-spacing: calc(-0.3 * var(--u));
+  transition: background-color 0.24s var(--ease-out-cubic),
+    color 0.24s var(--ease-out-cubic);
 }
 
-/* ── Derecha: la pantalla de entrada ───────────────────────────────── */
+/*
+  Mientras no hay ruta el botón está deshabilitado y lo dice con todo el
+  cuerpo, no sólo con el texto: es el disabledBackgroundColor del
+  ElevatedButton —el gris del divisor— con el texto apagado encima.
+*/
+.app-launch--vacio {
+  background: var(--divider);
+  color: var(--app-text-disabled);
+}
+
+/* ── El selector abierto en la hoja que se mueve ───────────────────── */
+
+/*
+  El hero no enseña el selector posado: lo abre. Y abrirlo no es cambiar de
+  contenido, es cambiar de superficie —en la app el selector es un diálogo
+  encima del mapa, no la hoja de distancia—, así que mientras está abierto
+  la hoja se viste de Material blanco con el patrón de calles del drawer y
+  el velo entra por debajo. Sólo cambia la piel: el relleno lo siguen
+  poniendo `.phone-sheet` y `.sheet-view`, y por eso la hoja no da un
+  brinco de tamaño al cambiarse de ropa —lo único que se mueve es el alto,
+  que ya lo anima `.sheet-views`.
+*/
+.phone-sheet.es-selector {
+  background-color: #FFFFFF;
+  /* elevation: 16 con shadowColor 0x6614274E. */
+  box-shadow: 0 calc(-6 * var(--u)) calc(30 * var(--u)) rgba(20, 39, 78, 0.22);
+}
+
+/* En la vista principal del selector el asa lleva 24 debajo, no 18. */
+.phone-sheet.es-selector .sheet-handle {
+  margin-bottom: calc(24 * var(--u));
+}
+
+/*
+  El velo, en el teléfono que se mueve. En los quietos está siempre puesto
+  —son una foto con la hoja abierta—; aquí entra y sale con el selector, y
+  se va justo cuando el dedo pulsa "Ver buses en vivo".
+*/
+.phone-scrim--vivo {
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-out-cubic);
+}
+
+.phone-scrim--vivo.is-on {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phone-scrim--vivo {
+    transition-duration: 0.01ms;
+  }
+}
+
+/* ── La pantalla de entrada ────────────────────────────────────────── */
 
 /*
   Fondo de tinta con el patrón de calles en blanco. Los puntos son la misma

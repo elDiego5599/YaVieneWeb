@@ -58,8 +58,9 @@
     0 16px 36px -14px rgba(6, 13, 31, 0.6),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
   transition:
-    box-shadow var(--transition-smooth),
-    transform var(--transition-smooth);
+    box-shadow 0.5s var(--ease-fluida),
+    border-color 0.5s var(--ease-fluida),
+    transform 0.5s var(--ease-fluida);
 }
 
 .nav-island.is-open {
@@ -103,16 +104,19 @@
   transform: translateY(-8px) scale(0.97);
   transform-origin: 50% 0;
   transition:
-    opacity var(--transition-normal),
-    transform 0.45s var(--ease-spring),
-    visibility 0s linear 0.3s;
+    opacity 0.18s var(--ease-out-cubic),
+    transform 0.24s var(--ease-out-cubic),
+    visibility 0s linear 0.24s;
 }
 
 .nav-island.is-open > .nav-island-reveal {
   opacity: 1;
   visibility: visible;
   transform: translateY(0) scale(1);
-  transition-delay: 0s;
+  transition:
+    opacity 0.24s var(--ease-out-cubic),
+    transform 0.5s var(--ease-spring),
+    visibility 0s;
 }
 
 .nav-island-inner {
@@ -126,6 +130,66 @@
   flex-direction: column;
   gap: 2px;
 }
+
+/* ── La entrada escalonada ─────────────────────────────────────────────
+
+   Un menú que aparece de golpe se lee como un cambio de opacidad. Aquí
+   cada pieza entra un pelo después de la anterior —40 ms— y con un
+   desplazamiento mínimo, así que el ojo sigue una sola ola en vez de ver
+   cuatro cosas encenderse a la vez. Es lo que hace que se sienta abrirse
+   y no aparecer.
+
+   El retraso va en `--retraso` y sólo lo llevan `opacity` y `transform`:
+   el `color` del enlace y la sombra del CTA se quedan sin él, porque si
+   no, pasar el ratón por encima con la isla ya abierta tardaría dos
+   décimas en responder. Un `transition-delay` suelto se los habría
+   comido a los cuatro.
+
+   Al cerrar manda la regla de abajo, sin retraso y más corta que el
+   pliegue: las piezas se van antes de que la píldora acabe de recogerse,
+   que es el orden que se espera. */
+.nav-island-inner .nav-link,
+.nav-island-inner .nav-island-cta {
+  --retraso: 0s;
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.nav-island-inner .nav-link {
+  transition:
+    opacity 0.14s linear,
+    transform 0.14s var(--ease-out-cubic),
+    color var(--transition-fast);
+}
+
+.nav-island-inner .nav-island-cta {
+  transition:
+    opacity 0.14s linear,
+    transform 0.14s var(--ease-out-cubic),
+    box-shadow var(--transition-fast);
+}
+
+.nav-island.is-open .nav-link {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.3s var(--ease-out-cubic) var(--retraso),
+    transform 0.55s var(--ease-fluida) var(--retraso),
+    color var(--transition-fast);
+}
+
+.nav-island.is-open .nav-island-cta {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.3s var(--ease-out-cubic) var(--retraso),
+    transform 0.55s var(--ease-fluida) var(--retraso),
+    box-shadow var(--transition-fast);
+}
+
+.nav-island.is-open .nav-link:nth-child(2) { --retraso: 0.04s; }
+.nav-island.is-open .nav-link:nth-child(3) { --retraso: 0.08s; }
+.nav-island.is-open .nav-island-cta { --retraso: 0.12s; }
 
 /*
   El enlace no cambia de fondo de golpe: el fondo es un pseudo-elemento que
@@ -285,11 +349,17 @@
     /* El pliegue: de 0fr a 1fr, con el contenido recortado mientras dura. */
     display: grid;
     grid-template-columns: 0fr;
-    transition: grid-template-columns 0.55s var(--ease-out-cubic);
+    /* Recoger es más corto que abrir: cerrar tiene que sentirse resuelto,
+       no verse. */
+    transition: grid-template-columns 0.32s var(--ease-out-cubic);
   }
 
   .nav-island.is-open > .nav-island-reveal {
     grid-template-columns: 1fr;
+    /* Medio segundo, pero con la curva fluida el ancho ya casi está a los
+       200 ms y el resto es el frenado. Con `ease-out-cubic` los 550 ms
+       anteriores se repartían parejos y por eso se sentía lenta. */
+    transition: grid-template-columns 0.5s var(--ease-fluida);
   }
 
   .nav-island-inner {
@@ -299,13 +369,13 @@
     min-width: 0;
     overflow: hidden;
     padding-left: 6px;
-    opacity: 0;
-    transition: opacity 0.3s var(--ease-out-cubic);
   }
 
-  .nav-island.is-open .nav-island-inner {
-    opacity: 1;
-    transition-delay: 0.12s;
+  /* En horizontal las piezas entran desde la izquierda, empujadas por el
+     propio pliegue, y no desde arriba como en el panel de móvil. */
+  .nav-island-inner .nav-link,
+  .nav-island-inner .nav-island-cta {
+    transform: translateX(-12px);
   }
 
   .nav-island-links {
@@ -324,12 +394,16 @@
 @media (prefers-reduced-motion: reduce) {
   .nav-island-reveal,
   .nav-island-inner,
+  .nav-island-inner .nav-link,
+  .nav-island-inner .nav-island-cta,
   .nav-island-grip,
   .nav-island-grip::before {
     transition: none;
   }
 
-  .nav-island-reveal {
+  .nav-island-reveal,
+  .nav-island-inner .nav-link,
+  .nav-island-inner .nav-island-cta {
     opacity: 1;
     visibility: visible;
     transform: none;

@@ -150,6 +150,8 @@
 /* Contenedor del teléfono central: por encima de los dos laterales. */
 .hero-phone-wrap {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   position: relative;
   z-index: 10;
 }
@@ -191,8 +193,14 @@
   24 % y en el azul marino de la marca en vez de negro puro: oscurece sin
   desaturar, y los tres vuelven a ser el mismo aparato. La demo de los
   momentos —un solo teléfono en pantalla— se queda con el 40 % de la app.
+
+  Va también el central, que desde que abre el selector de verdad tiene
+  velo propio: si se quedara con el negro de la app, cada vez que el guion
+  abriera la hoja el teléfono del medio se ensombrecería más que el de al
+  lado enseñando lo mismo.
 */
-.hero-phone-side .phone-scrim {
+.hero-phone-side .phone-scrim,
+.hero-phone-wrap .phone-scrim {
   background: rgba(11, 22, 40, 0.24);
 }
 
@@ -239,12 +247,13 @@
   }
 }
 
-/* La atribución cuelga de la escena entera: hay dos mapas, no uno. */
-.hero-grid > .map-credit {
-  margin-top: -14px;
+/* La atribución acompaña al teléfono central y queda justo bajo su marco. */
+.hero-phone-wrap .map-credit {
+  margin: 12px 0 0;
   font-size: 11px;
   color: var(--text-muted);
   text-align: center;
+  line-height: 1.4;
 }
 
 /* Buses flotantes vectoriales con fix de nitidez y aceleración */

@@ -64,6 +64,12 @@
 }
 
 /* ── El lienzo ── */
+.mapa-lienzo-columna {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
 .mapa-lienzo {
   position: relative;
   /* La proporción del mosaico, para que quepa la ciudad entera. */
@@ -155,12 +161,12 @@
 }
 
 .mapa-credito {
-  position: absolute;
-  left: 10px;
-  bottom: 8px;
-  font-size: 9.5px;
+  margin: 10px 4px 0;
+  font-size: 11px;
+  line-height: 1.4;
   letter-spacing: 0.02em;
-  color: rgba(15, 23, 42, 0.55);
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
   pointer-events: none;
 }
 
@@ -351,9 +357,13 @@
 
 @media (max-width: 1059px) {
   /* Apilado manda el mapa primero: es lo que hay que tocar. */
-  .mapa-lienzo {
+  .mapa-lienzo-columna {
     height: min(72vh, 560px);
     justify-self: center;
+  }
+
+  .mapa-lienzo {
+    height: 100%;
   }
 
   .mapa-columna--rutas {
