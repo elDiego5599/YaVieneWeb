@@ -95,12 +95,21 @@
   confunde con ninguna de las secciones que vienen después.
 */
 .panel--sun {
-  background-color: #F7F3EC;
+  background-color: #F0E8DA;
   background-image:
-    radial-gradient(1120px 680px at 50% 96%, rgba(0, 168, 89, 0.16), rgba(0, 168, 89, 0) 66%),
-    radial-gradient(820px 460px at 92% 0%, rgba(20, 39, 78, 0.07), rgba(20, 39, 78, 0) 68%),
-    radial-gradient(720px 420px at 6% 4%, rgba(20, 39, 78, 0.06), rgba(20, 39, 78, 0) 68%),
-    linear-gradient(180deg, #FFFFFF 0%, #FDFBF7 34%, #F5F0E7 100%);
+    /* La luz sobre el titular. Va la primera —encima de todo lo demás—
+       porque su trabajo es despejar el centro: el texto necesita el
+       blanco entero debajo y el resto de la capa puede ser cálido. */
+    radial-gradient(1180px 720px at 50% 18%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0) 68%),
+    /* El halo verde detrás del grupo de teléfonos. */
+    radial-gradient(1200px 760px at 50% 96%, rgba(0, 168, 89, 0.22), rgba(0, 168, 89, 0) 62%),
+    /* Dos respiros en las esquinas altas, los dos de la paleta: el azul
+       marino de la marca a la derecha y el coral a la izquierda. A esta
+       saturación no se leen como color, sólo como que la esquina no es
+       igual que el centro. */
+    radial-gradient(900px 520px at 97% -8%, rgba(20, 39, 78, 0.12), rgba(20, 39, 78, 0) 66%),
+    radial-gradient(820px 480px at 2% 0%, rgba(232, 106, 94, 0.11), rgba(232, 106, 94, 0) 66%),
+    linear-gradient(180deg, #FBF4E9 0%, #F6EEE1 46%, #EFE5D5 100%);
 }
 
 .panel--mint {
