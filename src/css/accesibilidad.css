@@ -1,0 +1,161 @@
+/* ============================================================
+   ACCESIBILIDAD
+   ============================================================
+
+   Esta hoja se carga la última a propósito. Todo lo que hay aquí es
+   invisible mientras se navegue con el ratón: anillos de foco que sólo
+   aparecen con el teclado, zonas de toque que crecen por debajo sin
+   mover nada, y dos consultas de medios que sólo se activan si el
+   usuario lo ha pedido en su sistema. No cambia ni un píxel de lo que
+   ya se ve.
+   ============================================================ */
+
+/* ---------- 1. Saltar al contenido ----------
+
+   El primer tabulador de la página. Sin esto, quien navegue con teclado
+   o lector de pantalla tiene que recorrer la isla de navegación entera
+   en cada carga antes de llegar al texto. Vive fuera de la pantalla y
+   sólo baja cuando recibe el foco, así que nadie más lo ve. */
+
+.saltar-al-contenido {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  z-index: 999;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 12px 28px -10px rgba(11, 22, 40, 0.55);
+  /* Arriba del todo y fuera de cuadro: `translate` y no `transform`,
+     que en esta base `transform` ya tiene dueños en varios sitios. */
+  translate: -50% -180%;
+  transition: translate 0.22s var(--ease-out-cubic);
+}
+
+.saltar-al-contenido:focus {
+  translate: -50% 0;
+}
+
+/* ---------- 2. Un único anillo de foco ----------
+
+   Varios controles ya traen su propio foco (la isla, las palabras del
+   clima, las filas del panel de error) y esos no se tocan. Los de aquí
+   abajo se quedaban con el anillo por defecto del navegador, que cambia
+   de color y de grosor según el sistema. Se les pone el verde de la
+   marca para que el recorrido con teclado se lea igual en toda la
+   página.
+
+   `outline` y no `box-shadow`: el contorno no participa en el diseño,
+   así que no puede pisar las sombras que estos botones ya llevan, y
+   además sigue la forma redondeada del elemento. */
+
+.btn-primary:focus-visible,
+.btn-outline:focus-visible,
+.form-submit-btn:focus-visible,
+.pasos-tab:focus-visible,
+.whatsapp-btn:focus-visible,
+.login-link:focus-visible,
+.mv-ruta:focus-visible,
+.nav-island-brand:focus-visible,
+.footer-brand:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 3px;
+}
+
+/* Sobre fondo oscuro el verde de marca se apaga; ahí el anillo va en
+   blanco, que es lo que ya hace el resto del pie. */
+.site-footer .btn-primary:focus-visible,
+.site-footer .btn-outline:focus-visible,
+.footer-brand:focus-visible {
+  outline-color: #fff;
+}
+
+/* El campo de texto apaga su `outline` para dibujar el foco con el
+   borde y un halo. Está bien con el ratón, pero con teclado conviene
+   que se note más: se le sube el halo sin cambiar el color. */
+.form-input:focus-visible {
+  box-shadow: 0 0 0 4px rgba(0, 168, 89, 0.28);
+}
+
+/* ---------- 3. Zonas de toque ----------
+
+   La norma que aplica es WCAG 2.5.8 (nivel AA): 24 por 24 píxeles
+   mínimo. Lo medido en la página: las pestañas de los pasos van a
+   210x37, las filas de ruta del mapa a 290x59, las palabras del clima a
+   33x35 — todas pasan de sobra. Las dos que no llegaban son las de
+   abajo, y se arreglan con un pseudo-elemento transparente: el área
+   sensible crece, la caja del elemento no se mueve y el diseño queda
+   exactamente igual.
+
+   No se fuerzan los 44 px de WCAG 2.5.5 (nivel AAA) en los enlaces del
+   pie: la separación entre uno y otro es de 11 px, así que estirarlos
+   tanto los solaparía y el dedo acabaría pulsando el enlace de al lado,
+   que es peor que el problema original. */
+
+.nav-island-toggle {
+  position: relative;
+}
+
+.nav-island-toggle::after {
+  content: '';
+  position: absolute;
+  /* 38 px reales -> 44 de área sensible. */
+  inset: -3px;
+}
+
+.footer-nav a,
+.footer-legal-links a {
+  position: relative;
+}
+
+.footer-nav a::after,
+.footer-legal-links a::after {
+  content: '';
+  position: absolute;
+  /* 21 y 18 px de alto -> 31 y 28. Cabe de sobra en el hueco que ya
+     dejaba el diseño, así que ninguna zona pisa a la de al lado. */
+  inset: -5px -4px;
+}
+
+/* ---------- 4. Menos transparencia ----------
+
+   Las píldoras del hero llevan un desenfoque de fondo. Para quien tiene
+   activado «reducir transparencia» en el sistema —normalmente por
+   problemas de vista— el cristal esmerilado hace que el texto de encima
+   cueste de leer. La píldora ya está al 92 % de opacidad, así que
+   cerrarla del todo casi no se nota y ahorra además el coste de pintar
+   un desenfoque. */
+
+@media (prefers-reduced-transparency: reduce) {
+  .scene-card {
+    background: var(--surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: var(--divider);
+  }
+}
+
+/* ---------- 5. Más contraste ----------
+
+   Con «aumentar contraste» activado, el texto secundario y los bordes
+   finos pasan a los tonos plenos que ya están en la paleta. No se
+   inventa ningún color: son las mismas variables. */
+
+@media (prefers-contrast: more) {
+  :root {
+    --text-secondary: rgba(11, 22, 40, 0.85);
+    --divider: rgba(11, 22, 40, 0.35);
+  }
+
+  /* El verde de marca da 3,11:1 sobre blanco: vale para titulares
+     grandes, no para quien pide más contraste. Se cambia por el verde
+     accesible de la paleta, que da 5,48:1. */
+  .hero-title .highlight {
+    color: var(--green-accessible);
+  }
+}

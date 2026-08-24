@@ -38,6 +38,12 @@
 -->
 
 <body class="err-body">
+
+  <!-- Primer tabulador de la página: manda directo al contenido y se
+       salta la navegación. Vive fuera de cuadro hasta que recibe el
+       foco, así que con el ratón no se ve nunca. -->
+  <a class="saltar-al-contenido" href="#contenido">Saltar al contenido</a>
+
   <header class="err-top">
     <a class="err-marca" href="/">
       <img src="/logo.svg" alt="" width="30" height="30" />
@@ -46,7 +52,7 @@
     <a class="err-volver" href="/">Volver a la página</a>
   </header>
 
-  <main class="err-hoja">
+  <main id="contenido" class="err-hoja">
     <p class="err-codigo" aria-hidden="true">404</p>
     <h1>No sabemos dónde está esta página.</h1>
     <p class="err-entrada">Cuando un bus lleva cinco minutos sin reportar, la app no te

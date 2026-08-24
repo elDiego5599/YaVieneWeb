@@ -27,6 +27,12 @@
 </head>
 
 <body class="legal-body">
+
+  <!-- Primer tabulador de la página: manda directo al contenido y se
+       salta la navegación. Vive fuera de cuadro hasta que recibe el
+       foco, así que con el ratón no se ve nunca. -->
+  <a class="saltar-al-contenido" href="#contenido">Saltar al contenido</a>
+
   <header class="legal-top">
     <a class="legal-marca" href="/">
       <img src="/logo.svg" alt="" width="30" height="30" />
@@ -35,7 +41,7 @@
     <a class="legal-volver" href="/">Volver a la página</a>
   </header>
 
-  <main class="legal-hoja">
+  <main id="contenido" class="legal-hoja">
     <p class="legal-fecha">Actualizado el 23 de agosto de 2026</p>
     <h1>Privacidad</h1>
     <p class="legal-entrada">Ya Viene es una aplicación para saber por dónde va tu bus. Para

@@ -17,6 +17,7 @@ import './css/layout.css';
 import './css/components.css';
 import './css/phone-simulator.css';
 import './css/animations.css';
+import './css/accesibilidad.css';
 
 import { ContactForm } from './contact-form';
 import { encajarEscena } from './encaje';
