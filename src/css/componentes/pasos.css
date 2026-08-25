@@ -538,7 +538,10 @@
   align-items: center;
   justify-content: center;
   gap: 0;
-  padding: 0 clamp(10px, 1.6vw, 26px);
+  /* Sin margen lateral: así el riel mide lo mismo que la línea de abajo y
+     la cabeza del verde cae clavada en el centro de cada pestaña. El aire
+     lo pone el `padding` de la pestaña, no el de la caja. */
+  padding: 0;
   border: 1px solid rgba(11, 22, 40, 0.1);
   border-bottom: 0;
   border-radius: clamp(26px, 3vw, 38px) clamp(26px, 3vw, 38px) 0 0;
@@ -626,7 +629,6 @@
 
   .pasos-mando {
     min-height: 52px;
-    padding-inline: 6px;
   }
 
   .pasos-riel {
@@ -669,11 +671,8 @@
   }
 }
 
-/* La barrita mide lo que mide la pestaña, no lo que mide la palabra: con
-   «Aviso» a un lado y «Punto de espera» al otro, unas barras a medida de
-   cada nombre se ven como tres rayas de tamaños distintos puestas al
-   azar. Por eso va en absoluto, de filo a filo de la pestaña —que ocupa
-   un tercio del riel—, y el icono y el nombre siguen centrados encima. */
+/* Icono y nombre centrados en su tercio del riel; la línea de progreso ya
+   no vive aquí dentro —es una sola, de filo a filo de la barra. */
 .pasos-tab {
   position: relative;
   display: grid;
@@ -716,24 +715,31 @@
   grid-column: 2;
 }
 
-.pasos-tab-barra {
+/* Una sola línea, de filo a filo del riel, que también hace de costura
+   entre la barra y la tarjeta. Tres barritas cortadas contaban tres
+   tramos sueltos; esta cuenta un recorrido, y el verde llega al centro
+   de la pestaña que toca. */
+.pasos-linea {
   position: absolute;
   right: 0;
   bottom: 0;
   left: 0;
   height: 2px;
-  border-radius: 999px;
-  background: rgba(11, 22, 40, 0.12);
+  background: rgba(11, 22, 40, 0.1);
   overflow: hidden;
 }
 
-.pasos-tab-avance {
+.pasos-linea b {
   display: block;
-  /* Lo pone pasos.ts con lo que lleva recorrido el tramo. */
-  width: var(--avance, 0%);
+  width: 100%;
   height: 100%;
-  border-radius: 999px;
+  border-radius: 0 999px 999px 0;
   background: var(--green);
+  /* Lo pone pasos.ts: 0 a 1 a lo largo de los tres momentos. Va en
+     `scale` y no en `width` para que lo mueva el compositor y no haya
+     que rehacer el layout en cada cuadro. */
+  transform: scaleX(var(--avance, 0));
+  transform-origin: 0 50%;
 }
 
 /*

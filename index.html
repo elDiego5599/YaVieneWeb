@@ -1272,7 +1272,6 @@
                     </svg>
                   </span>
                   <span class="pasos-tab-nombre">Punto de espera</span>
-                  <span class="pasos-tab-barra"><span class="pasos-tab-avance"></span></span>
                 </button>
                 <button class="pasos-tab" type="button" role="tab" id="pasos-tab-1"
                   aria-controls="paso-momento-2" aria-selected="false" tabindex="-1" data-pasos-tab="1">
@@ -1285,7 +1284,6 @@
                     </svg>
                   </span>
                   <span class="pasos-tab-nombre">Elige tu ruta</span>
-                  <span class="pasos-tab-barra"><span class="pasos-tab-avance"></span></span>
                 </button>
                 <button class="pasos-tab" type="button" role="tab" id="pasos-tab-2"
                   aria-controls="paso-momento-3" aria-selected="false" tabindex="-1" data-pasos-tab="2">
@@ -1297,9 +1295,16 @@
                     </svg>
                   </span>
                   <span class="pasos-tab-nombre">Aviso</span>
-                  <span class="pasos-tab-barra"><span class="pasos-tab-avance"></span></span>
                 </button>
               </div>
+
+              <!--
+                Una sola línea de lado a lado, no una por pestaña: tres
+                barritas seguidas se leen como tres rayas cortadas, y lo que
+                se quiere contar es un recorrido. Es también la costura entre
+                el riel y la tarjeta.
+              -->
+              <span class="pasos-linea" aria-hidden="true"><b data-pasos-avance></b></span>
             </div>
           </div>
         </div>

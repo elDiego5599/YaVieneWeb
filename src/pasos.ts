@@ -59,12 +59,15 @@ const CRUCE = 0.44;
  * primero al tercero casi uno. Con un tiempo fijo, el salto corto se
  * arrastra y el largo va a la carrera.
  */
-const VIAJE_MIN = 520;
-const VIAJE_MAX = 900;
+const VIAJE_MIN = 700;
+const VIAJE_MAX = 1200;
 
 const PASO_CINTA = 0.05;
 const PASO_OPACIDAD = 0.01;
-const PASO_BARRA = 1;
+/* La línea es una sola y recorre los tres momentos, así que cada punto de
+   scroll mueve un tercio de lo que movía antes. A ese ritmo un escalón del
+   1 % se ve; con milésimas el borde avanza medio píxel por cuadro. */
+const PASO_LINEA = 0.001;
 
 const cuantizar = (v: number, paso: number): number => Math.round(v / paso) * paso;
 
@@ -73,9 +76,7 @@ interface Momento {
   paso: HTMLElement;
   toma: HTMLElement | null;
   pestana: HTMLElement | null;
-  barra: HTMLElement | null;
   /** Lo último que se le puso, para no repetir escrituras inútiles. */
-  avance: number;
   opacidad: number;
 }
 
@@ -85,6 +86,7 @@ export class Pasos {
   private readonly obra: HTMLElement;
   private readonly carro: HTMLElement;
   private readonly mando: HTMLElement | null;
+  private readonly linea: HTMLElement | null;
   private readonly cuenta: HTMLElement | null;
   private readonly momentos: Momento[];
 
@@ -97,6 +99,7 @@ export class Pasos {
   private portadaBorrosa = -1;
   private obraEntra = -1;
   private mandoVisible = false;
+  private lineaAvance = -1;
 
   /**
    * Le dice a main.ts qué teléfono está a la vista y le toca moverse.
@@ -126,6 +129,7 @@ export class Pasos {
     this.obra = obra;
     this.carro = carro;
     this.mando = pista.querySelector<HTMLElement>('.pasos-mando');
+    this.linea = pista.querySelector<HTMLElement>('[data-pasos-avance]');
     this.cuenta = pista.querySelector<HTMLElement>('[data-pasos-cuenta]');
 
     const pestanas = Array.from(pista.querySelectorAll<HTMLElement>('[data-pasos-tab]'));
@@ -134,8 +138,6 @@ export class Pasos {
       paso,
       toma: tomas[i] ?? null,
       pestana: pestanas[i] ?? null,
-      barra: pestanas[i]?.querySelector<HTMLElement>('.pasos-tab-avance') ?? null,
-      avance: -1,
       opacidad: -1,
     }));
 
@@ -184,7 +186,7 @@ export class Pasos {
     if (Math.abs(salto) < 2) return;
 
     this.cortarViaje();
-    const duracion = Math.min(VIAJE_MAX, Math.max(VIAJE_MIN, Math.abs(salto) * 1.15));
+    const duracion = Math.min(VIAJE_MAX, Math.max(VIAJE_MIN, Math.abs(salto) * 1.45));
     const arranque = performance.now();
     this.cortar = () => {
       window.removeEventListener('wheel', this.cortar!);
@@ -327,14 +329,14 @@ export class Pasos {
       m.paso.style.opacity = String(opacidad);
     });
 
-    this.momentos.forEach((m, i) => {
-      const inicio = PORTADA_FIN + ancho * i;
-      const avance = cuantizar(entre(p, inicio, inicio + ancho) * 100, PASO_BARRA);
-      if (avance !== m.avance) {
-        m.avance = avance;
-        m.barra?.style.setProperty('--avance', `${avance}%`);
-      }
-    });
+    /* Un único avance para toda la cinta, no uno por tramo: el verde sale
+       del filo izquierdo y no vuelve atrás, y en cada descanso la cabeza
+       cae justo en el centro de la pestaña que está encendida. */
+    const avance = cuantizar(entre(p, PORTADA_FIN, 1), PASO_LINEA);
+    if (avance !== this.lineaAvance) {
+      this.lineaAvance = avance;
+      this.linea?.style.setProperty('--avance', String(avance));
+    }
 
     /*
       Y el teléfono. El cambio cae en la mitad del relevo, que es cuando la
