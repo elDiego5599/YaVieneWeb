@@ -1,6 +1,6 @@
 /* ── PROBLEMA ──────────────────────────────────────────────
 
-   La franja de datos, las tarjetas del problema y el reloj.
+   Las tarjetas del problema y el reloj.
 
    Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
    Se carga desde ahí y **el orden importa**: hay reglas que se pisan
@@ -9,40 +9,6 @@
    primero si más abajo en el orden de carga hay otra con la misma
    especificidad. Es el fallo que más veces ha pasado en esta base.
    ────────────────────────────────────────────────────────────────── */
-
-/* ── Franja de datos ───────────────────────────────────────────────── */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px 20px;
-}
-
-@media (min-width: 860px) {
-  .stats-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-.stat {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.stat-value {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 1.2rem + 2.4vw, 3rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.035em;
-  color: var(--amber);
-}
-
-.stat-label {
-  font-size: 13.5px;
-  line-height: 1.35;
-  color: var(--text-white-dim);
-}
 
 /* ── Rejilla de tarjetas (problema) ────────────────────────────────── */
 #problema {
