@@ -37,11 +37,16 @@ const OBRA_HASTA = 0.98;
  * principio del siguiente— para que el descanso caiga en el centro del
  * turno, que es adonde lleva el riel cuando se toca una pestaña.
  *
- * Con 0.44 el momento pasa algo más de la mitad de su turno parado. Menos
- * que eso y la cinta se mueve casi todo el rato; más, y el salto de un
- * momento a otro se vuelve brusco por lo poco que dura.
+ * Con 0.8 el relevo se come casi todo el turno y el descanso queda en una
+ * quinta parte. Ese reparto importa sobre todo al saltar de una pestaña a
+ * otra: el scroll frena con su curva hasta el centro del turno de
+ * destino, y si el relevo se hubiera terminado mucho antes —con 0.44
+ * acababa al 86 % del camino— la cinta se para en seco mientras la página
+ * sigue bajando a buena velocidad. Se veía como un frenazo. Ahora el
+ * relevo termina al 97 %, o sea justo cuando el scroll ya casi no se
+ * mueve, y la cinta se posa en vez de chocar.
  */
-const CRUCE = 0.44;
+const CRUCE = 0.8;
 
 /**
  * Cuánto tiene que cambiar un valor para que valga la pena escribirlo.
