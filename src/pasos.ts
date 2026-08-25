@@ -257,10 +257,12 @@ export class Pasos {
       this.portada.style.transform = `scale(${1 + irse * 0.34}) translateY(${irse * -24}px)`;
       this.portada.style.visibility = irse >= 1 ? 'hidden' : 'visible';
     }
-    // El desenfoque va a saltos de un píxel: un `filter` obliga a repintar
-    // el titular entero, y hacerlo sesenta veces por segundo es la
-    // diferencia entre ir a sesenta cuadros y no ir.
-    const portadaBorrosa = irse >= 1 ? 0 : Math.round(irse * 12);
+    // El desenfoque va a saltos de dos píxeles: un `filter` obliga a
+    // repintar el titular entero, y hacerlo sesenta veces por segundo es
+    // la diferencia entre ir a sesenta cuadros y no ir. Con doce saltos no
+    // se veía la escalera, y con seis tampoco: lo que se ve es el titular
+    // yéndose, no el paso del desenfoque.
+    const portadaBorrosa = irse >= 1 ? 0 : Math.round(irse * 6) * 2;
     if (portadaBorrosa !== this.portadaBorrosa) {
       this.portadaBorrosa = portadaBorrosa;
       this.portada.style.filter = portadaBorrosa > 0 ? `blur(${portadaBorrosa}px)` : 'none';

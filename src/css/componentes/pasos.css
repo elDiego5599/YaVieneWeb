@@ -221,7 +221,12 @@
   grid-area: 1 / 1;
   width: max-content;
   justify-self: center;
-  visibility: visible;
+  /* Escondida de verdad, no sólo transparente: un aparato a opacidad cero
+     sigue componiéndose y sigue animando lo que lleve dentro, y aquí hay
+     tres con su sombra larga, su tarjeta de aviso y su levitación. La
+     `visibility` cambia al terminar el fundido —de ahí el retardo—, así
+     que la salida se sigue viendo entera. */
+  visibility: hidden;
   opacity: 0;
   translate: 0 18px;
   scale: 0.975;
@@ -229,14 +234,21 @@
   transition:
     opacity 0.32s ease,
     translate 0.42s var(--ease-out-cubic),
-    scale 0.42s var(--ease-out-cubic);
+    scale 0.42s var(--ease-out-cubic),
+    visibility 0s linear 0.42s;
 }
 
 .es-cinta .paso-toma.is-activa {
+  visibility: visible;
   opacity: 1;
   translate: 0 0;
   scale: 1;
   pointer-events: auto;
+  transition:
+    opacity 0.32s ease,
+    translate 0.42s var(--ease-out-cubic),
+    scale 0.42s var(--ease-out-cubic),
+    visibility 0s;
 }
 
 /* Dos columnas partidas por la mitad. El teléfono se centra en la
@@ -424,6 +436,16 @@
   max-width: clamp(228px, 20vw, 286px);
 }
 
+/* Encima del aviso ya está el desenfoque de su propia entrada; el del
+   fondo sobraba, y desenfocar el mapa de debajo mientras la tarjeta
+   levita es de lo más caro que hay en la sección. Con el blanco casi
+   cerrado no se distingue. */
+.scene-card--paso {
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 /* Entra y sale como las del hero, y además baja un poco al entrar: es una
    heads-up, y una heads-up cae desde arriba. El deslizamiento va en
    `translate` —la propiedad suelta— porque el `transform` se lo lleva la
@@ -550,8 +572,11 @@
   border: 1px solid rgba(11, 22, 40, 0.1);
   border-bottom: 0;
   border-radius: clamp(26px, 3vw, 38px) clamp(26px, 3vw, 38px) 0 0;
+  /* Sin `backdrop-filter`: lo que hay detrás de esta barra es el fondo de
+     la página, y a 92-97 % de opacidad el desenfoque no se ve. Lo que sí
+     se notaba era el precio: desenfocar mil doscientos por sesenta
+     píxeles de fondo en movimiento, en cada cuadro de la bajada. */
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(255, 252, 246, 0.92));
-  backdrop-filter: blur(18px) saturate(1.1);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;

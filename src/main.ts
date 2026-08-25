@@ -29,6 +29,7 @@ import { PhoneMap } from './phone-map';
 import { PhoneSimulator } from './phone-simulator';
 import { ProblemWeather } from './problem-weather';
 import { Reloj } from './reloj';
+import { dormirLoQueNoSeVe } from './reposo';
 import { saltosDeMenu } from './salto';
 import { encenderScrollSuave } from './scroll-suave';
 import { ScrollEffects } from './scroll-effects';
@@ -37,6 +38,11 @@ import { sinMovimiento } from './scrolly';
 const arrancar = (): void => {
   // Apariciones al entrar en pantalla: no depende de nada más.
   new ScrollEffects();
+
+  // Y lo contrario: lo que está fuera de pantalla deja de animarse. Es lo
+  // primero que se enciende porque sólo mira secciones, no depende de que
+  // ninguna otra pieza haya montado lo suyo. Ver reposo.ts.
+  dormirLoQueNoSeVe();
 
   // Los enlaces internos cruzan por encima de las dos pistas; sin esto la
   // travesía reproduce sus historias a toda velocidad. Ver salto.ts.

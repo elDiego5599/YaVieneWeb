@@ -290,9 +290,14 @@
   transition-delay: 0s;
 }
 
+/* El único panel que no respira, y es a propósito: `.panel--mint` es
+   #solucion, una pista que sólo se ve mientras se baja por ella. Mover el
+   degradado del fondo obliga a repintar el panel entero en cada cuadro
+   —eso no lo mueve la tarjeta gráfica— y ahí ya hay tres momentos, una
+   cinta y un riel en marcha. Nadie ve el fondo respirar; lo que se veía
+   eran los tirones. */
 .panel--mint {
   background-size: 180% 180%;
-  animation: panel-gradient-respiro 10s ease-in-out infinite alternate;
 }
 
 .solucion-nota {

@@ -158,3 +158,25 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Fuera de pantalla, quieto ─────────────────────────────────────────
+
+   Lo pone y lo quita `reposo.ts` según lo que se esté viendo. Los
+   degradados que respiran en los paneles y en el pie animan
+   `background-position` y `background-size`: eso no lo mueve la tarjeta
+   gráfica, obliga a repintar el panel entero en cada cuadro, y son
+   `infinite`. Media docena corriendo a la vez, la mayoría fuera de la
+   vista, es lo que hacía que bajar por la sección de los momentos fuera
+   a tirones.
+
+   Va con `!important` porque las animaciones se declaran con la forma
+   corta —`animation: … infinite`—, que reinicia el estado a `running`, y
+   algunas desde selectores mucho más específicos que éste. */
+.en-reposo,
+.en-reposo::before,
+.en-reposo::after,
+.en-reposo *,
+.en-reposo *::before,
+.en-reposo *::after {
+  animation-play-state: paused !important;
+}
