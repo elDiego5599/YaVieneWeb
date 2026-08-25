@@ -538,10 +538,15 @@
   align-items: center;
   justify-content: center;
   gap: 0;
-  /* Sin margen lateral: así el riel mide lo mismo que la línea de abajo y
-     la cabeza del verde cae clavada en el centro de cada pestaña. El aire
-     lo pone el `padding` de la pestaña, no el de la caja. */
-  padding: 0;
+  /* El mismo aire para el riel y para la línea, y es el `padding` de la
+     tarjeta: así la línea arranca en la misma vertical que el número y el
+     titular de abajo. En absoluto, `left: 0` cae en el borde de la caja y
+     no donde empiezan las pestañas, de ahí que las dos lean la misma
+     medida —y con eso la cabeza del verde cae clavada en el centro de la
+     pestaña encendida. Los 2px de más son el aire lateral del visor, que
+     también empuja al texto. */
+  --riel-aire: calc(clamp(24px, 3vw, 44px) + 2px);
+  padding-inline: var(--riel-aire);
   border: 1px solid rgba(11, 22, 40, 0.1);
   border-bottom: 0;
   border-radius: clamp(26px, 3vw, 38px) clamp(26px, 3vw, 38px) 0 0;
@@ -586,6 +591,10 @@
     padding: clamp(20px, 4.4vw, 30px);
   }
 
+  .pasos-mando {
+    --riel-aire: calc(clamp(20px, 4.4vw, 30px) + 2px);
+  }
+
   .es-cinta .pasos-visor {
     height: clamp(206px, 30vh, 262px);
   }
@@ -628,6 +637,7 @@
   }
 
   .pasos-mando {
+    --riel-aire: 20px;
     min-height: 52px;
   }
 
@@ -715,16 +725,16 @@
   grid-column: 2;
 }
 
-/* Una sola línea, de filo a filo del riel, que también hace de costura
-   entre la barra y la tarjeta. Tres barritas cortadas contaban tres
-   tramos sueltos; esta cuenta un recorrido, y el verde llega al centro
-   de la pestaña que toca. */
+/* Una sola línea, de filo a filo del riel —no de la tarjeta—. Tres
+   barritas cortadas contaban tres tramos sueltos; esta cuenta un
+   recorrido, y el verde llega al centro de la pestaña que toca. */
 .pasos-linea {
   position: absolute;
-  right: 0;
+  right: var(--riel-aire);
   bottom: 0;
-  left: 0;
+  left: var(--riel-aire);
   height: 2px;
+  border-radius: 999px;
   background: rgba(11, 22, 40, 0.1);
   overflow: hidden;
 }

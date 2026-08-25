@@ -71,6 +71,15 @@ const PASO_LINEA = 0.001;
 
 const cuantizar = (v: number, paso: number): number => Math.round(v / paso) * paso;
 
+/**
+ * La curva del viaje entre pestañas. `suavizar` ya sale y entra con la
+ * velocidad a cero, pero frena en línea recta y el último tramo se siente
+ * como un tope. Esta —la misma de siempre con un grado más— también lleva
+ * la aceleración a cero en los extremos: el final se estira y la cinta se
+ * posa en el momento en vez de chocar contra él.
+ */
+const aterrizar = (t: number): number => t * t * t * (t * (t * 6 - 15) + 10);
+
 /** Las piezas de un momento, buscadas una vez y no en cada cuadro. */
 interface Momento {
   paso: HTMLElement;
@@ -203,7 +212,7 @@ export class Pasos {
     // golpe, que era justo lo contrario de lo que se buscaba.
     const paso = (ahora: number): void => {
       const t = limitar((ahora - arranque) / duracion);
-      window.scrollTo({ top: desde + salto * suavizar(t), behavior: 'instant' });
+      window.scrollTo({ top: desde + salto * aterrizar(t), behavior: 'instant' });
       if (t < 1) this.viaje = requestAnimationFrame(paso);
       else this.cortarViaje();
     };
