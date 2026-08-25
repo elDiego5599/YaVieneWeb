@@ -1299,50 +1299,47 @@
     <section class="panel panel--ink panel--sangre" id="mapa">
       <div class="panel-inner panel-inner--ancho mapa-inner">
         <header class="mapa-cabecera">
-          <span class="tracked-eyebrow eyebrow--verde">PRUÉBALO AQUÍ</span>
+          <p class="mapa-insignia">
+            <span class="mapa-insignia-punto" aria-hidden="true"></span>PRUÉBALO AQUÍ
+          </p>
           <h2 class="section-title">Marca dónde esperas<br>y mira quién viene.</h2>
           <p class="section-lead">Elige una de las seis rutas y toca el mapa donde te
             paras normalmente. Cuando un bus entre en tu kilómetro, salta el mismo
             aviso que le llega al teléfono.</p>
         </header>
-
-        <div class="mapa-tablero" data-mapa-vivo>
-          <div class="mapa-columna mapa-columna--rutas">
-            <h3 class="mapa-rotulo">Las seis rutas</h3>
-            <div class="mv-rutas" data-mapa-rutas role="group"
-              aria-label="Rutas disponibles"></div>
-          </div>
-
-          <div class="mapa-lienzo-columna">
-            <div class="mapa-lienzo" data-mapa-lienzo>
-              <svg class="mapa-svg" data-mapa-svg role="img"
-                aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
-              <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
-            </div>
-            <p class="mapa-credito">© OpenStreetMap · © CARTO</p>
-          </div>
-
-          <div class="mapa-columna mapa-columna--lectura">
-            <div class="mapa-lectura" data-mapa-lectura>
-              <span class="mapa-rotulo">Bus más cercano</span>
-              <span class="mapa-lectura-bus" data-mapa-bus></span>
-              <span class="mapa-lectura-metros" data-mapa-metros></span>
-              <span class="mapa-lectura-pie" data-mapa-lectura-pie>en línea recta hasta tu punto</span>
-            </div>
-
-            <!-- Las dos líneas las escribe mapa-vivo.ts con el mismo texto
-                 que arma la notificación en la app. -->
-            <div class="mapa-aviso" data-mapa-aviso role="status" aria-live="polite">
-              <div class="mapa-aviso-icono" aria-hidden="true">
-                <img src="/logo.svg" alt="" width="20" height="20">
-              </div>
-              <div class="mapa-aviso-texto">
-                <span class="mapa-aviso-app">Ya Viene · ahora</span>
-                <strong class="mapa-aviso-titulo" data-mapa-aviso-titulo></strong>
-                <span class="mapa-aviso-cuerpo" data-mapa-aviso-cuerpo></span>
+        <div class="mapa-consola">
+          <div class="mapa-tablero" data-mapa-vivo>
+            <div class="mapa-lienzo-columna">
+              <div class="mapa-lienzo" data-mapa-lienzo>
+                <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
+                <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
+                <p class="mapa-credito">© OpenStreetMap · © CARTO</p>
               </div>
             </div>
-
+            <div class="mapa-mando">
+              <div class="mapa-columna mapa-columna--rutas">
+                <h3 class="mapa-rotulo">Las seis rutas</h3>
+                <div class="mv-rutas" data-mapa-rutas role="group" aria-label="Rutas disponibles"></div>
+              </div>
+              <div class="mapa-columna mapa-columna--lectura">
+                <div class="mapa-lectura" data-mapa-lectura>
+                  <span class="mapa-rotulo">Bus más cercano</span>
+                  <span class="mapa-lectura-bus" data-mapa-bus></span>
+                  <span class="mapa-lectura-metros" data-mapa-metros></span>
+                  <span class="mapa-lectura-pie" data-mapa-lectura-pie>en línea recta hasta tu punto</span>
+                </div>
+                <div class="mapa-aviso" data-mapa-aviso role="status" aria-live="polite">
+                  <div class="mapa-aviso-icono" aria-hidden="true">
+                    <img src="/logo.svg" alt="" width="20" height="20">
+                  </div>
+                  <div class="mapa-aviso-texto">
+                    <span class="mapa-aviso-app">Ya Viene · ahora</span>
+                    <strong class="mapa-aviso-titulo" data-mapa-aviso-titulo></strong>
+                    <span class="mapa-aviso-cuerpo" data-mapa-aviso-cuerpo></span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

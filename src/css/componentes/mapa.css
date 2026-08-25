@@ -18,34 +18,152 @@
    una ilustración de fondo y pasa a parecer lo que es, una pantalla
    encendida.
 
-   Tres columnas: las rutas a la izquierda, el mapa en el centro y la
-   lectura a la derecha. El mapa manda —conserva la proporción del
-   mosaico, 1284×1982, para no recortar ninguna terminal— y las dos
-   columnas se le acomodan. */
+   Dos piezas, no tres columnas sueltas: el mapa —que conserva la
+   proporción del mosaico, 1284×1982, para no recortar ninguna terminal—
+   y a su lado el mando, con las rutas arriba y la lectura debajo. Las
+   dos van dentro de un mismo marco para que se lean como un aparato y
+   no como tres recuadros flotando sobre la tinta. */
 .mapa-inner {
   display: flex;
   flex-direction: column;
-  gap: clamp(28px, 3.4vw, 52px);
+  gap: clamp(28px, 3.4vw, 48px);
 }
 
+/* La cabecera ocupa el ancho entero: el titular a la izquierda y la
+   entradilla a su derecha, apoyada en la misma línea de base. Antes era
+   un bloque estrecho arriba a la izquierda y dejaba medio panel vacío. */
 .mapa-cabecera {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  max-width: 46ch;
+  gap: 16px;
+}
+
+/* Apilada la entradilla se queda con el ancho del panel entero, que son
+   cien caracteres por línea: hay que frenarla igual que arriba. */
+.mapa-cabecera .section-lead {
+  max-width: 52ch;
+}
+
+@media (min-width: 900px) {
+  .mapa-cabecera {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    column-gap: clamp(32px, 4vw, 80px);
+    align-items: end;
+  }
+
+  .mapa-cabecera .mapa-insignia,
+  .mapa-cabecera .section-title {
+    grid-column: 1;
+  }
+
+  .mapa-cabecera .section-lead {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: end;
+    margin: 0;
+    max-width: 46ch;
+  }
+}
+
+/* El rótulo de la sección: es la única parte de la página que se toca,
+   así que en vez del texto suelto de las otras lleva chapa y un punto
+   encendido —el mismo verde del bus cerca— para que se vea que aquí hay
+   algo vivo. */
+.mapa-insignia {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  align-self: start;
+  width: max-content;
+  margin: 0;
+  padding: 8px 17px 8px 14px;
+  border: 1px solid rgba(0, 168, 89, 0.55);
+  border-radius: 999px;
+  background: rgba(0, 168, 89, 0.16);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #4ADE80;
+}
+
+.mapa-insignia-punto {
+  position: relative;
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ADE80;
+}
+
+/* El latido va en `transform` y `opacity` —las dos que no repintan— y se
+   para solo cuando la sección sale de pantalla. */
+.mapa-insignia-punto::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #4ADE80;
+  animation: insignia-latido 2.4s var(--ease-out-cubic) infinite;
+}
+
+@keyframes insignia-latido {
+  0% { transform: scale(1); opacity: 0.5; }
+  70%, 100% { transform: scale(3.4); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapa-insignia-punto::after {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}
+
+/* El marco. Lo que va dentro deja de ser tres cosas sueltas sobre la
+   tinta y pasa a ser una sola pantalla. */
+.mapa-consola {
+  width: 100%;
+  max-width: min(100%, 1060px);
+  margin-inline: auto;
+  padding: clamp(14px, 1.7vw, 24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(24px, 2.4vw, 36px);
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: 0 40px 90px -50px rgba(0, 0, 0, 0.9);
 }
 
 .mapa-tablero {
   display: grid;
-  gap: clamp(18px, 2vw, 32px);
+  gap: clamp(16px, 1.8vw, 26px);
   justify-content: center;
   align-items: start;
 }
 
 @media (min-width: 1060px) {
   .mapa-tablero {
-    grid-template-columns: minmax(230px, 290px) auto minmax(250px, 320px);
+    /* El mapa pide el ancho que le toca por su proporción; el mando se
+       queda con el resto y estira hasta la misma altura. */
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: stretch;
   }
+}
+
+/* El mando: rutas arriba, lectura debajo, y la lectura se estira para
+   llenar lo que el mapa deja de alto. */
+.mapa-mando {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 1.6vw, 22px);
+  min-width: 0;
+}
+
+.mapa-mando .mapa-columna--rutas {
+  flex: 0 0 auto;
+}
+
+.mapa-mando .mapa-columna--lectura {
+  flex: 1;
 }
 
 .mapa-columna {
@@ -74,12 +192,13 @@
   position: relative;
   /* La proporción del mosaico, para que quepa la ciudad entera. */
   aspect-ratio: 1284 / 1982;
-  height: clamp(420px, 74vh, 720px);
-  border-radius: 26px;
+  height: clamp(420px, 72vh, 660px);
+  border-radius: 22px;
   overflow: hidden;
   background: #EDE7DE;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.7);
+  /* Dentro del marco la sombra larga sobraba: basta con despegarlo. */
+  box-shadow: 0 18px 44px -26px rgba(0, 0, 0, 0.8);
 }
 
 .mapa-svg {
@@ -157,13 +276,21 @@
   pointer-events: none;
 }
 
+/* La atribución va dentro del mapa, que es donde va en un mapa: como pie
+   centrado bajo el lienzo parecía una nota de la página. */
 .mapa-credito {
-  margin: 10px 4px 0;
-  font-size: 11px;
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 2;
+  margin: 0;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 10px;
   line-height: 1.4;
   letter-spacing: 0.02em;
-  color: rgba(255, 255, 255, 0.45);
-  text-align: center;
+  color: rgba(11, 22, 40, 0.6);
   pointer-events: none;
 }
 
@@ -172,6 +299,16 @@
   display: flex;
   flex-direction: column;
   gap: 7px;
+}
+
+/* Al lado del mapa hay ancho de sobra: las seis rutas en dos columnas
+   caben en tres filas y dejan sitio a la lectura. */
+@media (min-width: 1060px) {
+  .mv-rutas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
 }
 
 .mv-ruta {
@@ -232,9 +369,11 @@
 /* ── La lectura ── */
 .mapa-lectura {
   display: flex;
+  flex: 1;
   flex-direction: column;
+  justify-content: center;
   gap: 3px;
-  padding: 18px 20px 20px;
+  padding: 20px 22px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.04);
@@ -248,6 +387,39 @@
 
 .mapa-lectura .mapa-rotulo {
   margin-bottom: 6px;
+}
+
+/* Con el ancho del mando la lectura se lee como el cuadro de un
+   aparato: a la izquierda de qué bus hablamos, a la derecha el número
+   grande, que es lo único que de verdad se mira. */
+@media (min-width: 1060px) {
+  .mapa-lectura {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-content: center;
+    align-items: center;
+    column-gap: clamp(20px, 2.4vw, 40px);
+    row-gap: 2px;
+  }
+
+  .mapa-lectura .mapa-rotulo {
+    grid-area: 1 / 1;
+    margin-bottom: 0;
+  }
+
+  .mapa-lectura-bus {
+    grid-area: 2 / 1;
+  }
+
+  .mapa-lectura-pie {
+    grid-area: 3 / 1;
+    margin-top: 6px;
+  }
+
+  .mapa-lectura-metros {
+    grid-area: 1 / 2 / 4 / 3;
+    font-size: clamp(46px, 4.6vw, 68px);
+  }
 }
 
 .mapa-lectura-bus {
@@ -340,31 +512,22 @@
   color: var(--app-text-secondary);
 }
 
-.mapa-honesto {
-  font-size: 12px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.mapa-honesto strong {
-  display: block;
-  margin-bottom: 4px;
-  color: rgba(255, 255, 255, 0.72);
-}
-
 @media (max-width: 1059px) {
-  /* Apilado manda el mapa primero: es lo que hay que tocar. */
+  /* Apilado el mapa ya va primero en el orden del documento: es lo que
+     hay que tocar. Debajo, el mando con las rutas en un carril. */
+  /* Aquí manda el ancho, no el alto: el mosaico es más alto que ancho y
+     si se pide por altura se sale del marco en el móvil. Se le da el
+     ancho que quepa —con el alto de siempre como techo— y la proporción
+     saca la altura. */
   .mapa-lienzo-columna {
-    height: min(72vh, 560px);
+    width: 100%;
     justify-self: center;
   }
 
   .mapa-lienzo {
-    height: 100%;
-  }
-
-  .mapa-columna--rutas {
-    order: 3;
+    width: min(100%, calc(min(72vh, 560px) * 1284 / 1982));
+    height: auto;
+    margin-inline: auto;
   }
 
   .mv-rutas {
