@@ -25,13 +25,6 @@ export const suavizar = (t: number): number => {
 export const entre = (v: number, a: number, b: number): number =>
   b === a ? 0 : limitar((v - a) / (b - a));
 
-/** Reparte 0..1 en `n` tramos iguales; devuelve cuál y cuánto lleva. */
-export function tramo(p: number, n: number): { indice: number; dentro: number } {
-  const escala = limitar(p) * n;
-  const indice = Math.min(n - 1, Math.floor(escala));
-  return { indice, dentro: limitar(escala - indice) };
-}
-
 export const sinMovimiento = (): boolean =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

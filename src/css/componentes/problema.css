@@ -349,8 +349,15 @@
 }
 
 /* Cada golpe de texto entra cuando el reloj llega a su altura. Aparecen y
-   se quedan: al final de la sección está el texto entero, como siempre. */
-.problema-beat {
+   se quedan: al final de la sección está el texto entero, como siempre.
+
+   El escondite lo pone `es-guion`, y esa clase la pone reloj.ts al
+   engancharse al scroll. Sin JavaScript —o antes de que arranque— los
+   párrafos están puestos: la sección se lee entera aunque nadie los
+   revele nunca, que es lo contrario de lo que pasaba cuando el estado de
+   partida era invisible. El titular y la frase de arriba no llevan golpe:
+   ésos se leen siempre, con scroll o sin él. */
+.es-guion .problema-beat {
   opacity: 0;
   transform: translateY(20px);
   transition:
@@ -358,7 +365,7 @@
     transform 0.6s var(--ease-out-cubic);
 }
 
-.problema-beat.is-visible {
+.es-guion .problema-beat.is-visible {
   opacity: 1;
   transform: none;
 }

@@ -11,15 +11,20 @@
    ────────────────────────────────────────────────────────────────── */
 
 /* ── La solución: la app, momento a momento ───────────────────────────
-   Una sola sección para lo que antes iba en dos. Todo vive en la misma
-   celda de la rejilla: al entrar sólo está el titular, a tamaño de
-   portada; al bajar, el titular se abre y detrás entra el primer momento.
+   Una sola sección para lo que antes iba en dos. La portada y la obra
+   comparten celda de la rejilla: al entrar sólo está el titular, a tamaño
+   de portada; al bajar, el titular se abre y detrás aparece la obra.
 
-   Cada momento son dos columnas —el texto a la izquierda, el teléfono a la
-   derecha— y se relevan cruzando hacia la izquierda: el que llega viene
-   del margen izquierdo, desenfocado, y se asienta; el que se va sigue
-   hacia allá. Las dos columnas no viajan lo mismo —el teléfono va más
-   corto—, y ese desfase es lo que da la profundidad. */
+   La obra son dos piezas con oficios distintos. El teléfono se queda
+   plantado a la derecha y no se mueve en toda la sección: lo único que
+   cambia en él es la pantalla, como cuando uno navega la app de verdad.
+   El texto sí viaja: los tres momentos van en fila dentro de un visor que
+   los recorta, y la fila corre hacia la izquierda a medida que baja la
+   página, cada uno tapando al anterior. Nada se transparenta con nada.
+
+   Antes cruzaban los dos —texto y aparato— desvaneciéndose el uno sobre
+   el otro, con desenfoque de por medio. Bajando deprisa eso no era una
+   transición: eran dos teléfonos medio transparentes a la vez. */
 .pasos-escena {
   position: relative;
   display: flex;
@@ -27,27 +32,43 @@
   gap: clamp(26px, 3vw, 46px);
 }
 
+/* Riel y tarjeta van pegados, sin hueco: son la misma pieza, un panel con
+   sus pestañas encima, no dos cosas puestas una sobre otra. */
+.es-cinta .pasos-escena {
+  gap: 0;
+}
+
 /* La cinta no usa todo el panel: con el teléfono plantado en el centro,
    un contenedor de 1680 dejaría media pantalla muerta a la derecha. El
    riel de abajo sí lo usa entero, y ese contraste de anchos es parte de
-   lo que evita que la sección parezca dos líneas rectas. */
+   lo que evita que la sección parezca dos líneas rectas.
+
+   De partida no hay cinta ni superposición: portada, textos y teléfonos
+   caen uno debajo de otro, que es como se lee la sección si el JavaScript
+   no llega o si el sistema pide no animar. La clase `es-cinta` —la pone
+   pasos.ts cuando va a gobernar la sección— es la que apila la portada
+   sobre la obra y pone los momentos en fila. Sin nadie que las funda,
+   dos textos en la misma celda son dos textos encima del mismo sitio. */
 .pasos-pila {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(44px, 5vw, 84px);
   width: 100%;
   max-width: min(100%, 1180px);
   margin-inline: auto;
-  min-height: clamp(420px, 64vh, 660px);
+}
+
+.es-cinta .pasos-pila {
+  display: grid;
+  gap: 0;
+  min-height: 0;
   align-items: center;
 }
 
-.pasos-portada,
-.paso {
+.es-cinta .pasos-portada,
+.es-cinta .pasos-obra {
   grid-area: 1 / 1;
   align-self: center;
-  /* El aviso de capa lo pone y lo quita `pasos.ts` mientras el bloque
-     viaja: dejarlo fijo en los seis reserva memoria de vídeo todo el rato
-     y, con `filter` dentro, obliga al navegador a tener siempre a mano una
-     capa capaz de desenfocar el teléfono y el mapa enteros. */
 }
 
 /* ── La portada ──
@@ -89,14 +110,133 @@
   font-size: clamp(1rem, 0.9rem + 0.45vw, 1.25rem);
 }
 
-/* ── Cada momento ── */
-.paso {
-  display: grid;
-  gap: clamp(24px, 3vw, 60px);
+/* ── La obra: el texto que corre y el teléfono que no ── */
+.pasos-obra {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-items: center;
+  gap: clamp(24px, 3vw, 60px);
   width: 100%;
-  transform-origin: 50% 50%;
+}
+
+.es-cinta .pasos-obra {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.82fr);
+  justify-items: center;
+  align-items: center;
+  min-height: clamp(430px, 58vh, 570px);
+  padding: clamp(24px, 3vw, 44px);
+  border: 1px solid rgba(11, 22, 40, 0.1);
+  border-top: 0;
+  border-radius: 0 0 clamp(26px, 3vw, 38px) clamp(26px, 3vw, 38px);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 251, 244, 0.86)),
+    radial-gradient(480px 380px at 92% 92%, rgba(0, 168, 89, 0.09), transparent 72%);
+  box-shadow: 0 32px 80px -58px rgba(11, 22, 40, 0.52);
+}
+
+/* El visor recorta la fila de textos, y recorta justo en el borde: un
+   respiro lateral de ocho píxeles no se ve como aire, se ve como el
+   momento siguiente asomando por la derecha —el recorte cae en la caja de
+   relleno, no en el contenido—. Arriba y abajo sí hay sitio, que ahí no
+   hay nada esperando turno. */
+.pasos-visor {
+  width: 100%;
+}
+
+.es-cinta .pasos-visor {
+  overflow: hidden;
+  align-self: stretch;
+  height: clamp(300px, 48vh, 420px);
+  padding: 6px 2px;
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 5%, #000 95%, transparent 100%);
+}
+
+/* La fila. Cada momento ocupa el ancho entero del visor y los que sobran
+   se salen por la derecha, que es de donde vienen. Lo desplaza `pasos.ts`
+   con el avance de la pista: un porcentaje del ancho del visor, así que
+   la cuenta no cambia con el tamaño de la ventana. */
+.pasos-carro {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(44px, 5vw, 84px);
+}
+
+.es-cinta .pasos-carro {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: 100%;
+  width: 100%;
+  height: 100%;
+  gap: 0;
+  align-items: center;
+}
+
+/* Cada momento ocupa su columna entera y se alinea arriba: si se centrara,
+   el momento corto —el segundo, que no tiene apunte— bailaría respecto a
+   los otros dos al pasar, y el teléfono de al lado se queda quieto. */
+.paso {
+  width: 100%;
+}
+
+/* Se alinea arriba y guarda un alto mínimo: si se centrara, el momento
+   corto —el segundo, que no tiene apunte— bailaría al pasar respecto a
+   los otros dos, y el teléfono de al lado no se mueve. */
+.es-cinta .paso {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  min-height: 0;
+}
+
+/* ── El teléfono, plantado ──
+   Los tres aparatos comparten celda y sitio exacto: sólo se ve el del
+   momento en curso, y como el marco es idéntico en los tres, lo que se
+   ve al cambiar no es un teléfono que se va y otro que llega, sino la
+   pantalla del mismo aparato pasando de una cosa a otra.
+
+   `visibility` y no `display`: el mapa de cada momento necesita medirse
+   —el mosaico y las polilíneas se colocan con las medidas de la caja—, y
+   una caja sin `display` no mide nada. */
+.pasos-telefonos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(44px, 5vw, 84px);
+}
+
+.es-cinta .pasos-telefonos {
+  display: grid;
+  gap: 0;
+  justify-self: center;
+  align-self: stretch;
+  width: 100%;
+}
+
+/* El aparato ocupa lo que ocupa y se centra en su columna, en vez de
+   estirarse de lado a lado: el aviso del tercer momento se cuelga de su
+   borde derecho, y con la caja estirada ese borde caía en el filo de la
+   tarjeta y la notificación se salía de la página. */
+.es-cinta .paso-toma {
+  grid-area: 1 / 1;
+  width: max-content;
+  justify-self: center;
+  visibility: visible;
+  opacity: 0;
+  translate: 0 18px;
+  scale: 0.975;
+  pointer-events: none;
+  transition:
+    opacity 0.32s ease,
+    translate 0.42s var(--ease-out-cubic),
+    scale 0.42s var(--ease-out-cubic);
+}
+
+.es-cinta .paso-toma.is-activa {
+  opacity: 1;
+  translate: 0 0;
+  scale: 1;
+  pointer-events: auto;
 }
 
 /* Dos columnas partidas por la mitad. El teléfono se centra en la
@@ -109,13 +249,37 @@
    misma especificidad, gana la última, y cualquier valor que se ponga
    dentro de esta consulta de medios no llega a aplicarse nunca. */
 @media (min-width: 920px) {
-  .paso {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    justify-items: start;
+  .es-cinta .pasos-telefonos {
+    margin-top: 0;
+  }
+}
+
+/* Pantallas anchas pero bajas —un portátil de 1280 por 640, que de esos
+   hay muchos—. Ahí el visor se queda en su alto mínimo mientras el texto
+   sigue midiendo lo mismo, y el momento más largo, el tercero, se sale
+   por abajo. Se le baja el cuerpo a la letra en vez de recortar el visor:
+   el momento tiene que caber entero, que es lo único que no se negocia. */
+@media (min-width: 920px) and (max-height: 720px) {
+  .es-cinta .paso-titulo {
+    font-size: clamp(1.5rem, 1rem + 1vw, 1.95rem);
   }
 
-  .paso-toma {
-    margin-top: clamp(24px, 5vh, 76px);
+  .es-cinta .paso-texto {
+    font-size: var(--step-body);
+  }
+
+  .es-cinta .paso-nota {
+    font-size: 0.92rem;
+  }
+
+  .es-cinta .paso-cuerpo {
+    gap: 10px;
+  }
+
+  .es-cinta .paso-numero {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
   }
 }
 
@@ -130,8 +294,8 @@
 .paso-numero {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--green);
   color: var(--text-white);
@@ -154,6 +318,25 @@
   font-size: var(--step-lead);
   line-height: 1.5;
   color: var(--text-secondary);
+}
+
+/* Dentro de la tarjeta el momento no abre nada: lo que abre la sección es
+   la portada, y ésta ya se fue. Con el cuerpo de titular de sección —tres
+   coma seis rem— el momento uno, que es el que más línea tiene, no cabía
+   entero en el visor y se le comía el número y el final del apunte. Aquí
+   el titular es el de una tarjeta, como en la referencia.
+
+   Y el texto usa el ancho de la columna entera: medirlo en 42 caracteres
+   cuando la columna da para 48 no es respirar, es una línea más de alto
+   por párrafo, que es justo lo que no sobra. */
+.es-cinta .paso-titulo {
+  font-size: clamp(1.7rem, 1rem + 1.5vw, 2.5rem);
+  line-height: 1.06;
+}
+
+.es-cinta .paso-texto,
+.es-cinta .paso-nota {
+  max-width: none;
 }
 
 .paso-texto em {
@@ -180,7 +363,6 @@
   position: relative;
   display: grid;
   place-items: center;
-  justify-self: center;
 }
 
 .paso-toma::before {
@@ -194,6 +376,13 @@
 
 .paso-toma > * {
   position: relative;
+}
+
+/* El aparato cabe completo dentro de la tarjeta. En el hero puede ser una
+   vitrina; aquí comparte escena con la explicación y necesita dejarle aire
+   al texto, igual que las pantallas de la referencia. */
+.es-cinta .phone-shell--paso {
+  --ancho: clamp(210px, 18vw, 272px);
 }
 
 /* ── El aviso del tercer momento ──
@@ -299,6 +488,16 @@
   }
 }
 
+/* Dentro de la tarjeta hay menos banda libre que cuando el teléfono
+   estaba suelto en el panel: entre el hombro del aparato y el filo hay
+   unos 150 px, no los 260 de antes. El aviso se apoya más sobre la
+   pantalla y encoge un punto, pero sigue saliendo por el mismo sitio.
+   Va después de la consulta de medios de 1199, que si no le gana. */
+.es-cinta .scene-card--paso {
+  right: clamp(-132px, -9vw, -60px);
+  max-width: clamp(178px, 15vw, 212px);
+}
+
 /* ── El riel ──
    Índice y barra de avance a la vez: el momento activo se llena mientras
    dura y tocar uno lleva la página hasta su tramo. Aparece en cuanto la
@@ -309,25 +508,88 @@
    unas pestañas larguísimas con el nombre perdido a la izquierda. Se les
    pone tope y se centra el grupo: quedan las tres juntas debajo del
    momento, que es donde se leen como un índice. */
-.pasos-riel {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 210px));
+/* El mando entero —contador y riel— entra de una pieza cuando la portada
+   empieza a irse, y ya no se vuelve a esconder.
+
+   Va apoyado en el borde de arriba de la tarjeta y con su mismo ancho:
+   las pestañas y lo que enseñan son una sola pieza. De lado a lado de la
+   ventana quedaba una barra suelta con la tarjeta debajo, y flotando en
+   absoluto —que es como estaba— se le montaba al titular del momento; un
+   índice que tapa lo que indexa no es un índice.
+
+   Ocupa su sitio desde el principio aunque todavía no se vea, así que la
+   tarjeta no da un salto el día que aparece, y aparece con ella, en el
+   mismo fundido y al mismo ritmo: la opacidad se la escribe pasos.ts con
+   el avance de la pista, igual que a la tarjeta. Antes entraba por su
+   cuenta, mucho antes, y quedaba una barra suelta flotando por encima
+   del titular de portada, con su filo de abajo cortando la nada.
+
+   La costura entre los dos es el borde de abajo de esta caja; la tarjeta
+   no lleva el suyo arriba, para que no salgan dos líneas donde va una. */
+.pasos-mando {
+  order: -1;
+  position: relative;
+  z-index: 8;
+  display: flex;
+  width: 100%;
+  max-width: min(100%, 1180px);
+  margin-inline: auto;
+  min-height: 58px;
+  align-items: center;
   justify-content: center;
-  gap: 18px 18px;
-  padding-top: clamp(18px, 2vw, 26px);
-  border-top: 1px solid rgba(11, 22, 40, 0.1);
+  gap: 0;
+  padding: 0 clamp(10px, 1.6vw, 26px);
+  border: 1px solid rgba(11, 22, 40, 0.1);
+  border-bottom: 0;
+  border-radius: clamp(26px, 3vw, 38px) clamp(26px, 3vw, 38px) 0 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(255, 252, 246, 0.92));
+  backdrop-filter: blur(18px) saturate(1.1);
   opacity: 0;
-  transform: translateY(10px);
+  visibility: hidden;
   pointer-events: none;
-  transition:
-    opacity 0.5s var(--ease-out-cubic),
-    transform 0.5s var(--ease-out-cubic);
 }
 
-.pasos-riel.is-visible {
-  opacity: 1;
-  transform: none;
+.pasos-mando.is-visible {
+  visibility: visible;
   pointer-events: auto;
+}
+
+/* El contador contesta de un vistazo en cuál de los tres se está, que es
+   lo que el riel solo no decía: sus tres pestañas se parecen demasiado
+   entre sí como para leerlas de reojo. Cifras de ancho fijo para que el
+   número no dé un salto al pasar del 1 al 3. */
+.pasos-cuenta {
+  display: none;
+}
+
+.pasos-cuenta b {
+  display: none;
+}
+
+.pasos-riel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  justify-content: center;
+  gap: 0;
+}
+
+@media (max-width: 919px) {
+  .es-cinta .pasos-obra {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 8px;
+    min-height: clamp(430px, 62vh, 570px);
+    padding: clamp(20px, 4.4vw, 30px);
+  }
+
+  .es-cinta .pasos-visor {
+    height: clamp(206px, 30vh, 262px);
+  }
+
+  .es-cinta .pasos-telefonos {
+    min-height: 0;
+  }
 }
 
 /* En un teléfono no cabe la sección entera con el mockup a tamaño de
@@ -336,12 +598,15 @@
    riel conserva sus columnas pero pierde los nombres: lo que hace falta
    ahí es saber por dónde va la cinta, no leer un índice. */
 @media (max-width: 759px) {
-  .pasos-pila {
-    min-height: clamp(300px, 58vh, 470px);
-  }
-
   .paso {
     gap: clamp(16px, 4vw, 26px);
+  }
+
+  /* El hueco reservado se mide contra el texto más alto, y en un teléfono
+     el más alto son tres líneas sin apunte: con el alto de escritorio
+     quedaba un palmo de vacío entre la frase y el aparato. */
+  .es-cinta .paso {
+    min-height: 0;
   }
 
   .paso-titulo {
@@ -352,30 +617,76 @@
     font-size: var(--step-body);
   }
 
+  /* El apunte es la letra pequeña de la pantalla; en un teléfono, con el
+     mockup debajo, es la línea que sobra para que el momento entero quepa
+     de una vez. El texto que manda —titular y frase— se queda. */
   .paso-nota {
-    font-size: 0.875rem;
+    display: none;
+  }
+
+  .pasos-mando {
+    min-height: 52px;
+    padding-inline: 6px;
   }
 
   .pasos-riel {
+    width: 100%;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0 8px;
+    gap: 0;
   }
 
   .pasos-tab-nombre {
-    display: none;
+    display: block;
+    max-width: 11ch;
+    overflow: hidden;
+    font-size: 10px;
+    line-height: 1.05;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pasos-tab {
+    column-gap: 5px;
+    padding: 12px 3px 10px;
+  }
+
+  .pasos-tab-icon {
+    width: 15px;
+    height: 15px;
+  }
+
+  .es-cinta .pasos-obra {
+    min-height: clamp(420px, 62vh, 510px);
+    padding: 18px;
+  }
+
+  .es-cinta .pasos-visor {
+    height: clamp(168px, 24vh, 206px);
+  }
+
+  .es-cinta .phone-shell--paso {
+    --ancho: clamp(148px, 40vw, 188px);
   }
 }
 
+/* La barrita mide lo que mide la pestaña, no lo que mide la palabra: con
+   «Aviso» a un lado y «Punto de espera» al otro, unas barras a medida de
+   cada nombre se ven como tres rayas de tamaños distintos puestas al
+   azar. Por eso va en absoluto, de filo a filo de la pestaña —que ocupa
+   un tercio del riel—, y el icono y el nombre siguen centrados encima. */
 .pasos-tab {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 0;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto max-content;
+  align-items: center;
+  justify-content: center;
+  column-gap: 8px;
+  padding: 16px 18px 12px;
   border: 0;
   background: none;
   cursor: pointer;
   font: inherit;
-  font-size: clamp(14px, 1.05vw, 16px);
+  font-size: clamp(13px, 1.05vw, 16px);
   font-weight: 700;
   letter-spacing: -0.2px;
   text-align: center;
@@ -385,10 +696,31 @@
 
 .pasos-tab:hover,
 .pasos-tab.is-activa {
-  color: var(--ink);
+  color: var(--green-accessible);
+}
+
+.pasos-tab-icon {
+  grid-column: 1;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+}
+
+.pasos-tab-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.pasos-tab-nombre {
+  grid-column: 2;
 }
 
 .pasos-tab-barra {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
   height: 2px;
   border-radius: 999px;
   background: rgba(11, 22, 40, 0.12);
@@ -415,19 +747,10 @@
     transform: none;
   }
 
-  .pasos-pila {
-    display: flex;
-    flex-direction: column;
-    gap: clamp(44px, 5vw, 84px);
-    min-height: 0;
-  }
-
-  .pasos-portada,
-  .paso {
-    grid-area: auto;
-  }
-
-  .pasos-riel {
+  /* La cinta no se desarma aquí: es que no llega a armarse nunca, porque
+     `es-cinta` sólo la pone pasos.ts y ahí devuelve antes de ponerla. Lo
+     único que sobra es el mando, que sin cinta no lleva a ningún sitio. */
+  .pasos-mando {
     display: none;
   }
 }

@@ -242,9 +242,9 @@
 /* ── Pista y escena: el andamio del scrollytelling ────────────────────
    Una pista es un bloque de varias pantallas de alto con una escena
    pegada dentro. Mientras la pista cruza la ventana la escena se queda
-   quieta y lo que cambia es lo que hay dentro: el reloj corre, los pasos
-   se relevan de uno en uno. `--tramos` dice cuántos
-   momentos tiene y `--paso` cuánto scroll cuesta cada uno.
+   quieta y lo que cambia es lo que hay dentro: el reloj corre, la cinta
+   de momentos pasa de uno a otro. `--tramos` dice cuántos momentos tiene
+   y `--paso` cuánto scroll cuesta cada uno.
 
    Cuidado con `overflow` en cualquier antepasado: `hidden` convierte al
    padre en contenedor de scroll y el pegado deja de funcionar. Por eso el
@@ -256,18 +256,25 @@
   height: calc(var(--tramos) * var(--paso) + 100vh);
 }
 
-/* La solución pide más scroll por momento que las demás pistas: en la
-   mitad de cada turno el teléfono se queda quieto haciendo su demo, y ese
-   descanso tiene que durar lo que dura la demo. Si el tramo fuera corto,
-   la cinta se llevaría la animación a media frase.
+/* El reloj no necesita las tres pantallas y media que pedía antes: la
+   sección tardaba tanto en soltar su contenido que bajando a ritmo normal
+   se veían transiciones sin tiempo de leerlas, y el que llegaba al final
+   había recorrido más de tres mil píxeles para una idea sola. Con dos
+   tramos cortos el recorrido baja un tercio y la esfera sigue dando la
+   vuelta entera; lo que se lee de la sección ya no depende de haber
+   bajado hasta el fondo, porque el titular y la frase están puestos
+   desde el primer píxel. */
+.pista--reloj {
+  --tramos: 2;
+  --paso: 70vh;
+}
 
-   Aun así, con cinco momentos esto son casi cinco pantallas: es la parte
-   más larga de la página con diferencia y el que llega a ella no sabe
-   cuánto le queda. Por eso el tramo se aprieta hasta lo que aguanta la
-   demo —unos cuarenta por ciento de pantalla de descanso— y el riel de
-   pestañas aparece enseguida para poder saltar. */
+/* Los tramos los pone `pasos.ts`, uno por momento. El paso es más corto
+   que el de antes porque la cinta ya no tiene que cruzar dos bloques
+   desvaneciéndose: el texto se desplaza de un tirón y el teléfono no se
+   mueve, así que el mismo relevo se lee en menos recorrido. */
 .pista--pasos {
-  --paso: 76vh;
+  --paso: 68vh;
 }
 
 .escena {

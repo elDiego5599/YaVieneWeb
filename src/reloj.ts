@@ -97,6 +97,11 @@ export class Reloj {
       return;
     }
 
+    // A partir de aquí manda el scroll: sin esta clase los golpes de
+    // texto se quedan puestos, que es lo que se lee si el JavaScript no
+    // llega. Ver `.es-guion .problema-beat` en problema.css.
+    this.pista.classList.add('es-guion');
+
     this.soltar = seguirPista(pista, (p) => {
       this.scroll = p;
       this.pintar();

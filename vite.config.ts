@@ -128,5 +128,12 @@ export default defineConfig({
   server: {
     port: 8091,
     open: false
+  },
+  // Las demos sin deploy pasan por túneles de Cloudflare. Sin esto, el
+  // preview responde 403 a cualquier Host que no sea localhost (la
+  // protección anti DNS-rebinding de Vite). El punto inicial cubre los
+  // subdominios aleatorios que genera cada túnel efímero.
+  preview: {
+    allowedHosts: ['.trycloudflare.com']
   }
 });

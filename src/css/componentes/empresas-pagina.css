@@ -390,7 +390,7 @@
    pie de la ficha, donde antes iba el rótulo del piloto: quien lee la
    explicación y no quiere formulario tiene ahí mismo por dónde escribir. */
 .whatsapp-btn {
-  align-self: flex-start;
+  align-self: center;
   display: inline-flex;
   align-items: center;
   gap: 10px;

@@ -1,75 +1,68 @@
-import { entre, scrollDePista, seguirPista, sinMovimiento } from './scrolly';
+import { entre, limitar, scrollDePista, seguirPista, sinMovimiento, suavizar } from './scrolly';
 
 /**
- * La solución, momento por momento, sobre una cinta que corre hacia la
- * izquierda.
+ * La solución, momento por momento, con el teléfono quieto.
  *
  * Al principio sólo está el titular, grande y centrado. Al bajar, el
- * titular se abre —crece y se va— y detrás empieza a pasar la cinta: cada
- * momento entra por la derecha, se planta en el centro y sale por la
- * izquierda para que llegue el siguiente. Todo viaja en la misma
- * dirección, que es lo que hace que se lea como una cosa después de otra
- * y no como tres tarjetas iguales apiladas.
+ * titular se abre —crece y se va— y detrás aparece la obra: el texto a la
+ * izquierda, el teléfono a la derecha.
  *
- * Lo importante es el descanso: en la mitad de su turno el momento se
- * queda completamente quieto, y ése es el rato en el que el teléfono hace
- * su demo. La animación no se corta a media frase para dar paso a la
- * siguiente; termina, y después la cinta vuelve a moverse.
+ * A partir de ahí el contenido cambia como una secuencia de tarjetas: el
+ * texto entra desde abajo y el teléfono pasa suavemente a la pantalla del
+ * momento siguiente. Así se entiende el relevo sin que dos vistas de la
+ * app compitan en el mismo lugar.
+ *
+ * Lo importante sigue siendo el descanso: la mayor parte de su turno el
+ * momento está completamente quieto, y ése es el rato en el que el
+ * teléfono hace su demo. La cinta no vuelve a moverse hasta que se acaba
+ * el turno.
  */
-
-/**
- * Bordes del cruce, en unidades de turno. El que entra empieza antes de
- * que acabe el turno anterior y el que sale termina ya dentro del
- * siguiente: si no se pisaran, quedaría un tramo de pantalla vacía entre
- * momento y momento.
- */
-const ENTRA_DESDE = 0.18;
-const ENTRA_HASTA = 0.16;
-const SALE_DESDE = 0.16;
-const SALE_HASTA = 0.18;
-
-/** Cuánto viaja cada momento de lado, en píxeles. */
-const VIAJE = 210;
 
 /** Dónde acaba la portada y empieza la cinta, en avance de pista. */
 const PORTADA_FIN = 0.17;
 
 /**
  * La portada termina de irse antes de que le toque el turno al primer
- * momento, y el primero empieza a entrar antes de que ella acabe: entre
- * los dos hay que dejar solape, o queda un tramo de scroll con la sección
- * vacía. Los dos números son fracciones del turno de la portada.
+ * momento, y la obra empieza a aparecer antes de que ella acabe: entre
+ * las dos hay que dejar solape, o queda un tramo de scroll con la sección
+ * vacía. Los tres números son fracciones del turno de la portada.
  */
 const PORTADA_FUNDE = 0.8;
-const PRIMERO_DESDE = 0.3;
+const OBRA_DESDE = 0.36;
+const OBRA_HASTA = 0.98;
 
 /**
- * Tope del desenfoque de entrada, en píxeles, y el escalón con el que se
- * mueve.
+ * Cuánto de cada turno se pasa viajando, y el resto es descanso. El viaje
+ * va a caballo del cambio de turno —la mitad al final de uno, la mitad al
+ * principio del siguiente— para que el descanso caiga en el centro del
+ * turno, que es adonde lleva el riel cuando se toca una pestaña.
  *
- * Aquí está la diferencia entre ir a sesenta cuadros y no ir. Un `filter`
- * obliga al navegador a volver a pintar todo lo que hay debajo, y un
- * bloque de estos son mil ciento ochenta por seiscientos ochenta y cinco
- * píxeles con un teléfono y un mapa dentro. Si el valor cambia en cada
- * cuadro —y en un cruce hay dos bloques a la vez— no hay máquina que lo
- * aguante. Así que el desenfoque va sólo sobre la columna de texto, que
- * es pequeña, y a saltos de un píxel: cinco repintados por cruce en vez
- * de noventa. El teléfono cruza con opacidad y desplazamiento, que son
- * las dos cosas que la tarjeta gráfica hace gratis.
+ * Con 0.44 el momento pasa algo más de la mitad de su turno parado. Menos
+ * que eso y la cinta se mueve casi todo el rato; más, y el salto de un
+ * momento a otro se vuelve brusco por lo poco que dura.
  */
-const BORROSO_MAX = 5;
+const CRUCE = 0.44;
 
 /**
  * Cuánto tiene que cambiar un valor para que valga la pena escribirlo.
  *
  * Escribir en `style` no es gratis aunque el valor sea el mismo: cada
  * asignación pasa por el analizador de CSS y ensucia el estilo del
- * elemento. En un cruce hay tres bloques por cuatro propiedades cada
- * uno, sesenta veces por segundo. Redondeando a medio píxel y a un uno
- * por ciento de opacidad, la mayoría de los cuadros no escribe nada: se
- * ve igual y el navegador se queda tranquilo.
+ * elemento. Redondeando el desplazamiento a la veinteava parte de un uno
+ * por ciento del visor —medio píxel en una ventana normal— y la opacidad
+ * al uno por ciento, la mayoría de los cuadros no escribe nada: se ve
+ * igual y el navegador se queda tranquilo.
  */
-const PASO_PX = 0.5;
+/**
+ * Lo que tarda el viaje cuando se toca una pestaña, según lo lejos que
+ * quede el momento: del primero al segundo es medio segundo largo, del
+ * primero al tercero casi uno. Con un tiempo fijo, el salto corto se
+ * arrastra y el largo va a la carrera.
+ */
+const VIAJE_MIN = 520;
+const VIAJE_MAX = 900;
+
+const PASO_CINTA = 0.05;
 const PASO_OPACIDAD = 0.01;
 const PASO_BARRA = 1;
 
@@ -77,42 +70,42 @@ const cuantizar = (v: number, paso: number): number => Math.round(v / paso) * pa
 
 /** Las piezas de un momento, buscadas una vez y no en cada cuadro. */
 interface Momento {
-  raiz: HTMLElement;
-  cuerpo: HTMLElement | null;
+  paso: HTMLElement;
   toma: HTMLElement | null;
   pestana: HTMLElement | null;
   barra: HTMLElement | null;
   /** Lo último que se le puso, para no repetir escrituras inútiles. */
-  borroso: number;
-  movil: boolean;
-  opacidad: number;
-  x: number;
-  tomaX: number;
-  visible: boolean;
-  activo: boolean;
-  tabActiva: boolean;
   avance: number;
+  opacidad: number;
 }
 
 export class Pasos {
-  private readonly portada: HTMLElement;
-  private readonly momentos: Momento[];
-  private readonly riel: HTMLElement | null;
   private readonly pista: HTMLElement;
+  private readonly portada: HTMLElement;
+  private readonly obra: HTMLElement;
+  private readonly carro: HTMLElement;
+  private readonly mando: HTMLElement | null;
+  private readonly cuenta: HTMLElement | null;
+  private readonly momentos: Momento[];
+
   private soltar: (() => void) | null = null;
-  private reposo = -1;
-  private portadaBorrosa = -1;
+  private viaje = 0;
+  private cortar: (() => void) | null = null;
+  private indice = -1;
+  private cinta = NaN;
   private portadaIrse = -1;
-  private rielVisible = false;
+  private portadaBorrosa = -1;
+  private obraEntra = -1;
+  private mandoVisible = false;
 
   /**
-   * Le dice a main.ts qué teléfono está quieto y le toca moverse.
+   * Le dice a main.ts qué teléfono está a la vista y le toca moverse.
    *
    * Entra por el constructor y no como propiedad suelta a propósito. La
    * primera medida se toma aquí dentro, antes de devolver el objeto: si
    * la página arranca ya parada dentro de un momento —refrescando a media
    * sección— ése es el único aviso que se da en todo el rato, porque el
-   * siguiente no llega hasta que el reposo cambie de momento. Asignando
+   * siguiente no llega hasta que la cinta cambie de momento. Asignando
    * el aviso después, ese primero se perdía y el teléfono se quedaba
    * congelado en su foto de reposo hasta que uno subía y volvía a bajar.
    */
@@ -120,58 +113,127 @@ export class Pasos {
 
   constructor(pista: HTMLElement, alReposo?: (indice: number) => void) {
     const portada = pista.querySelector<HTMLElement>('[data-pasos-portada]');
+    const obra = pista.querySelector<HTMLElement>('[data-pasos-obra]');
+    const carro = pista.querySelector<HTMLElement>('[data-pasos-carro]');
     const pasos = Array.from(pista.querySelectorAll<HTMLElement>('[data-paso]'));
-    if (!portada || pasos.length === 0) throw new Error('Pasos: faltan piezas');
+    if (!portada || !obra || !carro || pasos.length === 0) {
+      throw new Error('Pasos: faltan piezas');
+    }
+
     this.alReposo = alReposo ?? null;
     this.pista = pista;
     this.portada = portada;
-    this.riel = pista.querySelector<HTMLElement>('.pasos-riel');
+    this.obra = obra;
+    this.carro = carro;
+    this.mando = pista.querySelector<HTMLElement>('.pasos-mando');
+    this.cuenta = pista.querySelector<HTMLElement>('[data-pasos-cuenta]');
 
     const pestanas = Array.from(pista.querySelectorAll<HTMLElement>('[data-pasos-tab]'));
-    this.momentos = pasos.map((raiz, i) => ({
-      raiz,
-      cuerpo: raiz.querySelector<HTMLElement>('.paso-cuerpo'),
-      toma: raiz.querySelector<HTMLElement>('.paso-toma'),
+    const tomas = Array.from(pista.querySelectorAll<HTMLElement>('[data-toma]'));
+    this.momentos = pasos.map((paso, i) => ({
+      paso,
+      toma: tomas[i] ?? null,
       pestana: pestanas[i] ?? null,
       barra: pestanas[i]?.querySelector<HTMLElement>('.pasos-tab-avance') ?? null,
-      borroso: -1,
-      movil: false,
-      opacidad: -1,
-      x: NaN,
-      tomaX: NaN,
-      visible: true,
-      activo: false,
-      tabActiva: false,
       avance: -1,
+      opacidad: -1,
     }));
 
-    // Un tramo por momento. Con el tramo de sobra que había antes, la
-    // sección pedía casi ocho pantallas de scroll para tres ideas: la
-    // portada ya tiene su propio arranque y el último momento se queda
-    // puesto hasta que la sección sale, así que no hace falta pagar un
-    // tramo entero por ese remate.
+    // Un tramo por momento. La portada tiene su arranque dentro del primero
+    // y el último se queda puesto hasta que la sección sale, así que no
+    // hace falta pagar un tramo entero por ninguno de los dos remates.
     pista.style.setProperty('--tramos', String(pasos.length));
 
-    // Sin animaciones no hay cinta que valga: los momentos se apilan en el
-    // flujo normal —lo arma el CSS— y aquí sólo hay que quitarles el
-    // maquillaje para que no queden invisibles.
-    if (sinMovimiento()) {
-      this.portada.removeAttribute('style');
-      for (const paso of pasos) paso.removeAttribute('style');
-      return;
-    }
+    // Sin animaciones no hay cinta que valga: los momentos y los teléfonos
+    // se leen de arriba abajo como una lista de toda la vida. Lo arma el
+    // CSS; aquí sólo hay que no ponerse en medio.
+    if (sinMovimiento()) return;
+
+    // La portada tapa a la obra sólo cuando hay quien las gobierne. Sin
+    // JavaScript se quedan una debajo de otra, que es feo pero se lee;
+    // superpuestas y sin nadie que las funda, serían dos textos encima del
+    // mismo sitio. Ver `.es-cinta` en pasos.css.
+    pista.classList.add('es-cinta');
 
     pestanas.forEach((pestana, i) => {
       pestana.addEventListener('click', () => this.irA(i));
+      pestana.addEventListener('keydown', (evento) => this.teclado(evento, i));
     });
 
     this.soltar = seguirPista(pista, (p) => this.pintar(p));
   }
 
-  /** Lleva el scroll al centro del descanso de un momento. */
+  /**
+   * Lleva el scroll al centro del descanso de un momento.
+   *
+   * El viaje se anima a mano, cuadro a cuadro, y las pistas se quedan
+   * vivas: lo que se ve mientras dura es la cinta pasando por los
+   * momentos del camino y la barrita del riel llenándose hasta el
+   * destino, que es lo que hace que tocar una pestaña se lea como un
+   * recorrido y no como un corte. Antes se congelaban —como hacen los
+   * enlaces del menú, ver salto.ts— y el momento aparecía de golpe.
+   *
+   * Si el que mira toca la rueda o la pantalla, el viaje se corta ahí
+   * mismo: el scroll es suyo, no nuestro.
+   */
   private irA(indice: number): void {
     const ancho = (1 - PORTADA_FIN) / this.momentos.length;
-    scrollDePista(this.pista, PORTADA_FIN + ancho * (indice + 0.5));
+    const destino = scrollDePista(this.pista, PORTADA_FIN + ancho * (indice + 0.5));
+    const desde = window.scrollY;
+    const salto = destino - desde;
+    if (Math.abs(salto) < 2) return;
+
+    this.cortarViaje();
+    const duracion = Math.min(VIAJE_MAX, Math.max(VIAJE_MIN, Math.abs(salto) * 1.15));
+    const arranque = performance.now();
+    this.cortar = () => {
+      window.removeEventListener('wheel', this.cortar!);
+      window.removeEventListener('touchstart', this.cortar!);
+      this.cortarViaje();
+    };
+    window.addEventListener('wheel', this.cortar, { passive: true });
+    window.addEventListener('touchstart', this.cortar, { passive: true });
+
+    // `instant` a propósito: el documento lleva `scroll-behavior: smooth`
+    // —ver base.css— y sin decírselo cada cuadro del viaje arrancaría su
+    // propio scroll suave, cancelando el del cuadro anterior. La página se
+    // quedaba clavada casi un segundo y luego daba el salto entero de
+    // golpe, que era justo lo contrario de lo que se buscaba.
+    const paso = (ahora: number): void => {
+      const t = limitar((ahora - arranque) / duracion);
+      window.scrollTo({ top: desde + salto * suavizar(t), behavior: 'instant' });
+      if (t < 1) this.viaje = requestAnimationFrame(paso);
+      else this.cortarViaje();
+    };
+    this.viaje = requestAnimationFrame(paso);
+  }
+
+  /** Corta el viaje en curso y recoge lo que dejó puesto. */
+  private cortarViaje(): void {
+    if (this.viaje !== 0) cancelAnimationFrame(this.viaje);
+    this.viaje = 0;
+    if (this.cortar) {
+      window.removeEventListener('wheel', this.cortar);
+      window.removeEventListener('touchstart', this.cortar);
+      this.cortar = null;
+    }
+  }
+
+  /** Las flechas recorren el riel, como en cualquier grupo de pestañas. */
+  private teclado(evento: KeyboardEvent, indice: number): void {
+    const ultimo = this.momentos.length - 1;
+    let destino = indice;
+    if (evento.key === 'ArrowRight' || evento.key === 'ArrowDown') destino = indice + 1;
+    else if (evento.key === 'ArrowLeft' || evento.key === 'ArrowUp') destino = indice - 1;
+    else if (evento.key === 'Home') destino = 0;
+    else if (evento.key === 'End') destino = ultimo;
+    else return;
+
+    evento.preventDefault();
+    destino = destino < 0 ? 0 : destino > ultimo ? ultimo : destino;
+    if (destino === indice) return;
+    this.momentos[destino]?.pestana?.focus();
+    this.irA(destino);
   }
 
   private pintar(p: number): void {
@@ -184,117 +246,122 @@ export class Pasos {
       this.portada.style.transform = `scale(${1 + irse * 0.34}) translateY(${irse * -24}px)`;
       this.portada.style.visibility = irse >= 1 ? 'hidden' : 'visible';
     }
-    // Mismo trato que los momentos: el desenfoque va a saltos para no
-    // repintar el titular entero sesenta veces por segundo.
+    // El desenfoque va a saltos de un píxel: un `filter` obliga a repintar
+    // el titular entero, y hacerlo sesenta veces por segundo es la
+    // diferencia entre ir a sesenta cuadros y no ir.
     const portadaBorrosa = irse >= 1 ? 0 : Math.round(irse * 12);
     if (portadaBorrosa !== this.portadaBorrosa) {
       this.portadaBorrosa = portadaBorrosa;
       this.portada.style.filter = portadaBorrosa > 0 ? `blur(${portadaBorrosa}px)` : 'none';
     }
 
-    // El riel es la salida de emergencia de la sección: si aparece a
-    // mitad de la portada, el que no quiera leer los tres momentos ya
-    // puede saltar al que le interese en vez de bajar a ciegas. Y una vez
-    // puesto se queda: al volver hacia arriba desaparecía, y un índice que
-    // se esconde justo cuando el que mira duda es un índice inútil.
-    const rielVisible = this.rielVisible || irse > 0.14;
-    if (rielVisible !== this.rielVisible) {
-      this.rielVisible = rielVisible;
-      this.riel?.classList.toggle('is-visible', rielVisible);
+    // La obra entra entera de una vez, con la portada todavía yéndose.
+    // Este es el único fundido que queda en la sección, y es el de la
+    // portada al contenido: entre momento y momento no hay ninguno.
+    const entra = cuantizar(
+      suavizar(entre(p, PORTADA_FIN * OBRA_DESDE, PORTADA_FIN * OBRA_HASTA)),
+      PASO_OPACIDAD
+    );
+    if (entra !== this.obraEntra) {
+      const movia = this.obraEntra > 0 && this.obraEntra < 1;
+      const mueve = entra > 0 && entra < 1;
+      this.obraEntra = entra;
+      this.obra.style.opacity = String(entra);
+      this.obra.style.visibility = entra <= 0 ? 'hidden' : 'visible';
+      if (mueve !== movia) this.obra.style.willChange = mueve ? 'opacity' : 'auto';
+      // El riel va pegado al borde de arriba de la tarjeta, así que entra
+      // con ella y no por su cuenta: son la misma pieza.
+      if (this.mando) this.mando.style.opacity = String(entra);
+    }
+
+    // El mando es la salida de emergencia de la sección: en cuanto la
+    // tarjeta asoma, el que no quiera ver los tres momentos ya puede
+    // saltar al que le interese en vez de bajar a ciegas. Va y viene con
+    // ella —no se queda puesto— porque lo que se ve es opacidad, y una
+    // barra invisible que sigue recibiendo clics es una barra que se come
+    // los del titular de portada que hay debajo.
+    const mandoVisible = entra > 0.02;
+    if (mandoVisible !== this.mandoVisible) {
+      this.mandoVisible = mandoVisible;
+      this.mando?.classList.toggle('is-visible', mandoVisible);
     }
 
     const n = this.momentos.length;
     const ancho = (1 - PORTADA_FIN) / n;
-    let reposo = -1;
+    // En qué turno va la pista, con decimales: 0 es el primer momento, 1
+    // el segundo. La cinta no empieza a correr hasta el final del turno.
+    const turno = (p - PORTADA_FIN) / ancho;
+
+    /*
+      Dónde está la cinta, en anchos de visor. Cada relevo es un escalón
+      suavizado a caballo del cambio de turno, y entre escalón y escalón
+      la cinta está exactamente quieta. Sumarlos en vez de calcular «el
+      turno actual más lo que lleve recorrido» evita el caso raro de dos
+      relevos pisándose si algún día `CRUCE` pasara de uno.
+    */
+    let desplazada = 0;
+    for (let i = 1; i < n; i++) {
+      desplazada += suavizar(entre(turno, i - CRUCE / 2, i + CRUCE / 2));
+    }
+
+    const cinta = cuantizar(desplazada * 100, PASO_CINTA);
+    if (cinta !== this.cinta) {
+      const paraba = this.cinta % 100 === 0;
+      const para = cinta % 100 === 0;
+      this.cinta = cinta;
+      this.carro.style.transform = `translate3d(0, ${-cinta}%, 0)`;
+      // El aviso a la tarjeta gráfica se da al empezar a moverse y se
+      // retira al pararse: dejarlo puesto reserva memoria de vídeo para
+      // nada durante todo el descanso, que es la mayor parte del rato.
+      if (para !== paraba) this.carro.style.willChange = para ? 'auto' : 'transform';
+    }
+
+    /* La tarjeta que sale se vuelve un recuerdo al llegar al borde alto y
+       la que entra termina de aparecer desde abajo. No se ven dos textos
+       recortados a la vez: es el relevo suave de la referencia, aplicado
+       a los tres momentos de la app. */
+    this.momentos.forEach((m, i) => {
+      const opacidad = cuantizar(1 - Math.min(1, Math.abs(i - desplazada) * 1.35), PASO_OPACIDAD);
+      if (opacidad === m.opacidad) return;
+      m.opacidad = opacidad;
+      m.paso.style.opacity = String(opacidad);
+    });
 
     this.momentos.forEach((m, i) => {
       const inicio = PORTADA_FIN + ancho * i;
-      const fin = inicio + ancho;
-
-      // El primero se adelanta menos que los demás: pisa la cola de la
-      // portada lo justo para que no haya pantalla en blanco entre las dos.
-      const desde = inicio - ancho * (i === 0 ? PRIMERO_DESDE : ENTRA_DESDE);
-      const entra = entre(p, desde, inicio + ancho * ENTRA_HASTA);
-      // El último no se va: si se fuera, la sección terminaría en blanco.
-      const sale =
-        i === n - 1 ? 0 : entre(p, fin - ancho * SALE_DESDE, fin + ancho * SALE_HASTA);
-
-      // Un solo eje y un solo sentido: entra por la derecha, se planta,
-      // sale por la izquierda.
-      const x = cuantizar(VIAJE * (1 - entra) - VIAJE * sale, PASO_PX);
-      const opacidad = cuantizar(entra * (1 - sale), PASO_OPACIDAD);
-      const quieto = entra > 0.995 && sale < 0.005;
-      const oculto = opacidad <= 0.001;
-
-      if (opacidad !== m.opacidad) {
-        m.opacidad = opacidad;
-        m.raiz.style.opacity = String(opacidad);
-      }
-      // `quieto` entra en la cuenta porque al pararse hay que cambiar el
-      // `translate3d` por `none` y soltar la capa de composición.
-      const parado = quieto ? NaN : x;
-      if (!Object.is(parado, m.x)) {
-        m.x = parado;
-        m.raiz.style.transform = quieto ? 'none' : `translate3d(${x}px, 0, 0)`;
-      }
-      if (oculto === m.visible) {
-        m.visible = !oculto;
-        m.raiz.style.visibility = oculto ? 'hidden' : 'visible';
-      }
-
-      // El aviso a la tarjeta gráfica se da al empezar a moverse y se
-      // retira al pararse: dejarlo puesto en los tres bloques a la vez
-      // reserva memoria de vídeo para nada.
-      const movil = !quieto && !oculto;
-      if (movil !== m.movil) {
-        m.movil = movil;
-        m.raiz.style.willChange = movil ? 'transform, opacity' : 'auto';
-      }
-
-      // El desenfoque, a saltos y sólo sobre el texto. Ver BORROSO_MAX.
-      const borroso = oculto ? 0 : Math.round(((1 - entra) + sale) * BORROSO_MAX);
-      if (m.cuerpo && borroso !== m.borroso) {
-        m.borroso = borroso;
-        m.cuerpo.style.filter = borroso > 0 ? `blur(${borroso}px)` : 'none';
-      }
-
-      const activo = opacidad > 0.5;
-      if (activo !== m.activo) {
-        m.activo = activo;
-        m.raiz.classList.toggle('is-activo', activo);
-      }
-
-      // El teléfono viaja un poco más que su texto: al cruzarse, la mano
-      // que lleva el aparato va por delante de la frase que lo explica.
-      if (m.toma) {
-        const extra = quieto ? NaN : cuantizar(x * 0.34, PASO_PX);
-        if (!Object.is(extra, m.tomaX)) {
-          m.tomaX = extra;
-          m.toma.style.transform = quieto ? 'none' : `translate3d(${extra}px, 0, 0)`;
-        }
-      }
-
-      const avance = cuantizar(entre(p, inicio, fin) * 100, PASO_BARRA);
+      const avance = cuantizar(entre(p, inicio, inicio + ancho) * 100, PASO_BARRA);
       if (avance !== m.avance) {
         m.avance = avance;
-        const tabActiva = avance > 0 && avance < 100;
-        if (tabActiva !== m.tabActiva) {
-          m.tabActiva = tabActiva;
-          m.pestana?.classList.toggle('is-activa', tabActiva);
-        }
         m.barra?.style.setProperty('--avance', `${avance}%`);
       }
-
-      if (quieto) reposo = i;
     });
 
-    if (reposo !== this.reposo) {
-      this.reposo = reposo;
-      this.alReposo?.(reposo);
+    /*
+      Y el teléfono. El cambio cae en la mitad del relevo, que es cuando la
+      cinta va más rápida y el ojo está en el texto que pasa: la pantalla
+      del aparato ya es la del momento que llega antes de que el texto
+      termine de sentarse. Mientras la portada tapa, no hay ninguno.
+    */
+    const indice = entra > 0.02 ? Math.round(desplazada) : -1;
+    if (indice !== this.indice) {
+      this.indice = indice;
+      // Con la sección fuera de pantalla no hay momento activo, pero el
+      // riel tiene que seguir siendo alcanzable con el tabulador: en ese
+      // caso el que recibe el foco es el primero.
+      const foco = indice < 0 ? 0 : indice;
+      this.momentos.forEach((m, i) => {
+        m.toma?.classList.toggle('is-activa', i === indice);
+        m.pestana?.classList.toggle('is-activa', i === indice);
+        m.pestana?.setAttribute('aria-selected', String(i === indice));
+        if (m.pestana) m.pestana.tabIndex = i === foco ? 0 : -1;
+      });
+      if (this.cuenta && indice >= 0) this.cuenta.textContent = String(indice + 1);
+      this.alReposo?.(indice);
     }
   }
 
   destroy(): void {
+    this.cortarViaje();
     this.soltar?.();
     this.soltar = null;
   }

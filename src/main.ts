@@ -100,30 +100,29 @@ const arrancar = (): void => {
   if (pistaReloj) new Reloj(pistaReloj);
 
   /*
-    La solución: tres momentos sobre una cinta, cada uno con su propio
-    teléfono. Los mapas son el mismo mosaico y las mismas seis polilíneas
-    del hero, uno por momento, porque cada guion mueve su bus a su ritmo.
+    La solución: los tres textos van en una cinta y los tres teléfonos
+    están apilados en el mismo sitio, uno por momento. Los mapas son el
+    mismo mosaico y las mismas seis polilíneas del hero, uno por teléfono,
+    porque cada guion mueve su bus a su ritmo.
 
-    `Pasos` avisa cuál está quieto en el centro y sólo ése se anima: así
-    la sección nunca tiene más de un bucle corriendo, y la animación se
-    ve entera antes de dar paso a la siguiente.
+    `Pasos` avisa qué teléfono está a la vista y sólo ése se anima: así la
+    sección nunca tiene más de un bucle corriendo, y la demo se ve entera
+    antes de dar paso a la siguiente. Con -1 se apagan todos, que es lo
+    que pasa cuando la sección se sale de pantalla.
   */
   const pistaPasos = document.querySelector<HTMLElement>('[data-pasos-pista]');
   if (pistaPasos) {
     const demos = new Map<number, PasoDemo>();
 
-    for (const paso of pistaPasos.querySelectorAll<HTMLElement>('[data-paso]')) {
-      const numero = Number(paso.dataset.demo);
-      const capa = paso.querySelector<SVGSVGElement>('.routes-svg-layer');
-      const lienzo = paso.querySelector<HTMLElement>('.phone-map');
+    for (const toma of pistaPasos.querySelectorAll<HTMLElement>('[data-toma]')) {
+      const numero = Number(toma.dataset.demo);
+      const capa = toma.querySelector<SVGSVGElement>('.routes-svg-layer');
+      const lienzo = toma.querySelector<HTMLElement>('.phone-map');
       if (!capa || !lienzo || !Number.isFinite(numero)) continue;
 
-      demos.set(numero - 1, new PasoDemo(paso, new PhoneMap(capa, lienzo), numero));
+      demos.set(numero - 1, new PasoDemo(toma, new PhoneMap(capa, lienzo), numero));
     }
 
-    // Los teléfonos primero: `Pasos` mide en cuanto se construye, y si la
-    // página se refresca ya parada dentro de un momento ése es el único
-    // aviso que va a dar. Tienen que estar todos listos para recibirlo.
     new Pasos(pistaPasos, (indice) => {
       for (const [i, demo] of demos) demo.activar(i === indice);
     });

@@ -52,7 +52,15 @@ const TOPE_MS = 3000;
  */
 const INTERRUMPEN = ['wheel', 'touchstart', 'keydown'] as const;
 
-const alLlegar = (soltar: () => void): void => {
+/**
+ * Llama a `soltar` cuando la página deja de moverse.
+ *
+ * Lo usan los dos sitios que mandan la página a otro lado por su cuenta:
+ * los enlaces del menú, aquí abajo, y el riel de la solución, que salta al
+ * tramo del momento que se toque. En los dos casos hace falta lo mismo,
+ * saber cuándo terminó el viaje para volver a soltar las pistas.
+ */
+export const alLlegar = (soltar: () => void): void => {
   let previo = window.scrollY;
   let quietos = 0;
   let vivo = true;
