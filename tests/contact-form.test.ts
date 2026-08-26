@@ -15,7 +15,10 @@ function montarFormulario(): HTMLFormElement {
       <button type="submit">Quiero conectar mi flota</button>
     </form>
     <p id="form-error" role="alert" hidden></p>
-    <div id="form-success" hidden></div>
+    <div id="form-success" hidden>
+      <h3 data-exito-titulo>¡Solicitud recibida!</h3>
+      <p data-exito-texto>Te contactaremos pronto.</p>
+    </div>
   `;
   return document.getElementById('contact-form') as HTMLFormElement;
 }
@@ -57,7 +60,8 @@ describe('ContactForm', () => {
 
   it('sin endpoint abre WhatsApp con el mensaje pre-armado', async () => {
     vi.stubEnv('VITE_CONTACT_ENDPOINT', '');
-    const abrirWhatsApp = vi.fn().mockReturnValue({});
+    const ventana = { opener: {} as unknown, location: { href: '' } };
+    const abrirWhatsApp = vi.fn().mockReturnValue(ventana);
     vi.stubGlobal('open', abrirWhatsApp);
     const post = vi.fn();
     vi.stubGlobal('fetch', post);
@@ -68,10 +72,45 @@ describe('ContactForm', () => {
 
     expect(post).not.toHaveBeenCalled();
     expect(abrirWhatsApp).toHaveBeenCalledTimes(1);
-    const url = abrirWhatsApp.mock.calls[0][0] as string;
-    expect(url).toContain('https://wa.me/573004438626');
-    expect(decodeURIComponent(url)).toContain('Hola, soy Diego de Sobusa');
+    expect(ventana.location.href).toContain('https://wa.me/573004438626');
+    expect(decodeURIComponent(ventana.location.href)).toContain('Hola, soy Diego de Sobusa');
     expect((document.getElementById('form-success') as HTMLElement).hidden).toBe(false);
+  });
+
+  /**
+   * La regresión que hay que impedir: la pestaña se pedía con `noopener`
+   * en la lista de opciones, y con eso el navegador devuelve `null`
+   * siempre. WhatsApp se abría con el mensaje escrito y la página, al
+   * volver, decía «no pudimos enviar la solicitud».
+   */
+  it('pide la pestaña en blanco y le corta el vínculo, sin usar noopener', async () => {
+    vi.stubEnv('VITE_CONTACT_ENDPOINT', '');
+    const ventana = { opener: {} as unknown, location: { href: '' } };
+    const abrirWhatsApp = vi.fn().mockReturnValue(ventana);
+    vi.stubGlobal('open', abrirWhatsApp);
+
+    const form = montarFormulario();
+    new ContactForm(form);
+    await enviar(form);
+
+    expect(abrirWhatsApp.mock.calls[0][0]).toBe('');
+    expect(String(abrirWhatsApp.mock.calls[0][2] ?? '')).not.toContain('noopener');
+    expect(ventana.opener).toBeNull();
+    const error = document.getElementById('form-error') as HTMLElement;
+    expect(error.hidden).toBe(true);
+  });
+
+  it('por WhatsApp no dice «recibida»: el mensaje aún está sin enviar', async () => {
+    vi.stubEnv('VITE_CONTACT_ENDPOINT', '');
+    vi.stubGlobal('open', vi.fn().mockReturnValue({ opener: {}, location: { href: '' } }));
+
+    const form = montarFormulario();
+    new ContactForm(form);
+    await enviar(form);
+
+    const exito = document.getElementById('form-success') as HTMLElement;
+    expect(exito.querySelector('[data-exito-titulo]')?.textContent).toBe('Te abrimos WhatsApp');
+    expect(exito.querySelector('[data-exito-texto]')?.textContent).toContain('Dale a enviar');
   });
 
   it('con la ventana bloqueada muestra error y no da por enviado nada', async () => {
