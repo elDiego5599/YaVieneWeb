@@ -388,30 +388,6 @@
   font-weight: 700;
 }
 
-/* La salida de siempre para el que no quiere llenar un formulario. Vive al
-   pie de la ficha, donde antes iba el rótulo del piloto: quien lee la
-   explicación y no quiere formulario tiene ahí mismo por dónde escribir. */
-.whatsapp-btn {
-  align-self: center;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px 22px;
-  border-radius: 999px;
-  background: #25D366;
-  color: #06301A;
-  font-size: 14px;
-  font-weight: 700;
-  transition: transform var(--transition-hover), box-shadow var(--transition-hover);
-}
-
-@media (hover: hover) {
-  .whatsapp-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 16px 30px -12px rgba(37, 211, 102, 0.6);
-  }
-}
-
 /* En un teléfono la fila no da para las cuatro columnas y «Sin señal»
    partía en dos líneas. Se cae el texto del estado, que es el dato que ya
    lleva el punto de color al lado; lo que no se cae es la placa ni el

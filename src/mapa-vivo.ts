@@ -342,7 +342,7 @@ export class MapaVivo {
     this.aparte =
       Math.hypot(cerca.x - destino.x, cerca.y - destino.y) * this.metrosPorUnidad;
     this.avisado = false;
-    this.aviso.classList.remove('is-on');
+    this.apagarAviso();
     this.dibujarPin();
     this.reponerBuses();
     this.actualizarLectura();
@@ -454,7 +454,7 @@ export class MapaVivo {
     if (vuelta || (lejos && pasados)) {
       this.reponerBuses();
       this.avisado = false;
-      this.aviso.classList.remove('is-on');
+      this.apagarAviso();
     }
 
     this.actualizarLectura();
@@ -492,7 +492,15 @@ export class MapaVivo {
       */
       this.avisoTitulo.textContent = `El bus ${cerca.placa} está cerca de ti`;
       this.aviso.classList.add('is-on');
+      // La banda de arriba es una sola: mientras hay aviso, la pista de
+      // toque se retira. Nunca se ven las dos, así que no reserva hueco.
+      this.raiz.classList.add('es-avisado');
     }
+  }
+
+  private apagarAviso(): void {
+    this.aviso.classList.remove('is-on');
+    this.raiz.classList.remove('es-avisado');
   }
 }
 

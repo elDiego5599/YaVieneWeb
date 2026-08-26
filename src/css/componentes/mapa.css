@@ -96,11 +96,55 @@
 
 @media (min-width: 1060px) {
   .mapa-tablero {
-    /* El mapa pide el ancho que le toca por su proporción; el mando se
-       queda con el resto y estira hasta la misma altura. */
-    grid-template-columns: auto minmax(0, 1fr);
+    /* El mapa a la derecha, que es donde acaba de leerse la fila: primero
+       se elige en la lista y después se mira lo que dibuja.
+
+       El mapa es lo que la sección viene a enseñar, así que se lleva el
+       sitio: pide todo el alto que le cabe en pantalla y su ancho sale
+       solo de la proporción del mosaico —`auto`—, que es vertical.
+
+       El mando lleva techo. Sin él se quedaba con todo lo que sobra en
+       una pantalla ancha —ochocientos y pico píxeles para dos palabras
+       por fila— y el mapa acababa pareciendo la ilustración de al lado
+       en vez del centro. Con el techo puesto los dos van parejos y el
+       grupo se centra, que es lo que ya hacía `justify-content`. */
+    grid-template-columns: minmax(0, 560px) auto;
     align-items: stretch;
   }
+
+  /* El orden del documento deja el mapa primero: apilado en el móvil es lo
+     que hay que tocar, y así llega antes. En ancho se cruzan. */
+  .mapa-tablero > .mapa-mando {
+    grid-area: 1 / 1;
+  }
+
+  .mapa-tablero > .mapa-vista {
+    grid-area: 1 / 2;
+  }
+}
+
+/* ── La vista: la banda de aviso y, debajo, el mapa ──
+   Dos piezas en columna. La banda es lo que antes flotaba sobre el
+   mosaico —la pista de toque y la notificación—, y flotando tapaba
+   rutas. Aquí tiene sitio propio y el mapa se queda limpio. */
+.mapa-vista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Las dos ocupan la misma celda: se relevan sin mover nada de sitio. El
+   alto mínimo es el de la tarjeta de aviso, para que al aparecer no
+   empuje el mapa hacia abajo. */
+.mapa-tira {
+  display: grid;
+  align-items: center;
+  min-height: 58px;
+}
+
+.mapa-tira > * {
+  grid-area: 1 / 1;
 }
 
 /* El mando: rutas arriba, lectura abajo, y nada de aire muerto en medio.
@@ -134,6 +178,17 @@
   color: var(--text-secondary);
 }
 
+/* El rótulo de las rutas ocupa la misma banda que la tira de al lado, así
+   la primera fila de la lista arranca a la altura del borde de arriba del
+   mapa. Sin esto la lista subía 40 px y la columna quedaba descuadrada. */
+@media (min-width: 1060px) {
+  .mapa-columna--rutas .mapa-rotulo {
+    display: flex;
+    align-items: center;
+    min-height: 58px;
+  }
+}
+
 /* ── El lienzo ──
    Va suelto en la rejilla del tablero: tenía una columna de envoltorio
    que no repartía nada, sólo una capa más entre el mapa y el hueco que
@@ -142,7 +197,7 @@
   position: relative;
   /* La proporción del mosaico, para que quepa la ciudad entera. */
   aspect-ratio: 1284 / 1982;
-  height: clamp(420px, 72vh, 660px);
+  height: clamp(440px, 82vh, 780px);
   border-radius: 22px;
   overflow: hidden;
   background: #EDE7DE;
@@ -208,41 +263,50 @@
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.28));
 }
 
+/* ── La pista de toque ──
+   La misma pastilla de tinta de siempre, centrada sobre el mapa. Lo que
+   cambió no es cómo se ve sino dónde: estaba encima del mosaico y tapaba
+   trazado; ahora se apoya en la banda, justo encima del borde.
+
+   Sin `backdrop-filter`: sobre el mapa desenfocaba el mosaico de detrás y
+   tenía sentido; sobre la crema del documento no hay nada que desenfocar
+   y es de lo más caro que se le puede pedir a un navegador. */
 .mapa-toque {
-  position: absolute;
-  left: 50%;
-  top: 16px;
-  transform: translateX(-50%);
-  z-index: 3;
+  justify-self: center;
+  margin: 0;
   padding: 9px 18px;
   border-radius: 999px;
-  background: rgba(11, 22, 40, 0.82);
+  background: rgba(11, 22, 40, 0.92);
   color: #FFFFFF;
   box-shadow: 0 10px 24px -12px rgba(11, 22, 40, 0.72);
-  backdrop-filter: blur(10px);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.01em;
   white-space: nowrap;
   pointer-events: none;
+  transition:
+    opacity var(--transition-normal),
+    translate 0.4s var(--ease-out-cubic);
 }
 
-/* La atribución va dentro del mapa, que es donde va en un mapa: como pie
-   centrado bajo el lienzo parecía una nota de la página. */
+/* Cuando salta el aviso, la pista se retira: la banda es una sola y el
+   aviso es lo que hay que leer. La clase la pone `mapa-vivo.ts`. */
+.mapa-tablero.es-avisado .mapa-toque {
+  opacity: 0;
+  translate: 0 -8px;
+}
+
+/* La atribución, como el mockup del hero: un pie centrado debajo del
+   mapa, con la misma letra y el mismo gris. Dentro del mosaico era una
+   pastilla más encima del dibujo, y de eso iba justamente la limpieza de
+   esta sección. Los 10 px de hueco de `.mapa-vista` más estos 2 dan los
+   12 que separan el crédito del teléfono en el hero. */
 .mapa-credito {
-  position: absolute;
-  right: 8px;
-  bottom: 8px;
-  z-index: 2;
-  margin: 0;
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.8);
-  font-size: 10px;
+  margin: 2px 0 0;
+  font-size: 11px;
   line-height: 1.4;
-  letter-spacing: 0.02em;
-  color: rgba(11, 22, 40, 0.6);
-  pointer-events: none;
+  text-align: center;
+  color: var(--text-muted);
 }
 
 /* ── Las rutas ── */
@@ -252,20 +316,20 @@
   gap: 7px;
 }
 
-/* Al lado del mapa hay ancho de sobra: las seis fichas en dos columnas
-   caben en tres filas. Las pinta `rutas.css`; aquí sólo se dice cómo se
-   reparten.
+/* Una lista, no una rejilla. En dos columnas había que barrer en zigzag
+   para encontrar una ruta; en una sola se lee de arriba abajo, como el
+   panel de una terminal, y cada fila tiene ancho para el nombre y el
+   tramo en la misma línea.
 
-   Las tres filas se parten el alto a partes iguales (`1fr`) en vez de
-   pedir cada una lo suyo: así las seis fichas llenan justo lo que el
-   mapa mide de alto y la rejilla termina donde termina el mapa. */
+   Las seis filas se parten el alto a partes iguales (`1fr`) en vez de
+   pedir cada una lo suyo: así llenan justo lo que el mapa mide de alto y
+   la lista termina donde termina el mapa. */
 @media (min-width: 1060px) {
   .mv-rutas {
     flex: 1;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: minmax(0, 1fr);
-    gap: 10px;
+    gap: 8px;
     min-height: 0;
   }
 }
@@ -384,32 +448,21 @@
    La misma notificación que sale en el teléfono, con la línea que arma
    la app. Aparece cuando un bus entra en el kilómetro y se queda.
 
-   Vive dentro del mapa, apoyada en el borde de abajo, y no en una
-   columna al lado. Tres razones:
+   Estuvo encima del mosaico, apoyada en el borde de abajo. Ahí tapaba
+   trazado justo cuando más se mira el mapa —con el bus dentro del
+   kilómetro—, que es lo contrario de lo que tiene que hacer. Ahora
+   ocupa la banda de arriba, en la celda de la pista de toque: no
+   reserva hueco de más, porque las dos nunca se ven a la vez.
 
-   Una, es lo que hace un teléfono: la notificación cae encima de lo que
-   estés mirando, no en un cajón aparte. Sobre el mapa —con el círculo
-   del kilómetro justo detrás— se entiende sola de dónde sale.
-
-   Dos, no cuesta sitio. En el flujo tenía que reservar su hueco aunque
-   estuviera apagada, y ese hueco era el vacío que dejaba la sección
-   mientras no hubiera bus cerca. Flotando no reserva nada.
-
-   Y tres, se diferencia de todo lo demás sin necesidad de un marco:
-   toma prestado el lenguaje de `.scene-card` —la tarjeta de aviso del
-   hero y de los pasos, que ya es la notificación de esta casa—; radio
-   de 16, borde blanco de un pelo y la misma sombra de dos capas, una
-   corta que la apoya y otra larga que la levanta. Los cuadros de al
-   lado son planos y de borde tinta. */
+   Se diferencia de todo lo demás sin necesidad de un marco: toma
+   prestado el lenguaje de `.scene-card` —la tarjeta de aviso del hero y
+   de los pasos, que ya es la notificación de esta casa—; radio de 16,
+   borde blanco de un pelo y la misma sombra de dos capas, una corta que
+   la apoya y otra larga que la levanta. Los cuadros de al lado son
+   planos y de borde tinta. */
 .mapa-aviso {
-  position: absolute;
-  /* Encima del mosaico y por debajo del aviso de toque, que es el que
-     manda mientras no haya pasado nada. */
-  z-index: 3;
-  left: 10px;
-  right: 10px;
-  /* Justo por encima de la atribución, que no se puede tapar. */
-  bottom: 34px;
+  justify-self: stretch;
+  align-items: center;
   display: flex;
   gap: 11px;
   padding: 13px 15px;
@@ -477,8 +530,16 @@
      saca la altura. */
   .mapa-lienzo {
     justify-self: center;
-    width: min(100%, calc(min(72vh, 560px) * 1284 / 1982));
+    width: min(100%, calc(min(76vh, 600px) * 1284 / 1982));
     height: auto;
+    margin-inline: auto;
+  }
+
+  /* La banda toma el ancho del mapa, no el de la sección: centrada encima
+     de él se lee como su cabecera; a lo ancho del panel parecía un aviso
+     suelto de la página. */
+  .mapa-tira {
+    width: min(100%, calc(min(76vh, 600px) * 1284 / 1982));
     margin-inline: auto;
   }
 
@@ -487,6 +548,19 @@
     overflow-x: auto;
     padding-bottom: 6px;
     scrollbar-width: none;
+  }
+
+  /* En el carril la ficha vuelve a ser tarjeta: 230 px no dan para poner
+     el nombre y el tramo en la misma línea. */
+  .ruta-ficha {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .ruta-ficha-tramo {
+    justify-content: flex-start;
+    text-align: left;
   }
 
   .mv-rutas::-webkit-scrollbar {

@@ -11,11 +11,33 @@
    ────────────────────────────────────────────────────────────────── */
 
 /* ── Rejilla de tarjetas (problema) ────────────────────────────────── */
+/* ── El clima ──
+   Dos climas, dos luces, y las dos tienen que verse. Estaban escritas en
+   ámbar al 14% sobre blanco puro —a un paso de no existir— y en un lavado
+   de tinta al 20% que sobre crema no parecía nube sino suciedad.
+
+   Lo que se rehízo:
+
+   Una, la luz baja donde está el reloj. Los halos vivían al 12% de alto,
+   arriba a la derecha, donde no hay nada que mirar; el reloj —que es lo
+   que la sección enseña— se quedaba sobre papel plano. Ahora el foco se
+   ancla a media altura, justo detrás de la esfera.
+
+   Dos, el sol es ámbar y la lluvia es azul. La lluvia dejó la tinta
+   (`rgba(15,35,63,…)`, que es gris sucio sobre crema) y pasó al azul de
+   la app, `--electric-blue`, el mismo con el que se pinta la palabra
+   «llueve» que se toca. Cada clima se lee del color de su palabra.
+
+   Y tres, el respiro dejó de ser un viaje. La capa medía 180% del panel y
+   la animación la cruzaba entera: el halo se iba de paseo y la mitad del
+   tiempo no estaba donde tenía que estar. Al 112% el recorrido es de un
+   12% de ancho —se respira, no se desplaza— y encima repinta doce veces
+   menos superficie. */
 #problema {
   background:
-    radial-gradient(860px circle at 78% 16%, rgba(255, 193, 7, 0.14), transparent 58%),
-    linear-gradient(180deg, #FFFFFF 0%, #FFF9EF 100%);
-  background-size: 180% 180%, 100% 100%;
+    radial-gradient(ellipse 58% 48% at 76% 10%, rgba(255, 193, 7, 0.22), transparent 66%),
+    linear-gradient(180deg, #FFFEFA 0%, #FFF5E2 100%);
+  background-size: 112% 112%, 100% 100%;
   background-position: 0% 50%, 50% 50%;
   animation: panel-gradient-respiro 10s ease-in-out infinite alternate;
   transition: background 0.7s var(--ease-out-cubic);
@@ -29,35 +51,48 @@
   pointer-events: none;
 }
 
+/* Sol: un foco cerrado detrás del reloj, un resplandor ancho arriba a la
+   derecha de donde viene la luz, y debajo el calor —crema arriba, el
+   coral pálido de la casa abajo—, que es lo que hace Barranquilla a las
+   dos de la tarde. */
 #problema .escena::before {
   z-index: 0;
   background:
-    radial-gradient(620px circle at 72% 12%, rgba(255, 193, 7, 0.28), transparent 60%),
-    linear-gradient(135deg, rgba(255, 248, 225, 0.9) 0%, rgba(255, 255, 255, 0.2) 54%,
-      rgba(251, 231, 228, 0.5) 100%);
+    radial-gradient(ellipse 34% 42% at 70% 46%,
+      rgba(255, 193, 7, 0.34), rgba(255, 193, 7, 0.1) 52%, transparent 76%),
+    radial-gradient(ellipse 66% 52% at 84% 4%, rgba(255, 193, 7, 0.2), transparent 66%),
+    linear-gradient(168deg, rgba(255, 248, 225, 0.92) 0%, rgba(255, 255, 255, 0) 48%,
+      rgba(251, 231, 228, 0.62) 100%);
   opacity: 1;
-  background-size: 180% 180%, 180% 180%;
-  background-position: 0% 50%, 50% 50%;
+  background-size: 112% 112%, 112% 112%, 100% 100%;
+  background-position: 0% 50%, 50% 50%, 50% 50%;
   animation: clima-gradient-respiro 9s ease-in-out infinite alternate;
   transition: opacity 0.65s var(--ease-out-cubic);
 }
 
+/* Lluvia: la misma construcción y el mismo sitio, en azul. El cielo se
+   cierra de arriba abajo —claro donde estaba el sol, cargado en el
+   canto—, y el reloj se queda debajo de la parte cargada. */
 #problema .escena::after {
   z-index: 1;
   background:
-    radial-gradient(520px circle at 76% 14%, rgba(15, 35, 63, 0.2), transparent 64%),
-    linear-gradient(138deg, rgba(15, 35, 63, 0.14), transparent 58%);
+    radial-gradient(ellipse 34% 42% at 70% 46%,
+      rgba(37, 99, 235, 0.28), rgba(37, 99, 235, 0.08) 52%, transparent 76%),
+    radial-gradient(ellipse 66% 52% at 84% 4%, rgba(20, 39, 78, 0.16), transparent 66%),
+    linear-gradient(168deg, rgba(37, 99, 235, 0.13) 0%, rgba(37, 99, 235, 0) 50%,
+      rgba(20, 39, 78, 0.14) 100%);
   opacity: 0;
-  background-size: 180% 180%, 180% 180%;
-  background-position: 100% 50%, 50% 50%;
+  background-size: 112% 112%, 112% 112%, 100% 100%;
+  background-position: 100% 50%, 50% 50%, 50% 50%;
   animation: clima-gradient-respiro 9s ease-in-out infinite alternate-reverse;
   transition: opacity 0.5s var(--ease-out-cubic);
 }
 
 #problema[data-clima='lluvia'] {
   background:
-    radial-gradient(760px circle at 74% 8%, rgba(37, 99, 235, 0.16), transparent 62%),
-    linear-gradient(180deg, #F1F6FC 0%, #E6EEF8 58%, #F7FAFC 100%);
+    radial-gradient(ellipse 58% 48% at 76% 10%, rgba(37, 99, 235, 0.2), transparent 66%),
+    linear-gradient(180deg, #F6FAFE 0%, #E3EDFA 60%, #F2F7FD 100%);
+  background-size: 112% 112%, 100% 100%;
 }
 
 #problema[data-clima='lluvia'] .escena::before {

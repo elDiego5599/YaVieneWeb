@@ -1315,25 +1315,30 @@
 
         <div class="rutas-cifras reveal" data-reveal-delay="90" data-rutas-cifras></div>
         <!--
-          El aviso vive dentro del mapa, no en una columna al lado. Es lo
-          que hace el teléfono: la notificación cae encima de lo que
-          estés mirando. Ahí además no deja hueco cuando está apagado,
-          que era el problema de tenerlo en el flujo.
+          Ni el aviso ni la pista de toque van encima del mosaico. Estuvieron
+          ahí y tapaban justo lo que hay que mirar —la ruta y el círculo del
+          kilómetro—. Ahora comparten una banda propia sobre el mapa: la
+          pista mientras no ha pasado nada, el aviso cuando el bus entra.
+          Nunca se ven las dos, así que la banda no reserva hueco de más.
         -->
         <div class="mapa-tablero" data-mapa-vivo>
-          <div class="mapa-lienzo" data-mapa-lienzo>
-            <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
-            <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
-            <div class="mapa-aviso" data-mapa-aviso role="status" aria-live="polite">
-              <div class="mapa-aviso-icono" aria-hidden="true">
-                <img src="/logo.svg" alt="" width="20" height="20">
-              </div>
-              <div class="mapa-aviso-texto">
-                <span class="mapa-aviso-app">Ya Viene · ahora</span>
-                <strong class="mapa-aviso-titulo" data-mapa-aviso-titulo></strong>
+          <div class="mapa-vista">
+            <div class="mapa-tira">
+              <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
+              <div class="mapa-aviso" data-mapa-aviso role="status" aria-live="polite">
+                <div class="mapa-aviso-icono" aria-hidden="true">
+                  <img src="/logo.svg" alt="" width="20" height="20">
+                </div>
+                <div class="mapa-aviso-texto">
+                  <span class="mapa-aviso-app">Ya Viene · ahora</span>
+                  <strong class="mapa-aviso-titulo" data-mapa-aviso-titulo></strong>
+                </div>
               </div>
             </div>
-            <p class="mapa-credito">© OpenStreetMap · © CARTO</p>
+            <div class="mapa-lienzo" data-mapa-lienzo>
+              <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
+            </div>
+            <p class="mapa-credito">Mapa base © OpenStreetMap · © CARTO</p>
           </div>
           <div class="mapa-mando">
             <div class="mapa-columna mapa-columna--rutas">
