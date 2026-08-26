@@ -17,3 +17,6 @@ __pycache__/
 /blob-report/
 /playwright/.cache/
 .vercel
+
+# Documentos de la propuesta: no son parte de la web.
+*.docx
