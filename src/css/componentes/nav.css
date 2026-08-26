@@ -460,3 +460,33 @@
     }
   }
 }
+
+/* ---------------------------------------------------------------
+   Blancos de dedo
+   --------------------------------------------------------------- */
+
+/* En la píldora los dos objetos tocables se quedan cortos para un dedo:
+   el botón mide treinta y ocho y la marca veintiocho de alto. Crecerlos
+   de verdad engordaría la píldora, que es lo único que flota sobre toda
+   la página y que está medida al píxel. Así que crece el blanco y no el
+   dibujo: una capa invisible por encima, estirada hasta los cuarenta y
+   cuatro que piden Apple y Android. Cabe dentro del relleno de la
+   píldora y los dos están en extremos opuestos, así que ninguno pisa al
+   otro. Sólo en pantallas de dedo. */
+@media (pointer: coarse) {
+  .nav-island-brand,
+  .nav-island-toggle {
+    position: relative;
+  }
+
+  .nav-island-brand::after,
+  .nav-island-toggle::after {
+    content: '';
+    position: absolute;
+    inset: -8px 0;
+  }
+
+  .nav-island-toggle::after {
+    inset: -3px;
+  }
+}

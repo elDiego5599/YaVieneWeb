@@ -94,9 +94,18 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
-  border: 1px solid rgba(20, 39, 78, 0.12);
+  /* El mismo material que la tarjeta de «El bus está cerca»: blanco casi
+     entero, filo de luz en vez de línea de tinta y la separación puesta
+     por la sombra. Con el blanco al 72% y un borde oscuro las fichas eran
+     papel translúcido al lado de una notificación opaca, y las dos cosas
+     están en el mismo tablero. La sombra va más floja que la del aviso:
+     una notificación es una y las fichas son seis. */
+  border: 1px solid rgba(255, 255, 255, 0.85);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow:
+    0 2px 6px -2px rgba(11, 22, 40, 0.05),
+    0 10px 24px -14px rgba(11, 22, 40, 0.16);
   color: inherit;
   /* `translate` y no `transform`: son las dos propiedades que el
      compositor resuelve solo, sin repintar. */

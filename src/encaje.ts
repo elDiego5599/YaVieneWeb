@@ -78,10 +78,17 @@ export function encajarEscena(escena: HTMLElement): () => void {
     const libre = pantalla - reserva;
     if (libre <= 0) return;
 
-    const k = Math.max(MINIMO, Math.min(1, libre / natural));
-    // Zona muerta: media centésima de factor no mueve un píxel, y sin ella
-    // el redondeo de una medida a otra podría dejarlo oscilando.
-    if (Math.abs(k - puesto) < 0.005) return;
+    // Se redondea hacia abajo, nunca hacia arriba: la milésima que sobra
+    // al redondear son píxeles de escena que se salen, y de una escena
+    // pegada lo que se sale no se alcanza.
+    const exacto = Math.min(1, libre / natural);
+    const k = Math.max(MINIMO, Math.floor(exacto * 1000) / 1000);
+    // La zona muerta sólo frena al crecer, que es donde una medida y la
+    // siguiente podrían dejarlo oscilando. Encogiendo no se frena nada: un
+    // píxel de más es un píxel cortado, y así se veía el reloj en un
+    // iPhone —la escena acababa un píxel por debajo de la ventana—.
+    if (k >= puesto && k - puesto < 0.005) return;
+    if (k === puesto) return;
     ultimo = k;
     escena.style.setProperty('--encaje', k.toFixed(3));
   };

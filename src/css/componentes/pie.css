@@ -22,8 +22,8 @@
   border: 0;
   border-radius: 0;
   background:
-    radial-gradient(640px circle at 50% 112%, rgba(255, 193, 7, 0.38), transparent 64%),
-    radial-gradient(980px circle at 50% 122%, rgba(232, 106, 94, 0.52), transparent 68%),
+    radial-gradient(860px circle at 50% 108%, rgba(255, 193, 7, 0.38), transparent 70%),
+    radial-gradient(1240px circle at 50% 116%, rgba(232, 106, 94, 0.52), transparent 74%),
     linear-gradient(180deg, #FFFDF8 0%, #FFF5EC 48%, #FBE7E4 100%);
   background-size: 135% 135%, 115% 115%, 100% 100%;
   background-position: 50% 100%, 50% 100%, 50% 50%;
@@ -225,4 +225,50 @@
 
 .footer-legal-links a {
   font-size: 12px;
+}
+
+/* ---------------------------------------------------------------
+   Blancos de dedo
+   --------------------------------------------------------------- */
+
+/* Un enlace de pie mide veintiún píxeles de alto: es la altura de su
+   propia letra, que es lo que ocupa un enlace cuando nadie le pone
+   relleno. Con el ratón da igual —el puntero es un píxel— pero un dedo
+   tapa cerca de un centímetro y lo que hay debajo se adivina. La guía
+   de Apple y la de Android piden lo mismo, cuarenta y cuatro, y aquí no
+   se llegaba ni a la mitad.
+
+   El alto se paga con relleno y se recupera quitando la separación:
+   el hueco entre un enlace y el siguiente pasa a estar dentro de los
+   dos, así que la lista sigue leyéndose con el mismo aire pero cada
+   línea es un blanco entero. Sólo en pantallas de dedo: con ratón el
+   pie se queda compacto como está. */
+@media (pointer: coarse) {
+  /* La marca ya casi llega —treinta y ocho— y no tiene a nadie al lado,
+     así que le basta una capa invisible tres píxeles por fuera. */
+  .footer-brand {
+    position: relative;
+  }
+
+  .footer-brand::after {
+    content: '';
+    position: absolute;
+    inset: -3px 0;
+  }
+
+  .footer-nav-group {
+    gap: 0;
+  }
+
+  .footer-nav a {
+    padding-block: 12px;
+  }
+
+  .footer-legal-links {
+    gap: 0 22px;
+  }
+
+  .footer-legal-links a {
+    padding-block: 13px;
+  }
 }

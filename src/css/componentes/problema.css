@@ -75,12 +75,19 @@
    canto—, y el reloj se queda debajo de la parte cargada. */
 #problema .escena::after {
   z-index: 1;
+  /* El azul solo salía celeste, y una tarde de aguacero en Barranquilla no
+     es celeste: el cielo se pone plomo y el azul se queda debajo. El gris
+     es la tinta de la casa, `--navy`, que es azul oscurecido y no un gris
+     nuevo, así que la sección no se sale de su paleta. Van tres capas y
+     ninguna dibuja nada: el frente pesado arriba a la derecha, de donde
+     viene el agua; el foco frío detrás del reloj, ya apagado; y la luz
+     cayendo de arriba abajo, que es lo que se ve antes de que caiga. */
   background:
     radial-gradient(ellipse 34% 42% at 70% 46%,
-      rgba(37, 99, 235, 0.28), rgba(37, 99, 235, 0.08) 52%, transparent 76%),
-    radial-gradient(ellipse 66% 52% at 84% 4%, rgba(20, 39, 78, 0.16), transparent 66%),
-    linear-gradient(168deg, rgba(37, 99, 235, 0.13) 0%, rgba(37, 99, 235, 0) 50%,
-      rgba(20, 39, 78, 0.14) 100%);
+      rgba(37, 99, 235, 0.18), rgba(37, 99, 235, 0.05) 52%, transparent 76%),
+    radial-gradient(ellipse 78% 60% at 82% -8%, rgba(20, 39, 78, 0.3), transparent 72%),
+    linear-gradient(168deg, rgba(20, 39, 78, 0.13) 0%, rgba(20, 39, 78, 0.02) 46%,
+      rgba(37, 99, 235, 0.12) 100%);
   opacity: 0;
   background-size: 112% 112%, 112% 112%, 100% 100%;
   background-position: 100% 50%, 50% 50%, 50% 50%;
@@ -88,11 +95,17 @@
   transition: opacity 0.5s var(--ease-out-cubic);
 }
 
+/* El papel de la sección cuando llueve. El azul hielo de antes hacía la
+   página más clara que con sol, que es justo al revés de lo que pasa.
+   Ahora el fondo es blanco arriba y se va cargando de tinta hacia abajo
+   —el peso del agua—, con la nube arriba a la derecha. Todo sale de los
+   tokens: blanco, `--surface-muted` y la tinta de `--navy` diluida. */
 #problema[data-clima='lluvia'] {
   background:
-    radial-gradient(ellipse 58% 48% at 76% 10%, rgba(37, 99, 235, 0.2), transparent 66%),
-    linear-gradient(180deg, #F6FAFE 0%, #E3EDFA 60%, #F2F7FD 100%);
-  background-size: 112% 112%, 100% 100%;
+    radial-gradient(ellipse 62% 50% at 78% 6%, rgba(20, 39, 78, 0.22), transparent 68%),
+    linear-gradient(180deg, rgba(20, 39, 78, 0) 44%, rgba(20, 39, 78, 0.13) 100%),
+    linear-gradient(180deg, var(--text-white) 0%, var(--surface-muted) 100%);
+  background-size: 112% 112%, 100% 100%, 100% 100%;
 }
 
 #problema[data-clima='lluvia'] .escena::before {
@@ -163,6 +176,25 @@
   outline: 2px solid currentColor;
   outline-offset: 6px;
   border-radius: 6px;
+}
+
+/* «sol» y «lluvia» son dos palabras dentro de una frase, y una palabra
+   mide lo que mide su letra: veintiocho píxeles de alto. Un dedo tapa
+   bastante más, y ahí al lado no hay nada que tocar por error —el resto
+   de la frase es texto y nada más—, así que el blanco puede crecer por
+   encima y por debajo de la línea sin quitarle el sitio a nadie. Crece
+   la capa invisible, no la palabra: la frase se sigue leyendo igual.
+   Sólo en pantallas de dedo. */
+@media (pointer: coarse) {
+  .clima-word {
+    position: relative;
+  }
+
+  .clima-word::after {
+    content: '';
+    position: absolute;
+    inset: -9px -6px;
+  }
 }
 
 /* La frase que carga el peso: casi tamaño de titular, y con el ancho de

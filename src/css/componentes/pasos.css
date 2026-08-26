@@ -745,6 +745,15 @@
 .pasos-tab-icon svg {
   width: 100%;
   height: 100%;
+  /* El de «Elige tu ruta» temblaba en el iPhone y los otros dos no. No es
+     casualidad: es el único con tramos rectos pegados a los ejes —la raya
+     de abajo y la subida del centro—, y son los que se parten entre dos
+     píxeles cuando el dibujo cae a medio píxel. Aquí cae siempre: la
+     escena va encogida por `--encaje`, que no es un número redondo, y
+     además va pegada, así que Safari la vuelve a rasterizar mientras se
+     baja y el reparto entre píxeles cambia en cada cuadro. Con una capa
+     propia el icono se dibuja una vez y se mueve ya dibujado. */
+  transform: translateZ(0);
 }
 
 .pasos-tab-nombre {
