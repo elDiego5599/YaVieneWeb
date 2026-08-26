@@ -203,11 +203,24 @@ export class Reloj {
 
       const lleno = minutos / TOPE_MIN;
       this.avance.style.strokeDashoffset = (ARCO * (1 - lleno)).toFixed(2);
-      this.aguja.style.transform = `rotate(${(INICIO + lleno * 300).toFixed(2)}deg)`;
+      // El giro va como atributo de SVG y no como transformación de CSS.
+      // No es capricho: `rotate(a 140 140)` dice el centro en unidades del
+      // `viewBox` y no hay más que hablar. En CSS el centro se pone con
+      // `transform-origin: 140px 140px` y `transform-box: view-box`, y ahí
+      // hay navegadores —el Safari del iPhone, entre ellos— que resuelven
+      // esos píxeles contra la caja en pantalla en vez de contra el
+      // `viewBox`. La esfera se dibuja a otro tamaño que sus 280 unidades,
+      // así que el centro cae donde no es y el arco entero se corre de
+      // sitio: el punto se quedaba lejos de la punta del arco. Con el
+      // atributo eso no puede pasar en ningún navegador.
+      this.aguja.setAttribute(
+        'transform',
+        `rotate(${(INICIO + lleno * 300).toFixed(2)} 140 140)`,
+      );
       // Una vuelta por minuto, como un segundero de verdad, y a saltos de
       // segundo: es lo que hace que el reloj se lea como en marcha y no
       // como una barra de progreso.
-      this.segundero.style.transform = `rotate(${segundos * 6}deg)`;
+      this.segundero.setAttribute('transform', `rotate(${segundos * 6} 140 140)`);
 
       const urgencia =
         enteros < 3 ? 'calma' : minutos < TOPE_MIN * 0.7 ? 'rato' : 'harto';

@@ -821,21 +821,27 @@
   }
 }
 
-@keyframes panel-gradient-respiro {
+/* La luz del clima, andando. Las dos capas van un 8% más grandes que su
+   hueco por los cuatro lados, así que pueden derivar sin descubrir el
+   canto. Es `transform`: no repinta, lo compone la tarjeta gráfica, y por
+   eso puede moverse lo bastante para verse sin costar cuadros. El sol
+   cruza en un sentido y el agua en el otro, y ninguno de los dos vuelve
+   al mismo sitio a la vez que el pulso de luz. */
+@keyframes clima-deriva {
   0% {
-    background-position: 0% 50%, 50% 50%, 50% 50%;
+    transform: translate3d(-3.4%, -1.6%, 0) scale(1.01);
   }
   100% {
-    background-position: 100% 50%, 50% 50%, 50% 50%;
+    transform: translate3d(3.4%, 1.8%, 0) scale(1.06);
   }
 }
 
-@keyframes clima-gradient-respiro {
+@keyframes clima-deriva-lluvia {
   0% {
-    background-position: 0% 50%, 50% 50%;
+    transform: translate3d(3.2%, -2%, 0) scale(1.05);
   }
   100% {
-    background-position: 100% 50%, 50% 50%;
+    transform: translate3d(-3.2%, 1.4%, 0) scale(1.01);
   }
 }
 
