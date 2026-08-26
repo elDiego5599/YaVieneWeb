@@ -86,6 +86,8 @@ export class MapaVivo {
   private readonly lecturaBus: HTMLElement;
   private readonly lecturaMetros: HTMLElement;
   private readonly lecturaPie: HTMLElement;
+  private readonly ciegoCodigo: HTMLElement;
+  private readonly ciegoRuta: HTMLElement;
 
   private readonly casing: SVGPathElement;
   private readonly activa: SVGPathElement;
@@ -121,6 +123,8 @@ export class MapaVivo {
     this.lecturaBus = req<HTMLElement>(raiz, '[data-mapa-bus]');
     this.lecturaMetros = req<HTMLElement>(raiz, '[data-mapa-metros]');
     this.lecturaPie = req<HTMLElement>(raiz, '[data-mapa-lectura-pie]');
+    this.ciegoCodigo = req<HTMLElement>(raiz, '[data-mapa-ciego-codigo]');
+    this.ciegoRuta = req<HTMLElement>(raiz, '[data-mapa-ciego-ruta]');
 
     // La C16 Calle 72 Uninorte es la que abre el resto de la página.
     this.ruta = YV_RUTAS.rutas.find(r => r.id === 'R-106') ?? YV_RUTAS.rutas[0];
@@ -317,10 +321,20 @@ export class MapaVivo {
     }
 
     this.dibujarTerminales();
+    this.pintaCiego();
     // Al cambiar de ruta el punto de espera se queda donde estaba, pero su
     // referencia sobre el recorrido cambia: hay que rehacerla.
     const primera = this.pinPunto.x === 0 && this.pinPunto.y === 0;
     this.ponerPin(primera ? this.punto(this.tCentral()) : this.pinPunto);
+  }
+
+  /** El cartel frontal: código en su sitio y nombre limpio al lado. */
+  private pintaCiego(): void {
+    const conCodigo = /^([A-Z]\d{1,2})\s+(.+)$/.exec(this.ruta.nombre);
+    this.ciegoCodigo.textContent = conCodigo ? conCodigo[1] : '';
+    this.ciegoRuta.textContent = conCodigo
+      ? conCodigo[2].replace(/\s+·\s+/g, ' · ')
+      : this.ruta.nombre;
   }
 
   private dibujarTerminales(): void {

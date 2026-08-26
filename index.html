@@ -1310,6 +1310,14 @@
         <div class="mapa-consola">
           <div class="mapa-tablero" data-mapa-vivo>
             <div class="mapa-lienzo-columna">
+              <!-- El cartel frontal del bus: negro con ámbar, como la
+                   persiana de destino. Cambia con la ruta elegida y hace
+                   de remate superior del mapa — el aparato tiene cara. -->
+              <div class="mapa-ciego" aria-hidden="true">
+                <span class="mapa-ciego-codigo" data-mapa-ciego-codigo>C16</span>
+                <span class="mapa-ciego-ruta" data-mapa-ciego-ruta>Calle 72 · Uninorte</span>
+                <span class="mapa-ciego-servicio"><i></i>En servicio</span>
+              </div>
               <div class="mapa-lienzo" data-mapa-lienzo>
                 <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
                 <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
@@ -1322,8 +1330,16 @@
                 <div class="mv-rutas" data-mapa-rutas role="group" aria-label="Rutas disponibles"></div>
               </div>
               <div class="mapa-columna mapa-columna--lectura">
-                <div class="mapa-lectura" data-mapa-lectura>
-                  <span class="mapa-rotulo">Bus más cercano</span>
+                <!-- La hoja de la app, no un cuadro: mismo handle, misma
+                     franja de estado y el número fino sobre blanco. -->
+                <div class="mapa-hoja" data-mapa-lectura>
+                  <span class="mapa-hoja-handle" aria-hidden="true"></span>
+                  <span class="mapa-hoja-franja" aria-hidden="true">
+                    <b class="mapa-hoja-franja-lejos">En camino · te avisamos a 1 km</b>
+                    <b class="mapa-hoja-franja-cerca">Bus ya está cerca</b>
+                    <b class="mapa-hoja-franja-fuera">Esta ruta no pasa cerca de tu punto</b>
+                  </span>
+                  <span class="mapa-rotulo mapa-rotulo--tinta">Bus más cercano</span>
                   <span class="mapa-lectura-bus" data-mapa-bus></span>
                   <span class="mapa-lectura-metros" data-mapa-metros></span>
                   <span class="mapa-lectura-pie" data-mapa-lectura-pie>en línea recta hasta tu punto</span>

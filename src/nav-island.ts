@@ -18,7 +18,7 @@
  * de la mano en el borde, cerraban el menú a mitad de camino.
  */
 
-const MARGEN_MS = 120;
+const MARGEN_MS = 450;
 
 export class NavIsland {
   private readonly isla: HTMLElement;

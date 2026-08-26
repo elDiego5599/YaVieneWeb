@@ -120,17 +120,13 @@
   }
 }
 
-/* El marco. Lo que va dentro deja de ser tres cosas sueltas sobre la
-   tinta y pasa a ser una sola pantalla. */
+/* El marco. Ya no es una caja de cristal: el aparato se sostiene solo
+   por la composición —cartel + mapa a un lado, tablero y hoja al otro—
+   y el fondo de tinta hace de noche de terminal. */
 .mapa-consola {
   width: 100%;
   max-width: min(100%, 1060px);
   margin-inline: auto;
-  padding: clamp(14px, 1.7vw, 24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: clamp(24px, 2.4vw, 36px);
-  background: rgba(255, 255, 255, 0.035);
-  box-shadow: 0 40px 90px -50px rgba(0, 0, 0, 0.9);
 }
 
 .mapa-tablero {
@@ -163,7 +159,8 @@
 }
 
 .mapa-mando .mapa-columna--lectura {
-  flex: 1;
+  flex: 0 0 auto;
+  gap: 12px;
 }
 
 .mapa-columna {
@@ -188,15 +185,79 @@
   min-width: 0;
 }
 
+/* El cartel frontal del bus: la persiana de destino que va sobre el
+   parabrisas. Negro, ámbar y una sola línea — es lo que se lee desde
+   la acera. Cambia con la ruta que marca mapa-vivo.ts. */
+.mapa-ciego {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-bottom: 0;
+  border-radius: 20px 20px 0 0;
+  background: #0a0f16;
+}
+
+.mapa-ciego-codigo {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--amber);
+}
+
+.mapa-ciego-ruta {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.mapa-ciego-servicio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #4ade80;
+}
+
+.mapa-ciego-servicio i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: insignia-latido 2.4s var(--ease-out-cubic) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapa-ciego-servicio i {
+    animation: none;
+  }
+}
+
 .mapa-lienzo {
   position: relative;
   /* La proporción del mosaico, para que quepa la ciudad entera. */
   aspect-ratio: 1284 / 1982;
   height: clamp(420px, 72vh, 660px);
-  border-radius: 22px;
+  /* Arriba cuadra con el cartel: el mapa es el parabrisas del aparato. */
+  border-radius: 0 0 22px 22px;
   overflow: hidden;
   background: #EDE7DE;
   border: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 0;
   /* Dentro del marco la sombra larga sobraba: basta con despegarlo. */
   box-shadow: 0 18px 44px -26px rgba(0, 0, 0, 0.8);
 }
@@ -294,32 +355,31 @@
   pointer-events: none;
 }
 
-/* ── Las rutas ── */
+/* ── Las rutas ──
+   Filas de tablero, no tarjetas: sin cajas, sin cristal. Un filete
+   separa cada destino — como la lista de salidas de una terminal — y
+   la elegida se marca con la barra verde y el disco invertido. */
 .mv-rutas {
   display: flex;
   flex-direction: column;
-  gap: 7px;
-}
-
-/* Al lado del mapa hay ancho de sobra: las seis rutas en dos columnas
-   caben en tres filas y dejan sitio a la lectura. */
-@media (min-width: 1060px) {
-  .mv-rutas {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 .mv-ruta {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 2px 10px;
-  padding: 11px 13px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.72);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'codigo nombre km'
+    'codigo datos km';
+  column-gap: 12px;
+  align-items: center;
+  padding: 11px 12px 11px 10px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  border-left: 3px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.68);
   text-align: left;
   cursor: pointer;
   transition:
@@ -329,39 +389,41 @@
 }
 
 .mv-ruta:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.03);
+  color: #ffffff;
 }
 
 .mv-ruta[aria-pressed='true'] {
-  background: rgba(0, 168, 89, 0.16);
-  border-color: rgba(0, 168, 89, 0.55);
-  color: #FFFFFF;
+  border-left-color: var(--green);
+  background: rgba(0, 168, 89, 0.09);
+  color: #ffffff;
 }
 
 .mv-ruta-nombre {
+  grid-area: nombre;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* La insignia de ruta, como el rótulo circular de una parada de bus:
-   el código va siempre en su disco verde y el nombre respira al lado.
+/* La insignia de ruta, como el rótulo circular de una parada de bus.
    Se la pinta mapa-vivo.ts cuando el nombre trae código («C16 …»). */
 .roundel {
+  grid-area: codigo;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  margin-right: 7px;
+  width: 27px;
+  height: 27px;
   border-radius: 50%;
   background: var(--green);
   color: #ffffff;
   font-size: 10.5px;
   font-weight: 800;
   letter-spacing: 0.02em;
-  vertical-align: -6px;
 }
 
 .mv-ruta[aria-pressed='true'] .roundel {
@@ -370,97 +432,135 @@
 }
 
 .mv-ruta-km {
-  grid-column: 2;
-  grid-row: 1;
+  grid-area: km;
   align-self: center;
+  justify-self: end;
   font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .mv-ruta[aria-pressed='true'] .mv-ruta-km {
-  color: var(--green);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .mv-ruta-datos {
-  grid-column: 1 / -1;
+  grid-area: datos;
   font-size: 11.5px;
   line-height: 1.35;
   color: rgba(255, 255, 255, 0.42);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ── La lectura ── */
-.mapa-lectura {
+/* ── La hoja ──
+   La lectura es la hoja inferior de la app puesta en la mesa: blanco
+   sólido, el handle de siempre, la franja de estado que en el teléfono
+   dice «En camino» o «Bus ya está cerca», y el número fino navy. Nada
+   de cristal: esto es Material, el chrome de la app sobre el escenario. */
+.mapa-hoja {
   display: flex;
-  flex: 1;
   flex-direction: column;
-  justify-content: center;
   gap: 3px;
-  padding: 20px 22px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.04);
-  transition: border-color var(--transition-normal), background var(--transition-normal);
+  padding: 0 0 18px;
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
 }
 
-.mapa-lectura.es-cerca {
-  border-color: rgba(0, 168, 89, 0.5);
-  background: rgba(0, 168, 89, 0.1);
+.mapa-hoja-handle {
+  display: block;
+  width: 42px;
+  height: 4px;
+  margin: 10px auto 10px;
+  border-radius: 999px;
+  background: var(--divider);
 }
 
-.mapa-lectura .mapa-rotulo {
-  margin-bottom: 6px;
+/* La franja de estado: la misma pieza que eta-strip en la app. Ámbar
+   mientras espera, verde cuando el bus entra al kilómetro, gris cuando
+   la ruta ni siquiera pasa cerca del punto. */
+.mapa-hoja-franja {
+  display: block;
+  margin-bottom: 10px;
+  padding: 8px 20px;
+  background: var(--amber-tint);
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--warn);
 }
 
-/* Con el ancho del mando la lectura se lee como el cuadro de un
-   aparato: a la izquierda de qué bus hablamos, a la derecha el número
-   grande, que es lo único que de verdad se mira. */
-@media (min-width: 1060px) {
-  .mapa-lectura {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-content: center;
-    align-items: center;
-    column-gap: clamp(20px, 2.4vw, 40px);
-    row-gap: 2px;
-  }
+.mapa-hoja-franja b {
+  display: none;
+}
 
-  .mapa-lectura .mapa-rotulo {
-    grid-area: 1 / 1;
-    margin-bottom: 0;
-  }
+.mapa-hoja-franja-lejos {
+  display: inline !important;
+}
 
-  .mapa-lectura-bus {
-    grid-area: 2 / 1;
-  }
+.mapa-hoja.es-cerca .mapa-hoja-franja {
+  background: var(--green-tint);
+  color: var(--green-accessible);
+}
 
-  .mapa-lectura-pie {
-    grid-area: 3 / 1;
-    margin-top: 6px;
-  }
+.mapa-hoja.es-cerca .mapa-hoja-franja-cerca {
+  display: inline !important;
+}
 
-  .mapa-lectura-metros {
-    grid-area: 1 / 2 / 4 / 3;
-    font-size: clamp(46px, 4.6vw, 68px);
-  }
+.mapa-hoja.es-cerca .mapa-hoja-franja-lejos,
+.mapa-hoja.es-cerca .mapa-hoja-franja-fuera {
+  display: none !important;
+}
+
+.mapa-hoja.es-fuera .mapa-hoja-franja {
+  background: var(--surface-muted);
+  color: var(--app-text-secondary);
+}
+
+.mapa-hoja.es-fuera .mapa-hoja-franja-fuera {
+  display: inline !important;
+}
+
+.mapa-hoja.es-fuera .mapa-hoja-franja-lejos,
+.mapa-hoja.es-fuera .mapa-hoja-franja-cerca {
+  display: none !important;
+}
+
+/* Sobre blanco los rótulos bajan de voz con la tinta de la app. */
+.mapa-rotulo--tinta {
+  color: var(--app-text-secondary);
+  letter-spacing: 0.18em;
+  font-size: 10px;
+  text-align: center;
+}
+
+.mapa-hoja .mapa-lectura-bus,
+.mapa-hoja .mapa-lectura-metros,
+.mapa-hoja .mapa-lectura-pie {
+  text-align: center;
 }
 
 .mapa-lectura-bus {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--app-text-primary);
 }
 
-/* Del mismo corte que el número grande de la app. */
+/* El número hero: fino y navy, el mismo corte de eta-number en la app. */
 .mapa-lectura-metros {
   font-family: var(--font-display);
-  font-size: clamp(38px, 3.6vw, 54px);
-  font-weight: 300;
+  font-size: clamp(44px, 4.4vw, 64px);
+  font-weight: 200;
   line-height: 1.05;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
-  color: #FFFFFF;
+  color: var(--ink);
   transition: color var(--transition-normal);
 }
 
@@ -470,22 +570,23 @@
 .mapa-lectura-metros::before {
   content: '';
   display: inline-block;
-  width: 0.3em;
-  height: 0.3em;
-  margin-right: 0.16em;
+  width: 0.26em;
+  height: 0.26em;
+  margin-right: 0.14em;
   border-radius: 50%;
-  background: conic-gradient(currentColor 0 78%, rgba(255, 255, 255, 0.16) 0);
+  background: conic-gradient(currentColor 0 78%, rgba(11, 22, 40, 0.12) 0);
   -webkit-mask: radial-gradient(circle, transparent 0 33%, #000 34%);
   mask: radial-gradient(circle, transparent 0 33%, #000 34%);
+  vertical-align: 0.08em;
 }
 
-.mapa-lectura.es-cerca .mapa-lectura-metros {
-  color: #4ADE80;
+.mapa-hoja.es-cerca .mapa-lectura-metros {
+  color: var(--green-accessible);
 }
 
 .mapa-lectura-pie {
   font-size: 11.5px;
-  color: rgba(255, 255, 255, 0.42);
+  color: var(--app-text-secondary);
 }
 
 /* ── El aviso ──
@@ -567,21 +668,5 @@
     width: min(100%, calc(min(72vh, 560px) * 1284 / 1982));
     height: auto;
     margin-inline: auto;
-  }
-
-  .mv-rutas {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 6px;
-    scrollbar-width: none;
-  }
-
-  .mv-rutas::-webkit-scrollbar {
-    display: none;
-  }
-
-  .mv-ruta {
-    flex: 0 0 auto;
-    width: 210px;
   }
 }
