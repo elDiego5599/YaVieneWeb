@@ -220,12 +220,20 @@
    hueco que no existe y en un teléfono —donde no sobra ni un píxel— el
    titular acaba debajo de la píldora. Con `border-box` el relleno se
    come el alto, así que la escena sigue midiendo una pantalla justa y el
-   pegado sigue funcionando igual. */
+   pegado sigue funcionando igual.
+
+   Y la pantalla se mide en `svh`, no en `vh`. En Safari de iPhone `100vh`
+   es la ventana SIN la barra de direcciones —la barra se retira al bajar,
+   pero mientras está puesta tapa los últimos ochenta píxeles—. Una escena
+   pegada de `100vh` mete ahí abajo el final del reloj y no hay forma de
+   sacarlo: la escena no se mueve. `svh` es la ventana más pequeña, la que
+   siempre se ve, así que lo que quepa se ve siempre. */
 .escena {
   position: sticky;
   top: 0;
   z-index: 2;
   min-height: 100vh;
+  min-height: 100svh;
   padding-top: calc(var(--gutter) + var(--nav-alto));
   display: grid;
   align-content: center;

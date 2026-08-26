@@ -51,15 +51,23 @@ export function encajarEscena(escena: HTMLElement): () => void {
     // comparar. Por eso esto no se realimenta.
     const natural = dentro.offsetHeight;
     if (natural <= 0) return;
-    // El alto libre no es la ventana entera: la escena le reserva arriba
-    // la franja de la cabecera, que va flotando toda la página. Ese
-    // relleno está en la escena, no en lo que se encoge, así que se lee
-    // en píxeles de verdad y se resta antes de dividir.
+    // Contra qué se compara: el alto de la escena tal y como lo dejó el
+    // CSS, no `window.innerHeight`. No son lo mismo en el Safari del
+    // iPhone —ahí la ventana que reporta el navegador incluye lo que tapa
+    // la barra de direcciones, y el CSS ya mide en `svh` para no contarlo—
+    // y basta esa diferencia para que el final del reloj quede debajo de la
+    // barra, en una escena pegada que no se puede mover. Leer el `min-height`
+    // ya resuelto es preguntarle al CSS por su propio número, así que los
+    // dos lados de la resta hablan de la misma pantalla.
     const marco = getComputedStyle(escena);
     const reserva =
       (Number.parseFloat(marco.paddingTop) || 0) +
       (Number.parseFloat(marco.paddingBottom) || 0);
-    const libre = window.innerHeight - reserva;
+    // La franja que reserva la cabecera está en la escena, no en lo que se
+    // encoge: se lee en píxeles de verdad y se resta antes de dividir.
+    const libre = (Number.parseFloat(marco.minHeight) || 0) - reserva;
+    // Sin `min-height` no hay escena que encajar: es lo que pasa con
+    // movimiento reducido, donde el bloque se lee de arriba abajo.
     if (libre <= 0) return;
     const k = Math.max(MINIMO, Math.min(1, Math.round((libre / natural) * 1000) / 1000));
     if (k === ultimo) return;
