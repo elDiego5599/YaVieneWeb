@@ -222,19 +222,27 @@
    come el alto, así que la escena sigue midiendo una pantalla justa y el
    pegado sigue funcionando igual.
 
-   Y la pantalla se mide en `svh`, no en `vh`. En Safari de iPhone `100vh`
-   es la ventana SIN la barra de direcciones —la barra se retira al bajar,
-   pero mientras está puesta tapa los últimos ochenta píxeles—. Una escena
-   pegada de `100vh` mete ahí abajo el final del reloj y no hay forma de
-   sacarlo: la escena no se mueve. `svh` es la ventana más pequeña, la que
-   siempre se ve, así que lo que quepa se ve siempre. */
+   Y abajo pasa lo mismo con la barra de direcciones. En el móvil `100vh`
+   es la ventana SIN barras, pero la barra está puesta y tapa los últimos
+   ochenta píxeles: una escena pegada mete ahí el final del reloj y de una
+   escena pegada no se saca nada bajando, porque no se mueve. */
 .escena {
   position: sticky;
   top: 0;
   z-index: 2;
+  /* La caja mide la ventana GRANDE —`lvh`, la de barras retiradas— porque
+     de ella cuelga el fondo de la sección: con la caja medida en `svh` el
+     fondo terminaba antes que la pantalla y en Android quedaba una franja
+     de panel pelado abajo. Y como la barra de direcciones sí tapa esos
+     últimos píxeles mientras está puesta, la caja se los reserva como
+     relleno: el contenido se centra en la ventana chica —la que siempre
+     se ve— y el fondo sigue llegando hasta abajo. La resta la entienden
+     los mismos navegadores que entienden `svh`; los que no, se quedan con
+     el `100vh` de siempre y no pierden nada. */
   min-height: 100vh;
-  min-height: 100svh;
+  min-height: 100lvh;
   padding-top: calc(var(--gutter) + var(--nav-alto));
+  padding-bottom: calc(100lvh - 100svh);
   display: grid;
   align-content: center;
 }
@@ -269,6 +277,7 @@
     position: static;
     min-height: 0;
     padding-top: 0;
+    padding-bottom: 0;
   }
 
   .escena .panel-inner {

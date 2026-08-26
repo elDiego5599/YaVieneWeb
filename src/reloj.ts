@@ -102,6 +102,17 @@ export class Reloj {
     // llega. Ver `.es-guion .problema-beat` en problema.css.
     this.pista.classList.add('es-guion');
 
+    // Al refrescar a media página el navegador devuelve el scroll a donde
+    // estabas, pero no siempre antes de que esto arranque: la primera
+    // medida sale con la página en el cero, el reloj se pinta en verde y
+    // en cero, y cuando llega el scroll de verdad se ve el arco barrer
+    // hasta el minuto que toca cambiando de color por el camino. La
+    // lectura acaba siendo la correcta; lo que sobra es el viaje. Con
+    // `es-crudo` las transiciones no existen todavía, así que esa primera
+    // corrección ocurre en un cuadro y no se ve. Ver problema.css.
+    this.pista.classList.add('es-crudo');
+    this.asentar();
+
     this.soltar = seguirPista(pista, (p) => {
       this.scroll = p;
       this.pintar();
@@ -120,6 +131,22 @@ export class Reloj {
       { threshold: 0 }
     );
     this.vigia.observe(pista);
+  }
+
+  /**
+   * Suelta las transiciones cuando la página ya está en su sitio: cargada
+   * del todo —ahí es donde el navegador ha terminado de devolver el
+   * scroll— y con un cuadro de margen para que la corrección que venga de
+   * ese scroll entre todavía sin transición.
+   */
+  private asentar(): void {
+    const soltar = (): void => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => this.pista.classList.remove('es-crudo'));
+      });
+    };
+    if (document.readyState === 'complete') soltar();
+    else window.addEventListener('load', soltar, { once: true });
   }
 
   /**

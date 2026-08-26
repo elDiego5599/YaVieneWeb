@@ -199,6 +199,10 @@ export function seguirPista(
 
   window.addEventListener('scroll', pedir, { passive: true });
   window.addEventListener('resize', pedir);
+  // Un refresco a media página devuelve el scroll a donde estabas, pero no
+  // siempre antes de que esto se enganche: sin volver a medir al terminar
+  // la carga, la escena se queda con la medida de un cero que ya no es.
+  window.addEventListener('load', colocar);
   medidores.add(colocar);
   colocar();
 
@@ -206,6 +210,7 @@ export function seguirPista(
     if (pedido) cancelAnimationFrame(pedido);
     window.removeEventListener('scroll', pedir);
     window.removeEventListener('resize', pedir);
+    window.removeEventListener('load', colocar);
     medidores.delete(colocar);
   };
 }

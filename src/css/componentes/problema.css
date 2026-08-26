@@ -381,6 +381,20 @@
   transform: none;
 }
 
+/* El primer cuadro no se anima. Al refrescar a media página el navegador
+   devuelve el scroll cuando le parece, a veces después de que el reloj ya
+   se haya pintado en cero: la corrección que viene detrás es correcta,
+   pero con transición se ve como un barrido del arco de verde a coral que
+   no cuenta nada. Mientras dura `es-crudo` —lo quita reloj.ts en cuanto la
+   página está cargada— el reloj salta directo a lo que toca. Va después de
+   las reglas que anula: misma especificidad, gana la última. */
+.pista.es-crudo .reloj,
+.pista.es-crudo .reloj-avance,
+.pista.es-crudo .reloj-halo,
+.es-crudo .problema-beat {
+  transition: none;
+}
+
 /* ── El reloj ──
    Esfera de 300 grados, con hueco abajo: si cerrara el círculo el treinta
    caería encima del cero y no se sabría si empieza o acaba. La aguja

@@ -12,9 +12,9 @@
  * La solución es la que tomaría cualquiera: si no cabe, se encoge hasta
  * que quepa. `zoom` sirve justo para eso y no es lo mismo que un
  * `transform: scale()` —vuelve a maquetar en pequeño, así que el texto
- * sigue siendo texto nítido y no una foto reducida—, y como el zoom no
- * toca `offsetHeight` ni las unidades de ventana, medir es una resta:
- * lo que mide la escena contra lo que mide la ventana, sin bucles.
+ * sigue siendo texto nítido y no una foto reducida—. Medir es una regla
+ * de tres: lo que ocupa la escena en pantalla, deshecho el factor que ya
+ * lleva puesto, contra el hueco que le deja la ventana.
  *
  * Todo lo que hay dentro hereda el factor en `--encaje`, y de ahí lo lee
  * el poco código que mezcla píxeles de pantalla con píxeles del elemento
@@ -46,33 +46,44 @@ export function encajarEscena(escena: HTMLElement): () => void {
 
   const medir = (): void => {
     pedido = 0;
-    // `offsetHeight` no cuenta el zoom: es el alto que tendría la escena
-    // si nadie la hubiera encogido, que es justo con lo que hay que
-    // comparar. Por eso esto no se realimenta.
-    const natural = dentro.offsetHeight;
-    if (natural <= 0) return;
-    // Contra qué se compara: el alto de la escena tal y como lo dejó el
-    // CSS, no `window.innerHeight`. No son lo mismo en el Safari del
-    // iPhone —ahí la ventana que reporta el navegador incluye lo que tapa
-    // la barra de direcciones, y el CSS ya mide en `svh` para no contarlo—
-    // y basta esa diferencia para que el final del reloj quede debajo de la
-    // barra, en una escena pegada que no se puede mover. Leer el `min-height`
-    // ya resuelto es preguntarle al CSS por su propio número, así que los
-    // dos lados de la resta hablan de la misma pantalla.
     const marco = getComputedStyle(escena);
+    // Sin pegado no hay nada que encajar: es lo que pasa con movimiento
+    // reducido, donde la sección se lee de arriba abajo y nada se corta.
+    if (marco.position !== 'sticky') return;
+
+    const puesto = ultimo > 0 ? ultimo : 1;
+    // El alto natural se saca de lo que se ve dividido por el factor que
+    // ya está puesto, no de `offsetHeight`. Los dos navegadores no cuentan
+    // igual: Chrome deja `offsetHeight` sin tocar por el zoom y el WebKit
+    // del iPhone lo devuelve ya encogido. Con el segundo, medir dos veces
+    // daba 1 a la segunda, el factor se caía y el reloj volvía a salirse
+    // por abajo —cortado en iPhone y en ningún otro sitio—. Lo que se ve
+    // en pantalla, en cambio, lo dicen los dos igual.
+    const natural = dentro.getBoundingClientRect().height / puesto;
+    if (natural <= 0) return;
+
+    // El alto libre no es la caja entera: arriba se reserva la franja de
+    // la cabecera y abajo la de la barra de direcciones. Los dos son
+    // relleno de la escena, así que se leen en píxeles de verdad y se
+    // restan antes de dividir.
     const reserva =
       (Number.parseFloat(marco.paddingTop) || 0) +
       (Number.parseFloat(marco.paddingBottom) || 0);
-    // La franja que reserva la cabecera está en la escena, no en lo que se
-    // encoge: se lee en píxeles de verdad y se resta antes de dividir.
-    const libre = (Number.parseFloat(marco.minHeight) || 0) - reserva;
-    // Sin `min-height` no hay escena que encajar: es lo que pasa con
-    // movimiento reducido, donde el bloque se lee de arriba abajo.
+    // Y se compara contra el alto que le dio el CSS, no contra
+    // `window.innerHeight`: el CSS ya sabe de barras y el navegador no
+    // siempre dice lo mismo. Si no lo resuelve, la ventana sirve.
+    const declarado = Number.parseFloat(marco.minHeight);
+    const pantalla =
+      Number.isFinite(declarado) && declarado > 0 ? declarado : window.innerHeight;
+    const libre = pantalla - reserva;
     if (libre <= 0) return;
-    const k = Math.max(MINIMO, Math.min(1, Math.round((libre / natural) * 1000) / 1000));
-    if (k === ultimo) return;
+
+    const k = Math.max(MINIMO, Math.min(1, libre / natural));
+    // Zona muerta: media centésima de factor no mueve un píxel, y sin ella
+    // el redondeo de una medida a otra podría dejarlo oscilando.
+    if (Math.abs(k - puesto) < 0.005) return;
     ultimo = k;
-    escena.style.setProperty('--encaje', String(k));
+    escena.style.setProperty('--encaje', k.toFixed(3));
   };
 
   const pedir = (): void => {
@@ -89,9 +100,9 @@ export function encajarEscena(escena: HTMLElement): () => void {
   // bloque que se despliega—. Con una medida sola el factor se quedaba
   // corto y lo que había crecido se salía por abajo sin forma de
   // alcanzarlo: así se cortaba el reloj en un teléfono. El observador
-  // vuelve a medir cada vez que cambia el alto. No se realimenta:
-  // `offsetHeight` ignora el zoom, así que al cambiarlo el número que se
-  // mide es el mismo y `ultimo` corta ahí.
+  // vuelve a medir cada vez que cambia el alto. No se realimenta: la
+  // medida se divide por el factor ya puesto, así que al aplicarlo el alto
+  // natural que sale es el mismo y la zona muerta corta ahí.
   const vigia = new ResizeObserver(pedir);
   vigia.observe(dentro);
   medir();
