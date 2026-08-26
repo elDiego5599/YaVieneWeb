@@ -82,7 +82,6 @@ export class MapaVivo {
   private readonly lista: HTMLElement;
   private readonly aviso: HTMLElement;
   private readonly avisoTitulo: HTMLElement;
-  private readonly avisoCuerpo: HTMLElement;
   private readonly lectura: HTMLElement;
   private readonly lecturaBus: HTMLElement;
   private readonly lecturaMetros: HTMLElement;
@@ -117,7 +116,6 @@ export class MapaVivo {
     this.lista = req<HTMLElement>(raiz, '[data-mapa-rutas]');
     this.aviso = req<HTMLElement>(raiz, '[data-mapa-aviso]');
     this.avisoTitulo = req<HTMLElement>(raiz, '[data-mapa-aviso-titulo]');
-    this.avisoCuerpo = req<HTMLElement>(raiz, '[data-mapa-aviso-cuerpo]');
     this.lectura = req<HTMLElement>(raiz, '[data-mapa-lectura]');
     this.lecturaBus = req<HTMLElement>(raiz, '[data-mapa-bus]');
     this.lecturaMetros = req<HTMLElement>(raiz, '[data-mapa-metros]');
@@ -486,9 +484,13 @@ export class MapaVivo {
 
     if (dentro && !this.avisado) {
       this.avisado = true;
-      // Las mismas dos líneas que arma bus_notification_service.dart.
-      this.avisoTitulo.textContent = `${this.ruta.nombre} - ${cerca.placa} está cerca de ti`;
-      this.avisoCuerpo.textContent = `Está a ${redondear(cerca.metros)} m de tu ubicación`;
+      /*
+        Una línea, la misma en los tres sitios donde la página enseña un
+        aviso: aquí, en el teléfono del hero y en el paso 3. La distancia
+        exacta no se repite en la tarjeta porque ya está a su lado, en el
+        número grande de la lectura y en el círculo del mapa.
+      */
+      this.avisoTitulo.textContent = `El bus ${cerca.placa} está cerca de ti`;
       this.aviso.classList.add('is-on');
     }
   }

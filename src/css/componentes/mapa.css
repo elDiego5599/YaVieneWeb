@@ -42,6 +42,23 @@
   gap: 16px;
 }
 
+/* Este titular no tenía tamaño propio: caía en el `h2` de `base.css`, que
+   son los 2em que trae el navegador y encima con la letra de cuerpo. Al
+   lado del mapa —que ocupa media pantalla— se leía como un pie de foto.
+
+   Ahora es lo que es: la invitación a tocar la única parte de la página
+   que se toca. Va en la de display, medio escalón por encima del titular
+   del problema (4,5rem de techo) y por debajo del de los pasos (9rem),
+   que es el más grande de la página y así sigue siendo. */
+.mapa-cabecera .section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.7rem, 1.1rem + 5.4vw, 5.75rem);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+}
+
 /* Apilada la entradilla se queda con el ancho del panel entero, que son
    cien caracteres por línea: hay que frenarla igual que arriba. */
 .mapa-cabecera .section-lead {
@@ -86,28 +103,27 @@
   }
 }
 
-/* El mando: rutas arriba, lectura debajo, y la lectura se estira para
-   llenar lo que el mapa deja de alto. */
+/* El mando: rutas arriba, lectura abajo, y nada de aire muerto en medio.
+
+   Es una rejilla de dos filas y no una columna flexible porque lo que
+   sobra de alto tiene que ir a algún sitio concreto: va a las fichas
+   —`1fr`—, que crecen hasta que su última fila queda a la altura de la
+   lectura, y la lectura se queda con lo que pide su contenido. Antes lo
+   que sobraba quedaba suelto entre las dos piezas, y eso es lo que se
+   veía como un hueco. */
 .mapa-mando {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: clamp(16px, 1.6vw, 22px);
   min-width: 0;
-}
-
-.mapa-mando .mapa-columna--rutas {
-  flex: 0 0 auto;
-}
-
-.mapa-mando .mapa-columna--lectura {
-  flex: 1;
 }
 
 .mapa-columna {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   min-width: 0;
+  min-height: 0;
 }
 
 .mapa-rotulo {
@@ -118,13 +134,10 @@
   color: var(--text-secondary);
 }
 
-/* ── El lienzo ── */
-.mapa-lienzo-columna {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
+/* ── El lienzo ──
+   Va suelto en la rejilla del tablero: tenía una columna de envoltorio
+   que no repartía nada, sólo una capa más entre el mapa y el hueco que
+   dejaba. */
 .mapa-lienzo {
   position: relative;
   /* La proporción del mosaico, para que quepa la ciudad entera. */
@@ -240,26 +253,43 @@
 }
 
 /* Al lado del mapa hay ancho de sobra: las seis fichas en dos columnas
-   caben en tres filas y dejan sitio a la lectura. Las pinta `rutas.css`;
-   aquí sólo se dice cómo se reparten. */
+   caben en tres filas. Las pinta `rutas.css`; aquí sólo se dice cómo se
+   reparten.
+
+   Las tres filas se parten el alto a partes iguales (`1fr`) en vez de
+   pedir cada una lo suyo: así las seis fichas llenan justo lo que el
+   mapa mide de alto y la rejilla termina donde termina el mapa. */
 @media (min-width: 1060px) {
   .mv-rutas {
+    flex: 1;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    grid-auto-rows: minmax(0, 1fr);
+    gap: 10px;
+    min-height: 0;
   }
 }
 
-/* ── La lectura ── */
+/* ── La lectura ──
+   Tres estados y tres superficies, y ninguna de las tres es blanca. El
+   blanco translúcido de antes sobre la crema del documento no era un
+   estado: era el cuadro esperando a tener uno, y así se veía —apagado
+   justo cuando el bus viene de camino, que es cuando más se mira—.
+
+   El de reposo es `--surface-muted`, el gris azulado con el que la app
+   pinta sus superficies quietas (app_theme.dart). No es un color nuevo
+   ni una decoración: dice «esto está midiendo». Y deja sitio a los otros
+   dos, que sí son avisos: verde cuando el bus entró en el kilómetro,
+   ámbar cuando la ruta ni siquiera pasa cerca. */
 .mapa-lectura {
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 3px;
   padding: 20px 22px;
-  border: 1px solid rgba(20, 39, 78, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.16);
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--surface-muted);
   transition: border-color var(--transition-normal), background var(--transition-normal);
 }
 
@@ -351,32 +381,37 @@
 }
 
 /* ── El aviso ──
-   La misma notificación que sale en el teléfono, con las dos líneas que
-   arma la app. Aparece cuando un bus entra en el kilómetro y se queda.
+   La misma notificación que sale en el teléfono, con la línea que arma
+   la app. Aparece cuando un bus entra en el kilómetro y se queda.
 
-   No es un cuadro más de la sección: es lo único aquí que no pertenece a
-   la página, sino al teléfono de quien mira. Eso hay que verlo sin leer
-   nada, y se dice de tres maneras.
+   Vive dentro del mapa, apoyada en el borde de abajo, y no en una
+   columna al lado. Tres razones:
 
-   Una, la forma: toma prestado el lenguaje de `.scene-card` —la tarjeta
-   de aviso del hero y de los pasos, que ya es la notificación de esta
-   casa—; radio de 16, borde blanco de un pelo y la misma sombra de dos
-   capas, una corta que la apoya y otra larga y difusa que la levanta.
-   Los cuadros de al lado son planos y de borde tinta.
+   Una, es lo que hace un teléfono: la notificación cae encima de lo que
+   estés mirando, no en un cajón aparte. Sobre el mapa —con el círculo
+   del kilómetro justo detrás— se entiende sola de dónde sale.
 
-   Dos, el ancho: una notificación de Android no se estira de lado a
-   lado, ocupa una banda y deja aire a su derecha. Aquí igual.
+   Dos, no cuesta sitio. En el flujo tenía que reservar su hueco aunque
+   estuviera apagada, y ese hueco era el vacío que dejaba la sección
+   mientras no hubiera bus cerca. Flotando no reserva nada.
 
-   Y tres, la altura: se despega del cuadro de la lectura y baja hasta el
-   pie de la columna, a la altura del borde de abajo del mapa. Entre las
-   dos queda un hueco que no es descuido —es lo que separa un dato que
-   siempre está de un aviso que llega. */
+   Y tres, se diferencia de todo lo demás sin necesidad de un marco:
+   toma prestado el lenguaje de `.scene-card` —la tarjeta de aviso del
+   hero y de los pasos, que ya es la notificación de esta casa—; radio
+   de 16, borde blanco de un pelo y la misma sombra de dos capas, una
+   corta que la apoya y otra larga que la levanta. Los cuadros de al
+   lado son planos y de borde tinta. */
 .mapa-aviso {
+  position: absolute;
+  /* Encima del mosaico y por debajo del aviso de toque, que es el que
+     manda mientras no haya pasado nada. */
+  z-index: 3;
+  left: 10px;
+  right: 10px;
+  /* Justo por encima de la atribución, que no se puede tapar. */
+  bottom: 34px;
   display: flex;
   gap: 11px;
-  /* Al fondo de la columna, no pegada a la lectura. */
-  margin-top: auto;
-  max-width: 360px;
   padding: 13px 15px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.97);
@@ -424,17 +459,13 @@
   color: var(--app-text-secondary);
 }
 
+/* Una sola línea. La distancia exacta no se repite aquí: está al lado,
+   en el número grande de la lectura, y dibujada en el mapa. */
 .mapa-aviso-titulo {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   line-height: 1.3;
   color: var(--app-text-primary);
-}
-
-.mapa-aviso-cuerpo {
-  font-size: 12.5px;
-  line-height: 1.35;
-  color: var(--app-text-secondary);
 }
 
 @media (max-width: 1059px) {
@@ -444,12 +475,8 @@
      si se pide por altura se sale del marco en el móvil. Se le da el
      ancho que quepa —con el alto de siempre como techo— y la proporción
      saca la altura. */
-  .mapa-lienzo-columna {
-    width: 100%;
-    justify-self: center;
-  }
-
   .mapa-lienzo {
+    justify-self: center;
     width: min(100%, calc(min(72vh, 560px) * 1284 / 1982));
     height: auto;
     margin-inline: auto;

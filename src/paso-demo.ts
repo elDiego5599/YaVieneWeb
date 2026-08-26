@@ -358,12 +358,9 @@ export class PasoDemo {
     this.refresco = ahora;
     this.setMetros(metros);
 
-    const dentro = this.avisoPuesto && metros <= RADIO_AVISO_M;
-    if (dentro) {
-      // bus_notification_service.dart, palabra por palabra.
-      this.texto('notif-body', `Está a ${this.redondear(metros)} m de tu ubicación`);
-    }
-    this.prender('notif', dentro);
+    // La tarjeta no cambia de texto: dice una línea, «El bus B-042 está
+    // cerca de ti», y el metraje vive en la hoja del teléfono, debajo.
+    this.prender('notif', this.avisoPuesto && metros <= RADIO_AVISO_M);
   }
 
   private redondear(metros: number): number {

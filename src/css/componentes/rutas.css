@@ -1,17 +1,16 @@
 /* ── LAS SEIS RUTAS ─────────────────────────────────────────────────
 
    Los datos duros de la sección del mapa, y son datos que nadie más
-   tiene: seis rutas reales de Sobusa con su código, sus terminales y su
-   kilometraje. Tres cifras de cabecera y seis fichas de registro
-   —código arriba a la izquierda, kilómetro a la derecha, nombre y
-   trayecto debajo—, no tarjetas de producto.
+   tiene: seis rutas reales de Sobusa con sus terminales. Tres cifras de
+   cabecera y seis fichas —nombre y trayecto—, no tarjetas de producto.
 
-   Las nueve piezas van pequeñas a propósito. Estuvieron solas en su
-   propia sección, a tamaño de tarjeta y en rejilla de tres; al fundirse
-   con el mapa comparten el ancho con él, así que la ficha se aprieta
-   hasta caber en media columna del mando. Lo que se recorta es aire y
-   cuerpo de letra, no información: sigue estando el código, el largo,
-   el nombre y las dos terminales.
+   La ficha llevó también el código interno (R-101) y el kilometraje.
+   Eran ciertos y ya no están: al lado del mapa la ficha no es un
+   registro que se lee, es el botón que cambia lo que el mapa dibuja, y
+   un botón se mira de un vistazo. Con cuatro datos había que buscar
+   cuál era el nombre. El kilometraje no se pierde —sigue sumado en la
+   cifra de cabecera— y el código sigue en `rutas.json`, que es donde lo
+   usan la app y el backend.
 
    Y dejaron de ser una lista para ser el mando: cada ficha es un botón
    que cambia la ruta que el mapa dibuja. Por eso el estado elegido pesa
@@ -71,15 +70,20 @@
 /* ── La ficha ──
    Es un `<button>`, así que hereda el gris y la letra del sistema si no
    se le dice otra cosa: eso es lo que hacen las cuatro primeras
-   declaraciones. El reparto de rejilla lo dice `mapa.css`, que es quien
-   sabe cuánto ancho le queda al lado del mapa. */
+   declaraciones. El reparto lo dice `mapa.css`, que es quien sabe
+   cuánto ancho y cuánto alto le quedan al lado del mapa.
+
+   Dos líneas centradas y nada más. La ficha crece con la rejilla —las
+   tres filas se parten el alto del mapa—, así que el contenido va
+   centrado y no pegado arriba: estirada con `align-items: start` se
+   quedaba el texto en el borde y el resto en blanco. */
 .ruta-ficha {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: start;
-  gap: 5px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
   margin: 0;
-  padding: 11px 13px;
+  padding: 14px 16px;
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -130,77 +134,24 @@
   translate: none;
 }
 
-/* El código real de la ruta en rutas.json. No es una viñeta bonita: es
-   el identificador con el que la app y el backend la llaman. */
-.ruta-ficha-id {
-  grid-column: 1;
-  justify-self: start;
-  padding: 2px 7px;
-  border-radius: 999px;
-  background: var(--green-tint);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  font-variant-numeric: tabular-nums;
-  color: var(--green-accessible);
-}
-
-/* Sobre el verde de la elegida la chapa se perdía: se le devuelve el
-   blanco para que siga siendo una chapa y no una mancha. */
-.ruta-ficha[aria-pressed='true'] .ruta-ficha-id {
-  background: #FFFFFF;
-}
-
-.ruta-ficha-km {
-  grid-column: 2;
-  grid-row: 1 / 3;
-  display: flex;
-  align-items: baseline;
-  gap: 3px;
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  font-variant-numeric: tabular-nums;
-  color: var(--navy);
-  transition: color var(--transition-fast);
-}
-
-.ruta-ficha:hover .ruta-ficha-km,
-.ruta-ficha[aria-pressed='true'] .ruta-ficha-km {
-  color: var(--green-accessible);
-}
-
-.ruta-ficha-km-cifra {
-  font-size: 1.15rem;
-  line-height: 1;
-}
-
-.ruta-ficha-km-unidad {
-  font-family: var(--font-family);
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-}
-
+/* Sin la chapa ni el número al lado, el nombre es lo único grande de la
+   ficha y puede permitírselo: sube de 0,95rem a algo que se lee a la
+   distancia a la que se mira el mapa. */
 .ruta-ficha-nombre {
-  grid-column: 1;
   font-family: var(--font-display);
-  font-size: 0.95rem;
+  font-size: clamp(0.95rem, 0.85rem + 0.35vw, 1.2rem);
   font-weight: 700;
   line-height: 1.15;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   color: var(--text-primary);
 }
 
 .ruta-ficha-tramo {
-  grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 5px;
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.3;
   color: var(--text-secondary);
 }

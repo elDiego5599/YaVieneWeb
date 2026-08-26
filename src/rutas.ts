@@ -3,9 +3,15 @@
  *
  * Las seis rutas de Sobusa ya viajaban en el paquete —las carga
  * `src/data/rutas-landing.ts` para dibujar el mapa—, pero se enseñaban en
- * un riel estrecho de dos líneas. Aquí se arma la ficha completa: el
- * código con el que la app y el backend llaman a la ruta, el nombre, las
- * dos terminales y el kilometraje.
+ * un riel estrecho de dos líneas. Aquí se arma la ficha: el nombre de la
+ * ruta y sus dos terminales.
+ *
+ * Y sólo eso. La ficha llegó a llevar también el código interno (R-101) y
+ * el kilometraje, que son datos reales pero de otra conversación: al lado
+ * del mapa la ficha es un mando —se pulsa para cambiar lo que el mapa
+ * dibuja— y un mando se lee de un vistazo. El código y los kilómetros
+ * siguen en `rutas.json`, y el total de kilómetros sigue saliendo en las
+ * cifras de cabecera de aquí abajo.
  *
  * La ficha es un botón, no un enlace: vive al lado del mapa y lo que hace
  * es cambiar la ruta que el mapa dibuja, ahí mismo. Quien la pinta es
@@ -64,13 +70,7 @@ export const fichaDeRuta = (ruta: RutaLanding): HTMLButtonElement => {
   tramo.append(trozo('ruta-ficha-terminal', ruta.terminalA), flecha,
     trozo('ruta-ficha-terminal', ruta.terminalB));
 
-  const largo = document.createElement('span');
-  largo.className = 'ruta-ficha-km';
-  largo.append(trozo('ruta-ficha-km-cifra', cifra(ruta.km)),
-    trozo('ruta-ficha-km-unidad', 'km'));
-
-  ficha.append(trozo('ruta-ficha-id', ruta.id), largo,
-    trozo('ruta-ficha-nombre', ruta.nombre), tramo);
+  ficha.append(trozo('ruta-ficha-nombre', ruta.nombre), tramo);
   return ficha;
 };
 

@@ -144,7 +144,7 @@
   <header class="site-header" id="top">
     <div class="nav-island">
       <a href="#top" class="nav-island-brand" aria-label="Ya Viene, inicio">
-        <svg class="nav-island-logo" viewBox="0 0 512 512" role="img" aria-label="Ya Viene Logo">
+        <svg class="nav-island-logo" width="28" height="28" viewBox="0 0 512 512" role="img" aria-label="Ya Viene Logo">
         <circle cx="256" cy="256" r="256" fill="#00A859" />
         <path d="M 120 130 A 200 200 0 0 1 392 130" fill="none" stroke="#FFFFFF" stroke-width="32"
         stroke-linecap="round" opacity="0.5" />
@@ -745,8 +745,7 @@
               </svg>
             </div>
             <div>
-              <strong data-escena="notif-title">B18 Tcherassi - B-042 está cerca de ti</strong>
-              <span data-escena="notif-body">Está a 320 m de tu ubicación</span>
+              <strong data-escena="notif-title">El bus B-042 está cerca de ti</strong>
             </div>
           </div>
 
@@ -1220,7 +1219,6 @@
                       </span>
                       <div>
                         <strong data-el="notif-title">El bus B-042 está cerca de ti</strong>
-                        <span data-el="notif-body">Está a 640 m de tu ubicación</span>
                       </div>
                     </div>
                   </div>
@@ -1310,41 +1308,43 @@
       <div class="panel-inner panel-inner--ancho mapa-inner">
         <header class="mapa-cabecera reveal">
           <span class="tracked-eyebrow eyebrow--verde">EN OPERACIÓN</span>
-          <h2 class="section-title">Seis rutas de Sobusa,<br />moviéndose ahora.</h2>
-          <p class="section-lead">Cuando un bus entre en tu kilómetro, salta el mismo
-            aviso que le llega al teléfono.</p>
+          <h2 class="section-title">Prueba el mapa<br />con rutas en vivo.</h2>
+          <p class="section-lead">Seis rutas reales de Sobusa. Mueve tu punto y, cuando un
+            bus entre en tu kilómetro, salta el mismo aviso que le llega al teléfono.</p>
         </header>
 
         <div class="rutas-cifras reveal" data-reveal-delay="90" data-rutas-cifras></div>
+        <!--
+          El aviso vive dentro del mapa, no en una columna al lado. Es lo
+          que hace el teléfono: la notificación cae encima de lo que
+          estés mirando. Ahí además no deja hueco cuando está apagado,
+          que era el problema de tenerlo en el flujo.
+        -->
         <div class="mapa-tablero" data-mapa-vivo>
-          <div class="mapa-lienzo-columna">
-            <div class="mapa-lienzo" data-mapa-lienzo>
-              <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
-              <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
-              <p class="mapa-credito">© OpenStreetMap · © CARTO</p>
+          <div class="mapa-lienzo" data-mapa-lienzo>
+            <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
+            <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
+            <div class="mapa-aviso" data-mapa-aviso role="status" aria-live="polite">
+              <div class="mapa-aviso-icono" aria-hidden="true">
+                <img src="/logo.svg" alt="" width="20" height="20">
+              </div>
+              <div class="mapa-aviso-texto">
+                <span class="mapa-aviso-app">Ya Viene · ahora</span>
+                <strong class="mapa-aviso-titulo" data-mapa-aviso-titulo></strong>
+              </div>
             </div>
+            <p class="mapa-credito">© OpenStreetMap · © CARTO</p>
           </div>
           <div class="mapa-mando">
             <div class="mapa-columna mapa-columna--rutas">
+              <span class="mapa-rotulo">Elige una ruta</span>
               <div class="mv-rutas" data-mapa-rutas role="group" aria-label="Rutas disponibles"></div>
             </div>
-            <div class="mapa-columna mapa-columna--lectura">
-              <div class="mapa-lectura" data-mapa-lectura>
-                <span class="mapa-rotulo">Bus más cercano</span>
-                <span class="mapa-lectura-bus" data-mapa-bus></span>
-                <span class="mapa-lectura-metros" data-mapa-metros></span>
-                <span class="mapa-lectura-pie" data-mapa-lectura-pie>en línea recta hasta tu punto</span>
-              </div>
-              <div class="mapa-aviso" data-mapa-aviso role="status" aria-live="polite">
-                <div class="mapa-aviso-icono" aria-hidden="true">
-                  <img src="/logo.svg" alt="" width="20" height="20">
-                </div>
-                <div class="mapa-aviso-texto">
-                  <span class="mapa-aviso-app">Ya Viene · ahora</span>
-                  <strong class="mapa-aviso-titulo" data-mapa-aviso-titulo></strong>
-                  <span class="mapa-aviso-cuerpo" data-mapa-aviso-cuerpo></span>
-                </div>
-              </div>
+            <div class="mapa-lectura" data-mapa-lectura>
+              <span class="mapa-rotulo">Bus más cercano</span>
+              <span class="mapa-lectura-bus" data-mapa-bus></span>
+              <span class="mapa-lectura-metros" data-mapa-metros></span>
+              <span class="mapa-lectura-pie" data-mapa-lectura-pie>en línea recta hasta tu punto</span>
             </div>
           </div>
         </div>

@@ -93,10 +93,60 @@ function seoDeRaiz(): Plugin {
   };
 }
 
+/*
+  El parpadeo de la recarga, y sólo en `vite dev`.
+
+  En la página construida el CSS va en tres `<link>` dentro del `<head>`:
+  el navegador no pinta nada hasta tenerlos, así que no hay parpadeo. En
+  desarrollo no hay `<link>` ninguno —Vite sirve los módulos sin
+  empaquetar y las hojas las inyecta `main.ts` en cuanto se ejecuta—, así
+  que entre el primer pintado y esa inyección hay unos milisegundos con
+  el HTML desnudo: los SVG sin medidas se van al ancho de su contenedor
+  (de ahí el «icono gigante»), los teléfonos se apilan y el pie sale
+  arriba. Es un artefacto del servidor de desarrollo, no un fallo de la
+  página, pero se ve en cada F5 y desconcierta.
+
+  Se tapa como se tapa esto: el documento sale escondido y se enseña
+  cuando los módulos ya corrieron. Va aquí y no en el HTML a propósito
+  —`apply: 'serve'`—, para que no cueste ni un byte en producción ni
+  retrase el primer pintado de verdad. Y lleva un plazo de gracia: si
+  `main.ts` reventara, a los tres segundos la página aparece igual, con
+  su error a la vista y no en negro.
+*/
+const GUARDA = `
+  <!-- Inyectado por vite.config.ts. Sólo en desarrollo. -->
+  <style>html.yv-sin-css body { visibility: hidden; }</style>
+  <script>
+    (function () {
+      var raiz = document.documentElement;
+      raiz.classList.add('yv-sin-css');
+      var listo = function () { raiz.classList.remove('yv-sin-css'); };
+      addEventListener('DOMContentLoaded', function () { requestAnimationFrame(listo); });
+      setTimeout(listo, 3000);
+    })();
+  </script>
+`;
+
+function sinParpadeo(): Plugin {
+  return {
+    name: 'yaviene-sin-parpadeo',
+    apply: 'serve',
+    transformIndexHtml: {
+      order: 'pre',
+      /*
+        Después del `charset`, no antes: la codificación tiene que caber
+        en el primer kilobyte del documento y no se le adelanta nada.
+      */
+      handler: (html) =>
+        html.replace('<meta charset="UTF-8" />', `<meta charset="UTF-8" />${GUARDA}`)
+    }
+  };
+}
+
 export default defineConfig({
   // La landing se sirve desde la raíz del dominio.
   base: '/',
-  plugins: [seoDeRaiz()],
+  plugins: [seoDeRaiz(), sinParpadeo()],
   // Los tests de humo montan el formulario real: necesitan un DOM.
   test: {
     environment: 'happy-dom',

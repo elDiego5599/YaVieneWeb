@@ -710,17 +710,17 @@ export class PhoneSimulator {
   }
 
   /**
-   * La tarjeta flotante repite, palabra por palabra, la notificación que
-   * manda bus_notification_service.dart: título "<ruta> - <placa> está cerca
-   * de ti" y cuerpo "Está a N m de tu ubicación". Y aparece cuando aparecería
-   * de verdad: con el aviso armado y el bus ya dentro del kilómetro.
+   * La tarjeta flotante dice lo que dice la notificación de la app, en una
+   * línea: "El bus <placa> está cerca de ti". Y aparece cuando aparecería de
+   * verdad: con el aviso armado y el bus ya dentro del kilómetro. La
+   * distancia no se repite aquí —está en la hoja del teléfono, justo
+   * debajo—, y es la misma tarjeta del paso 3 y de la sección del mapa.
    */
   private notificacion(placa: string, metros: number): void {
     const dentro = !this.cerrando && this.avisoActivo && metros <= this.radioAvisoM;
     const tarjeta = this.escena?.querySelector('[data-escena="notif"]');
     if (dentro) {
-      this.escenaTexto('notif-title', `${this.rutaActual.nombre} - ${placa} está cerca de ti`);
-      this.escenaTexto('notif-body', `Está a ${metros} m de tu ubicación`);
+      this.escenaTexto('notif-title', `El bus ${placa} está cerca de ti`);
     }
     tarjeta?.classList.toggle('is-on', dentro);
   }
