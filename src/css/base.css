@@ -67,10 +67,6 @@ p {
   text-wrap: pretty;
 }
 
-.text-primary {
-  color: var(--text-primary);
-}
-
 .tracked-eyebrow {
   display: inline-block;
   font-size: 11px;
@@ -82,7 +78,6 @@ p {
 .eyebrow--coral { color: var(--coral); }
 .eyebrow--verde { color: var(--green-accessible); }
 .eyebrow--ambar { color: var(--amber); }
-.eyebrow--tenue { color: var(--text-muted); }
 
 /* Texto que sólo alcanza el lector de pantalla: describe lo que la demo
    del teléfono enseña, que es puramente visual. */

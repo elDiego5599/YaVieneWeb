@@ -1309,11 +1309,14 @@
         <header class="mapa-cabecera reveal">
           <span class="tracked-eyebrow eyebrow--verde">EN OPERACIÓN</span>
           <h2 class="section-title">Prueba el mapa<br />con rutas en vivo.</h2>
-          <p class="section-lead">Seis rutas reales de Sobusa. Mueve tu punto y, cuando un
-            bus entre en tu kilómetro, salta el mismo aviso que le llega al teléfono.</p>
+          <!--
+            En la columna derecha de la cabecera van las cifras, no un
+            párrafo: al lado del mapa lo que sostiene el titular son los
+            datos duros —seis rutas, diez terminales, los kilómetros—, y
+            de la demo ya se encarga la pista sobre el mapa.
+          -->
+          <div class="rutas-cifras reveal" data-reveal-delay="90" data-rutas-cifras></div>
         </header>
-
-        <div class="rutas-cifras reveal" data-reveal-delay="90" data-rutas-cifras></div>
         <!--
           Ni el aviso ni la pista de toque van encima del mosaico. Estuvieron
           ahí y tapaban justo lo que hay que mirar —la ruta y el círculo del
@@ -1337,8 +1340,8 @@
             </div>
             <div class="mapa-lienzo" data-mapa-lienzo>
               <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
+              <p class="mapa-credito">Mapa base © OpenStreetMap · © CARTO</p>
             </div>
-            <p class="mapa-credito">Mapa base © OpenStreetMap · © CARTO</p>
           </div>
           <div class="mapa-mando">
             <div class="mapa-columna mapa-columna--rutas">

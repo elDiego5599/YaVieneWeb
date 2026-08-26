@@ -33,13 +33,19 @@
   gap: clamp(28px, 3.4vw, 48px);
 }
 
-/* La cabecera ocupa el ancho entero: el titular a la izquierda y la
-   entradilla a su derecha, apoyada en la misma línea de base. Antes era
-   un bloque estrecho arriba a la izquierda y dejaba medio panel vacío. */
+/* La cabecera ocupa el ancho entero: el titular a la izquierda y las tres
+   cifras de las rutas a su derecha, apoyadas en la misma línea de base.
+   Ahí había una entradilla que contaba lo que la propia demo enseña —que
+   son seis rutas y que al entrar el bus salta el aviso—, así que decía en
+   prosa lo que se ve tocando. Las cifras, en cambio, no se ven en ningún
+   otro sitio de la página. */
 .mapa-cabecera {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  /* La línea que la separa del tablero, a todo el ancho del panel. */
+  padding-bottom: clamp(20px, 2.2vw, 30px);
+  border-bottom: 1px solid rgba(20, 39, 78, 0.14);
 }
 
 /* Este titular no tenía tamaño propio: caía en el `h2` de `base.css`, que
@@ -59,12 +65,6 @@
   letter-spacing: -0.045em;
 }
 
-/* Apilada la entradilla se queda con el ancho del panel entero, que son
-   cien caracteres por línea: hay que frenarla igual que arriba. */
-.mapa-cabecera .section-lead {
-  max-width: 52ch;
-}
-
 @media (min-width: 900px) {
   .mapa-cabecera {
     display: grid;
@@ -78,12 +78,13 @@
     grid-column: 1;
   }
 
-  .mapa-cabecera .section-lead {
+  /* Las cifras caen en la segunda columna, apoyadas en la misma línea de
+     base que el titular: son el dato que lo sostiene, no un pie. */
+  .mapa-cabecera .rutas-cifras {
     grid-column: 2;
     grid-row: 1 / span 2;
     align-self: end;
     margin: 0;
-    max-width: 46ch;
   }
 }
 
@@ -103,12 +104,14 @@
        sitio: pide todo el alto que le cabe en pantalla y su ancho sale
        solo de la proporción del mosaico —`auto`—, que es vertical.
 
-       El mando lleva techo. Sin él se quedaba con todo lo que sobra en
-       una pantalla ancha —ochocientos y pico píxeles para dos palabras
-       por fila— y el mapa acababa pareciendo la ilustración de al lado
-       en vez del centro. Con el techo puesto los dos van parejos y el
-       grupo se centra, que es lo que ya hacía `justify-content`. */
-    grid-template-columns: minmax(0, 560px) auto;
+       El mando lleva techo. Sin él se queda con todo lo que sobra en una
+       pantalla ancha y el mapa acaba pareciendo la ilustración de al
+       lado en vez del centro. El techo es el ancho que piden dos
+       columnas de fichas —unos cuatrocientos por columna, que es lo que
+       mide el nombre de ruta más largo con su tramo debajo— y ni un
+       píxel más. Con él puesto los dos van parejos y el grupo se
+       centra, que es lo que ya hacía `justify-content`. */
+    grid-template-columns: minmax(0, 820px) auto;
     align-items: stretch;
   }
 
@@ -160,6 +163,17 @@
   grid-template-rows: minmax(0, 1fr) auto;
   gap: clamp(16px, 1.6vw, 22px);
   min-width: 0;
+}
+
+/* En dos columnas las seis fichas ocupan la mitad de alto que en una, y
+   ese alto tiene que ir a algún sitio: se lo reparten las fichas y la
+   lectura en vez de dejarlo suelto entre las dos. La proporción da unas
+   fichas holgadas —son botones, se tocan— y una lectura del tamaño del
+   número que enseña. */
+@media (min-width: 1060px) {
+  .mapa-mando {
+    grid-template-rows: minmax(0, 2.2fr) minmax(0, 1fr);
+  }
 }
 
 .mapa-columna {
@@ -296,17 +310,23 @@
   translate: 0 -8px;
 }
 
-/* La atribución, como el mockup del hero: un pie centrado debajo del
-   mapa, con la misma letra y el mismo gris. Dentro del mosaico era una
-   pastilla más encima del dibujo, y de eso iba justamente la limpieza de
-   esta sección. Los 10 px de hueco de `.mapa-vista` más estos 2 dan los
-   12 que separan el crédito del teléfono en el hero. */
+/* La atribución va donde la ponen los mapas: dentro del mosaico, abajo a
+   la izquierda, que es la esquina por la que no pasa ninguna ruta. Es
+   letra pequeña sobre una pastilla del propio color del papel del mapa,
+   así que no compite con nada y tampoco tapa. */
 .mapa-credito {
-  margin: 2px 0 0;
-  font-size: 11px;
+  position: absolute;
+  left: 10px;
+  bottom: 9px;
+  z-index: 2;
+  margin: 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(237, 231, 222, 0.86);
+  font-size: 10.5px;
   line-height: 1.4;
-  text-align: center;
-  color: var(--text-muted);
+  color: var(--text-secondary);
+  pointer-events: none;
 }
 
 /* ── Las rutas ── */
@@ -316,20 +336,21 @@
   gap: 7px;
 }
 
-/* Una lista, no una rejilla. En dos columnas había que barrer en zigzag
-   para encontrar una ruta; en una sola se lee de arriba abajo, como el
-   panel de una terminal, y cada fila tiene ancho para el nombre y el
-   tramo en la misma línea.
+/* Tres y tres. En una sola columna las seis fichas pedían todo el alto
+   del mapa para poner dos palabras por fila, y el mando se quedaba
+   estrecho al lado. En dos columnas la lista ocupa el ancho que le
+   sobraba y cada ficha tiene sitio para el nombre y el tramo debajo.
 
-   Las seis filas se parten el alto a partes iguales (`1fr`) en vez de
-   pedir cada una lo suyo: así llenan justo lo que el mapa mide de alto y
-   la lista termina donde termina el mapa. */
+   Las tres filas se parten el alto a partes iguales (`1fr`) en vez de
+   pedir cada una lo suyo: así llenan justo lo que les toca del mando y
+   la lista termina donde empieza la lectura. */
 @media (min-width: 1060px) {
   .mv-rutas {
     flex: 1;
     display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: minmax(0, 1fr);
-    gap: 8px;
+    gap: 10px;
     min-height: 0;
   }
 }
@@ -411,7 +432,7 @@
 
   .mapa-lectura-metros {
     grid-area: 1 / 2 / 4 / 3;
-    font-size: clamp(46px, 4.6vw, 68px);
+    font-size: clamp(52px, 5.6vw, 92px);
   }
 }
 
@@ -548,19 +569,6 @@
     overflow-x: auto;
     padding-bottom: 6px;
     scrollbar-width: none;
-  }
-
-  /* En el carril la ficha vuelve a ser tarjeta: 230 px no dan para poner
-     el nombre y el tramo en la misma línea. */
-  .ruta-ficha {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-  }
-
-  .ruta-ficha-tramo {
-    justify-content: flex-start;
-    text-align: left;
   }
 
   .mv-rutas::-webkit-scrollbar {

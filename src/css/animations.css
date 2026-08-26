@@ -13,39 +13,7 @@
   transform: translateY(0);
 }
 
-/* Pulse Beacon */
-.pulse-beacon {
-  position: relative;
-}
-
-.pulse-beacon::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  background: var(--green);
-  opacity: 0.6;
-  animation: beaconPulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
-  pointer-events: none;
-}
-
-@keyframes beaconPulse {
-  0% {
-    transform: scale(0.9);
-    opacity: 0.7;
-  }
-  70% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(2.4);
-    opacity: 0;
-  }
-}
-
 /* Aceleración de hardware y renderizado vectorial nítido HD para buses y elementos flotantes */
-.bus-floating-svg,
 .scene-bus,
 .scene-bus-img,
 .animate-float-slow,
@@ -83,25 +51,6 @@
 
 .animate-float-delayed {
   animation: floatDelayed 7s ease-in-out infinite 1.5s;
-}
-
-.levita {
-  --inclina: 0deg;
-  animation: levitar 6s ease-in-out infinite;
-}
-
-.levita--lenta {
-  animation-duration: 7.4s;
-  animation-delay: -2.2s;
-}
-
-@keyframes levitar {
-  0%, 100% {
-    transform: translateY(-7px) rotate(var(--inclina));
-  }
-  50% {
-    transform: translateY(7px) rotate(var(--inclina));
-  }
 }
 
 /* Latido bajo el pin del mapa, el mismo faro de ubicación de la app. */
@@ -159,14 +108,6 @@
     transition: none !important;
     translate: none !important;
   }
-  .pulse-beacon::after {
-    animation: none !important;
-  }
-  .map-pin-ping {
-    animation: none !important;
-    opacity: 0 !important;
-  }
-  .levita,
   .animate-float-slow,
   .animate-float-delayed {
     animation: none !important;

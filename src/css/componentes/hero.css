@@ -286,8 +286,7 @@
 }
 
 /* Buses flotantes vectoriales con fix de nitidez y aceleración */
-.scene-bus,
-.bus-floating-svg {
+.scene-bus {
   position: absolute;
   z-index: 20;
   /* Nunca más anchos que su carril: si el carril se estrecha, el bus se

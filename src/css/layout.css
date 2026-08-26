@@ -63,19 +63,8 @@
   margin-top: var(--panel-gap);
 }
 
-/* El taller: el fondo arena de la app —el mismo del mockup— bajo las piezas
-   de producto, que van en blanco encima. Sobre blanco no se despegarían. */
-.panel--taller {
-  background: var(--arena);
-}
-
 .panel-inner--ancho {
   max-width: var(--content-wide);
-}
-
-.panel-inner.tight {
-  padding-top: clamp(36px, 4vw, 64px);
-  padding-bottom: clamp(36px, 4vw, 64px);
 }
 
 /* ── Fondos de panel ───────────────────────────────────────────────── */
@@ -125,30 +114,6 @@
   background: linear-gradient(180deg, var(--green-tint) 0%, #F2FBF6 100%);
 }
 
-/* Papel: blanco con un punto de verde frío y dos luces muy bajas. Es el
-   fondo de lo que se lee de cerca —una ficha, un formulario— y no se pisa
-   ni con el arena del problema ni con la crema del pie. */
-.panel--papel {
-  background:
-    radial-gradient(680px circle at 4% 0%, rgba(0, 168, 89, 0.13), transparent 62%),
-    radial-gradient(620px circle at 98% 100%, rgba(17, 169, 199, 0.1), transparent 60%),
-    linear-gradient(158deg, #FFFFFF 0%, #F3F8F5 54%, #E9F1ED 100%);
-  color: var(--text-primary);
-}
-
-.panel--ink {
-  background:
-    radial-gradient(720px circle at 12% 0%, rgba(0, 168, 89, 0.22), transparent 60%),
-    radial-gradient(680px circle at 92% 100%, rgba(255, 193, 7, 0.14), transparent 58%),
-    linear-gradient(160deg, var(--navy) 0%, var(--ink) 55%, var(--ink-deep) 100%);
-  color: var(--text-white);
-}
-
-.panel--ink h2,
-.panel--ink h3 {
-  color: var(--text-white);
-}
-
 /*
   Trama de puntos: la misma rejilla que dibuja MapPatternPainter en la app,
   copiada número por número. Paso de 34, primer punto en (18, 28), radio 1,6
@@ -185,30 +150,6 @@
   opacity: 0.05;
 }
 
-/* Sobre tinta el punto blanco pesa más que el azul sobre beige. */
-.panel--ink .panel-dots {
-  opacity: 0.09;
-}
-
-/* ── Utilidades de ancho de lectura ────────────────────────────────── */
-
-.measure {
-  max-width: var(--measure);
-}
-
-.measure-wide {
-  max-width: 78ch;
-}
-
-.stack {
-  display: flex;
-  flex-direction: column;
-}
-
-.stack-sm { gap: 12px; }
-.stack-md { gap: 20px; }
-.stack-lg { gap: 32px; }
-
 /* ── Encabezado de sección ─────────────────────────────────────────── */
 
 .section-head {
@@ -232,10 +173,6 @@
   line-height: 1.45;
   color: var(--text-secondary);
   max-width: var(--measure);
-}
-
-.panel--ink .section-head .section-lead {
-  color: var(--text-white-dim);
 }
 
 
