@@ -89,19 +89,37 @@
   color: inherit;
   /* `translate` y no `transform`: son las dos propiedades que el
      compositor resuelve solo, sin repintar. */
+  /* Las cuatro al mismo tiempo. Iban a dos velocidades —el borde y el
+     fondo en 0.15s, la sombra y el saltito en 0.3s— y se veía: la ficha
+     cambiaba de color y sólo después se levantaba. */
   transition:
-    border-color var(--transition-fast),
-    background var(--transition-fast),
-    box-shadow var(--transition-normal),
-    translate var(--transition-normal);
+    border-color var(--transition-hover),
+    background var(--transition-hover),
+    box-shadow var(--transition-hover),
+    translate var(--transition-hover);
 }
 
-.ruta-ficha:hover,
+/* El foco fuera del guarda, el puntero dentro. Ver botones.css. */
 .ruta-ficha:focus-visible {
   border-color: rgba(0, 168, 89, 0.5);
   background: #FFFFFF;
   box-shadow: 0 16px 30px -26px rgba(20, 39, 78, 0.6);
   translate: 0 -2px;
+}
+
+@media (hover: hover) {
+  .ruta-ficha:hover {
+    border-color: rgba(0, 168, 89, 0.5);
+    background: #FFFFFF;
+    box-shadow: 0 16px 30px -26px rgba(20, 39, 78, 0.6);
+    translate: 0 -2px;
+  }
+}
+
+/* El acuse del dedo, que en el móvil es el único que hay. Ver botones.css. */
+.ruta-ficha:active {
+  translate: 0 0;
+  transition-duration: 0.09s;
 }
 
 /* La elegida: la que el mapa está dibujando ahora mismo. Tiene que

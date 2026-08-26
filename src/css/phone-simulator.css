@@ -553,7 +553,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: color 0.25s ease;
+  transition: color 0.25s var(--ease-out-cubic);
 }
 
 /* Con ruta activa el subtítulo pasa a verde accesible (4.5:1 sobre
@@ -937,7 +937,7 @@
   height: calc(4 * var(--u));
   border-radius: 999px;
   background: var(--green);
-  transition: background-color 0.6s ease;
+  transition: background-color var(--transition-smooth);
 }
 
 /* colorUrgencia() de phone-simulator.ts: dentro del kilómetro la barra pasa

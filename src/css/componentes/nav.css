@@ -159,14 +159,15 @@
   transition:
     opacity 0.14s linear,
     transform 0.14s var(--ease-out-cubic),
-    color var(--transition-fast);
+    color var(--transition-hover);
 }
 
 .nav-island-inner .nav-island-cta {
   transition:
     opacity 0.14s linear,
     transform 0.14s var(--ease-out-cubic),
-    box-shadow var(--transition-fast);
+    box-shadow var(--transition-hover),
+    background-image var(--transition-hover);
 }
 
 .nav-island.is-open .nav-link {
@@ -175,7 +176,7 @@
   transition:
     opacity 0.3s var(--ease-out-cubic) var(--retraso),
     transform 0.55s var(--ease-fluida) var(--retraso),
-    color var(--transition-fast);
+    color var(--transition-hover);
 }
 
 .nav-island.is-open .nav-island-cta {
@@ -184,7 +185,8 @@
   transition:
     opacity 0.3s var(--ease-out-cubic) var(--retraso),
     transform 0.55s var(--ease-fluida) var(--retraso),
-    box-shadow var(--transition-fast);
+    box-shadow var(--transition-hover),
+    background-image var(--transition-hover);
 }
 
 .nav-island.is-open .nav-link:nth-child(2) { --retraso: 0.04s; }
@@ -205,7 +207,7 @@
   font-weight: 600;
   white-space: nowrap;
   color: var(--text-white-dim);
-  transition: color var(--transition-fast);
+  transition: color var(--transition-hover);
 }
 
 .nav-link::before {
@@ -217,19 +219,29 @@
   opacity: 0;
   transform: scale(0.8);
   transition:
-    opacity 0.22s var(--ease-out-cubic),
+    opacity var(--transition-hover),
     transform 0.34s var(--ease-spring);
 }
 
-.nav-link:hover,
+/* El foco fuera del guarda, el puntero dentro. Ver botones.css. */
 .nav-link:focus-visible {
   color: var(--text-white);
 }
 
-.nav-link:hover::before,
 .nav-link:focus-visible::before {
   opacity: 1;
   transform: scale(1);
+}
+
+@media (hover: hover) {
+  .nav-link:hover {
+    color: var(--text-white);
+  }
+
+  .nav-link:hover::before {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .nav-island-cta {
@@ -249,7 +261,13 @@
   box-shadow:
     inset 0 1px 1px rgba(255, 255, 255, 0.3),
     0 8px 20px -8px var(--green-glow);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  /* `background-image` entra en la lista porque el hover pinta un velo de
+     blanco encima: sin ella el velo aparecía de golpe mientras la sombra
+     todavía iba en camino, y el botón se encendía a dos velocidades. */
+  transition:
+    background-image var(--transition-hover),
+    box-shadow var(--transition-hover),
+    transform var(--transition-hover);
 }
 
 /*
@@ -260,7 +278,6 @@
   medio tono y el filo de arriba se abre. Es el botón el que se enciende,
   no la píldora la que se mancha.
 */
-.nav-island-cta:hover,
 .nav-island-cta:focus-visible {
   /* Sin verde nuevo: el mismo #00A859 con un velo de blanco encima. */
   background-image: linear-gradient(rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
@@ -268,6 +285,22 @@
     inset 0 1px 1.5px rgba(255, 255, 255, 0.45),
     inset 0 0 0 1px rgba(255, 255, 255, 0.16),
     0 6px 14px -8px var(--green-glow);
+}
+
+/* El acuse del dedo, que en el móvil es el único que hay. Ver botones.css. */
+.nav-island-cta:active {
+  transform: scale(0.97);
+  transition-duration: 0.09s;
+}
+
+@media (hover: hover) {
+  .nav-island-cta:hover {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
+    box-shadow:
+      inset 0 1px 1.5px rgba(255, 255, 255, 0.45),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+      0 6px 14px -8px var(--green-glow);
+  }
 }
 
 /* ── El botón que abre y cierra ────────────────────────────────────── */
@@ -283,13 +316,17 @@
   place-items: center;
   cursor: pointer;
   transition:
-    background var(--transition-fast),
+    background var(--transition-hover),
     transform 0.28s var(--ease-spring);
 }
 
-.nav-island-toggle:hover {
-  background: rgba(255, 255, 255, 0.18);
-  transform: scale(1.06);
+/* Éste es el que más se notaba en el móvil: al tocar la ✕ el botón se
+   quedaba un 6 % más grande el resto de la visita. */
+@media (hover: hover) {
+  .nav-island-toggle:hover {
+    background: rgba(255, 255, 255, 0.18);
+    transform: scale(1.06);
+  }
 }
 
 .nav-island-toggle:active {

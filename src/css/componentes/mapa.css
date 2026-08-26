@@ -253,7 +253,6 @@
 /* ── La lectura ── */
 .mapa-lectura {
   display: flex;
-  flex: 1;
   flex-direction: column;
   justify-content: center;
   gap: 3px;
@@ -353,14 +352,38 @@
 
 /* ── El aviso ──
    La misma notificación que sale en el teléfono, con las dos líneas que
-   arma la app. Aparece cuando un bus entra en el kilómetro y se queda. */
+   arma la app. Aparece cuando un bus entra en el kilómetro y se queda.
+
+   No es un cuadro más de la sección: es lo único aquí que no pertenece a
+   la página, sino al teléfono de quien mira. Eso hay que verlo sin leer
+   nada, y se dice de tres maneras.
+
+   Una, la forma: toma prestado el lenguaje de `.scene-card` —la tarjeta
+   de aviso del hero y de los pasos, que ya es la notificación de esta
+   casa—; radio de 16, borde blanco de un pelo y la misma sombra de dos
+   capas, una corta que la apoya y otra larga y difusa que la levanta.
+   Los cuadros de al lado son planos y de borde tinta.
+
+   Dos, el ancho: una notificación de Android no se estira de lado a
+   lado, ocupa una banda y deja aire a su derecha. Aquí igual.
+
+   Y tres, la altura: se despega del cuadro de la lectura y baja hasta el
+   pie de la columna, a la altura del borde de abajo del mapa. Entre las
+   dos queda un hueco que no es descuido —es lo que separa un dato que
+   siempre está de un aviso que llega. */
 .mapa-aviso {
   display: flex;
   gap: 11px;
+  /* Al fondo de la columna, no pegada a la lectura. */
+  margin-top: auto;
+  max-width: 360px;
   padding: 13px 15px;
-  border-radius: 18px;
-  background: #FFFFFF;
-  box-shadow: 0 18px 38px -22px rgba(20, 39, 78, 0.6);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 4px 12px -2px rgba(11, 22, 40, 0.06),
+    0 18px 40px -10px rgba(11, 22, 40, 0.18);
   opacity: 0;
   transform: translateY(-10px) scale(0.97);
   visibility: hidden;

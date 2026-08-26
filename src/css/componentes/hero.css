@@ -400,7 +400,7 @@
 .scene-card--notif {
   opacity: 0;
   filter: blur(3px);
-  transition: opacity 0.45s ease, filter 0.45s ease;
+  transition: opacity 0.45s var(--ease-out-cubic), filter 0.45s var(--ease-out-cubic);
 }
 
 .scene-card--route.is-on,

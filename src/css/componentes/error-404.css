@@ -166,8 +166,8 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-white);
   transition:
-    padding-left var(--transition-fast),
-    background-color var(--transition-fast);
+    padding-left var(--transition-hover),
+    background-color var(--transition-hover);
 }
 
 .err-fila strong {
@@ -181,14 +181,21 @@
   color: var(--text-white-sub);
 }
 
-.err-fila:hover,
+/* El foco fuera del guarda, el puntero dentro. Ver botones.css. */
 .err-fila:focus-visible {
   padding-left: 10px;
   background: rgba(255, 255, 255, 0.045);
 }
 
-.err-fila:hover strong {
-  color: var(--green);
+@media (hover: hover) {
+  .err-fila:hover {
+    padding-left: 10px;
+    background: rgba(255, 255, 255, 0.045);
+  }
+
+  .err-fila:hover strong {
+    color: var(--green);
+  }
 }
 
 .err-pie {

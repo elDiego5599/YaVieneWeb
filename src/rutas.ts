@@ -91,14 +91,22 @@ export const pintarCifras = (caja: HTMLElement): void => {
     Se cuentan los nombres tal como vienen en rutas.json, que es la lista
     del operador. Por eso «Nevada» y «Nevada (Soledad)» cuentan como dos:
     si quien opera las rutas las escribe distinto, no somos nosotros los
-    que vamos a decidir que son la misma. De ahí el rótulo: terminales
-    distintas, no lugares.
+    que vamos a decidir que son la misma. El diez son nombres de
+    terminal, no lugares comprobados sobre el terreno.
   */
   const terminales = new Set(rutas.flatMap(r => [r.terminalA, r.terminalB]));
 
+  /*
+    Rótulos de una palabra. Decían «rutas en operación», «terminales
+    distintas» y «kilómetros trazados»: el primero repetía el antetítulo
+    de la sección, y los otros dos añadían un adjetivo que el número ya
+    deja claro. La precisión no se pierde, se muda aquí —el diez son
+    nombres distintos de terminal, contados como los escribe el
+    operador—, que es donde hace falta.
+  */
   caja.replaceChildren(
-    dato(String(rutas.length), 'rutas en operación'),
-    dato(String(terminales.size), 'terminales distintas'),
-    dato(cifra(Number(km.toFixed(1))), 'kilómetros trazados')
+    dato(String(rutas.length), 'rutas'),
+    dato(String(terminales.size), 'terminales'),
+    dato(cifra(Number(km.toFixed(1))), 'kilómetros')
   );
 };

@@ -319,12 +319,14 @@
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: background var(--transition-fast), transform var(--transition-fast);
+  transition: background var(--transition-hover), transform var(--transition-hover);
 }
 
-.form-submit-btn:hover {
-  background: #00C267;
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .form-submit-btn:hover {
+    background: #00C267;
+    transform: translateY(-2px);
+  }
 }
 
 /* Un envío que falla lo dice donde el usuario está mirando: justo encima
@@ -400,12 +402,14 @@
   color: #06301A;
   font-size: 14px;
   font-weight: 700;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: transform var(--transition-hover), box-shadow var(--transition-hover);
 }
 
-.whatsapp-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 30px -12px rgba(37, 211, 102, 0.6);
+@media (hover: hover) {
+  .whatsapp-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 30px -12px rgba(37, 211, 102, 0.6);
+  }
 }
 
 /* En un teléfono la fila no da para las cuatro columnas y «Sin señal»

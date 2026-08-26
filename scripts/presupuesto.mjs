@@ -30,11 +30,23 @@ const KB = 1024;
  *  —`phone-simulator.css` no tiene una sola clase muerta, las siete que lo
  *  parecían se ponen desde JS, y entre los cuatro paquetes de dist no hay
  *  reglas repetidas— y no había nada que recuperar. Lo que devolvió el
- *  margen no fue limpiar, fue quitar una sección. */
+ *  margen no fue limpiar, fue quitar una sección.
+ *
+ *  Y volvió a subir a 86 el 25/08/2026, con la revisión de las animaciones.
+ *  Lo que costó ese kilobyte y pico: meter cada `:hover` de la página en
+ *  `@media (hover: hover)` —en un móvil el `:hover` se queda pegado tras el
+ *  toque— sacando el `:focus-visible` fuera del guarda, lo que obliga a
+ *  escribir dos veces el mismo cuerpo de regla; y el `:active` que ocupa su
+ *  sitio en táctil, que antes no existía. Se miró cómo no pagarlo: juntar
+ *  todos los hover en un solo bloque al final del orden de carga los haría
+ *  ganar a la ficha elegida del mapa, que tiene que ganarles a ellos, y
+ *  meter el estado en una variable con `calc()` dentro de los colores es
+ *  ilegible. Con 84.5 de build el tope de 85 no dejaba margen para nada:
+ *  el presupuesto sólo sirve si avisa antes de reventar, no al reventar. */
 const TOPES = {
   'todo dist': 750,
   'JavaScript': 65,
-  'CSS': 85,
+  'CSS': 86,
   'primera visita': 600,
 };
 

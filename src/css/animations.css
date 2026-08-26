@@ -118,6 +118,25 @@
 
 /* Reduced motion accessibility query */
 @media (prefers-reduced-motion: reduce) {
+  /* El suelo. Lo de abajo es una lista escrita a mano, y una lista escrita
+     a mano se queda vieja: cada animación nueva hay que acordarse de
+     apuntarla, y la que se olvide sigue moviéndose para quien pidió que
+     nada se mueva. Esto lo apaga todo de entrada, incluido lo que aún no
+     existe; las reglas de abajo siguen valiendo porque son más
+     específicas, y ahí está lo que el suelo no sabe: qué propiedad lleva
+     cada movimiento —`translate`, `scale` o `transform`— y en qué valor
+     hay que dejarla.
+
+     `0.01ms` y no `none` a propósito: con duración cero el navegador no
+     dispara `transitionend`, y `scroll-effects.ts` lo espera para soltar
+     la capa de compositor de cada aparición. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
   .reveal {
     transition: none !important;
     opacity: 1 !important;

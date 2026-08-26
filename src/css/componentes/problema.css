@@ -115,8 +115,13 @@
   text-shadow: 0 5px 16px rgba(11, 22, 40, 0.14);
 }
 
-.clima-word:hover {
-  transform: translateY(-2px);
+/* Sin el guarda, la palabra que tocabas se quedaba levantada 2 px y ganaba
+   —misma especificidad, va después— al `-1px` de la que está elegida: en el
+   móvil las dos acababan altas y no se sabía cuál mandaba. */
+@media (hover: hover) {
+  .clima-word:hover {
+    transform: translateY(-2px);
+  }
 }
 
 .clima-word:focus-visible {
@@ -240,7 +245,7 @@
 
 .weather-text > span {
   grid-area: 1 / 1;
-  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  transition: opacity var(--transition-normal), visibility 0s linear 0.3s;
 }
 
 #problema[data-clima='sol'] .weather-text__lluvia,
@@ -372,7 +377,7 @@
   background: radial-gradient(circle at 50% 46%, currentColor, transparent 66%);
   opacity: 0.12;
   filter: blur(22px);
-  transition: opacity 0.9s ease;
+  transition: opacity 0.9s var(--ease-fluida);
   pointer-events: none;
 }
 

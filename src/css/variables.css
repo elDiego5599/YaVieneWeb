@@ -82,6 +82,12 @@
      grande se sienta ligero. La misma que ya usaba --transition-smooth. */
   --ease-fluida: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-fast: 0.15s var(--ease-out-cubic);
+  /* El paso del puntero. 0.15s se lee como un salto —el botón está abajo y
+     de pronto está arriba, sin nada en medio— y 0.3s ya se arrastra bajo
+     el dedo. En 0.22s se ve el recorrido y sigue respondiendo al instante.
+     No es una cifra nueva: es la que ya usaba el halo de `.nav-link`, que
+     es el hover mejor resuelto de la página. Ahora la usan todos. */
+  --transition-hover: 0.22s var(--ease-out-cubic);
   --transition-normal: 0.3s var(--ease-out-cubic);
   --transition-smooth: 0.6s var(--ease-fluida);
 }
