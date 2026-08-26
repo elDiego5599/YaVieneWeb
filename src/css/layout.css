@@ -214,11 +214,19 @@
   --paso: 68vh;
 }
 
+/* La escena se pega a la ventana entera, pero la ventana entera no está
+   libre: la píldora de la cabecera flota sobre los primeros setenta
+   píxeles toda la página. Sin descontarlos, el contenido se centra en un
+   hueco que no existe y en un teléfono —donde no sobra ni un píxel— el
+   titular acaba debajo de la píldora. Con `border-box` el relleno se
+   come el alto, así que la escena sigue midiendo una pantalla justa y el
+   pegado sigue funcionando igual. */
 .escena {
   position: sticky;
   top: 0;
   z-index: 2;
   min-height: 100vh;
+  padding-top: calc(var(--gutter) + var(--nav-alto));
   display: grid;
   align-content: center;
 }
@@ -252,6 +260,7 @@
   .escena {
     position: static;
     min-height: 0;
+    padding-top: 0;
   }
 
   .escena .panel-inner {

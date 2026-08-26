@@ -51,8 +51,17 @@ export function encajarEscena(escena: HTMLElement): () => void {
     // comparar. Por eso esto no se realimenta.
     const natural = dentro.offsetHeight;
     if (natural <= 0) return;
-    const cabe = window.innerHeight / natural;
-    const k = Math.max(MINIMO, Math.min(1, Math.round(cabe * 1000) / 1000));
+    // El alto libre no es la ventana entera: la escena le reserva arriba
+    // la franja de la cabecera, que va flotando toda la página. Ese
+    // relleno está en la escena, no en lo que se encoge, así que se lee
+    // en píxeles de verdad y se resta antes de dividir.
+    const marco = getComputedStyle(escena);
+    const reserva =
+      (Number.parseFloat(marco.paddingTop) || 0) +
+      (Number.parseFloat(marco.paddingBottom) || 0);
+    const libre = window.innerHeight - reserva;
+    if (libre <= 0) return;
+    const k = Math.max(MINIMO, Math.min(1, Math.round((libre / natural) * 1000) / 1000));
     if (k === ultimo) return;
     ultimo = k;
     escena.style.setProperty('--encaje', String(k));
@@ -66,10 +75,22 @@ export function encajarEscena(escena: HTMLElement): () => void {
   window.addEventListener('resize', pedir);
   // Las fuentes cambian el alto del texto al llegar, y llegan tarde.
   void document.fonts?.ready.then(pedir);
+
+  // Y no sólo las fuentes: la escena crece después de la primera medida
+  // por todo lo que llega tarde —el mosaico del mapa, una imagen, un
+  // bloque que se despliega—. Con una medida sola el factor se quedaba
+  // corto y lo que había crecido se salía por abajo sin forma de
+  // alcanzarlo: así se cortaba el reloj en un teléfono. El observador
+  // vuelve a medir cada vez que cambia el alto. No se realimenta:
+  // `offsetHeight` ignora el zoom, así que al cambiarlo el número que se
+  // mide es el mismo y `ultimo` corta ahí.
+  const vigia = new ResizeObserver(pedir);
+  vigia.observe(dentro);
   medir();
 
   return () => {
     if (pedido) cancelAnimationFrame(pedido);
+    vigia.disconnect();
     window.removeEventListener('resize', pedir);
   };
 }

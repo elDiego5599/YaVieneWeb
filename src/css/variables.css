@@ -55,6 +55,10 @@
      (como Aave o incident.io), no de un container angosto centrado. El
      ancho de lectura se limita sólo en el texto, con --measure. */
   --gutter: 14px;
+  /* Lo que mide la píldora de la cabecera. Va pegada arriba toda la
+     página, así que la franja que ocupa —hueco más píldora— no es sitio
+     libre para nadie: las escenas se la descuentan antes de centrar. */
+  --nav-alto: 56px;
   --panel-radius: 28px;
   --panel-gap: 14px;
   --content-max: 1480px;
