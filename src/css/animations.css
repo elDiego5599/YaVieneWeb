@@ -134,10 +134,9 @@
     transition: none !important;
     transform: none !important;
   }
-  /* El saltito de las fichas de ruta y el de su flecha de salida. El
-     borde verde sigue diciendo lo mismo sin que nada se mueva. */
-  .ruta-ficha,
-  .rutas-salida-flecha {
+  /* El saltito de las fichas de ruta. El borde verde y el relleno de la
+     elegida siguen diciendo lo mismo sin que nada se mueva. */
+  .ruta-ficha {
     transition: none !important;
     translate: none !important;
   }

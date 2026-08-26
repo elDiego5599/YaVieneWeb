@@ -60,7 +60,7 @@
 .pasos-tab:focus-visible,
 .whatsapp-btn:focus-visible,
 .login-link:focus-visible,
-.mv-ruta:focus-visible,
+.ruta-ficha:focus-visible,
 .nav-island-brand:focus-visible,
 .footer-brand:focus-visible {
   outline: 3px solid var(--green);
@@ -86,8 +86,9 @@
 
    La norma que aplica es WCAG 2.5.8 (nivel AA): 24 por 24 píxeles
    mínimo. Lo medido en la página: las pestañas de los pasos van a
-   210x37, las filas de ruta del mapa a 290x59, las palabras del clima a
-   33x35 — todas pasan de sobra. Las dos que no llegaban son las de
+   210x37, las fichas de ruta a 432x85 en escritorio y 230x123 en el
+   carrusel del móvil, las palabras del clima a 33x35 — todas pasan de
+   sobra. Las dos que no llegaban son las de
    abajo, y se arreglan con un pseudo-elemento transparente: el área
    sensible crece, la caja del elemento no se mueve y el diseño queda
    exactamente igual.

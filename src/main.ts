@@ -29,7 +29,7 @@ import { PhoneMap } from './phone-map';
 import { PhoneSimulator } from './phone-simulator';
 import { ProblemWeather } from './problem-weather';
 import { Reloj } from './reloj';
-import { pintarRutas, saltosDeRuta } from './rutas';
+import { pintarCifras } from './rutas';
 import { dormirLoQueNoSeVe } from './reposo';
 import { saltosDeMenu } from './salto';
 import { encenderScrollSuave } from './scroll-suave';
@@ -38,16 +38,22 @@ import { sinMovimiento } from './scrolly';
 
 const arrancar = (): void => {
   /*
-    El tablero de rutas, antes que nada: sus fichas nacen con `.reveal` y
-    el observador de abajo sólo recoge lo que encuentra al construirse.
-    Pintadas después entrarían ya visibles y la sección aparecería de
-    golpe. Ver rutas.ts.
-  */
-  const tablero = document.querySelector<HTMLElement>('#rutas');
-  if (tablero) pintarRutas(tablero);
-  saltosDeRuta();
+    Lo que se pinta con `.reveal` va antes que el observador, sin
+    excepción: `ScrollEffects` recoge los nodos una sola vez, al
+    construirse, y lo que nazca después entra ya visible —la sección
+    aparecería de golpe en vez de escalonada—.
 
-  // Apariciones al entrar en pantalla: no depende de nada más.
+    Son dos: las tres cifras de la cabecera y las seis fichas de ruta,
+    que las pinta el mapa porque es él quien sabe cuál está elegida.
+  */
+  const cifras = document.querySelector<HTMLElement>('[data-rutas-cifras]');
+  if (cifras) pintarCifras(cifras);
+
+  // El mapa jugable: la única parte de la página que se toca.
+  const mapa = document.querySelector<HTMLElement>('[data-mapa-vivo]');
+  if (mapa) new MapaVivo(mapa);
+
+  // Apariciones al entrar en pantalla: ya está puesto todo lo que mira.
   new ScrollEffects();
   // La escena del hero, que entra sola al cargar.
   entrarEscena();
@@ -95,10 +101,6 @@ const arrancar = (): void => {
 
   const problema = document.querySelector<HTMLElement>('#problema');
   if (problema) new ProblemWeather(problema);
-
-  // El mapa jugable: la única parte de la página que se toca.
-  const mapa = document.querySelector<HTMLElement>('[data-mapa-vivo]');
-  if (mapa) new MapaVivo(mapa);
 
   /*
     Las dos secciones que se recorren en vez de leerse de un golpe. Cada

@@ -21,16 +21,20 @@ const KB = 1024;
 
 /** Topes en KB. Medido el 24/08/2026 y redondeado hacia arriba.
  *
- *  El de CSS subió el 25/08/2026 de 85 a 88, con la sección de las seis
- *  rutas. Antes se buscó de dónde sacarlo sin subirlo: `phone-simulator.css`
- *  no tiene una sola clase muerta —las siete que lo parecían se ponen desde
- *  JS— y entre los cuatro paquetes de dist no hay reglas repetidas. No
- *  había nada que recuperar, así que se paga: 3 KB por el bloque con más
- *  datos duros de la página. */
+ *  El de CSS subió a 88 el 25/08/2026 para la sección de las seis rutas y
+ *  volvió a 85 el mismo día, cuando esa sección se fundió con la del mapa:
+ *  al compartir cabecera y marco se fueron el bloque `.mv-ruta*` entero, la
+ *  chapa de «pruébalo aquí» y el marco de consola, y sobró más de lo que
+ *  había costado. Queda anotado porque la conclusión de entonces sigue
+ *  valiendo: se buscó de dónde sacarlo sin subir el tope
+ *  —`phone-simulator.css` no tiene una sola clase muerta, las siete que lo
+ *  parecían se ponen desde JS, y entre los cuatro paquetes de dist no hay
+ *  reglas repetidas— y no había nada que recuperar. Lo que devolvió el
+ *  margen no fue limpiar, fue quitar una sección. */
 const TOPES = {
   'todo dist': 750,
   'JavaScript': 65,
-  'CSS': 88,
+  'CSS': 85,
   'primera visita': 600,
 };
 

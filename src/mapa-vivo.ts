@@ -19,6 +19,7 @@
  */
 
 import { YV_RUTAS } from './data/rutas-landing';
+import { fichaDeRuta } from './rutas';
 import { sinMovimiento } from './scrolly';
 import type { Punto, RutaLanding } from './types';
 
@@ -242,19 +243,20 @@ export class MapaVivo {
   /** El riel de rutas: las seis de rutas.json, con sus terminales y su largo. */
   private pintarLista(): void {
     const marco = document.createDocumentFragment();
-    for (const ruta of YV_RUTAS.rutas) {
-      const boton = document.createElement('button');
-      boton.type = 'button';
-      boton.className = 'mv-ruta';
-      boton.dataset.ruta = ruta.id;
-      boton.setAttribute('aria-pressed', String(ruta.id === this.ruta.id));
-      boton.innerHTML =
-        `<span class="mv-ruta-nombre">${ruta.nombre}</span>` +
-        `<span class="mv-ruta-datos">${ruta.terminalA} → ${ruta.terminalB}</span>` +
-        `<span class="mv-ruta-km">${String(ruta.km).replace('.', ',')} km</span>`;
-      boton.addEventListener('click', () => this.setRuta(ruta.id));
-      marco.appendChild(boton);
-    }
+    YV_RUTAS.rutas.forEach((ruta, i) => {
+      const ficha = fichaDeRuta(ruta);
+      ficha.setAttribute('aria-pressed', String(ruta.id === this.ruta.id));
+      /*
+        Entran por turnos al bajar, y el turno se cuenta por columna —de
+        ahí el resto de dos, que son las columnas del riel—: con el
+        retraso corrido la última ficha llegaba con un tercio de segundo
+        de más encima y se veía perezosa.
+      */
+      ficha.classList.add('reveal');
+      ficha.dataset.revealDelay = String((i % 2) * 70);
+      ficha.addEventListener('click', () => this.setRuta(ruta.id));
+      marco.appendChild(ficha);
+    });
     this.lista.replaceChildren(marco);
   }
 

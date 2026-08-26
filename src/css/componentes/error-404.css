@@ -221,13 +221,3 @@
     gap: 3px;
   }
 }
-
-/* El punto marcado se salió del alcance de la ruta: el número deja de ser
-   una cuenta atrás y pasa a ser un dato, y se pinta como tal. */
-.mapa-lectura.es-fuera .mapa-lectura-metros {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.mapa-lectura.es-fuera .mapa-lectura-pie {
-  color: var(--amber);
-}

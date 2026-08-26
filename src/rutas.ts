@@ -1,29 +1,34 @@
 /**
- * El tablero de rutas.
+ * Las fichas de ruta y las cifras del tablero.
  *
  * Las seis rutas de Sobusa ya viajaban en el paquete —las carga
- * `src/data/rutas-landing.ts` para dibujar el mapa—, pero sólo se veían
- * dentro del mando del mapa, en un riel estrecho y en penumbra. Aquí se
- * enseñan como lo que son: seis fichas con su código, sus dos terminales
- * y su kilometraje, que es la información más sustanciosa que tiene la
- * página y la única que nadie más puede copiar.
+ * `src/data/rutas-landing.ts` para dibujar el mapa—, pero se enseñaban en
+ * un riel estrecho de dos líneas. Aquí se arma la ficha completa: el
+ * código con el que la app y el backend llaman a la ruta, el nombre, las
+ * dos terminales y el kilometraje.
  *
- * Nada de esto se escribe en el HTML. Las cifras de la cabecera se
- * calculan de los mismos datos que dibujan el mapa, así que no pueden
- * decir una cosa distinta a la que el mapa enseña: si mañana entra una
- * ruta más, el titular cambia solo.
+ * La ficha es un botón, no un enlace: vive al lado del mapa y lo que hace
+ * es cambiar la ruta que el mapa dibuja, ahí mismo. Quien la pinta es
+ * `MapaVivo`, que es el que sabe cuál está puesta; este módulo sólo sabe
+ * cómo se ve una.
  *
- * Cada ficha es un enlace de verdad a `#mapa` —el salto suave se lo da
- * `salto.ts` sin que aquí haya que hacer nada— y además deja el mapa
- * puesto en esa ruta, apretando el mismo botón que apretaría el visitante.
- * Es a propósito: no hay una segunda vía de entrada a `MapaVivo` que
- * mantener en pie, sólo la que ya existe.
+ * Las cifras de cabecera se calculan de los mismos datos que dibujan el
+ * mapa, así que no pueden decir una cosa distinta a la que el mapa
+ * enseña: si mañana entra una ruta más, el titular cambia solo.
  */
 
 import { YV_RUTAS } from './data/rutas-landing';
+import type { RutaLanding } from './types';
 
 /** Coma decimal, que es como se escriben los números por aquí. */
 const cifra = (n: number): string => String(n).replace('.', ',');
+
+const trozo = (clase: string, texto: string): HTMLElement => {
+  const nodo = document.createElement('span');
+  nodo.className = clase;
+  nodo.textContent = texto;
+  return nodo;
+};
 
 /** Un dato de la cabecera: el número grande y lo que significa. */
 const dato = (valor: string, rotulo: string): HTMLElement => {
@@ -34,120 +39,66 @@ const dato = (valor: string, rotulo: string): HTMLElement => {
   numero.className = 'rutas-dato-numero';
   numero.textContent = valor;
 
-  const nombre = document.createElement('span');
-  nombre.className = 'rutas-dato-rotulo';
-  nombre.textContent = rotulo;
-
-  pieza.append(numero, nombre);
+  pieza.append(numero, trozo('rutas-dato-rotulo', rotulo));
   return pieza;
 };
 
-const trozo = (clase: string, texto: string): HTMLElement => {
-  const nodo = document.createElement('span');
-  nodo.className = clase;
-  nodo.textContent = texto;
-  return nodo;
+/**
+ * La ficha de una ruta, lista para el riel del mapa.
+ *
+ * Sale apagada a propósito: el estado `aria-pressed` lo pone quien la
+ * coloca, que es el único que sabe cuál está puesta.
+ */
+export const fichaDeRuta = (ruta: RutaLanding): HTMLButtonElement => {
+  const ficha = document.createElement('button');
+  ficha.type = 'button';
+  ficha.className = 'ruta-ficha';
+  ficha.dataset.ruta = ruta.id;
+
+  const tramo = document.createElement('span');
+  tramo.className = 'ruta-ficha-tramo';
+  const flecha = trozo('ruta-ficha-flecha', '→');
+  // La flecha es dibujo, no lectura: quien escucha la página oye las dos
+  // terminales seguidas y no una flecha en medio.
+  flecha.setAttribute('aria-hidden', 'true');
+  tramo.append(trozo('ruta-ficha-terminal', ruta.terminalA), flecha,
+    trozo('ruta-ficha-terminal', ruta.terminalB));
+
+  const largo = document.createElement('span');
+  largo.className = 'ruta-ficha-km';
+  largo.append(trozo('ruta-ficha-km-cifra', cifra(ruta.km)),
+    trozo('ruta-ficha-km-unidad', 'km'));
+
+  ficha.append(trozo('ruta-ficha-id', ruta.id), largo,
+    trozo('ruta-ficha-nombre', ruta.nombre), tramo);
+  return ficha;
 };
 
 /**
- * Pinta las cifras y las fichas.
+ * Las tres cifras de cabecera, calculadas de los datos del mapa.
  *
- * Se llama antes que `ScrollEffects` a propósito: el observador recoge
- * los `.reveal` que encuentra al construirse, y estas fichas nacen aquí.
- * Si se pintaran después entrarían en pantalla ya visibles y la sección
- * aparecería de golpe, que es justo lo contrario de lo que se busca.
+ * Se pintan antes que `ScrollEffects` para que el observador las recoja:
+ * llevan `.reveal` desde el HTML y pintadas después entrarían ya visibles.
  */
-export const pintarRutas = (raiz: HTMLElement): void => {
-  const rejilla = raiz.querySelector<HTMLElement>('[data-rutas-rejilla]');
-  const cifras = raiz.querySelector<HTMLElement>('[data-rutas-cifras]');
-  if (!rejilla) return;
-
+export const pintarCifras = (caja: HTMLElement): void => {
   const rutas = YV_RUTAS.rutas;
+  const km = rutas.reduce((suma, r) => suma + r.km, 0);
 
-  if (cifras) {
-    const km = rutas.reduce((suma, r) => suma + r.km, 0);
-    /*
-      Las terminales sin repetir: Granabastos y Uninorte son cabecera de
-      dos rutas cada una, y contarlas dos veces sería inflar el dato.
+  /*
+    Las terminales sin repetir: Granabastos y Uninorte son cabecera de dos
+    rutas cada una, y contarlas dos veces sería inflar el dato.
 
-      Se cuentan los nombres tal como vienen en rutas.json, que es la
-      lista del operador. Por eso «Nevada» y «Nevada (Soledad)» cuentan
-      como dos: si quien opera las rutas las escribe distinto, no somos
-      nosotros los que vamos a decidir que son la misma. De ahí el
-      rótulo: terminales distintas, no lugares.
-    */
-    const terminales = new Set(rutas.flatMap(r => [r.terminalA, r.terminalB]));
+    Se cuentan los nombres tal como vienen en rutas.json, que es la lista
+    del operador. Por eso «Nevada» y «Nevada (Soledad)» cuentan como dos:
+    si quien opera las rutas las escribe distinto, no somos nosotros los
+    que vamos a decidir que son la misma. De ahí el rótulo: terminales
+    distintas, no lugares.
+  */
+  const terminales = new Set(rutas.flatMap(r => [r.terminalA, r.terminalB]));
 
-    cifras.replaceChildren(
-      dato(String(rutas.length), 'rutas en operación'),
-      dato(String(terminales.size), 'terminales distintas'),
-      dato(cifra(Number(km.toFixed(1))), 'kilómetros trazados')
-    );
-  }
-
-  const marco = document.createDocumentFragment();
-
-  rutas.forEach((ruta, i) => {
-    const ficha = document.createElement('a');
-    ficha.className = 'ruta-ficha reveal';
-    ficha.href = '#mapa';
-    ficha.dataset.rutaSalto = ruta.id;
-    /*
-      Entran por turnos: se lee como un tablero llenándose, no como seis
-      cosas que aparecen a la vez. El turno se cuenta por columna y no por
-      posición en la lista —de ahí el resto de tres, que son las columnas
-      en pantalla ancha—: con el retraso corrido, la segunda fila, que
-      entra en su propio momento de scroll, llegaría con un tercio de
-      segundo de más encima y se vería perezosa.
-    */
-    ficha.dataset.revealDelay = String((i % 3) * 70);
-
-    const tramo = document.createElement('span');
-    tramo.className = 'ruta-ficha-tramo';
-    tramo.append(
-      trozo('ruta-ficha-terminal', ruta.terminalA),
-      trozo('ruta-ficha-flecha', '→'),
-      trozo('ruta-ficha-terminal', ruta.terminalB)
-    );
-    // La flecha es dibujo, no lectura: quien escucha la página oye las
-    // dos terminales seguidas y no una flecha en medio.
-    tramo.querySelector('.ruta-ficha-flecha')?.setAttribute('aria-hidden', 'true');
-
-    const largo = document.createElement('span');
-    largo.className = 'ruta-ficha-km';
-    largo.append(trozo('ruta-ficha-km-cifra', cifra(ruta.km)), trozo('ruta-ficha-km-unidad', 'km'));
-
-    ficha.append(
-      trozo('ruta-ficha-id', ruta.id),
-      largo,
-      trozo('ruta-ficha-nombre', ruta.nombre),
-      tramo
-    );
-    marco.appendChild(ficha);
-  });
-
-  rejilla.replaceChildren(marco);
-};
-
-/**
- * Tocar una ficha deja el mapa puesto en esa ruta.
- *
- * Delegado en el documento y sin `preventDefault`: el enlace hace su
- * viaje a `#mapa` como cualquier otro, y esto sólo aprieta el botón de la
- * ruta dentro del mando. Si el mapa no llegó a montar —o el botón no
- * está—, no pasa nada: el salto sigue funcionando.
- */
-export const saltosDeRuta = (): void => {
-  document.addEventListener('click', evento => {
-    const objetivo = evento.target;
-    if (!(objetivo instanceof Element)) return;
-
-    const ficha = objetivo.closest<HTMLElement>('[data-ruta-salto]');
-    const id = ficha?.dataset.rutaSalto;
-    if (!id) return;
-
-    document
-      .querySelector<HTMLButtonElement>(`[data-mapa-rutas] [data-ruta="${id}"]`)
-      ?.click();
-  });
+  caja.replaceChildren(
+    dato(String(rutas.length), 'rutas en operación'),
+    dato(String(terminales.size), 'terminales distintas'),
+    dato(cifra(Number(km.toFixed(1))), 'kilómetros trazados')
+  );
 };

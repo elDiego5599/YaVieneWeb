@@ -1,20 +1,29 @@
 /* ── LAS SEIS RUTAS ─────────────────────────────────────────────────
 
-   El tablero de operación. Es la sección con más datos duros de la
-   página, y son datos que nadie más tiene: seis rutas reales de Sobusa
-   con su código, sus terminales y su kilometraje. Se enseñan como
-   fichas de registro —código arriba a la izquierda, kilómetro arriba a
-   la derecha, nombre y trayecto debajo—, no como tarjetas de producto.
+   Los datos duros de la sección del mapa, y son datos que nadie más
+   tiene: seis rutas reales de Sobusa con su código, sus terminales y su
+   kilometraje. Tres cifras de cabecera y seis fichas de registro
+   —código arriba a la izquierda, kilómetro a la derecha, nombre y
+   trayecto debajo—, no tarjetas de producto.
 
-   Va en panel claro y a plena luz. La sección anterior es menta y la
-   siguiente es tinta: ésta es el respiro entre las dos. Las tres cifras
-   de la cabecera van en tres colores de la propia página —verde, coral
+   Las nueve piezas van pequeñas a propósito. Estuvieron solas en su
+   propia sección, a tamaño de tarjeta y en rejilla de tres; al fundirse
+   con el mapa comparten el ancho con él, así que la ficha se aprieta
+   hasta caber en media columna del mando. Lo que se recorta es aire y
+   cuerpo de letra, no información: sigue estando el código, el largo,
+   el nombre y las dos terminales.
+
+   Y dejaron de ser una lista para ser el mando: cada ficha es un botón
+   que cambia la ruta que el mapa dibuja. Por eso el estado elegido pesa
+   —verde relleno, borde verde— y no es sólo un `:hover` más fuerte.
+
+   Las tres cifras van en tres colores de la propia página —verde, coral
    y tinta marina—, no en una paleta nueva. El ámbar se queda fuera a
-   propósito: sobre blanco no llega al contraste ni siendo texto
-   grande, y estas cifras son lo que hay que poder leer.
+   propósito: sobre crema no llega al contraste ni siendo texto grande,
+   y estas cifras son lo que hay que poder leer.
 
-   Las fichas las pinta `src/rutas.ts` desde los mismos datos que dibujan
-   el mapa. Entran por turnos al bajar, con el `.reveal` de siempre.
+   Las pinta `src/rutas.ts` desde los mismos datos que dibujan el mapa.
+   Entran por turnos al bajar, con el `.reveal` de siempre.
    ────────────────────────────────────────────────────────────────── */
 
 /* ── Las cifras de cabecera ── */
@@ -22,9 +31,9 @@
 .rutas-cifras {
   display: flex;
   flex-wrap: wrap;
-  gap: clamp(22px, 4vw, 64px);
-  margin: 0 0 clamp(30px, 3.6vw, 48px);
-  padding-top: clamp(20px, 2.4vw, 30px);
+  gap: clamp(20px, 3.4vw, 52px);
+  margin: 0;
+  padding-top: clamp(18px, 2vw, 26px);
   border-top: 1px solid rgba(20, 39, 78, 0.14);
 }
 
@@ -36,7 +45,7 @@
 
 .rutas-dato-numero {
   font-family: var(--font-display);
-  font-size: clamp(2.4rem, 1.1rem + 3.4vw, 4rem);
+  font-size: clamp(1.9rem, 1.1rem + 2.1vw, 2.9rem);
   font-weight: 700;
   line-height: 0.92;
   letter-spacing: -0.045em;
@@ -52,47 +61,34 @@
 .rutas-dato:nth-child(3) .rutas-dato-numero { color: var(--navy); }
 
 .rutas-dato-rotulo {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-secondary);
 }
 
-/* ── La rejilla ── */
-
-/* Tres y tres, no las que quepan. Son seis rutas: con `auto-fit` salían
-   cuatro y dos en pantalla ancha, y los nombres largos —«C13 Carrera 50
-   Paraíso»— partían en dos líneas dejando las fichas de distinto alto.
-   Dos filas de tres es la única partición limpia que admite un seis. */
-.rutas-rejilla {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: clamp(12px, 1.3vw, 18px);
-}
-
-@media (min-width: 620px) {
-  .rutas-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (min-width: 1040px) {
-  .rutas-rejilla { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-
+/* ── La ficha ──
+   Es un `<button>`, así que hereda el gris y la letra del sistema si no
+   se le dice otra cosa: eso es lo que hacen las cuatro primeras
+   declaraciones. El reparto de rejilla lo dice `mapa.css`, que es quien
+   sabe cuánto ancho le queda al lado del mapa. */
 .ruta-ficha {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: start;
-  gap: 10px 14px;
-  padding: clamp(16px, 1.6vw, 22px);
+  gap: 5px 12px;
+  margin: 0;
+  padding: 11px 13px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
   border: 1px solid rgba(20, 39, 78, 0.12);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.86);
-  text-decoration: none;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
   color: inherit;
-  box-shadow: 0 12px 28px -24px rgba(20, 39, 78, 0.55);
-  /* `translate` y no `transform`: las fichas no animan nada más, pero
-     mantener la propiedad libre es la costumbre de esta hoja. */
+  /* `translate` y no `transform`: son las dos propiedades que el
+     compositor resuelve solo, sin repintar. */
   transition:
     border-color var(--transition-fast),
     background var(--transition-fast),
@@ -104,8 +100,16 @@
 .ruta-ficha:focus-visible {
   border-color: rgba(0, 168, 89, 0.5);
   background: #FFFFFF;
-  box-shadow: 0 20px 38px -26px rgba(20, 39, 78, 0.6);
-  translate: 0 -3px;
+  box-shadow: 0 16px 30px -26px rgba(20, 39, 78, 0.6);
+  translate: 0 -2px;
+}
+
+/* La elegida: la que el mapa está dibujando ahora mismo. Tiene que
+   ganarle al `:hover` de cualquier otra, por eso va después. */
+.ruta-ficha[aria-pressed='true'] {
+  border-color: rgba(0, 168, 89, 0.55);
+  background: var(--green-tint);
+  translate: none;
 }
 
 /* El código real de la ruta en rutas.json. No es una viñeta bonita: es
@@ -113,14 +117,20 @@
 .ruta-ficha-id {
   grid-column: 1;
   justify-self: start;
-  padding: 3px 9px;
+  padding: 2px 7px;
   border-radius: 999px;
   background: var(--green-tint);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
   color: var(--green-accessible);
+}
+
+/* Sobre el verde de la elegida la chapa se perdía: se le devuelve el
+   blanco para que siga siendo una chapa y no una mancha. */
+.ruta-ficha[aria-pressed='true'] .ruta-ficha-id {
+  background: #FFFFFF;
 }
 
 .ruta-ficha-km {
@@ -128,7 +138,7 @@
   grid-row: 1 / 3;
   display: flex;
   align-items: baseline;
-  gap: 4px;
+  gap: 3px;
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.04em;
@@ -137,18 +147,19 @@
   transition: color var(--transition-fast);
 }
 
-.ruta-ficha:hover .ruta-ficha-km {
+.ruta-ficha:hover .ruta-ficha-km,
+.ruta-ficha[aria-pressed='true'] .ruta-ficha-km {
   color: var(--green-accessible);
 }
 
 .ruta-ficha-km-cifra {
-  font-size: clamp(1.5rem, 1.1rem + 1.1vw, 2rem);
+  font-size: 1.15rem;
   line-height: 1;
 }
 
 .ruta-ficha-km-unidad {
   font-family: var(--font-family);
-  font-size: 11px;
+  font-size: 9.5px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -158,10 +169,10 @@
 .ruta-ficha-nombre {
   grid-column: 1;
   font-family: var(--font-display);
-  font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem);
+  font-size: 0.95rem;
   font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -0.025em;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
 }
 
@@ -170,44 +181,13 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 7px;
-  font-size: 13.5px;
-  line-height: 1.35;
+  gap: 5px;
+  font-size: 11.5px;
+  line-height: 1.3;
   color: var(--text-secondary);
 }
 
 .ruta-ficha-flecha {
   font-weight: 700;
   color: var(--green);
-}
-
-/* ── La salida ──
-   Un solo enlace al final, como cierran sus bloques los sitios que se
-   leen como índice. Lleva al mapa, que es donde estas seis fichas
-   dejan de ser una lista y se mueven. */
-.rutas-salida {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  margin-top: clamp(24px, 2.6vw, 34px);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--green-accessible);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(4, 120, 87, 0.28);
-  padding-bottom: 3px;
-  transition: border-color var(--transition-fast);
-}
-
-.rutas-salida:hover,
-.rutas-salida:focus-visible {
-  border-bottom-color: var(--green-accessible);
-}
-
-.rutas-salida-flecha {
-  transition: translate var(--transition-normal);
-}
-
-.rutas-salida:hover .rutas-salida-flecha {
-  translate: 4px 0;
 }

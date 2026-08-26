@@ -11,18 +11,22 @@
    ────────────────────────────────────────────────────────────────── */
 
 /* ══════════════════════════════════════════════════════════════════════
-   EL MAPA, EN VIVO
+   LAS SEIS RUTAS, EN VIVO
    ══════════════════════════════════════════════════════════════════════
-   La única parte de la página que se toca. Va sobre tinta porque el
-   mosaico de Barranquilla es claro: puesto sobre oscuro deja de parecer
-   una ilustración de fondo y pasa a parecer lo que es, una pantalla
-   encendida.
+   La única parte de la página que se toca, y también la que trae los
+   datos: las tres cifras del catálogo arriba y las seis rutas reales
+   al lado del mapa, que se eligen.
+
+   Estuvo sobre tinta y ya no: es la última sección antes del pie, y el
+   pie es crema. Sin fondo propio las dos se leen como una sola bajada,
+   que es justo lo que son —el mapa y las rutas que dibuja—. El mosaico
+   de Barranquilla ya es claro, así que sobre crema no pierde nada; lo
+   que había que rehacer era el cromo de alrededor, que estaba escrito
+   en blancos translúcidos y sobre crema no se veía.
 
    Dos piezas, no tres columnas sueltas: el mapa —que conserva la
    proporción del mosaico, 1284×1982, para no recortar ninguna terminal—
-   y a su lado el mando, con las rutas arriba y la lectura debajo. Las
-   dos van dentro de un mismo marco para que se lean como un aparato y
-   no como tres recuadros flotando sobre la tinta. */
+   y a su lado el mando, con las seis fichas arriba y la lectura debajo. */
 .mapa-inner {
   display: flex;
   flex-direction: column;
@@ -52,7 +56,7 @@
     align-items: end;
   }
 
-  .mapa-cabecera .mapa-insignia,
+  .mapa-cabecera .tracked-eyebrow,
   .mapa-cabecera .section-title {
     grid-column: 1;
   }
@@ -64,73 +68,6 @@
     margin: 0;
     max-width: 46ch;
   }
-}
-
-/* El rótulo de la sección: es la única parte de la página que se toca,
-   así que en vez del texto suelto de las otras lleva chapa y un punto
-   encendido —el mismo verde del bus cerca— para que se vea que aquí hay
-   algo vivo. */
-.mapa-insignia {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  align-self: start;
-  width: max-content;
-  margin: 0;
-  padding: 8px 17px 8px 14px;
-  border: 1px solid rgba(0, 168, 89, 0.55);
-  border-radius: 999px;
-  background: rgba(0, 168, 89, 0.16);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #4ADE80;
-}
-
-.mapa-insignia-punto {
-  position: relative;
-  flex-shrink: 0;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #4ADE80;
-}
-
-/* El latido va en `transform` y `opacity` —las dos que no repintan— y se
-   para solo cuando la sección sale de pantalla. */
-.mapa-insignia-punto::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: #4ADE80;
-  animation: insignia-latido 2.4s var(--ease-out-cubic) infinite;
-}
-
-@keyframes insignia-latido {
-  0% { transform: scale(1); opacity: 0.5; }
-  70%, 100% { transform: scale(3.4); opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mapa-insignia-punto::after {
-    animation: none !important;
-    opacity: 0 !important;
-  }
-}
-
-/* El marco. Lo que va dentro deja de ser tres cosas sueltas sobre la
-   tinta y pasa a ser una sola pantalla. */
-.mapa-consola {
-  width: 100%;
-  max-width: min(100%, 1060px);
-  margin-inline: auto;
-  padding: clamp(14px, 1.7vw, 24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: clamp(24px, 2.4vw, 36px);
-  background: rgba(255, 255, 255, 0.035);
-  box-shadow: 0 40px 90px -50px rgba(0, 0, 0, 0.9);
 }
 
 .mapa-tablero {
@@ -178,7 +115,7 @@
   font-weight: 800;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
 }
 
 /* ── El lienzo ── */
@@ -196,9 +133,10 @@
   border-radius: 22px;
   overflow: hidden;
   background: #EDE7DE;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  /* Dentro del marco la sombra larga sobraba: basta con despegarlo. */
-  box-shadow: 0 18px 44px -26px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(20, 39, 78, 0.12);
+  /* Sobre crema la sombra vuelve a hacer falta: es lo único que separa
+     el mosaico —que también es claro— del papel de la página. */
+  box-shadow: 0 26px 60px -34px rgba(20, 39, 78, 0.55);
 }
 
 .mapa-svg {
@@ -301,69 +239,15 @@
   gap: 7px;
 }
 
-/* Al lado del mapa hay ancho de sobra: las seis rutas en dos columnas
-   caben en tres filas y dejan sitio a la lectura. */
+/* Al lado del mapa hay ancho de sobra: las seis fichas en dos columnas
+   caben en tres filas y dejan sitio a la lectura. Las pinta `rutas.css`;
+   aquí sólo se dice cómo se reparten. */
 @media (min-width: 1060px) {
   .mv-rutas {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
-}
-
-.mv-ruta {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 2px 10px;
-  padding: 11px 13px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.72);
-  text-align: left;
-  cursor: pointer;
-  transition:
-    background var(--transition-fast),
-    border-color var(--transition-fast),
-    color var(--transition-fast);
-}
-
-.mv-ruta:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #FFFFFF;
-}
-
-.mv-ruta[aria-pressed='true'] {
-  background: rgba(0, 168, 89, 0.16);
-  border-color: rgba(0, 168, 89, 0.55);
-  color: #FFFFFF;
-}
-
-.mv-ruta-nombre {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.mv-ruta-km {
-  grid-column: 2;
-  grid-row: 1;
-  align-self: center;
-  font-size: 12px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.mv-ruta[aria-pressed='true'] .mv-ruta-km {
-  color: var(--green);
-}
-
-.mv-ruta-datos {
-  grid-column: 1 / -1;
-  font-size: 11.5px;
-  line-height: 1.35;
-  color: rgba(255, 255, 255, 0.42);
 }
 
 /* ── La lectura ── */
@@ -374,15 +258,31 @@
   justify-content: center;
   gap: 3px;
   padding: 20px 22px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(20, 39, 78, 0.12);
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.72);
   transition: border-color var(--transition-normal), background var(--transition-normal);
 }
 
 .mapa-lectura.es-cerca {
   border-color: rgba(0, 168, 89, 0.5);
-  background: rgba(0, 168, 89, 0.1);
+  background: var(--green-tint);
+}
+
+/* Y lo contrario: el punto marcado se salió del alcance de la ruta, así
+   que el número deja de ser una cuenta atrás y pasa a ser un dato.
+
+   El aviso lo da la superficie, no la letra. El ámbar sólo aguanta como
+   fondo —sobre crema no llega al contraste ni siendo texto grande—, y
+   este cuadro existe para leerse. Vivía en `error-404.css`, que no tiene
+   nada que ver; aquí queda al lado de su pareja. */
+.mapa-lectura.es-fuera {
+  border-color: rgba(255, 193, 7, 0.55);
+  background: var(--amber-tint);
+}
+
+.mapa-lectura.es-fuera .mapa-lectura-metros {
+  color: var(--text-secondary);
 }
 
 .mapa-lectura .mapa-rotulo {
@@ -425,7 +325,7 @@
 .mapa-lectura-bus {
   font-size: 13px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--text-primary);
 }
 
 /* Del mismo corte que el número grande de la app. */
@@ -436,17 +336,19 @@
   line-height: 1.05;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
-  color: #FFFFFF;
+  color: var(--navy);
   transition: color var(--transition-normal);
 }
 
+/* El verde que aguanta texto: el de marca no llega a 4.5:1 sobre crema
+   y este número es el que hay que poder leer. */
 .mapa-lectura.es-cerca .mapa-lectura-metros {
-  color: #4ADE80;
+  color: var(--green-accessible);
 }
 
 .mapa-lectura-pie {
   font-size: 11.5px;
-  color: rgba(255, 255, 255, 0.42);
+  color: var(--text-secondary);
 }
 
 /* ── El aviso ──
@@ -457,8 +359,8 @@
   gap: 11px;
   padding: 13px 15px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 16px 34px -18px rgba(0, 0, 0, 0.8);
+  background: #FFFFFF;
+  box-shadow: 0 18px 38px -22px rgba(20, 39, 78, 0.6);
   opacity: 0;
   transform: translateY(-10px) scale(0.97);
   visibility: hidden;
@@ -541,8 +443,8 @@
     display: none;
   }
 
-  .mv-ruta {
+  .ruta-ficha {
     flex: 0 0 auto;
-    width: 210px;
+    width: 230px;
   }
 }
