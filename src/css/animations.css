@@ -134,6 +134,13 @@
     transition: none !important;
     transform: none !important;
   }
+  /* El saltito de las fichas de ruta y el de su flecha de salida. El
+     borde verde sigue diciendo lo mismo sin que nada se mueva. */
+  .ruta-ficha,
+  .rutas-salida-flecha {
+    transition: none !important;
+    translate: none !important;
+  }
   .pulse-beacon::after {
     animation: none !important;
   }

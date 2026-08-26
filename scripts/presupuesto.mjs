@@ -19,11 +19,18 @@ import { join, extname } from 'node:path';
 const DIST = 'dist';
 const KB = 1024;
 
-/** Topes en KB. Medido el 24/08/2026 y redondeado hacia arriba. */
+/** Topes en KB. Medido el 24/08/2026 y redondeado hacia arriba.
+ *
+ *  El de CSS subió el 25/08/2026 de 85 a 88, con la sección de las seis
+ *  rutas. Antes se buscó de dónde sacarlo sin subirlo: `phone-simulator.css`
+ *  no tiene una sola clase muerta —las siete que lo parecían se ponen desde
+ *  JS— y entre los cuatro paquetes de dist no hay reglas repetidas. No
+ *  había nada que recuperar, así que se paga: 3 KB por el bloque con más
+ *  datos duros de la página. */
 const TOPES = {
   'todo dist': 750,
   'JavaScript': 65,
-  'CSS': 85,
+  'CSS': 88,
   'primera visita': 600,
 };
 

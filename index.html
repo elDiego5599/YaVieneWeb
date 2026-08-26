@@ -166,6 +166,7 @@
           <nav class="nav-island-links" aria-label="Navegación principal">
             <a href="#problema" class="nav-link">El problema</a>
             <a href="#solucion" class="nav-link">Cómo funciona</a>
+            <a href="#rutas" class="nav-link">Las rutas</a>
             <a href="/empresas.html" class="nav-link">Para empresas</a>
           </nav>
           <a href="#mapa" class="nav-island-cta">Probar el mapa</a>
@@ -1289,6 +1290,36 @@
     </section>
 
 
+    <!-- ============ LAS SEIS RUTAS ============
+      El único dato de la página que no se puede copiar: las seis rutas
+      reales de Sobusa, con su código, sus terminales y su kilometraje.
+      Hasta ahora sólo se veían dentro del mando del mapa, en un riel
+      estrecho. Aquí se leen enteras, y desde aquí se entra al mapa con
+      la ruta ya puesta.
+
+      Las fichas y las cifras no están escritas abajo: las pinta
+      `src/rutas.ts` de los mismos datos que dibujan el mapa, para que no
+      puedan decir una cosa distinta a la que el mapa enseña.
+    -->
+    <section class="panel panel--papel panel--sangre" id="rutas">
+      <div class="panel-inner">
+        <header class="section-head reveal">
+          <span class="tracked-eyebrow eyebrow--verde">EN OPERACIÓN</span>
+          <h2 class="section-title">Seis rutas de Sobusa,<br />de terminal a terminal</h2>
+          <p class="section-lead">Las mismas que trae la app y las mismas que se mueven
+            en el mapa de abajo. Toca una y el mapa se abre con ella puesta.</p>
+        </header>
+
+        <div class="rutas-cifras reveal" data-reveal-delay="90" data-rutas-cifras></div>
+
+        <div class="rutas-rejilla" data-rutas-rejilla></div>
+
+        <a class="rutas-salida reveal" data-reveal-delay="120" href="#mapa">Míralas moverse en el mapa<span
+            class="rutas-salida-flecha" aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+
     <!-- ============ EL MAPA, EN VIVO ============
       Hasta aquí la página enseña teléfonos y el que mira los mira. Esta
       sección se toca: las seis rutas de Sobusa, el radio de aviso de un
@@ -1298,7 +1329,7 @@
     -->
     <section class="panel panel--ink panel--sangre" id="mapa">
       <div class="panel-inner panel-inner--ancho mapa-inner">
-        <header class="mapa-cabecera">
+        <header class="mapa-cabecera reveal">
           <p class="mapa-insignia">
             <span class="mapa-insignia-punto" aria-hidden="true"></span>PRUÉBALO AQUÍ
           </p>
@@ -1374,6 +1405,7 @@
           <span>Explora</span>
           <a href="#problema">El problema</a>
           <a href="#solucion">Cómo funciona</a>
+          <a href="#rutas">Las seis rutas</a>
           <a href="#mapa">El mapa en vivo</a>
         </div>
         <div class="footer-nav-group">

@@ -1,0 +1,213 @@
+/* ── LAS SEIS RUTAS ─────────────────────────────────────────────────
+
+   El tablero de operación. Es la sección con más datos duros de la
+   página, y son datos que nadie más tiene: seis rutas reales de Sobusa
+   con su código, sus terminales y su kilometraje. Se enseñan como
+   fichas de registro —código arriba a la izquierda, kilómetro arriba a
+   la derecha, nombre y trayecto debajo—, no como tarjetas de producto.
+
+   Va en panel claro y a plena luz. La sección anterior es menta y la
+   siguiente es tinta: ésta es el respiro entre las dos. Las tres cifras
+   de la cabecera van en tres colores de la propia página —verde, coral
+   y tinta marina—, no en una paleta nueva. El ámbar se queda fuera a
+   propósito: sobre blanco no llega al contraste ni siendo texto
+   grande, y estas cifras son lo que hay que poder leer.
+
+   Las fichas las pinta `src/rutas.ts` desde los mismos datos que dibujan
+   el mapa. Entran por turnos al bajar, con el `.reveal` de siempre.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── Las cifras de cabecera ── */
+
+.rutas-cifras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(22px, 4vw, 64px);
+  margin: 0 0 clamp(30px, 3.6vw, 48px);
+  padding-top: clamp(20px, 2.4vw, 30px);
+  border-top: 1px solid rgba(20, 39, 78, 0.14);
+}
+
+.rutas-dato {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rutas-dato-numero {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 1.1rem + 3.4vw, 4rem);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  /* Cifras de ancho fijo: son tres números en fila y con anchos
+     variables la línea de base se lee torcida. */
+  font-variant-numeric: tabular-nums;
+  color: var(--green-accessible);
+}
+
+/* Tres colores que ya reparte la página: el verde de «la solución», el
+   coral de «el problema» y la tinta marina de la marca. */
+.rutas-dato:nth-child(2) .rutas-dato-numero { color: var(--coral); }
+.rutas-dato:nth-child(3) .rutas-dato-numero { color: var(--navy); }
+
+.rutas-dato-rotulo {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* ── La rejilla ── */
+
+/* Tres y tres, no las que quepan. Son seis rutas: con `auto-fit` salían
+   cuatro y dos en pantalla ancha, y los nombres largos —«C13 Carrera 50
+   Paraíso»— partían en dos líneas dejando las fichas de distinto alto.
+   Dos filas de tres es la única partición limpia que admite un seis. */
+.rutas-rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(12px, 1.3vw, 18px);
+}
+
+@media (min-width: 620px) {
+  .rutas-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1040px) {
+  .rutas-rejilla { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.ruta-ficha {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 10px 14px;
+  padding: clamp(16px, 1.6vw, 22px);
+  border: 1px solid rgba(20, 39, 78, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 12px 28px -24px rgba(20, 39, 78, 0.55);
+  /* `translate` y no `transform`: las fichas no animan nada más, pero
+     mantener la propiedad libre es la costumbre de esta hoja. */
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-normal),
+    translate var(--transition-normal);
+}
+
+.ruta-ficha:hover,
+.ruta-ficha:focus-visible {
+  border-color: rgba(0, 168, 89, 0.5);
+  background: #FFFFFF;
+  box-shadow: 0 20px 38px -26px rgba(20, 39, 78, 0.6);
+  translate: 0 -3px;
+}
+
+/* El código real de la ruta en rutas.json. No es una viñeta bonita: es
+   el identificador con el que la app y el backend la llaman. */
+.ruta-ficha-id {
+  grid-column: 1;
+  justify-self: start;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--green-tint);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  color: var(--green-accessible);
+}
+
+.ruta-ficha-km {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--navy);
+  transition: color var(--transition-fast);
+}
+
+.ruta-ficha:hover .ruta-ficha-km {
+  color: var(--green-accessible);
+}
+
+.ruta-ficha-km-cifra {
+  font-size: clamp(1.5rem, 1.1rem + 1.1vw, 2rem);
+  line-height: 1;
+}
+
+.ruta-ficha-km-unidad {
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.ruta-ficha-nombre {
+  grid-column: 1;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+}
+
+.ruta-ficha-tramo {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px;
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+.ruta-ficha-flecha {
+  font-weight: 700;
+  color: var(--green);
+}
+
+/* ── La salida ──
+   Un solo enlace al final, como cierran sus bloques los sitios que se
+   leen como índice. Lleva al mapa, que es donde estas seis fichas
+   dejan de ser una lista y se mueven. */
+.rutas-salida {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: clamp(24px, 2.6vw, 34px);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--green-accessible);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(4, 120, 87, 0.28);
+  padding-bottom: 3px;
+  transition: border-color var(--transition-fast);
+}
+
+.rutas-salida:hover,
+.rutas-salida:focus-visible {
+  border-bottom-color: var(--green-accessible);
+}
+
+.rutas-salida-flecha {
+  transition: translate var(--transition-normal);
+}
+
+.rutas-salida:hover .rutas-salida-flecha {
+  translate: 4px 0;
+}

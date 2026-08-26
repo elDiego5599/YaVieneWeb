@@ -29,6 +29,7 @@ import { PhoneMap } from './phone-map';
 import { PhoneSimulator } from './phone-simulator';
 import { ProblemWeather } from './problem-weather';
 import { Reloj } from './reloj';
+import { pintarRutas, saltosDeRuta } from './rutas';
 import { dormirLoQueNoSeVe } from './reposo';
 import { saltosDeMenu } from './salto';
 import { encenderScrollSuave } from './scroll-suave';
@@ -36,6 +37,16 @@ import { entrarEscena, ScrollEffects } from './scroll-effects';
 import { sinMovimiento } from './scrolly';
 
 const arrancar = (): void => {
+  /*
+    El tablero de rutas, antes que nada: sus fichas nacen con `.reveal` y
+    el observador de abajo sólo recoge lo que encuentra al construirse.
+    Pintadas después entrarían ya visibles y la sección aparecería de
+    golpe. Ver rutas.ts.
+  */
+  const tablero = document.querySelector<HTMLElement>('#rutas');
+  if (tablero) pintarRutas(tablero);
+  saltosDeRuta();
+
   // Apariciones al entrar en pantalla: no depende de nada más.
   new ScrollEffects();
   // La escena del hero, que entra sola al cargar.
@@ -86,8 +97,8 @@ const arrancar = (): void => {
   if (problema) new ProblemWeather(problema);
 
   // El mapa jugable: la única parte de la página que se toca.
-  const tablero = document.querySelector<HTMLElement>('[data-mapa-vivo]');
-  if (tablero) new MapaVivo(tablero);
+  const mapa = document.querySelector<HTMLElement>('[data-mapa-vivo]');
+  if (mapa) new MapaVivo(mapa);
 
   /*
     Las dos secciones que se recorren en vez de leerse de un golpe. Cada
