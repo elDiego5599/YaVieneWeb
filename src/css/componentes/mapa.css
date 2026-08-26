@@ -345,6 +345,30 @@
   letter-spacing: -0.01em;
 }
 
+/* La insignia de ruta, como el rótulo circular de una parada de bus:
+   el código va siempre en su disco verde y el nombre respira al lado.
+   Se la pinta mapa-vivo.ts cuando el nombre trae código («C16 …»). */
+.roundel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  vertical-align: -6px;
+}
+
+.mv-ruta[aria-pressed='true'] .roundel {
+  background: #ffffff;
+  color: #046b45;
+}
+
 .mv-ruta-km {
   grid-column: 2;
   grid-row: 1;
@@ -438,6 +462,21 @@
   font-variant-numeric: tabular-nums;
   color: #FFFFFF;
   transition: color var(--transition-normal);
+}
+
+/* Eco del reloj del problema: un aro con un arco recorrido, del mismo
+   color que la cifra. No mide nada aquí —recuerda que la distancia se
+   recorre—; por eso es decorativo y aria-hidden no hace falta. */
+.mapa-lectura-metros::before {
+  content: '';
+  display: inline-block;
+  width: 0.3em;
+  height: 0.3em;
+  margin-right: 0.16em;
+  border-radius: 50%;
+  background: conic-gradient(currentColor 0 78%, rgba(255, 255, 255, 0.16) 0);
+  -webkit-mask: radial-gradient(circle, transparent 0 33%, #000 34%);
+  mask: radial-gradient(circle, transparent 0 33%, #000 34%);
 }
 
 .mapa-lectura.es-cerca .mapa-lectura-metros {

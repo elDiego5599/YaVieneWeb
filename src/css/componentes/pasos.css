@@ -838,15 +838,6 @@
   }
 }
 
-@keyframes footer-gradient-respiro {
-  0% {
-    background-size: 135% 135%, 115% 115%, 100% 100%;
-  }
-  100% {
-    background-size: 155% 155%, 132% 132%, 100% 100%;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   #problema .escena::before,
   #problema .escena::after,

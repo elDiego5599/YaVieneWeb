@@ -58,9 +58,15 @@ button, input {
 
 h1, h2, h3, h4 {
   text-wrap: balance;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.035em;
   font-weight: 800;
   color: var(--text-primary);
+}
+
+/* Selección en verde de marca: el azul default del navegador es el
+   único color de la página que nadie eligió. */
+::selection {
+  background: rgba(0, 168, 89, 0.24);
 }
 
 p {

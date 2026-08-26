@@ -239,7 +239,7 @@ export class MapaVivo {
     return g;
   }
 
-  /** El riel de rutas: las seis de rutas.json, con sus terminales y su largo. */
+  /** El riel de rutas: las seis de rutas-landing, con sus terminales y su largo. */
   private pintarLista(): void {
     const marco = document.createDocumentFragment();
     for (const ruta of YV_RUTAS.rutas) {
@@ -248,8 +248,16 @@ export class MapaVivo {
       boton.className = 'mv-ruta';
       boton.dataset.ruta = ruta.id;
       boton.setAttribute('aria-pressed', String(ruta.id === this.ruta.id));
+      // El código de ruta («C16», «B18») va en su insignia circular, como
+      // en el rótulo de una parada; el nombre queda limpio al lado. Si un
+      // nombre no trae código, no hay insignia y no pasa nada.
+      const conCodigo = /^([A-Z]\d{1,2})\s+(.+)$/.exec(ruta.nombre);
+      const insignia = conCodigo
+        ? `<b class="roundel">${conCodigo[1]}</b>`
+        : '';
+      const nombreLimpio = conCodigo ? conCodigo[2] : ruta.nombre;
       boton.innerHTML =
-        `<span class="mv-ruta-nombre">${ruta.nombre}</span>` +
+        `<span class="mv-ruta-nombre">${insignia}${nombreLimpio}</span>` +
         `<span class="mv-ruta-datos">${ruta.terminalA} → ${ruta.terminalB}</span>` +
         `<span class="mv-ruta-km">${String(ruta.km).replace('.', ',')} km</span>`;
       boton.addEventListener('click', () => this.setRuta(ruta.id));

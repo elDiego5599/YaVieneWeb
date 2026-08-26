@@ -71,7 +71,9 @@
   /* Escala fluida: los titulares crecen con el viewport en vez de quedarse
      clavados en un tamaño pensado para 1200px. */
   --step-display: clamp(2.75rem, 1.2rem + 6.2vw, 6.5rem);
-  --step-h2: clamp(2rem, 1.1rem + 3.2vw, 3.75rem);
+  /* El h2 sube de tope (3.75→4.4rem): la mitad izquierda de cada sección
+     tenía que pelearle el protagonismo al hero con media octava menos. */
+  --step-h2: clamp(2.25rem, 1.05rem + 3.8vw, 4.4rem);
   --step-h3: clamp(1.15rem, 0.95rem + 0.7vw, 1.5rem);
   --step-lead: clamp(1.05rem, 0.95rem + 0.5vw, 1.375rem);
   --step-body: clamp(0.95rem, 0.9rem + 0.2vw, 1.0625rem);
