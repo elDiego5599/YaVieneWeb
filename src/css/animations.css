@@ -123,6 +123,13 @@
     opacity: 1 !important;
     transform: none !important;
   }
+  /* La entrada del hero anima `scale`, no `transform`: hay que apagar esa
+     propiedad y no la otra. */
+  .escena-entra {
+    transition: none !important;
+    opacity: 1 !important;
+    scale: none !important;
+  }
   .phone-shell {
     transition: none !important;
     transform: none !important;

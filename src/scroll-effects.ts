@@ -45,3 +45,34 @@ export class ScrollEffects {
     this.observer?.disconnect();
   }
 }
+
+/**
+ * La entrada de la escena del hero.
+ *
+ * No pasa por el observador de arriba a propósito. El hero está arriba
+ * del todo por definición, pero sus piezas más bajas —los buses del
+ * carril de abajo— caen por debajo del margen del observador, así que
+ * con IntersectionObserver tres de los cuatro buses se quedaban
+ * invisibles hasta que alguien hiciera scroll. Aquí no hay nada que
+ * esperar: la escena se enciende al cargar y cada pieza espera su turno.
+ *
+ * Con el movimiento desactivado el CSS ya deja las piezas visibles de
+ * salida (`opacity: 1 !important`), así que no hace falta ramificar:
+ * esto sólo les pone la clase y no se nota ninguna transición.
+ */
+export const entrarEscena = (raiz: ParentNode = document): void => {
+  const piezas = Array.from(raiz.querySelectorAll<HTMLElement>('.escena-entra'));
+  if (piezas.length === 0) return;
+
+  // Dos cuadros de margen: si se encienden en el mismo en que se pintan,
+  // el navegador no llega a ver el estado inicial y no hay transición
+  // que animar —las piezas aparecerían de golpe.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      for (const pieza of piezas) {
+        pieza.style.transitionDelay = `${pieza.dataset.revealDelay ?? 0}ms`;
+        pieza.classList.add('is-visible');
+      }
+    });
+  });
+};

@@ -147,6 +147,35 @@
   justify-content: center;
 }
 
+/* ── La entrada de la escena ──────────────────────────────────────────
+   El trío de teléfonos y los cuatro buses aparecían todos a la vez y ya
+   levitando: se leía como «aquí todo se mueve» en vez de como un momento
+   dirigido. Ahora entran por turnos —primero el aparato central, que es
+   la tesis; luego los laterales, que lo vuelven un grupo; y al final los
+   buses, que son la ciudad llenándose alrededor—. El turno de cada uno
+   lo pone `data-reveal-delay` en el marcado.
+
+   Se animan `opacity` y `scale`, nunca `transform` ni `translate`: esas
+   dos ya están ocupadas —`transform` la lleva la levitación de los buses
+   y `translate` la respiración del trío— y una animación gana siempre a
+   una declaración normal, así que una tercera regla peleándose por ellas
+   no se vería. `scale` está libre en ambos y compone en la GPU igual.
+
+   Sin `will-change`: son siete elementos y la promoción a capa
+   permanente cuesta memoria para algo que pasa una sola vez. */
+.escena-entra {
+  opacity: 0;
+  scale: 0.94;
+  transition:
+    opacity 0.8s var(--ease-fluida),
+    scale 0.8s var(--ease-fluida);
+}
+
+.escena-entra.is-visible {
+  opacity: 1;
+  scale: 1;
+}
+
 /* Contenedor del teléfono central: por encima de los dos laterales. */
 .hero-phone-wrap {
   display: flex;

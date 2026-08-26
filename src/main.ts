@@ -32,12 +32,14 @@ import { Reloj } from './reloj';
 import { dormirLoQueNoSeVe } from './reposo';
 import { saltosDeMenu } from './salto';
 import { encenderScrollSuave } from './scroll-suave';
-import { ScrollEffects } from './scroll-effects';
+import { entrarEscena, ScrollEffects } from './scroll-effects';
 import { sinMovimiento } from './scrolly';
 
 const arrancar = (): void => {
   // Apariciones al entrar en pantalla: no depende de nada más.
   new ScrollEffects();
+  // La escena del hero, que entra sola al cargar.
+  entrarEscena();
 
   // Y lo contrario: lo que está fuera de pantalla deja de animarse. Es lo
   // primero que se enciende porque sólo mira secciones, no depende de que
