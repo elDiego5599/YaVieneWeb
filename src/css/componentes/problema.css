@@ -200,7 +200,14 @@
    de la frase es texto y nada más—, así que el blanco puede crecer por
    encima y por debajo de la línea sin quitarle el sitio a nadie. Crece
    la capa invisible, no la palabra: la frase se sigue leyendo igual.
-   Sólo en pantallas de dedo. */
+   Sólo en pantallas de dedo.
+
+   El reparto va dividido por `--encaje` porque esta capa vive dentro de
+   la escena, y la escena va encogida —0.896 en un teléfono de 390—. Los
+   nueve píxeles escritos aquí dentro llegaban a la pantalla hechos ocho,
+   y la diana se quedaba en cuarenta y uno de alto: por debajo de los
+   cuarenta y cuatro que piden Apple y Google. Dividiendo, los diez son
+   diez en pantalla, salga el factor que salga. */
 @media (pointer: coarse) {
   .clima-word {
     position: relative;
@@ -209,7 +216,7 @@
   .clima-word::after {
     content: '';
     position: absolute;
-    inset: -9px -6px;
+    inset: calc(-10px / var(--encaje, 1)) calc(-11px / var(--encaje, 1));
   }
 }
 

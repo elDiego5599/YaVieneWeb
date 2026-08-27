@@ -608,6 +608,67 @@
   gap: 0;
 }
 
+/* Icono y nombre centrados en su tercio del riel; la línea de progreso ya
+   no vive aquí dentro —es una sola, de filo a filo de la barra.
+
+   Y van AQUÍ, antes de los dos `@media` de abajo y no después, que es
+   donde estaban. Una consulta de medios no suma especificidad: valen lo
+   mismo, así que ganaba la de más abajo y el teléfono se quedaba con la
+   maqueta de escritorio —el icono al lado del nombre, con el relleno de
+   dieciocho píxeles— por mucho que el bloque de móvil dijera otra cosa.
+   De ahí salía «Punto de espera» cruzando el tercio de al lado. Es el
+   fallo que avisa la cabecera de este fichero. */
+.pasos-tab {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto max-content;
+  align-items: center;
+  justify-content: center;
+  column-gap: 8px;
+  padding: 16px 18px 12px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(13px, 1.05vw, 16px);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  text-align: center;
+  color: var(--text-muted);
+  transition: color var(--transition-normal);
+}
+
+.pasos-tab:hover,
+.pasos-tab.is-activa {
+  color: var(--green-accessible);
+}
+
+.pasos-tab-icon {
+  grid-column: 1;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+}
+
+.pasos-tab-icon svg {
+  width: 100%;
+  height: 100%;
+  /* El de «Elige tu ruta» temblaba en el iPhone y los otros dos no. No es
+     casualidad: es el único con tramos rectos pegados a los ejes —la raya
+     de abajo y la subida del centro—, y son los que se parten entre dos
+     píxeles cuando el dibujo cae a medio píxel. Aquí cae siempre: la
+     escena va encogida por `--encaje`, que no es un número redondo, y
+     además va pegada, así que Safari la vuelve a rasterizar mientras se
+     baja y el reparto entre píxeles cambia en cada cuadro. Con una capa
+     propia el icono se dibuja una vez y se mueve ya dibujado. */
+  transform: translateZ(0);
+}
+
+.pasos-tab-nombre {
+  grid-column: 2;
+}
+
 @media (max-width: 919px) {
   .es-cinta .pasos-obra {
     grid-template-columns: 1fr;
@@ -673,24 +734,44 @@
     gap: 0;
   }
 
+  /* Aquí el icono se pone encima del nombre, y no al lado.
+
+     En fila no caben: en un teléfono de 360 el tercio del riel mide 91
+     px y «Punto de espera» pedía 102 contando el icono y su hueco. Lo
+     que sobraba se salía por los dos lados —una rejilla centrada reparte
+     el desbordamiento— y la última letra acababa debajo del icono de la
+     pestaña siguiente. Eso es lo que se veía «sin salir completo». El
+     tope de ancho que había —once caracteres— tampoco arreglaba nada:
+     dejaba menos de dos píxeles de margen con la letra de la casa, así
+     que en cuanto el teléfono tardaba en bajarla y entraba la de
+     sistema, el nombre salía cortado con puntos suspensivos.
+
+     Apilado, el nombre tiene el tercio entero para él, cabe de una línea
+     y puede partirse en dos si el teléfono es más estrecho todavía. Sin
+     cortes: un índice con el nombre a medias no indexa nada. Y los
+     tercios siguen midiendo lo mismo, que es de lo que depende que la
+     cabeza del verde caiga en el centro de la pestaña encendida. */
   .pasos-tab-nombre {
+    grid-column: 1;
     display: block;
-    max-width: 11ch;
-    overflow: hidden;
-    font-size: 10px;
-    line-height: 1.05;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    max-width: 100%;
+    font-size: 11px;
+    line-height: 1.15;
+    white-space: normal;
   }
 
   .pasos-tab {
-    column-gap: 5px;
-    padding: 12px 3px 10px;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    row-gap: 3px;
+    column-gap: 0;
+    padding: 9px 2px 8px;
   }
 
   .pasos-tab-icon {
-    width: 15px;
-    height: 15px;
+    grid-column: 1;
+    width: 16px;
+    height: 16px;
   }
 
   .es-cinta .pasos-obra {
@@ -705,59 +786,6 @@
   .es-cinta .phone-shell--paso {
     --ancho: clamp(148px, 40vw, 188px);
   }
-}
-
-/* Icono y nombre centrados en su tercio del riel; la línea de progreso ya
-   no vive aquí dentro —es una sola, de filo a filo de la barra. */
-.pasos-tab {
-  position: relative;
-  display: grid;
-  grid-template-columns: auto max-content;
-  align-items: center;
-  justify-content: center;
-  column-gap: 8px;
-  padding: 16px 18px 12px;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  font: inherit;
-  font-size: clamp(13px, 1.05vw, 16px);
-  font-weight: 700;
-  letter-spacing: -0.2px;
-  text-align: center;
-  color: var(--text-muted);
-  transition: color var(--transition-normal);
-}
-
-.pasos-tab:hover,
-.pasos-tab.is-activa {
-  color: var(--green-accessible);
-}
-
-.pasos-tab-icon {
-  grid-column: 1;
-  display: grid;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-}
-
-.pasos-tab-icon svg {
-  width: 100%;
-  height: 100%;
-  /* El de «Elige tu ruta» temblaba en el iPhone y los otros dos no. No es
-     casualidad: es el único con tramos rectos pegados a los ejes —la raya
-     de abajo y la subida del centro—, y son los que se parten entre dos
-     píxeles cuando el dibujo cae a medio píxel. Aquí cae siempre: la
-     escena va encogida por `--encaje`, que no es un número redondo, y
-     además va pegada, así que Safari la vuelve a rasterizar mientras se
-     baja y el reparto entre píxeles cambia en cada cuadro. Con una capa
-     propia el icono se dibuja una vez y se mueve ya dibujado. */
-  transform: translateZ(0);
-}
-
-.pasos-tab-nombre {
-  grid-column: 2;
 }
 
 /* Una sola línea, de filo a filo del riel —no de la tarjeta—. Tres
