@@ -64,16 +64,16 @@
   width: auto;
   max-width: 200px;
   object-fit: contain;
-  /* Monocromático elegante sin quemar: grayscale puro + velo */
+  /* Grayscale real: respeta contrastes (blanco sigue blanco, no se funde
+     con el relleno). Nada de brightness(0) que quema los bordes. */
   filter: grayscale(1);
   opacity: 0.6;
   transition: opacity 0.3s var(--ease-out-cubic), filter 0.3s var(--ease-out-cubic);
 }
 
 .marcas-item:hover .marcas-logo {
+  filter: grayscale(0);
   opacity: 1;
-  /* Se mantiene grayscale: el hover solo quita el velo, no añade color.
-     Si algún día se quiere color al hover, sería filter: grayscale(0) */
 }
 
 /* ── Responsive ─────────────────────────────────────────────────── */
