@@ -1,0 +1,245 @@
+/* ── MARCAS: CARRUSEL INFINITO DE LOGOS ───────────────────────
+   Va justo después del hero, antes del problema. Es una banda
+   editorial, no un panel flotante: a sangre, sin radio, con
+   dos filetes sutiles que la separan del cálido del hero y del
+   blanco del problema. Fondo blanco para que los logos, todos
+   en escala de gris, respiren.
+
+   La pista corre sola en bucle infinito; al pasar el puntero
+   se detiene. Respeta `prefers-reduced-motion` y no atrapa
+   el foco. Los bordes laterales se funden a transparente con
+   `mask-image` para que la entrada y salida no sea un corte
+   seco, como en la referencia (Netflix / Etsy / Notion …).
+   ─────────────────────────────────────────────────────────────── */
+
+.marcas {
+  position: relative;
+  /* Banda a sangre: rompe el ritmo de paneles con gutter */
+  margin: 0;
+  padding: 22px 0 24px;
+  background: var(--surface);
+  border-top: 1px solid rgba(11, 22, 40, 0.06);
+  border-bottom: 1px solid rgba(11, 22, 40, 0.06);
+  overflow: clip;
+  isolation: isolate;
+}
+
+.marcas-inner {
+  max-width: var(--content-wide);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.marcas-label {
+  display: block;
+  text-align: center;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 18px;
+  /* Cejilla editorial: no grita, orienta */
+}
+
+.marcas-track-wrap {
+  position: relative;
+  overflow: hidden;
+  /* Degradado transparente en los bordes — el truco de la referencia.
+     88px es ~el ancho de un logo + gap: lo que se ve asomando antes de
+     fundirse. En móvil es menos. */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 72px,
+    black calc(100% - 72px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 72px,
+    black calc(100% - 72px),
+    transparent 100%
+  );
+}
+
+.marcas-track {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  width: max-content;
+  /* Bucle infinito: la pista mide el doble (dos sets idénticos), así
+     que mover -50% es un ciclo completo sin salto. 32s es pausa-premium:
+     se lee sin marear, pero se nota que vive. */
+  animation: marcas-scroll 32s linear infinite;
+  will-change: transform;
+}
+
+.marcas-track:hover {
+  animation-play-state: paused;
+}
+
+.marcas-item {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  /* El ancho lo da el logo; el item solo centra y da zona de respiro
+     si el logo es estrecho. */
+}
+
+.marcas-logo {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: 160px;
+  object-fit: contain;
+  /* Identidad contenida: gris y tenue hasta el hover. Los 7 logos
+     venían en negro puro sobre blanco; en gris no compiten con el
+     titular del hero ni con el mapa. */
+  filter: grayscale(1) contrast(0.9) brightness(1.05);
+  opacity: 0.62;
+  transition:
+    filter 0.22s var(--ease-out-cubic),
+    opacity 0.22s var(--ease-out-cubic),
+    transform 0.22s var(--ease-out-cubic);
+}
+
+/* SODIS y Coochofal son apaisados y piden un poco más de aire para no
+   verse minúsculos al lado de los cuadrados (Sobusa, Tras Alfa). */
+.marcas-item--wide .marcas-logo {
+  max-width: 180px;
+}
+
+.marcas-item--transmetro .marcas-logo {
+  max-width: 148px;
+}
+
+.marcas-track:hover .marcas-logo {
+  opacity: 0.72;
+}
+
+.marcas-item:hover .marcas-logo {
+  filter: grayscale(0) contrast(1) brightness(1);
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+@keyframes marcas-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ── Respeto al movimiento ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .marcas-track {
+    animation: none;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    gap: 36px;
+    padding-bottom: 2px;
+  }
+
+  .marcas-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .marcas-track-wrap {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  /* Fallback del degradado para reduce-motion: pseudo-elementos con
+     fundido a blanco, que al ser scroll manual sí se ve el borde. */
+  .marcas-track-wrap::before,
+  .marcas-track-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 36px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .marcas-track-wrap::before {
+    left: 0;
+    background: linear-gradient(to right, var(--surface), transparent);
+  }
+
+  .marcas-track-wrap::after {
+    right: 0;
+    background: linear-gradient(to left, var(--surface), transparent);
+  }
+}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .marcas {
+    padding: 18px 0 20px;
+  }
+
+  .marcas-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    margin-bottom: 14px;
+  }
+
+  .marcas-track-wrap {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 36px,
+      black calc(100% - 36px),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 36px,
+      black calc(100% - 36px),
+      transparent 100%
+    );
+  }
+
+  .marcas-track {
+    gap: 36px;
+    animation-duration: 26s;
+  }
+
+  .marcas-item {
+    height: 26px;
+  }
+
+  .marcas-item--wide .marcas-logo {
+    max-width: 148px;
+  }
+}
+
+@media (max-width: 480px) {
+  .marcas-track {
+    gap: 28px;
+    animation-duration: 22s;
+  }
+
+  .marcas-item {
+    height: 24px;
+  }
+}
+
+/* ── Focus visible para accesibilidad de teclado si algún logo fuera link
+   (hoy no lo son, pero si se enlazan van listos) ─────────────────────── */
+.marcas-item:focus-within {
+  outline: 2px solid var(--green);
+  outline-offset: 4px;
+  border-radius: 4px;
+}

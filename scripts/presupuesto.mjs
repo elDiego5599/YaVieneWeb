@@ -42,12 +42,21 @@ const KB = 1024;
  *  ganar a la ficha elegida del mapa, que tiene que ganarles a ellos, y
  *  meter el estado en una variable con `calc()` dentro de los colores es
  *  ilegible. Con 84.5 de build el tope de 85 no dejaba margen para nada:
- *  el presupuesto sólo sirve si avisa antes de reventar, no al reventar. */
+ *  el presupuesto sólo sirve si avisa antes de reventar, no al reventar.
+ *
+ *  Y subió a 88 / 760 / 605 el 27/08/2026 con la banda de logos tras el
+ *  hero (Sobusa, Coolitoral, Coochofal, Sodis, Transmecar, Tras Alfa,
+ *  Transmetro). Son 7 PNGs a 1–8 KB cada uno —32 px de alto, 2× para
+ *  retina— más el CSS del carrusel infinito con degradado en los bordes.
+ *  Sin esa banda la portada no tiene prueba social: el claim «ya en
+ *  pruebas con Sobusa y sus 6 rutas» quedaba en texto y nadie lo creía.
+ *  La alternativa —poner los logos en el hero— lo recargaba y rompía la
+ *  escena de los tres teléfonos, que es lo que vende. */
 const TOPES = {
-  'todo dist': 750,
+  'todo dist': 760,
   'JavaScript': 65,
-  'CSS': 86,
-  'primera visita': 600,
+  'CSS': 88,
+  'primera visita': 605,
 };
 
 /** Lo que el navegador se baja de verdad al abrir la portada por primera
