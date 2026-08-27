@@ -42,12 +42,31 @@ const KB = 1024;
  *  ganar a la ficha elegida del mapa, que tiene que ganarles a ellos, y
  *  meter el estado en una variable con `calc()` dentro de los colores es
  *  ilegible. Con 84.5 de build el tope de 85 no dejaba margen para nada:
- *  el presupuesto sólo sirve si avisa antes de reventar, no al reventar. */
+ *  el presupuesto sólo sirve si avisa antes de reventar, no al reventar.
+ *
+ *  Y subió a 88 / 760 / 605 el 27/08/2026 con la banda de logos tras el
+ *  hero (Sobusa, Coolitoral, Coochofal, Sodis, Transmecar, Tras Alfa,
+ *  Transmetro). Sin esa banda la portada no tiene prueba social: el claim
+ *  «ya en pruebas con Sobusa y sus 6 rutas» quedaba en texto y nadie lo
+ *  creía. La alternativa —poner los logos en el hero— lo recargaba y
+ *  rompía la escena de los tres teléfonos, que es lo que vende.
+ *
+ *  Esa banda pasó por tres versiones el mismo día —carrusel infinito,
+ *  logos en negro puro, grilla en gris al 60 %— y cada una fue subiendo el
+ *  tope hasta 810 / 88 / 655, con los siete PNG pesando entre 8 y 22 KB.
+ *  Ahora vuelven a bajar: los logos son los originales a color y aun así
+ *  los siete juntos ocupan 32 KB, la tercera parte. Lo que los adelgazó no
+ *  fue encogerlos —se ven más grandes que nunca— sino sacarlos del SVG con
+ *  su máscara de alfa, recortarlos por el trazo y guardarlos con paleta de
+ *  96 colores: son logos, no fotos, y una paleta les sienta cuatro veces
+ *  mejor que WebP con pérdida (33 KB contra 70 KB medidos con los mismos
+ *  píxeles). Los topes quedan otra vez en lo que pesa la build de hoy más
+ *  un margen, que es para lo que están. */
 const TOPES = {
-  'todo dist': 750,
+  'todo dist': 760,
   'JavaScript': 65,
-  'CSS': 86,
-  'primera visita': 600,
+  'CSS': 87,
+  'primera visita': 610,
 };
 
 /** Lo que el navegador se baja de verdad al abrir la portada por primera
