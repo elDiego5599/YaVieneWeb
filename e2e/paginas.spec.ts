@@ -166,3 +166,47 @@ for (const { ruta, nombre } of PAGINAS) {
     });
   });
 }
+
+/*
+  Lo que todavía no se ha asomado no se toca. Los golpes de texto del
+  problema entran con el reloj, y mientras esperan están transparentes;
+  transparente no es escondido, así que «sol» y «lluvia» —que son
+  botones— se dejaban pulsar, y cambiaban el degradado de toda la
+  sección, sin haber aparecido nunca en pantalla.
+*/
+test.describe('el guion del problema', () => {
+  test('los golpes que aún no entran no se dejan tocar', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'load' });
+    await page.evaluate(() => document.fonts.ready);
+
+    // Justo a la entrada de la pista: la escena ya está pegada y en
+    // pantalla, pero el reloj no ha llegado a ningún golpe todavía. Ahí
+    // es donde los botones invisibles quedaban al alcance del dedo.
+    await page.evaluate(() => {
+      const pista = document.querySelector('#problema') as HTMLElement;
+      const top = pista.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: top + 60, behavior: 'instant' });
+    });
+    await page.waitForTimeout(600);
+
+    const escondidos = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('.problema-beat:not(.is-visible)')).map((beat) => {
+        const boton = beat.querySelector('[data-clima-choice]');
+        const caja = (boton ?? beat).getBoundingClientRect();
+        const centro = document.elementFromPoint(caja.left + caja.width / 2, caja.top + caja.height / 2);
+        return {
+          golpe: (beat as HTMLElement).dataset.beat,
+          alcanzable: !!centro && (boton ?? beat).contains(centro),
+        };
+      })
+    );
+
+    // Que haya alguno escondido es parte de la prueba: si el guion no
+    // arrancó, esto no estaría comprobando nada.
+    expect(escondidos.length, 'ningún golpe esperando su turno').toBeGreaterThan(0);
+    expect(
+      escondidos.filter((b) => b.alcanzable).map((b) => b.golpe),
+      'golpes invisibles que responden al dedo'
+    ).toEqual([]);
+  });
+});
