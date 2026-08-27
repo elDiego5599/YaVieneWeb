@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { test, expect, type Page, type ConsoleMessage } from '@playwright/test';
 
 /**
@@ -12,6 +14,26 @@ const PAGINAS = [
   { ruta: '/terminos.html', nombre: 'términos' },
   { ruta: '/404.html', nombre: 'error 404' },
 ];
+
+/* La política de contenido que Vercel manda en producción. Se lee del
+   mismo `vercel.json` que se publica —no de una copia— para que la
+   prueba no pueda quedarse hablando de una política que ya no existe.
+
+   Una política estricta es fácil de escribir y fácil de romper: basta un
+   `<style>` suelto, un icono en `data:` o una fuente de Google para que
+   el navegador empiece a bloquear cosas en silencio, en producción y no
+   aquí. Por eso se prueba con ella puesta. */
+const CSP = (() => {
+  const raiz = fileURLToPath(new URL('../vercel.json', import.meta.url));
+  const config = JSON.parse(readFileSync(raiz, 'utf8')) as {
+    headers: { headers: { key: string; value: string }[] }[];
+  };
+  const cabecera = config.headers
+    .flatMap((r) => r.headers)
+    .find((h) => h.key.toLowerCase() === 'content-security-policy');
+  if (!cabecera) throw new Error('vercel.json ya no manda Content-Security-Policy');
+  return cabecera.value;
+})();
 
 /** Ruidos que no son culpa nuestra y que no vale la pena perseguir. */
 const RUIDO = [/favicon\.ico/i, /Download the React DevTools/i];
@@ -142,6 +164,37 @@ for (const { ruta, nombre } of PAGINAS) {
       await page.goto(ruta, { waitUntil: 'load' });
       await page.evaluate(() => document.fonts.ready);
       expect(ajenas, 'peticiones a dominios de terceros').toEqual([]);
+    });
+
+    test('aguanta la política de contenido de producción', async ({ page }) => {
+      const violaciones: string[] = [];
+      await page.exposeFunction('anotarViolacion', (v: string) => void violaciones.push(v));
+      await page.addInitScript(() => {
+        document.addEventListener('securitypolicyviolation', (e) => {
+          const w = window as unknown as { anotarViolacion?: (v: string) => void };
+          w.anotarViolacion?.(`${e.violatedDirective} ← ${e.blockedURI || e.sourceFile}`);
+        });
+      });
+
+      // El servidor de pruebas no manda la cabecera; se la ponemos aquí
+      // encima, tal cual sale de `vercel.json`.
+      await page.route('**/*', async (route) => {
+        const respuesta = await route.fetch();
+        await route.fulfill({
+          response: respuesta,
+          headers: { ...respuesta.headers(), 'content-security-policy': CSP },
+        });
+      });
+
+      await page.goto(ruta, { waitUntil: 'load' });
+      await page.evaluate(() => document.fonts.ready);
+
+      // Recorrerla entera: hay animaciones, mapas y hojas que sólo piden
+      // cosas cuando les toca aparecer.
+      await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }));
+      await page.waitForTimeout(900);
+
+      expect(violaciones, 'la política de contenido bloqueó algo nuestro').toEqual([]);
     });
 
     test('el esqueleto accesible está en su sitio', async ({ page }) => {

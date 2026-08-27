@@ -9,8 +9,10 @@
  * choque contra un formulario muerto.
  */
 
-/** El WhatsApp de Ya Viene, el mismo del botón de la sección. */
-const WHATSAPP = '573004438626';
+/** El WhatsApp de Ya Viene, el mismo del botón de la sección. Se exporta
+    para que `tests/coherencia.test.ts` compruebe que los enlaces escritos
+    a mano en el HTML siguen apuntando a este número y no a uno viejo. */
+export const WHATSAPP = '573004438626';
 
 export class ContactForm {
   private readonly form: HTMLFormElement;

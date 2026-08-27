@@ -36,6 +36,27 @@ etiqueta canónica, las de Open Graph, los datos estructurados, el
 relativas y no se generan los dos ficheros — la build lo avisa por
 consola. El día que haya dominio se rellena esa línea y ya.
 
+En Vercel esa variable ya está puesta en el proyecto, así que lo
+publicado sí lleva URL absoluta, `robots.txt` y `sitemap.xml`. El `.env`
+del repo se queda vacío a propósito: es el valor de trabajo local.
+
+## Cabeceras
+
+`vercel.json` es lo único que hay ahí: las cabeceras de seguridad que
+Vercel manda con cada respuesta. La importante es la política de
+contenido, y es estricta —`default-src 'none'` y todo lo demás a
+`'self'`— porque la landing se lo puede permitir: no hay un solo
+`<script>` ni `<style>` en línea, ni un `data:`, ni una petición a
+terceros. Eso lo comprueba la prueba «no pide nada a servidores ajenos».
+
+Si algún día hace falta traer algo de fuera —una fuente de Google, un
+endpoint de formulario en `VITE_CONTACT_ENDPOINT`—, hay que añadir su
+origen a la directiva que toque o el navegador lo bloqueará en
+producción y en ningún otro sitio. Para que no pase en silencio, la
+prueba «aguanta la política de contenido de producción» carga las cinco
+páginas con la cabecera de `vercel.json` puesta encima y falla si el
+navegador bloquea algo.
+
 ## Cómo está montado
 
 ```

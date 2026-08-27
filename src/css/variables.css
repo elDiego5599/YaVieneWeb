@@ -5,14 +5,31 @@
   --navy: #14274E;
   --navy-light: #1E3A6D;
   --green: #00A859;
-  --green-accessible: #047857;
+  --green-accessible: #047454;
   --green-tint: #E6F7F0;
   --green-glow: rgba(0, 168, 89, 0.25);
 
   --coral: #E86A5E;
+  --coral-accessible: #CE2D1D;
   --coral-light: #FBE7E4;
   --amber: #FFC107;
+  --amber-accessible: #8A6700;
   --amber-tint: #FFF8E1;
+
+  /* Los `-accessible` son los mismos colores de marca, con el mismo tono y
+     la misma saturación, bajados lo justo para que un texto pequeño encima
+     de nuestros cremas llegue al 4.5:1 que pide la norma AA. Nada de esto
+     es teoría: medido con un píxel de la pantalla ya compuesta —fondo,
+     gradientes y capas incluidos, y a lo largo del ciclo del gradiente que
+     respira en el pie—, la cejilla coral iba a 3.00:1 y la ámbar a 1.57:1
+     sobre su propio fondo. La verde ya usaba el suyo y aun así se quedaba
+     en 4.49:1 en el teléfono, donde su cejilla cae sobre el verde pálido
+     del panel en vez de sobre crema: dos puntos más oscura y ya pasa en
+     los dos sitios.
+
+     Los de marca siguen intactos y siguen siendo los que se usan para
+     rellenos, bordes y trazos grandes, donde el contraste de texto no
+     aplica. Estos otros son sólo para letra. */
   --warn: #D97706;
   --arena: #FAF6F0;
   --surface: #FFFFFF;

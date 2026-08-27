@@ -75,9 +75,12 @@ p {
   text-transform: uppercase;
 }
 
-.eyebrow--coral { color: var(--coral); }
+/* Once píxeles en mayúsculas y muy espaciados: para la norma esto es
+   texto pequeño y pide 4.5:1. Van las tres al color accesible de su
+   familia —la verde ya iba, las otras dos no—. */
+.eyebrow--coral { color: var(--coral-accessible); }
 .eyebrow--verde { color: var(--green-accessible); }
-.eyebrow--ambar { color: var(--amber); }
+.eyebrow--ambar { color: var(--amber-accessible); }
 
 /* Texto que sólo alcanza el lector de pantalla: describe lo que la demo
    del teléfono enseña, que es puramente visual. */
