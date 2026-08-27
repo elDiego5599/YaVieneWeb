@@ -46,31 +46,27 @@ const KB = 1024;
  *
  *  Y subió a 88 / 760 / 605 el 27/08/2026 con la banda de logos tras el
  *  hero (Sobusa, Coolitoral, Coochofal, Sodis, Transmecar, Tras Alfa,
- *  Transmetro). Son 7 PNGs a 1–8 KB cada uno —32 px de alto, 2× para
- *  retina— más el CSS del carrusel infinito con degradado en los bordes.
- *  Sin esa banda la portada no tiene prueba social: el claim «ya en
- *  pruebas con Sobusa y sus 6 rutas» quedaba en texto y nadie lo creía.
- *  La alternativa —poner los logos en el hero— lo recargaba y rompía la
- *  escena de los tres teléfonos, que es lo que vende.
+ *  Transmetro). Sin esa banda la portada no tiene prueba social: el claim
+ *  «ya en pruebas con Sobusa y sus 6 rutas» quedaba en texto y nadie lo
+ *  creía. La alternativa —poner los logos en el hero— lo recargaba y
+ *  rompía la escena de los tres teléfonos, que es lo que vende.
  *
- *  El 27/08/2026 por la tarde los logos se recortaron de verdad
- *  (bbox del trazo, no todo el lienzo de 1024) y se invirtieron a
- *  negro sobre transparente: pasaron de 1–2 KB a 6–17 KB cada uno
- *  —el trazo recortado pesa más porque ya no es un cuadrado pequeño—
- *  pero ahora se leen en negro puro sobre blanco, sin cajitas grises.
- *  La banda dejó de ser carrusel y pasó a grilla estática de 2 filas,
- *  como la referencia (Vercel / Notion): más editorial, menos feria.
- *
- *  Horas después se subieron a 80 px de alto (36 px en pantalla, 2,2×)
- *  y se les dejó el color original —sin velo gris ni cajita—: pesan
- *  8–22 KB y la primera visita roza los 652 KB, pero a 28 px no se leía
- *  la letra pequeña de «Sociedad de Transportadores» ni el isotipo de
- *  Tras Alfa. A 36 px se lee sin lupa y la grilla respira. */
+ *  Esa banda pasó por tres versiones el mismo día —carrusel infinito,
+ *  logos en negro puro, grilla en gris al 60 %— y cada una fue subiendo el
+ *  tope hasta 810 / 88 / 655, con los siete PNG pesando entre 8 y 22 KB.
+ *  Ahora vuelven a bajar: los logos son los originales a color y aun así
+ *  los siete juntos ocupan 32 KB, la tercera parte. Lo que los adelgazó no
+ *  fue encogerlos —se ven más grandes que nunca— sino sacarlos del SVG con
+ *  su máscara de alfa, recortarlos por el trazo y guardarlos con paleta de
+ *  96 colores: son logos, no fotos, y una paleta les sienta cuatro veces
+ *  mejor que WebP con pérdida (33 KB contra 70 KB medidos con los mismos
+ *  píxeles). Los topes quedan otra vez en lo que pesa la build de hoy más
+ *  un margen, que es para lo que están. */
 const TOPES = {
-  'todo dist': 810,
+  'todo dist': 760,
   'JavaScript': 65,
-  'CSS': 88,
-  'primera visita': 655,
+  'CSS': 87,
+  'primera visita': 610,
 };
 
 /** Lo que el navegador se baja de verdad al abrir la portada por primera

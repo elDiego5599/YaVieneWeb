@@ -263,3 +263,41 @@ test.describe('el guion del problema', () => {
     ).toEqual([]);
   });
 });
+
+/*
+  La banda de empresas. Es prueba social: si un logo no carga, no se lee o
+  sale en gris, la banda deja de probar nada y encima señala a la empresa
+/*
+  La banda de empresas en /empresas.html. Es prueba social: si un logo no
+  carga, no se lee o sale en gris, la banda deja de probar nada. Se
+  comprueba que los siete logos estén en color real y cargados.
+*/
+test.describe('la banda de empresas', () => {
+  test('los siete logos se ven en color y cargan correctamente en /empresas.html', async ({ page }) => {
+    await page.goto('/empresas.html', { waitUntil: 'load' });
+    await page.evaluate(() => document.fonts.ready);
+
+    await page.locator('.empresa-marcas').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(700);
+
+    const logos = await page.evaluate(() =>
+      Array.from(document.querySelectorAll<HTMLElement>('.empresa-marcas-grupo:not([aria-hidden]) .empresa-marcas-logo')).map((logo) => {
+        const img = logo as HTMLImageElement;
+        const caja = img.getBoundingClientRect();
+        return {
+          empresa: img.alt,
+          pintado: img.complete && img.naturalWidth > 0,
+          filtro: getComputedStyle(img).filter,
+          opacidad: Number(getComputedStyle(img).opacity),
+          alto: Math.round(caja.height),
+        };
+      })
+    );
+
+    expect(logos.length, 'las siete empresas están en el carrusel').toBe(7);
+    expect(logos.filter((p) => !p.pintado).map((p) => p.empresa), 'logos que no cargaron').toEqual([]);
+    expect(logos.filter((p) => p.filtro !== 'none').map((p) => p.empresa), 'logos con filtro encima').toEqual([]);
+    expect(logos.filter((p) => p.opacidad < 1).map((p) => p.empresa), 'logos a media tinta').toEqual([]);
+    expect(logos.filter((p) => p.alto < 18).map((p) => p.empresa), 'logos demasiado pequeños para leerse').toEqual([]);
+  });
+});

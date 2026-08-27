@@ -156,9 +156,22 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    // El mosaico de Barranquilla pesa ~160 KB. Si se inline como data URI
-    // deja de cachearse aparte y engorda el HTML en cada visita.
-    assetsInlineLimit: 4096,
+    /*
+      Nada en línea. El mosaico de Barranquilla pesa ~160 KB y como data URI
+      dejaría de cachearse aparte, pero el motivo de bajar el límite a cero
+      es otro: la CSP de vercel.json dice `img-src 'self'` y un data URI no
+      es 'self'. Con el límite por defecto de 4096 el empaquetador metía en
+      línea los dos logos más ligeros de la banda de empresas —Transmetro y
+      Tras Alfa— y en producción salían bloqueados y no se veían. La prueba
+      «aguanta la política de contenido de producción» de e2e/paginas.spec.ts
+      lo caza, y así se cazó.
+
+      Se prefiere esto a añadir `data:` a la política: la landing no necesita
+      ni un solo data URI, y abrir la puerta por dos ficheros de 3 KB es
+      cambiar seguridad por nada. De paso el HTML adelgaza, que base64 abulta
+      un tercio más que el binario.
+    */
+    assetsInlineLimit: 0,
     target: 'es2022',
     rollupOptions: {
       // Tres páginas, no una: los enlaces de «Términos» y «Privacidad» del
