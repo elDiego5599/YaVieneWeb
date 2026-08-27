@@ -1,33 +1,29 @@
-/* ── MARCAS: CARRUSEL INFINITO DE LOGOS ───────────────────────
-   Va justo después del hero, antes del problema. Es una banda
-   editorial, no un panel flotante: a sangre, sin radio, con
-   dos filetes sutiles que la separan del cálido del hero y del
-   blanco del problema. Fondo blanco para que los logos, todos
-   en escala de gris, respiren.
+/* ── MARCAS: GRILLA DE CONFIANZA ────────────────────────────
+   Va justo después del hero, antes del problema. Banda a sangre
+   (full-bleed), blanca, con un filete sutil arriba que la separa
+   del cálido del hero. Fondo blanco puro para que los 7 logos —
+   ya sin fondo, en negro recortado — respiren sin cajitas.
 
-   La pista corre sola en bucle infinito; al pasar el puntero
-   se detiene. Respeta `prefers-reduced-motion` y no atrapa
-   el foco. Los bordes laterales se funden a transparente con
-   `mask-image` para que la entrada y salida no sea un corte
-   seco, como en la referencia (Netflix / Etsy / Notion …).
+   Referencia: grilla densa de 2 filas (Vercel / Notion / Ramp)
+   centrada, con aire generoso y sin animación: lo que vende es
+   el peso editorial, no el movimiento. En móvil las 7 se
+   reordenan en 3-2-2 o 2-2-3 según el ancho, siempre centradas.
    ─────────────────────────────────────────────────────────────── */
 
 .marcas {
   position: relative;
-  /* Banda a sangre: rompe el ritmo de paneles con gutter */
   margin: 0;
-  padding: 22px 0 24px;
+  padding: 32px 0 36px;
   background: var(--surface);
   border-top: 1px solid rgba(11, 22, 40, 0.06);
-  border-bottom: 1px solid rgba(11, 22, 40, 0.06);
   overflow: clip;
   isolation: isolate;
 }
 
 .marcas-inner {
-  max-width: var(--content-wide);
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 0 var(--gutter);
+  padding: 0 clamp(20px, 4vw, 48px);
 }
 
 .marcas-label {
@@ -36,49 +32,22 @@
   font-family: var(--font-family);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin: 0 0 18px;
-  /* Cejilla editorial: no grita, orienta */
+  margin: 0 0 28px;
 }
 
-.marcas-track-wrap {
-  position: relative;
-  overflow: hidden;
-  /* Degradado transparente en los bordes — el truco de la referencia.
-     88px es ~el ancho de un logo + gap: lo que se ve asomando antes de
-     fundirse. En móvil es menos. */
-  mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    black 72px,
-    black calc(100% - 72px),
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    black 72px,
-    black calc(100% - 72px),
-    transparent 100%
-  );
-}
-
-.marcas-track {
+/* Grilla: flex centrado que envuelve en 2 filas en desktop,
+   3 filas en tablet y 3-4 en móvil. El gap es editorial:
+   28px vertical para que las dos filas se lean como bloque,
+   52px horizontal para que ningún logo toque a otro. */
+.marcas-grid {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 48px;
-  width: max-content;
-  /* Bucle infinito: la pista mide el doble (dos sets idénticos), así
-     que mover -50% es un ciclo completo sin salto. 32s es pausa-premium:
-     se lee sin marear, pero se nota que vive. */
-  animation: marcas-scroll 32s linear infinite;
-  will-change: transform;
-}
-
-.marcas-track:hover {
-  animation-play-state: paused;
+  gap: 28px 52px;
 }
 
 .marcas-item {
@@ -86,149 +55,64 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
-  /* El ancho lo da el logo; el item solo centra y da zona de respiro
-     si el logo es estrecho. */
+  height: 36px;
 }
 
 .marcas-logo {
   display: block;
   height: 100%;
   width: auto;
-  max-width: 160px;
+  max-width: 200px;
   object-fit: contain;
-  /* Identidad contenida: gris y tenue hasta el hover. Los 7 logos
-     venían en negro puro sobre blanco; en gris no compiten con el
-     titular del hero ni con el mapa. */
-  filter: grayscale(1) contrast(0.9) brightness(1.05);
-  opacity: 0.62;
-  transition:
-    filter 0.22s var(--ease-out-cubic),
-    opacity 0.22s var(--ease-out-cubic),
-    transform 0.22s var(--ease-out-cubic);
-}
-
-/* SODIS y Coochofal son apaisados y piden un poco más de aire para no
-   verse minúsculos al lado de los cuadrados (Sobusa, Tras Alfa). */
-.marcas-item--wide .marcas-logo {
-  max-width: 180px;
-}
-
-.marcas-item--transmetro .marcas-logo {
-  max-width: 148px;
-}
-
-.marcas-track:hover .marcas-logo {
-  opacity: 0.72;
+  /* Color original, sin velo gris: cada marca queda como viene.
+     Sin fondo, sin cajita, solo la tinta sobre blanco. */
+  filter: none;
+  opacity: 1;
+  transition: transform 0.18s var(--ease-out-cubic);
 }
 
 .marcas-item:hover .marcas-logo {
-  filter: grayscale(0) contrast(1) brightness(1);
-  opacity: 1;
   transform: translateY(-1px);
 }
 
-@keyframes marcas-scroll {
-  from {
-    transform: translateX(0);
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .marcas-grid {
+    gap: 24px 42px;
   }
-  to {
-    transform: translateX(-50%);
+
+  .marcas-item {
+    height: 32px;
   }
 }
 
-/* ── Respeto al movimiento ─────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .marcas-track {
-    animation: none;
-    width: 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    gap: 36px;
-    padding-bottom: 2px;
-  }
-
-  .marcas-track::-webkit-scrollbar {
-    display: none;
-  }
-
-  .marcas-track-wrap {
-    mask-image: none;
-    -webkit-mask-image: none;
-  }
-
-  /* Fallback del degradado para reduce-motion: pseudo-elementos con
-     fundido a blanco, que al ser scroll manual sí se ve el borde. */
-  .marcas-track-wrap::before,
-  .marcas-track-wrap::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 36px;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .marcas-track-wrap::before {
-    left: 0;
-    background: linear-gradient(to right, var(--surface), transparent);
-  }
-
-  .marcas-track-wrap::after {
-    right: 0;
-    background: linear-gradient(to left, var(--surface), transparent);
-  }
-}
-
-/* ── Responsive ──────────────────────────────────────────────────── */
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .marcas {
-    padding: 18px 0 20px;
+    padding: 26px 0 30px;
   }
 
   .marcas-label {
     font-size: 10px;
-    letter-spacing: 0.12em;
-    margin-bottom: 14px;
+    letter-spacing: 0.13em;
+    margin-bottom: 22px;
   }
 
-  .marcas-track-wrap {
-    mask-image: linear-gradient(
-      to right,
-      transparent 0,
-      black 36px,
-      black calc(100% - 36px),
-      transparent 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0,
-      black 36px,
-      black calc(100% - 36px),
-      transparent 100%
-    );
-  }
-
-  .marcas-track {
-    gap: 36px;
-    animation-duration: 26s;
+  .marcas-grid {
+    gap: 20px 32px;
   }
 
   .marcas-item {
-    height: 26px;
+    height: 28px;
   }
 
-  .marcas-item--wide .marcas-logo {
-    max-width: 148px;
+  .marcas-logo {
+    max-width: 160px;
   }
 }
 
-@media (max-width: 480px) {
-  .marcas-track {
-    gap: 28px;
-    animation-duration: 22s;
+@media (max-width: 420px) {
+  .marcas-grid {
+    gap: 18px 24px;
   }
 
   .marcas-item {
@@ -236,10 +120,8 @@
   }
 }
 
-/* ── Focus visible para accesibilidad de teclado si algún logo fuera link
-   (hoy no lo son, pero si se enlazan van listos) ─────────────────────── */
-.marcas-item:focus-within {
-  outline: 2px solid var(--green);
-  outline-offset: 4px;
-  border-radius: 4px;
+/* Compat: si quedó algún .marcas-track-wrap viejo en caché */
+.marcas-track-wrap,
+.marcas-track {
+  display: contents;
 }
