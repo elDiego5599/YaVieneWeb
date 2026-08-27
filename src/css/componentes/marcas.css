@@ -1,53 +1,45 @@
 /* ── MARCAS: GRILLA DE CONFIANZA ────────────────────────────
-   Va justo después del hero, antes del problema. Banda a sangre
-   (full-bleed), blanca, con un filete sutil arriba que la separa
-   del cálido del hero. Fondo blanco puro para que los 7 logos —
-   ya sin fondo, en negro recortado — respiren sin cajitas.
-
-   Referencia: grilla densa de 2 filas (Vercel / Notion / Ramp)
-   centrada, con aire generoso y sin animación: lo que vende es
-   el peso editorial, no el movimiento. En móvil las 7 se
-   reordenan en 3-2-2 o 2-2-3 según el ancho, siempre centradas.
+   Banda a sangre blanca con filete slate-100 arriba, como la
+   referencia SaaS (Linear/Vercel). Logos en una sola fila
+   centrada (flex wrap), con altura uniforme y sin filtros que
+   quemen los bordes. Grayscale + opacity para el velo elegante.
    ─────────────────────────────────────────────────────────────── */
 
 .marcas {
   position: relative;
   margin: 0;
-  padding: 32px 0 36px;
-  background: var(--surface);
-  border-top: 1px solid rgba(11, 22, 40, 0.06);
+  padding: 48px 0; /* py-12 */
+  background: rgba(255, 255, 255, 0.5); /* bg-white/50 */
+  border-top: 1px solid #f1f5f9; /* border-slate-100 */
   overflow: clip;
   isolation: isolate;
 }
 
 .marcas-inner {
-  max-width: 1120px;
+  max-width: 1152px; /* max-w-6xl */
   margin: 0 auto;
-  padding: 0 clamp(20px, 4vw, 48px);
+  padding: 0 16px; /* px-4 */
 }
 
 .marcas-label {
   display: block;
   text-align: center;
   font-family: var(--font-family);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  font-size: 12px; /* text-xs */
+  font-weight: 600; /* font-semibold */
+  letter-spacing: 0.05em; /* tracking-wider */
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin: 0 0 28px;
+  color: #94a3b8; /* text-slate-400 */
+  margin: 0 0 32px; /* mb-8 */
 }
 
-/* Grilla: flex centrado que envuelve en 2 filas en desktop,
-   3 filas en tablet y 3-4 en móvil. El gap es editorial:
-   28px vertical para que las dos filas se lean como bloque,
-   52px horizontal para que ningún logo toque a otro. */
+/* Contenedor: flex wrap centrado, gap como Tailwind gap-x-12 gap-y-6 */
 .marcas-grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   align-items: center;
-  gap: 28px 52px;
+  justify-content: center;
+  gap: 24px 48px; /* gap-y-6 (24px) gap-x-12 (48px) */
 }
 
 .marcas-item {
@@ -55,7 +47,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
+  height: 28px; /* h-7 */
+}
+
+.marcas-item--coolitoral {
+  height: 24px; /* h-6 para compensar trazo grueso */
+}
+
+.marcas-item--trasalfa {
+  height: 32px; /* h-8 para que no quede huérfano */
 }
 
 .marcas-logo {
@@ -64,64 +64,52 @@
   width: auto;
   max-width: 200px;
   object-fit: contain;
-  /* Color original, sin velo gris: cada marca queda como viene.
-     Sin fondo, sin cajita, solo la tinta sobre blanco. */
-  filter: none;
-  opacity: 1;
-  transition: transform 0.18s var(--ease-out-cubic);
+  /* Monocromático elegante sin quemar: grayscale puro + velo */
+  filter: grayscale(1);
+  opacity: 0.6;
+  transition: opacity 0.3s var(--ease-out-cubic), filter 0.3s var(--ease-out-cubic);
 }
 
 .marcas-item:hover .marcas-logo {
-  transform: translateY(-1px);
+  opacity: 1;
+  /* Se mantiene grayscale: el hover solo quita el velo, no añade color.
+     Si algún día se quiere color al hover, sería filter: grayscale(0) */
 }
 
 /* ── Responsive ─────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .marcas-grid {
-    gap: 24px 42px;
-  }
-
-  .marcas-item {
-    height: 32px;
+    gap: 20px 36px;
   }
 }
 
 @media (max-width: 640px) {
   .marcas {
-    padding: 26px 0 30px;
+    padding: 36px 0;
   }
 
   .marcas-label {
-    font-size: 10px;
-    letter-spacing: 0.13em;
-    margin-bottom: 22px;
+    font-size: 11px;
+    margin-bottom: 24px;
   }
 
   .marcas-grid {
-    gap: 20px 32px;
+    gap: 20px 28px;
   }
 
   .marcas-item {
+    height: 24px;
+  }
+
+  .marcas-item--coolitoral {
+    height: 20px;
+  }
+
+  .marcas-item--trasalfa {
     height: 28px;
   }
 
   .marcas-logo {
     max-width: 160px;
   }
-}
-
-@media (max-width: 420px) {
-  .marcas-grid {
-    gap: 18px 24px;
-  }
-
-  .marcas-item {
-    height: 24px;
-  }
-}
-
-/* Compat: si quedó algún .marcas-track-wrap viejo en caché */
-.marcas-track-wrap,
-.marcas-track {
-  display: contents;
 }
