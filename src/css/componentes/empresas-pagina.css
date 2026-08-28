@@ -433,20 +433,37 @@
   max-width: 100%;
   width: 100%;
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    black 7%,
-    black 93%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    black 7%,
-    black 93%,
-    transparent 100%
-  );
+}
+
+/*
+  El apagón de los bordes iba con `mask-image`. El problema es que una
+  máscara sobre contenido que se anima obliga a bastantes móviles —sobre
+  todo gama media de Android— a recomponerla en cada cuadro en vez de
+  dejar la animación correr sola en el compositor, y ahí es donde el
+  carrusel se ponía lentísimo: no cambiaba la duración, cambiaban los
+  cuadros por segundo. Dos franjas quietas del mismo `--surface` del
+  fondo, superpuestas al filo, hacen el mismo apagón sin tocar el
+  elemento que se mueve.
+*/
+.empresa-marcas-carrusel::before,
+.empresa-marcas-carrusel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(28px, 8vw, 56px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.empresa-marcas-carrusel::before {
+  left: 0;
+  background: linear-gradient(to right, var(--surface), transparent);
+}
+
+.empresa-marcas-carrusel::after {
+  right: 0;
+  background: linear-gradient(to left, var(--surface), transparent);
 }
 
 .empresa-marcas-track {
@@ -508,7 +525,9 @@
   }
   .empresa-marcas-carrusel {
     overflow-x: auto;
-    -webkit-mask-image: none;
-    mask-image: none;
+  }
+  .empresa-marcas-carrusel::before,
+  .empresa-marcas-carrusel::after {
+    display: none;
   }
 }
