@@ -456,14 +456,20 @@
   pointer-events: none;
 }
 
+/*
+  El desvanecido termina en `--surface-nada`, que es el mismo blanco con
+  alfa 0, y no en `transparent`. `transparent` es negro transparente: un
+  degradado de blanco hacia ahí pasa por grises translúcidos y deja una
+  sombra sucia justo en el filo, encima de los logos que entran y salen.
+*/
 .empresa-marcas-carrusel::before {
   left: 0;
-  background: linear-gradient(to right, var(--surface), transparent);
+  background: linear-gradient(to right, var(--surface), var(--surface-nada));
 }
 
 .empresa-marcas-carrusel::after {
   right: 0;
-  background: linear-gradient(to left, var(--surface), transparent);
+  background: linear-gradient(to left, var(--surface), var(--surface-nada));
 }
 
 .empresa-marcas-track {

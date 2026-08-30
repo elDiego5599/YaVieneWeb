@@ -180,51 +180,60 @@
           <div class="empresa-marcas">
             <span class="tracked-eyebrow eyebrow--verde empresa-marcas-titulo">Empresas que ya conectan su flota</span>
             <div class="empresa-marcas-carrusel" aria-label="Empresas de transporte que ya conectan su flota">
+              <!--
+                Los logos van en `eager` a propósito. Con `lazy` el navegador
+                no carga lo que está fuera de la pantalla, y aquí casi todo lo
+                está: la cinta mide el doble de ancho que el móvil. El segundo
+                grupo se quedaba sin cargar de Coolitoral en adelante, así que
+                la cinta giraba y a mitad de vuelta se veía el hueco. Son
+                siete PNG pequeños y el segundo grupo los repite desde caché:
+                cargarlos de una no cuesta ni una petición más.
+              -->
               <div class="empresa-marcas-track">
                 <div class="empresa-marcas-grupo">
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--sobusa" src="./src/assets/logos-empresas/logosobusa.png" alt="Sobusa S.A." width="350" height="75" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--sobusa" src="./src/assets/logos-empresas/logosobusa.png" alt="Sobusa S.A." width="350" height="75" loading="eager" decoding="async" />
                   </div>
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--sodis" src="./src/assets/logos-empresas/logosodis.png" alt="Alianza Sodis" width="285" height="81" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--sodis" src="./src/assets/logos-empresas/logosodis.png" alt="Alianza Sodis" width="285" height="81" loading="eager" decoding="async" />
                   </div>
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--coolitoral" src="./src/assets/logos-empresas/logocoolitoral.png" alt="Coolitoral" width="289" height="59" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--coolitoral" src="./src/assets/logos-empresas/logocoolitoral.png" alt="Coolitoral" width="289" height="59" loading="eager" decoding="async" />
                   </div>
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--transmetro" src="./src/assets/logos-empresas/transmetro.png" alt="Transmetro" width="169" height="97" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--transmetro" src="./src/assets/logos-empresas/transmetro.png" alt="Transmetro" width="169" height="97" loading="eager" decoding="async" />
                   </div>
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--coochofal" src="./src/assets/logos-empresas/logocoochofal.png" alt="Coochofal" width="342" height="53" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--coochofal" src="./src/assets/logos-empresas/logocoochofal.png" alt="Coochofal" width="342" height="53" loading="eager" decoding="async" />
                   </div>
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--transmecar" src="./src/assets/logos-empresas/logotransmecar.png" alt="Transmecar S.A.S" width="289" height="68" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--transmecar" src="./src/assets/logos-empresas/logotransmecar.png" alt="Transmecar S.A.S" width="289" height="68" loading="eager" decoding="async" />
                   </div>
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--trasalfa" src="./src/assets/logos-empresas/logotrasalfa.png" alt="Trasalfa" width="95" height="97" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--trasalfa" src="./src/assets/logos-empresas/logotrasalfa.png" alt="Trasalfa" width="95" height="97" loading="eager" decoding="async" />
                   </div>
                 </div>
                 <div class="empresa-marcas-grupo" aria-hidden="true">
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--sobusa" src="./src/assets/logos-empresas/logosobusa.png" alt="" width="350" height="75" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--sobusa" src="./src/assets/logos-empresas/logosobusa.png" alt="" width="350" height="75" loading="eager" decoding="async" />
                   </div>
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--sodis" src="./src/assets/logos-empresas/logosodis.png" alt="" width="285" height="81" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--sodis" src="./src/assets/logos-empresas/logosodis.png" alt="" width="285" height="81" loading="eager" decoding="async" />
                   </div>
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--coolitoral" src="./src/assets/logos-empresas/logocoolitoral.png" alt="" width="289" height="59" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--coolitoral" src="./src/assets/logos-empresas/logocoolitoral.png" alt="" width="289" height="59" loading="eager" decoding="async" />
                   </div>
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--transmetro" src="./src/assets/logos-empresas/transmetro.png" alt="" width="169" height="97" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--transmetro" src="./src/assets/logos-empresas/transmetro.png" alt="" width="169" height="97" loading="eager" decoding="async" />
                   </div>
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--coochofal" src="./src/assets/logos-empresas/logocoochofal.png" alt="" width="342" height="53" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--coochofal" src="./src/assets/logos-empresas/logocoochofal.png" alt="" width="342" height="53" loading="eager" decoding="async" />
                   </div>
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--transmecar" src="./src/assets/logos-empresas/logotransmecar.png" alt="" width="289" height="68" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--transmecar" src="./src/assets/logos-empresas/logotransmecar.png" alt="" width="289" height="68" loading="eager" decoding="async" />
                   </div>
                   <div class="empresa-marcas-item">
-                    <img class="empresa-marcas-logo empresa-marcas-logo--trasalfa" src="./src/assets/logos-empresas/logotrasalfa.png" alt="" width="95" height="97" loading="lazy" decoding="async" />
+                    <img class="empresa-marcas-logo empresa-marcas-logo--trasalfa" src="./src/assets/logos-empresas/logotrasalfa.png" alt="" width="95" height="97" loading="eager" decoding="async" />
                   </div>
                 </div>
               </div>
