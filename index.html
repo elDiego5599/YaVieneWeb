@@ -481,8 +481,10 @@
                 <!-- El indicador de inicio de iOS. -->
                 <div class="phone-gesture"></div>
 
-                <!-- Píldora de búsqueda + chip de ubicación. -->
-                <div class="phone-topbar">
+                <!-- Píldora de búsqueda + chip de ubicación. El grupo entero
+                     se aparta mientras el selector está abierto, como hace
+                     CabeceraFlotante en la app. -->
+                <div class="phone-topbar phone-topbar--vivo" data-el="topbar">
                   <div class="app-pill" data-el="pill">
                     <span class="app-pill-btn">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"

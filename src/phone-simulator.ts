@@ -519,6 +519,9 @@ export class PhoneSimulator {
     const enSelector = PhoneSimulator.VISTAS_SELECTOR.has(vista);
     this.sheetEl.classList.toggle('es-selector', enSelector);
     this.el('scrim')?.classList.toggle('is-on', enSelector);
+    // Y con el selector arriba se aparta también el grupo de la cabecera,
+    // que es el gesto en espejo de la hoja: cabecera_flotante.dart.
+    this.el('topbar')?.classList.toggle('esta-apartada', enSelector);
     this.ajustarAlto();
   }
 

@@ -232,6 +232,28 @@
 .phone-screen.is-cerrando .phone-topbar {
   opacity: 0;
   transform: translateY(calc(-10 * var(--u)));
+  /* La despedida del ciclo sí es lenta: es una sesión que se suelta, no
+     un paso de la app. */
+  transition-duration: 0.6s;
+}
+
+/*
+  Y el otro momento en que el grupo de arriba se aparta: mientras el
+  selector ocupa la pantalla —cabecera_flotante.dart, AnimatedSlide a
+  (0, -0,4) y AnimatedOpacity, los dos en AppMotion.pausado—.
+
+  Antes se quedaba debajo del velo, asomando por los bordes como una
+  segunda cabecera, con el blanco de la píldora ensuciado a gris azulado.
+  No tiene nada que hacer ahí: mientras se elige ruta, la ruta se elige en
+  la tarjeta.
+*/
+.phone-topbar--vivo {
+  transition-duration: 0.28s;
+}
+
+.phone-topbar.esta-apartada {
+  opacity: 0;
+  transform: translateY(-40%);
 }
 
 /* La hoja no se limita a apagarse: se va por abajo, que es como se cierra
