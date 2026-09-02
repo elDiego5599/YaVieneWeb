@@ -379,7 +379,7 @@ export class PasoDemo {
   private setAviso(puesto: boolean): void {
     this.avisoPuesto = puesto;
     this.el('alert-btn')?.classList.toggle('active', puesto);
-    this.texto('alert-label', puesto ? 'AVISO ACTIVADO' : 'AVISARME CUANDO ESTÉ CERCA');
+    this.texto('alert-label', puesto ? 'Aviso activado' : 'Avisarme cuando esté cerca');
     this.icono('aviso', puesto ? 'visto' : 'campana');
   }
 }

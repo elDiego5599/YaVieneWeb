@@ -3,16 +3,18 @@
 /*
   Dos piezas independientes:
 
-  1. La carcasa (.phone-shell) — un Pixel: bisel parejo por los cuatro
-     lados, cámara en agujero centrada, marco de aluminio azul lavanda con
-     los cuatro cantos planos y radios concéntricos.
+  1. La carcasa (.phone-shell) — un iPhone: bisel finísimo y parejo, isla
+     dinámica en vez de agujero, cantos de titanio cepillado con las
+     esquinas muy redondeadas y los botones repartidos como en el aparato
+     (acción y volumen a la izquierda, encendido a la derecha).
 
   2. La pantalla — la app de verdad, redibujada en HTML. Cada medida sale
      del código Flutter (search_pill_bar.dart, location_status_chip.dart,
      route_selector_sheet.dart, eta_bottom_sheet.dart) y se expresa en
-     `--u`, que vale un píxel lógico de un teléfono de 412 pt de ancho. Así
-     la interfaz se reduce entera y en proporción, en vez de que cada
-     tamaño de letra se escoja a ojo.
+     `--u`, que vale un píxel lógico de un iPhone de 402 pt de ancho —el
+     mismo lienzo en el que se revelan los goldens de la app. Así la
+     interfaz se reduce entera y en proporción, en vez de que cada tamaño
+     de letra se escoja a ojo.
 
   El mockup es una vitrina: se reproduce solo y nadie lo toca. Por eso no
   hay estados :hover ni cursores de clic aquí dentro — sugerirían una
@@ -26,20 +28,23 @@
   /* El bisel son dos piezas, como en el aparato real: el riel de metal por
      fuera y el marco negro de la pantalla por dentro. Sumados valen lo de
      siempre, así que `--u` —y con él la app entera— no se mueve. */
-  --riel: calc(var(--ancho) * 0.016);
-  --negro: calc(var(--ancho) * 0.013);
+  --riel: calc(var(--ancho) * 0.010);
+  --negro: calc(var(--ancho) * 0.008);
   --bisel: calc(var(--riel) + var(--negro));
-  --radio: calc(var(--ancho) * 0.135);
+  /* La esquina del iPhone no es un radio, es una curva continua, y de
+     todos los valores de un `border-radius` normal el que más se le
+     parece es este: 62 pt de radio de pantalla sobre 402 de ancho. */
+  --radio: calc(var(--ancho) * 0.158);
 
   position: relative;
   width: var(--ancho);
-  /* Pixel 9: 152.8 × 72 mm. */
-  aspect-ratio: 72 / 152.8;
+  /* iPhone 17: 149.6 × 71.5 mm. */
+  aspect-ratio: 71.5 / 149.6;
   padding: var(--bisel);
   border-radius: var(--radio);
 
   /*
-    El riel: titanio pulido. No hay ningún tono nuevo aquí dentro; todas
+    El riel: titanio cepillado. No hay ningún tono nuevo aquí dentro; todas
     las paradas son `color-mix` de grises que ya existen —el slate #64748B
     y el #94A3B8 de los textos apagados, más el #E5E7EB del divisor— con
     negro o con blanco, que es lo que hace el volumen del metal.
@@ -83,13 +88,15 @@
   z-index: -1;
 }
 
-/* Botones: el mismo degradado del marco, sobresaliendo apenas medio píxel,
-   como los del Pixel — se notan de perfil, no de frente. */
+/*
+  Botones. En el iPhone no están todos del mismo lado: el de encendido va
+  a la derecha, y a la izquierda van el de acción —corto, arriba de todo—
+  y las dos teclas de volumen, separadas. Sobresalen apenas medio píxel:
+  se notan de perfil, no de frente.
+*/
 .phone-key {
   position: absolute;
-  right: calc(var(--bisel) * -0.34);
-  width: calc(var(--bisel) * 0.34);
-  border-radius: 0 2px 2px 0;
+  width: calc(var(--bisel) * 0.5);
   background: linear-gradient(
     180deg,
     var(--surface) 0%,
@@ -97,25 +104,52 @@
     color-mix(in srgb, var(--app-text-disabled) 92%, #FFF) 55%,
     color-mix(in srgb, var(--app-text-secondary) 52%, #000) 100%
   );
-  box-shadow: 1px 0 2px rgba(11, 22, 40, 0.45);
 }
 
+/* Derecha: encendido. */
 .phone-key--power {
-  top: 22%;
-  height: 7.5%;
+  right: calc(var(--bisel) * -0.5);
+  border-radius: 0 2px 2px 0;
+  box-shadow: 1px 0 2px rgba(11, 22, 40, 0.45);
+  top: 27%;
+  height: 9.5%;
 }
 
-.phone-key--vol {
-  top: 32%;
-  height: 12%;
+/* Izquierda: acción, y las dos de volumen. */
+.phone-key--accion,
+.phone-key--vol-sube,
+.phone-key--vol-baja {
+  left: calc(var(--bisel) * -0.5);
+  border-radius: 2px 0 0 2px;
+  box-shadow: -1px 0 2px rgba(11, 22, 40, 0.45);
+}
+
+.phone-key--accion {
+  top: 18.5%;
+  height: 4.4%;
+}
+
+.phone-key--vol-sube {
+  top: 25.5%;
+  height: 6.4%;
+}
+
+.phone-key--vol-baja {
+  top: 33.4%;
+  height: 6.4%;
 }
 
 /* ── Pantalla ──────────────────────────────────────────────────────── */
 
 .phone-screen {
-  /* Un píxel lógico de un teléfono de 412 pt. Toda la interfaz de la app
-     se mide con esto. */
-  --u: 0.24272cqw;
+  /* Un píxel lógico de un iPhone de 402 pt. Toda la interfaz de la app se
+     mide con esto. */
+  --u: 0.24876cqw;
+  /* Lo que la app tiene prohibido por arriba: reloj e isla. El
+     `SafeArea` de iOS en este aparato mide 59 pt, y de él cuelgan tanto la
+     barra de estado como el sitio donde empieza a dibujar la app —si se
+     tocara uno sin el otro, la píldora se metería debajo de la isla. */
+  --alto-estado: calc(59 * var(--u));
 
   position: relative;
   width: 100%;
@@ -168,118 +202,149 @@
   }
 }
 
-/* ── La cámara en agujero ──────────────────────────────────────────
+/* ── La isla dinámica ──────────────────────────────────────────────
 
-   El Pixel no lleva isla, lleva un agujero perforado en el panel, y de
-   cerca ese agujero tiene tres cosas: el corte negro del panel, el barril
-   de la lente hundido dentro y un destello en el cristal. Antes era un
-   círculo plano de un solo color y por eso parecía una pegatina.
-
-   Se arma con tres capas sobre el mismo elemento: el corte es el fondo del
-   propio `.phone-lens`, `::before` es el barril y el iris, y `::after` es
-   el reflejo. Todo cuelga de `--lente`, para que encoja con el aparato.
+   Una pastilla negra de 126 × 37 pt a 11 del borde. No es un rectángulo
+   plano: dentro se ven las dos cosas que la ocupan de verdad —la cámara,
+   con su barril y su destello, a la derecha, y el sensor a la izquierda—
+   y encima el filo de vidrio que la separa del panel. Sin eso es una
+   mancha, y a este tamaño se nota.
    ────────────────────────────────────────────────────────────────────── */
-.phone-lens {
-  /* El agujero del Pixel mide ~3,7 mm en un aparato de 72 mm: un 5 % del
-     ancho, que en pantalla de 412 pt son 19 puntos. Y queda centrado en la
-     barra de estado, que mide 40. */
-  --lente: calc(19 * var(--u));
+.phone-island {
+  --isla-alto: calc(37 * var(--u));
 
   position: absolute;
-  top: calc(10.5 * var(--u));
+  top: calc(11 * var(--u));
   left: 50%;
   transform: translateX(-50%);
-  width: var(--lente);
-  height: var(--lente);
-  border-radius: 50%;
-  /* El corte del panel: negro absoluto, que es lo que se ve del hueco. */
+  width: calc(126 * var(--u));
+  height: var(--isla-alto);
+  border-radius: 999px;
   background: #000;
-  /* El halo de píxeles apagados alrededor del corte, y el filo de vidrio. */
+  /* El filo de vidrio, y el halo de píxeles apagados que la rodea. */
   box-shadow:
-    0 0 0 calc(var(--lente) * 0.055) rgba(0, 0, 0, 0.55),
-    0 0 calc(var(--lente) * 0.3) rgba(0, 0, 0, 0.45),
-    inset 0 0 0 0.5px rgba(229, 231, 235, 0.28);
+    0 0 calc(var(--isla-alto) * 0.28) rgba(0, 0, 0, 0.45),
+    inset 0 0 0 0.5px rgba(229, 231, 235, 0.16);
   z-index: 40;
   pointer-events: none;
 }
 
-/* El barril: un cono oscuro con el iris al fondo. El gris del marco es el
-   que se cuela en el vidrio, no un color de otro sitio. */
-.phone-lens::before {
+/* La cámara: barril oscuro con el iris al fondo, hundida a la derecha. El
+   gris del marco es el que se cuela en el vidrio, no un color de otro
+   sitio. */
+.phone-island::before {
   content: '';
   position: absolute;
-  inset: 13%;
+  top: 50%;
+  right: calc(var(--isla-alto) * 0.30);
+  width: calc(var(--isla-alto) * 0.42);
+  height: calc(var(--isla-alto) * 0.42);
+  transform: translateY(-50%);
   border-radius: 50%;
   background:
-    radial-gradient(circle at 50% 50%, rgba(100, 116, 139, 0.85) 0%, rgba(100, 116, 139, 0) 58%),
-    radial-gradient(circle at 38% 30%, #2B3444 0%, #0B0E14 55%, #000 100%);
-  box-shadow: inset 0 0 calc(var(--lente) * 0.14) rgba(0, 0, 0, 0.9);
+    radial-gradient(circle at 50% 50%, rgba(100, 116, 139, 0.8) 0%, rgba(100, 116, 139, 0) 60%),
+    radial-gradient(circle at 36% 28%, #2B3444 0%, #0B0E14 55%, #000 100%);
+  box-shadow:
+    inset 0 0 calc(var(--isla-alto) * 0.08) rgba(0, 0, 0, 0.9),
+    inset 0.5px 0.5px 0 rgba(255, 255, 255, 0.22);
 }
 
-/* El destello: pequeño, arriba a la izquierda y desenfocado. Un punto
-   blanco nítido se leería como un defecto, no como un reflejo. */
-.phone-lens::after {
+/* El sensor de proximidad y luz: una mancha apenas más clara que el
+   negro, a la izquierda. Se intuye antes de verse, que es justo lo que
+   pasa en el aparato. */
+.phone-island::after {
   content: '';
   position: absolute;
-  top: 17%;
-  left: 20%;
-  width: 32%;
-  height: 26%;
-  border-radius: 50%;
-  background: linear-gradient(140deg, rgba(255, 255, 255, 0.85), rgba(229, 231, 235, 0.1));
-  filter: blur(0.4px);
+  top: 50%;
+  left: calc(var(--isla-alto) * 0.44);
+  width: calc(var(--isla-alto) * 0.30);
+  height: calc(var(--isla-alto) * 0.18);
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: rgba(43, 52, 68, 0.55);
 }
 
-/* Barra de estado de Android: la app dibuja debajo de ella (SafeArea). */
+/*
+  Barra de estado de iOS: la app dibuja debajo de ella (SafeArea).
+
+  El reloj no va pegado al canto como en Android: va centrado en la mitad
+  izquierda que le deja la isla, y los glifos centrados en la derecha. Por
+  eso el relleno lateral es tan generoso —son los 30 pt de iOS— y las dos
+  mitades se reparten el ancho a partes iguales.
+*/
 .phone-status {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: calc(40 * var(--u));
-  padding: 0 calc(20 * var(--u));
+  height: var(--alto-estado);
+  padding-top: calc(2 * var(--u));
   display: flex;
   align-items: center;
   justify-content: space-between;
   /* La hora con cifras de ancho fijo: sin eso el reloj baila un píxel a
      cada minuto y el ojo lo nota en un bucle que no para. */
-  font-size: calc(13 * var(--u));
+  /* SF Pro no está en la web, pero el reloj de iOS no es una tipografía
+     cualquiera: es semibold, ajustado y con las cifras de ancho fijo.
+     Sin lo último el reloj baila un píxel a cada minuto y el ojo lo nota
+     en un bucle que no para. */
+  font-size: calc(15 * var(--u));
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  letter-spacing: calc(-0.1 * var(--u));
+  letter-spacing: calc(-0.2 * var(--u));
   color: var(--app-text-primary);
   z-index: 35;
   pointer-events: none;
 }
 
+.phone-status-reloj,
 .phone-status-glifos {
+  /* Las dos orejas que deja la isla, ni un punto más: (402 - 126) / 2.
+     Centrados dentro de su oreja quedan donde iOS los pone; centrados en
+     media pantalla —que es lo que hace un `flex: 1`— la hora se corre a
+     la derecha y las barras de cobertura se meten debajo de la isla. */
+  width: calc(138 * var(--u));
+  flex: none;
   display: flex;
   align-items: center;
-  gap: calc(6 * var(--u));
-  opacity: 0.88;
+  justify-content: center;
+}
+
+.phone-status-glifos {
+  gap: calc(5 * var(--u));
 }
 
 .phone-status svg {
-  width: calc(13 * var(--u));
-  height: calc(13 * var(--u));
+  width: calc(17 * var(--u));
+  height: calc(12 * var(--u));
   display: block;
 }
 
-/* La batería es más ancha que alta: su viewBox mide 26, no 24. */
-.phone-status .glifo-bateria {
-  width: calc(14.1 * var(--u));
+/* Cada glifo de iOS tiene su propia proporción: las barras son casi
+   cuadradas, el wifi un poco más ancho que alto y la pila bastante más
+   ancha. Se miden por el viewBox de cada uno, no todos por el mismo. */
+.phone-status .glifo-cobertura {
+  width: calc(17 * var(--u));
 }
 
-/* Barra de gestos. */
+.phone-status .glifo-wifi {
+  width: calc(16 * var(--u));
+}
+
+.phone-status .glifo-bateria {
+  width: calc(25 * var(--u));
+}
+
+/* El indicador de inicio de iOS: 139 × 5 pt, a 8 del canto. */
 .phone-gesture {
   position: absolute;
   bottom: calc(8 * var(--u));
   left: 50%;
   transform: translateX(-50%);
-  width: calc(108 * var(--u));
-  height: calc(4 * var(--u));
+  width: calc(139 * var(--u));
+  height: calc(5 * var(--u));
   border-radius: 999px;
-  background: rgba(11, 22, 40, 0.32);
+  background: rgba(11, 22, 40, 0.42);
   z-index: 40;
 }
 
@@ -459,7 +524,7 @@
 
 .phone-topbar {
   position: absolute;
-  top: calc(40 * var(--u));
+  top: var(--alto-estado);
   left: 0;
   right: 0;
   /* SafeArea + EdgeInsets.symmetric(horizontal: 20, vertical: 12). */
@@ -495,8 +560,33 @@
 }
 
 .app-pill-btn svg {
-  width: calc(22 * var(--u));
-  height: calc(22 * var(--u));
+  width: calc(20 * var(--u));
+  height: calc(20 * var(--u));
+  display: block;
+}
+
+/*
+  El botón de la derecha no es uno, son dos, y la app los cambia:
+  `Icons.tune_rounded` en navy y sin fondo mientras no hay ruta, y una
+  `Icons.close_rounded` gris dentro de un círculo relleno cuando sí la
+  hay —porque entonces lo que hace es quitarla, no filtrar—.
+*/
+.app-pill-btn--der {
+  transition: background-color var(--transition-smooth),
+    color var(--transition-smooth);
+}
+
+.app-pill-btn--der.es-cerrar {
+  background: var(--surface-muted);
+  color: var(--app-text-secondary);
+}
+
+.app-pill-btn--der .icono-cerrar,
+.app-pill-btn--der.es-cerrar .icono-tune {
+  display: none;
+}
+
+.app-pill-btn--der.es-cerrar .icono-cerrar {
   display: block;
 }
 
@@ -943,20 +1033,27 @@
 /* colorUrgencia() de phone-simulator.ts: dentro del kilómetro la barra pasa
    a ámbar. A los 640 metros del tercer momento, es el que toca. */
 .eta-strip--cerca {
-  background: var(--warn);
+  background: var(--app-warn-accessible);
 }
 
 .eta-route {
   margin-top: calc(18 * var(--u));
   text-align: center;
   font-size: calc(13 * var(--u));
-  font-weight: 700;
-  letter-spacing: calc(0.4 * var(--u));
+  font-weight: 600;
+  letter-spacing: calc(-0.1 * var(--u));
   color: var(--app-text-secondary);
 }
 
-/* El número hero: 64, peso 200 y muy poco interlineado — es el mismo
-   AppTextStyles.etaNumber que usa la app. */
+/*
+  El número hero: 64, peso 200 y muy poco interlineado — es AppTextStyles.dato,
+  el único sitio de la app donde el peso más fino tiene sentido, porque es el
+  único texto lo bastante grande para sostenerlo.
+
+  Y no es navy: toma el color de la urgencia, el mismo de la barra de
+  arriba. Es el número que la app existe para dar; que cambie de color al
+  acercarse el bus es medio mensaje.
+*/
 .eta-number {
   margin-top: calc(10 * var(--u));
   text-align: center;
@@ -965,14 +1062,22 @@
   line-height: 1;
   letter-spacing: calc(-2 * var(--u));
   font-variant-numeric: tabular-nums;
-  color: var(--navy);
+  color: var(--app-primary-accessible);
+  transition: color var(--transition-smooth);
 }
 
+.eta-number--cerca {
+  color: var(--app-warn-accessible);
+}
+
+/* AppTextStyles.cuerpoFuerte: la unidad pesa lo mismo que el dato de una
+   fila, no menos. */
 .eta-unit {
   margin-top: calc(6 * var(--u));
   text-align: center;
-  font-size: calc(15 * var(--u));
-  font-weight: 600;
+  font-size: calc(16 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(-0.2 * var(--u));
   color: var(--app-text-secondary);
 }
 
@@ -992,7 +1097,9 @@
 }
 
 /* Botón de aviso: 60 de alto, píldora completa, verde de marca; con el
-   aviso puesto pasa al verde profundo. */
+   aviso puesto pasa al verde profundo. El rótulo va en frase, no en
+   versales: es lo que dice el botón en la app —"Avisarme cuando esté
+   cerca"—, y en mayúsculas se leía como un cartel y no como una acción. */
 .app-cta {
   margin-top: calc(18 * var(--u));
   height: calc(60 * var(--u));
@@ -1003,16 +1110,16 @@
   align-items: center;
   justify-content: center;
   gap: calc(10 * var(--u));
-  font-size: calc(15 * var(--u));
+  font-size: calc(16 * var(--u));
   font-weight: 800;
-  letter-spacing: calc(0.5 * var(--u));
+  letter-spacing: calc(-0.2 * var(--u));
   text-align: center;
   box-shadow: 0 calc(8 * var(--u)) calc(20 * var(--u)) rgba(0, 168, 89, 0.24);
   transition: background-color 0.25s var(--ease-out-cubic), box-shadow 0.25s var(--ease-out-cubic);
 }
 
 .app-cta.active {
-  background: #065F46;
+  background: var(--app-green-deep);
   box-shadow: 0 calc(8 * var(--u)) calc(20 * var(--u)) rgba(6, 95, 70, 0.24);
 }
 
@@ -1079,50 +1186,138 @@
 }
 
 .sheet-selector .sheet-head {
-  margin-bottom: calc(24 * var(--u));
+  margin-bottom: 0;
 }
 
 .sheet-selector .sheet-head-title {
   display: block;
 }
 
-/* Los rótulos EMPRESA y RUTA. */
-.sheet-label {
-  display: block;
-  margin-bottom: calc(12 * var(--u));
-  font-size: calc(12 * var(--u));
-  font-weight: 800;
-  letter-spacing: calc(1 * var(--u));
+/* La frase que va debajo del título: dice cuánto cuesta esto antes de que
+   nadie toque nada. */
+.sheet-head-sub {
+  margin: calc(6 * var(--u)) 0 calc(22 * var(--u));
+  font-size: calc(15 * var(--u));
+  font-weight: 400;
+  letter-spacing: calc(-0.2 * var(--u));
   color: var(--app-text-secondary);
 }
 
-.sheet-label + .app-select {
-  margin-bottom: calc(20 * var(--u));
+/*
+  Los dos pasos cuelgan de una misma línea, con su nodo cada uno. La línea
+  no es adorno: dice lo único que había que explicar de esta pantalla —que
+  la ruta depende de la empresa— y lo dice antes de tocar nada. Antes eran
+  dos rótulos en versalitas ("EMPRESA", "RUTA") sobre dos tarjetas
+  idénticas, y el orden solo se descubría chocándose con él.
+
+  El riel mide 22 y el nodo va centrado en el alto de la ficha, con los dos
+  tramos de línea repartiéndose lo que sobra arriba y abajo. Entre las dos
+  fichas no hay hueco: si lo hubiera, la línea se cortaría.
+*/
+.escalon {
+  display: flex;
+  align-items: stretch;
+  gap: calc(14 * var(--u));
+}
+
+.escalon-riel {
+  width: calc(22 * var(--u));
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.escalon-linea {
+  flex: 1;
+  width: calc(2 * var(--u));
+  background: transparent;
+  transition: background-color 0.24s var(--ease-out-cubic);
+}
+
+/* El tramo existe: se pinta gris, y verde sólo hasta donde ya se llegó. */
+.escalon-linea.is-visible {
+  background: var(--divider);
+}
+
+.escalon-linea.is-visible.is-hecho {
+  background: var(--green);
+}
+
+.escalon-nodo {
+  width: calc(20 * var(--u));
+  height: calc(20 * var(--u));
+  flex: none;
+  border-radius: 50%;
+  border: calc(2 * var(--u)) solid var(--divider);
+  background: var(--arena);
+  display: grid;
+  place-items: center;
+  transition: background-color 0.24s var(--ease-out-cubic),
+    border-color 0.24s var(--ease-out-cubic);
+}
+
+/* El paso en el que se está: aro verde con un punto dentro. */
+.escalon-nodo.is-actual {
+  border-color: var(--green);
+}
+
+.escalon-nodo.is-actual::before {
+  content: '';
+  width: calc(7 * var(--u));
+  height: calc(7 * var(--u));
+  border-radius: 50%;
+  background: var(--green);
+}
+
+/* El paso ya dado: relleno verde con el visto dentro. */
+.escalon-nodo.is-hecho {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.escalon-nodo svg {
+  display: none;
+  width: calc(13 * var(--u));
+  height: calc(13 * var(--u));
+  color: #FFFFFF;
+}
+
+.escalon-nodo.is-hecho svg {
+  display: block;
+}
+
+/* La ficha respira 6 arriba y 6 abajo, que es lo que la separa de la
+   siguiente sin partir la línea. */
+.escalon-ficha {
+  flex: 1;
+  min-width: 0;
+  padding: calc(6 * var(--u)) 0;
 }
 
 /*
-  _PremiumSelectorTile. Sin elegir es un hueco apagado —borde divisor fino,
-  ícono gris sobre gris, título en el texto deshabilitado y sin subtítulo—
-  y al elegir se enciende: el borde engorda y toma el navy, el ícono pasa
-  al verde sobre su tinte y el título a tinta. Es el `isActive` del widget,
-  y lo que separa un mockup posado de uno que está eligiendo.
+  _SelectorTile. Sin elegir es un hueco apagado —línea de pelo, ícono gris
+  sobre gris y título en el texto deshabilitado— y al elegir se enciende:
+  el borde engorda y toma el verde, el ícono pasa al verde sobre su tinte y
+  el título a tinta. Es el `isActive` del widget, y lo que separa un mockup
+  posado de uno que está eligiendo.
 */
 .app-select {
+  min-height: calc(78 * var(--u));
   display: flex;
   align-items: center;
   gap: calc(16 * var(--u));
-  padding: calc(16 * var(--u));
-  background: #FFFFFF;
-  border-radius: calc(20 * var(--u));
-  border: calc(1 * var(--u)) solid var(--divider);
-  box-shadow: 0 calc(4 * var(--u)) calc(12 * var(--u)) rgba(20, 39, 78, 0.04);
+  padding: calc(10 * var(--u)) calc(16 * var(--u));
+  background: var(--surface);
+  border-radius: calc(16 * var(--u));
+  border: calc(1 * var(--u)) solid var(--app-hairline);
   transition: border-color 0.24s var(--ease-out-cubic),
     border-width 0.24s var(--ease-out-cubic);
 }
 
 .app-select.is-activa {
   border-width: calc(1.5 * var(--u));
-  border-color: rgba(20, 39, 78, 0.2);
+  border-color: rgba(0, 168, 89, 0.45);
 }
 
 .app-select-icon {
@@ -1131,9 +1326,9 @@
   flex: none;
   display: grid;
   place-items: center;
-  border-radius: calc(14 * var(--u));
+  border-radius: calc(12 * var(--u));
   /* AppColors.surfaceMuted mientras no hay nada elegido. */
-  background: #F1F5F9;
+  background: var(--surface-muted);
   color: var(--app-text-disabled);
   transition: background-color 0.24s var(--ease-out-cubic),
     color 0.24s var(--ease-out-cubic);
@@ -1158,9 +1353,9 @@
 }
 
 .app-select-title {
-  font-size: calc(16 * var(--u));
-  font-weight: 800;
-  letter-spacing: calc(-0.4 * var(--u));
+  font-size: calc(18 * var(--u));
+  font-weight: 700;
+  letter-spacing: calc(-0.3 * var(--u));
   color: var(--app-text-disabled);
   transition: color 0.24s var(--ease-out-cubic);
   white-space: nowrap;
@@ -1172,7 +1367,8 @@
   color: var(--app-text-primary);
 }
 
-/* Sin elegir el hueco no tiene subtítulo: el widget lo pasa nulo. */
+/* Aquí el hueco vacío sí tiene subtítulo —"Con cuál viajas", "Cuál
+   esperas"—: es la pregunta que contesta el paso. */
 .app-select-sub {
   margin-top: calc(2 * var(--u));
   font-size: calc(12 * var(--u));
@@ -1187,18 +1383,23 @@
   flex: none;
   display: grid;
   place-items: center;
-  color: #CBD5E1;
+  color: var(--app-text-disabled);
 }
 
 .app-select-chevron svg {
-  width: calc(24 * var(--u));
-  height: calc(24 * var(--u));
+  width: calc(20 * var(--u));
+  height: calc(20 * var(--u));
   display: block;
 }
 
-/* "Ver buses en vivo": navy, píldora, sin elevación. */
+/*
+  El botón nunca está muerto: siempre lleva a algún sitio. Sin empresa dice
+  "Elegir empresa", sin ruta "Elegir ruta" y con las dos "Ver buses en
+  vivo", y sólo entonces se pone verde. Hasta ahí es navy, que es la manera
+  de decir "sigue" sin decir "listo".
+*/
 .app-launch {
-  margin-top: calc(32 * var(--u));
+  margin-top: calc(26 * var(--u));
   height: calc(58 * var(--u));
   display: flex;
   align-items: center;
@@ -1206,21 +1407,15 @@
   border-radius: 999px;
   background: var(--navy);
   color: #FFFFFF;
-  font-size: calc(16 * var(--u));
-  font-weight: 800;
-  letter-spacing: calc(-0.3 * var(--u));
+  font-size: calc(15 * var(--u));
+  font-weight: 600;
+  letter-spacing: calc(-0.2 * var(--u));
   transition: background-color 0.24s var(--ease-out-cubic),
     color 0.24s var(--ease-out-cubic);
 }
 
-/*
-  Mientras no hay ruta el botón está deshabilitado y lo dice con todo el
-  cuerpo, no sólo con el texto: es el disabledBackgroundColor del
-  ElevatedButton —el gris del divisor— con el texto apagado encima.
-*/
-.app-launch--vacio {
-  background: var(--divider);
-  color: var(--app-text-disabled);
+.app-launch.is-lista {
+  background: var(--green);
 }
 
 /* ── El selector abierto en la hoja que se mueve ───────────────────── */
@@ -1271,9 +1466,9 @@
 /*
   Fondo de tinta con el patrón de calles en blanco. Los puntos son la misma
   retícula del selector con el color cambiado; las curvas van en un SVG con
-  el lienzo exacto de la pantalla —412 × 874,2, que es 72 : 152,8—, así que
-  `preserveAspectRatio` no tiene nada que corregir y cada curva cae donde
-  cae en el teléfono.
+  el lienzo exacto de la pantalla —402 × 857,5, lo que mide este iPhone en
+  puntos—, así que `preserveAspectRatio` no tiene nada que corregir y cada
+  curva cae donde cae en el teléfono.
 */
 .phone-screen--tinta {
   display: flex;
@@ -1313,7 +1508,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: calc(40 * var(--u));
+  padding-top: var(--alto-estado);
 }
 
 .tinta-logo {

@@ -256,10 +256,12 @@
           <div class="hero-phone-side hero-phone-side--izq escena-entra" data-reveal-delay="140">
             <div class="phone-shell">
               <span class="phone-key phone-key--power"></span>
-              <span class="phone-key phone-key--vol"></span>
+              <span class="phone-key phone-key--accion"></span>
+              <span class="phone-key phone-key--vol-sube"></span>
+              <span class="phone-key phone-key--vol-baja"></span>
 
               <div class="phone-screen">
-                <span class="phone-lens"></span>
+                <span class="phone-island"></span>
 
                 <div class="phone-map" id="phone-map-lado">
                   <svg class="routes-svg-layer" id="phone-routes-lado"></svg>
@@ -269,29 +271,36 @@
                 <div class="phone-scrim"></div>
 
                 <div class="phone-status">
-                  <span>7:23</span>
+                  <span class="phone-status-reloj">7:23</span>
                   <span class="phone-status-glifos">
-                    <!-- Cobertura: la cuña llena de Android, no cuatro barritas. -->
-                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
-                      stroke-linejoin="round">
-                      <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                    <!-- Cobertura: las cuatro barras de iOS, no la cuña de Android. -->
+                    <svg class="glifo-cobertura" viewBox="0 0 17 12" fill="currentColor">
+                      <rect x="0" y="8" width="3" height="4" rx="1" opacity="0.35" />
+                      <rect x="4.7" y="5.4" width="3" height="6.6" rx="1" />
+                      <rect x="9.4" y="2.7" width="3" height="9.3" rx="1" />
+                      <rect x="14" y="0" width="3" height="12" rx="1" />
                     </svg>
-                    <!-- Wifi al máximo: cono lleno, que tres arcos sueltos a este tamaño
-                         se leen como una mancha. -->
-                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
-                      stroke-linejoin="round">
-                      <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                    <!-- Wifi: los tres arcos y el punto, que es como lo dibuja iOS. -->
+                    <svg class="glifo-wifi" viewBox="0 0 16 12" fill="none" stroke="currentColor"
+                      stroke-width="1.7" stroke-linecap="round">
+                      <path d="M0.1 6a11.2 11.2 0 0 1 15.8 0" />
+                      <path d="M2.3 7.3a8 8 0 0 1 11.4 0" />
+                      <path d="M4.9 8.8a4.4 4.4 0 0 1 6.2 0" />
+                      <circle cx="8" cy="10.7" r="0.9" fill="currentColor" stroke="none" />
                     </svg>
-                    <!-- Batería: contorno a media luz y la carga sólida dentro. -->
-                    <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
-                      <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
-                        stroke-width="1.5" opacity="0.5" />
-                      <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
-                      <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                        opacity="0.5" />
+                    <!-- Batería: contorno a media luz, la carga sólida dentro y el pezón. -->
+                    <svg class="glifo-bateria" viewBox="0 0 25 12" fill="none">
+                      <rect x="0.6" y="0.6" width="20.8" height="10.8" rx="3.2" stroke="currentColor"
+                        stroke-width="1.1" opacity="0.35" />
+                      <rect x="2.2" y="2.2" width="14.6" height="7.6" rx="2" fill="currentColor" />
+                      <path d="M23.2 4.3v3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                        opacity="0.35" />
                     </svg>
                   </span>
                 </div>
+
+                <!-- El indicador de inicio de iOS. -->
+                <div class="phone-gesture"></div>
 
                 <!-- Material blanco, esquinas de arriba a 32, y encima el
                      mismo patrón de calles del drawer en navy, tenue. -->
@@ -302,53 +311,80 @@
                     <div class="sheet-head">
                       <span class="sheet-head-title">Elige tu ruta</span>
                     </div>
+                    <p class="sheet-head-sub">Dos pasos y ves los buses moviéndose.</p>
 
-                    <span class="sheet-label">EMPRESA</span>
-                    <div class="app-select is-activa">
-                      <span class="app-select-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
-                          stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M3.5 20.5V9.5l7-3.5" />
+                    <div class="escalon">
+                      <span class="escalon-riel">
+                        <span class="escalon-linea"></span>
+                        <span class="escalon-nodo is-hecho">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12.5l4.5 4.5L19 7.5" />
+                          </svg>
+                        </span>
+                        <span class="escalon-linea is-visible is-hecho"></span>
+                      </span>
+                      <span class="escalon-ficha">
+                        <div class="app-select is-activa">
+                          <span class="app-select-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                              stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M3.5 20.5V9.5l7-3.5" />
                           <path d="M10.5 20.5V4.6a1.6 1.6 0 0 1 1.6-1.6h6.3A1.6 1.6 0 0 1 20 4.6v15.9" />
                           <path d="M2 20.5h20" />
                           <path d="M13.5 7.5h3M13.5 11.5h3M13.5 15.5h3" />
-                        </svg>
-                      </span>
-                      <span class="app-select-body">
-                        <span class="app-select-title">Sobusa</span>
-                        <span class="app-select-sub">Empresa de transporte masivo</span>
-                      </span>
-                      <span class="app-select-chevron">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                          stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M9.5 5l7 7l-7 7" />
-                        </svg>
+                            </svg>
+                          </span>
+                          <span class="app-select-body">
+                            <span class="app-select-title">Sobusa</span>
+                            <span class="app-select-sub">Empresa de transporte masivo</span>
+                          </span>
+                          <span class="app-select-chevron">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                              stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M9.5 5l7 7l-7 7" />
+                            </svg>
+                          </span>
+                        </div>
                       </span>
                     </div>
 
-                    <span class="sheet-label">RUTA</span>
-                    <div class="app-select is-activa">
-                      <span class="app-select-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
-                          stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M4 18h4a4 4 0 0 0 4-4V10a4 4 0 0 1 4-4h4" />
+                    <div class="escalon">
+                      <span class="escalon-riel">
+                        <span class="escalon-linea is-visible is-hecho"></span>
+                        <span class="escalon-nodo is-hecho">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12.5l4.5 4.5L19 7.5" />
+                          </svg>
+                        </span>
+                        <span class="escalon-linea"></span>
+                      </span>
+                      <span class="escalon-ficha">
+                        <div class="app-select is-activa">
+                          <span class="app-select-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                              stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M4 18h4a4 4 0 0 0 4-4V10a4 4 0 0 1 4-4h4" />
                           <path d="M17 3l3 3l-3 3" />
                           <circle cx="5" cy="18" r="2" />
-                        </svg>
-                      </span>
-                      <span class="app-select-body">
-                        <span class="app-select-title">C16 Calle 72 Uninorte</span>
-                        <span class="app-select-sub">Granabastos ↔ Uninorte</span>
-                      </span>
-                      <span class="app-select-chevron">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                          stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M9.5 5l7 7l-7 7" />
-                        </svg>
+                            </svg>
+                          </span>
+                          <span class="app-select-body">
+                            <span class="app-select-title">C16 Calle 72 Uninorte</span>
+                            <span class="app-select-sub">Granabastos ↔ Uninorte</span>
+                          </span>
+                          <span class="app-select-chevron">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                              stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M9.5 5l7 7l-7 7" />
+                            </svg>
+                          </span>
+                        </div>
                       </span>
                     </div>
 
-                    <div class="app-launch">Ver buses en vivo</div>
+                    <div class="app-launch is-lista">Ver buses en vivo</div>
                   </div>
                 </div>
               </div>
@@ -366,12 +402,14 @@
           <div class="hero-phone-wrap escena-entra" data-reveal-delay="0">
             <div class="phone-shell">
               <span class="phone-key phone-key--power"></span>
-              <span class="phone-key phone-key--vol"></span>
+              <span class="phone-key phone-key--accion"></span>
+              <span class="phone-key phone-key--vol-sube"></span>
+              <span class="phone-key phone-key--vol-baja"></span>
 
               <div class="phone-screen" id="phone">
 
                 <!-- La cámara perforada del Pixel, encima de todo. -->
-                <span class="phone-lens"></span>
+                <span class="phone-island"></span>
 
                 <!-- Mapa: mosaico real de Barranquilla + rutas reales. -->
                 <div class="phone-map" id="phone-map">
@@ -385,29 +423,36 @@
 
                 <!-- Barra de estado de Android: la app dibuja debajo. -->
                 <div class="phone-status">
-                  <span>7:23</span>
+                  <span class="phone-status-reloj">7:23</span>
                   <span class="phone-status-glifos">
-                    <!-- Cobertura: la cuña llena de Android, no cuatro barritas. -->
-                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
-                      stroke-linejoin="round">
-                      <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                    <!-- Cobertura: las cuatro barras de iOS, no la cuña de Android. -->
+                    <svg class="glifo-cobertura" viewBox="0 0 17 12" fill="currentColor">
+                      <rect x="0" y="8" width="3" height="4" rx="1" opacity="0.35" />
+                      <rect x="4.7" y="5.4" width="3" height="6.6" rx="1" />
+                      <rect x="9.4" y="2.7" width="3" height="9.3" rx="1" />
+                      <rect x="14" y="0" width="3" height="12" rx="1" />
                     </svg>
-                    <!-- Wifi al máximo: cono lleno, que tres arcos sueltos a este tamaño
-                         se leen como una mancha. -->
-                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
-                      stroke-linejoin="round">
-                      <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                    <!-- Wifi: los tres arcos y el punto, que es como lo dibuja iOS. -->
+                    <svg class="glifo-wifi" viewBox="0 0 16 12" fill="none" stroke="currentColor"
+                      stroke-width="1.7" stroke-linecap="round">
+                      <path d="M0.1 6a11.2 11.2 0 0 1 15.8 0" />
+                      <path d="M2.3 7.3a8 8 0 0 1 11.4 0" />
+                      <path d="M4.9 8.8a4.4 4.4 0 0 1 6.2 0" />
+                      <circle cx="8" cy="10.7" r="0.9" fill="currentColor" stroke="none" />
                     </svg>
-                    <!-- Batería: contorno a media luz y la carga sólida dentro. -->
-                    <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
-                      <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
-                        stroke-width="1.5" opacity="0.5" />
-                      <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
-                      <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                        opacity="0.5" />
+                    <!-- Batería: contorno a media luz, la carga sólida dentro y el pezón. -->
+                    <svg class="glifo-bateria" viewBox="0 0 25 12" fill="none">
+                      <rect x="0.6" y="0.6" width="20.8" height="10.8" rx="3.2" stroke="currentColor"
+                        stroke-width="1.1" opacity="0.35" />
+                      <rect x="2.2" y="2.2" width="14.6" height="7.6" rx="2" fill="currentColor" />
+                      <path d="M23.2 4.3v3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                        opacity="0.35" />
                     </svg>
                   </span>
                 </div>
+
+                <!-- El indicador de inicio de iOS. -->
+                <div class="phone-gesture"></div>
 
                 <!-- Píldora de búsqueda + chip de ubicación. -->
                 <div class="phone-topbar">
@@ -427,12 +472,17 @@
                       <span class="app-pill-sub" data-el="pill-sub">Toca para buscar tu ruta</span>
                     </span>
 
-                    <span class="app-pill-btn">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    <span class="app-pill-btn app-pill-btn--der" data-el="pill-der">
+                      <svg class="icono-tune" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                         stroke-linecap="round">
                         <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
                         <circle cx="15" cy="7" r="2" />
                         <circle cx="9" cy="17" r="2" />
+                      </svg>
+                      <!-- Con ruta activa el botón deja de ajustar y pasa a limpiar. -->
+                      <svg class="icono-cerrar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                        stroke-linecap="round">
+                        <path d="M7 7l10 10M17 7L7 17" />
                       </svg>
                     </span>
                   </div>
@@ -504,55 +554,80 @@
                       <div class="sheet-head">
                         <span class="sheet-head-title">Elige tu ruta</span>
                       </div>
+                      <p class="sheet-head-sub">Dos pasos y ves los buses moviéndose.</p>
 
-                      <span class="sheet-label">EMPRESA</span>
-                      <div class="app-select" data-el="sel-empresa">
-                        <span class="app-select-icon">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3.5 20.5V9.5l7-3.5" />
+                      <div class="escalon" data-el="paso-empresa">
+                        <span class="escalon-riel">
+                          <span class="escalon-linea"></span>
+                          <span class="escalon-nodo is-actual">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                              stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M5 12.5l4.5 4.5L19 7.5" />
+                            </svg>
+                          </span>
+                          <span class="escalon-linea is-visible"></span>
+                        </span>
+                        <span class="escalon-ficha">
+                          <div class="app-select" data-el="sel-empresa">
+                            <span class="app-select-icon">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3.5 20.5V9.5l7-3.5" />
                             <path d="M10.5 20.5V4.6a1.6 1.6 0 0 1 1.6-1.6h6.3A1.6 1.6 0 0 1 20 4.6v15.9" />
                             <path d="M2 20.5h20" />
                             <path d="M13.5 7.5h3M13.5 11.5h3M13.5 15.5h3" />
-                          </svg>
-                        </span>
-                        <span class="app-select-body">
-                          <span class="app-select-title" data-el="sel-empresa-title">Selecciona una empresa</span>
-                          <span class="app-select-sub" data-el="sel-empresa-sub" hidden></span>
-                        </span>
-                        <span class="app-select-chevron">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M9.5 5l7 7l-7 7" />
-                          </svg>
+                              </svg>
+                            </span>
+                            <span class="app-select-body">
+                              <span class="app-select-title" data-el="sel-empresa-title">Empresa</span>
+                              <span class="app-select-sub" data-el="sel-empresa-sub">Con cuál viajas</span>
+                            </span>
+                            <span class="app-select-chevron">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9.5 5l7 7l-7 7" />
+                              </svg>
+                            </span>
+                          </div>
                         </span>
                       </div>
 
-                      <span class="sheet-label">RUTA</span>
-                      <div class="app-select" data-el="sel-ruta">
-                        <span class="app-select-icon">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M4 18h4a4 4 0 0 0 4-4V10a4 4 0 0 1 4-4h4" />
+                      <div class="escalon" data-el="paso-ruta">
+                        <span class="escalon-riel">
+                          <span class="escalon-linea is-visible"></span>
+                          <span class="escalon-nodo">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                              stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M5 12.5l4.5 4.5L19 7.5" />
+                            </svg>
+                          </span>
+                          <span class="escalon-linea"></span>
+                        </span>
+                        <span class="escalon-ficha">
+                          <div class="app-select" data-el="sel-ruta">
+                            <span class="app-select-icon">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 18h4a4 4 0 0 0 4-4V10a4 4 0 0 1 4-4h4" />
                             <path d="M17 3l3 3l-3 3" />
                             <circle cx="5" cy="18" r="2" />
-                          </svg>
-                        </span>
-                        <span class="app-select-body">
-                          <span class="app-select-title" data-el="sel-ruta-title">Selecciona una ruta</span>
-                          <span class="app-select-sub" data-el="sel-ruta-sub" hidden></span>
-                        </span>
-                        <span class="app-select-chevron">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M9.5 5l7 7l-7 7" />
-                          </svg>
+                              </svg>
+                            </span>
+                            <span class="app-select-body">
+                              <span class="app-select-title" data-el="sel-ruta-title">Ruta</span>
+                              <span class="app-select-sub" data-el="sel-ruta-sub">Cuál esperas</span>
+                            </span>
+                            <span class="app-select-chevron">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9.5 5l7 7l-7 7" />
+                              </svg>
+                            </span>
+                          </div>
                         </span>
                       </div>
 
-                      <!-- Deshabilitado mientras no haya ruta, con el texto
-                           que lleva el botón en ese estado. -->
-                      <div class="app-launch app-launch--vacio" data-el="launch">Selecciona una ruta para continuar</div>
+                      <div class="app-launch" data-el="launch">Elegir empresa</div>
                     </div>
                   </div>
 
@@ -610,7 +685,7 @@
                         <circle cx="12" cy="12" r="9" />
                         <path d="M8 12.5l2.8 2.8L16 10" />
                       </svg>
-                      <span data-el="alert-label">AVISARME CUANDO ESTÉ CERCA</span>
+                      <span data-el="alert-label">Avisarme cuando esté cerca</span>
                     </div>
                   </div>
                   </div>
@@ -622,8 +697,6 @@
                   parte, así que no estorba a nada de lo que hay debajo.
                 -->
                 <span class="phone-toque" data-el="toque" aria-hidden="true"></span>
-
-                <div class="phone-gesture"></div>
               </div>
             </div>
             <p class="map-credit">Mapa base © OpenStreetMap · © CARTO</p>
@@ -633,49 +706,56 @@
             Teléfono derecho: la pantalla de entrada (login_screen.dart), la
             primera que ve cualquiera al abrir la app. La trama de fondo son
             las tres curvas y la retícula de puntos de MapPatternPainter,
-            resueltas para un lienzo de 412 x 874,2 — el tamaño lógico de
+            resueltas para un lienzo de 402 x 857,5 — el tamaño lógico de
             esta pantalla, así que las curvas caen donde caen en el teléfono.
           -->
           <div class="hero-phone-side hero-phone-side--der escena-entra" data-reveal-delay="140">
             <div class="phone-shell">
               <span class="phone-key phone-key--power"></span>
-              <span class="phone-key phone-key--vol"></span>
+              <span class="phone-key phone-key--accion"></span>
+              <span class="phone-key phone-key--vol-sube"></span>
+              <span class="phone-key phone-key--vol-baja"></span>
 
               <div class="phone-screen phone-screen--tinta">
-                <span class="phone-lens"></span>
+                <span class="phone-island"></span>
 
-                <svg class="tinta-rutas" viewBox="0 0 412 874.2" preserveAspectRatio="none">
-                  <path d="M-20 139.9 C103 69.9 156.6 262.3 255.4 192.3
-                           C329.6 139.9 362.6 297.2 432 244.8" />
-                  <path d="M49.4 -10 C24.7 157.4 115.4 227.3 90.6 419.6" />
-                  <path d="M-20 646.9 C74.2 577 164.8 769.3 255.4 681.9
-                           C329.6 611.9 370.8 751.8 432 699.4" />
+                <svg class="tinta-rutas" viewBox="0 0 402 857.5" preserveAspectRatio="none">
+                  <path d="M-19.5 137.2C100.5 68.6 152.8 257.3 249.2 188.6C321.6 137.2 353.8 291.5 421.5 240.1" />
+                  <path d="M48.2 -9.8C24.1 154.4 112.6 223 88.4 411.6" />
+                  <path d="M-19.5 634.5C72.4 566 160.8 754.6 249.2 668.9C321.6 600.2 361.8 737.4 421.5 686" />
                 </svg>
 
                 <div class="phone-status phone-status--claro">
-                  <span>7:23</span>
+                  <span class="phone-status-reloj">7:23</span>
                   <span class="phone-status-glifos">
-                    <!-- Cobertura: la cuña llena de Android, no cuatro barritas. -->
-                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
-                      stroke-linejoin="round">
-                      <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                    <!-- Cobertura: las cuatro barras de iOS, no la cuña de Android. -->
+                    <svg class="glifo-cobertura" viewBox="0 0 17 12" fill="currentColor">
+                      <rect x="0" y="8" width="3" height="4" rx="1" opacity="0.35" />
+                      <rect x="4.7" y="5.4" width="3" height="6.6" rx="1" />
+                      <rect x="9.4" y="2.7" width="3" height="9.3" rx="1" />
+                      <rect x="14" y="0" width="3" height="12" rx="1" />
                     </svg>
-                    <!-- Wifi al máximo: cono lleno, que tres arcos sueltos a este tamaño
-                         se leen como una mancha. -->
-                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
-                      stroke-linejoin="round">
-                      <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                    <!-- Wifi: los tres arcos y el punto, que es como lo dibuja iOS. -->
+                    <svg class="glifo-wifi" viewBox="0 0 16 12" fill="none" stroke="currentColor"
+                      stroke-width="1.7" stroke-linecap="round">
+                      <path d="M0.1 6a11.2 11.2 0 0 1 15.8 0" />
+                      <path d="M2.3 7.3a8 8 0 0 1 11.4 0" />
+                      <path d="M4.9 8.8a4.4 4.4 0 0 1 6.2 0" />
+                      <circle cx="8" cy="10.7" r="0.9" fill="currentColor" stroke="none" />
                     </svg>
-                    <!-- Batería: contorno a media luz y la carga sólida dentro. -->
-                    <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
-                      <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
-                        stroke-width="1.5" opacity="0.5" />
-                      <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
-                      <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                        opacity="0.5" />
+                    <!-- Batería: contorno a media luz, la carga sólida dentro y el pezón. -->
+                    <svg class="glifo-bateria" viewBox="0 0 25 12" fill="none">
+                      <rect x="0.6" y="0.6" width="20.8" height="10.8" rx="3.2" stroke="currentColor"
+                        stroke-width="1.1" opacity="0.35" />
+                      <rect x="2.2" y="2.2" width="14.6" height="7.6" rx="2" fill="currentColor" />
+                      <path d="M23.2 4.3v3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                        opacity="0.35" />
                     </svg>
                   </span>
                 </div>
+
+                <!-- El indicador de inicio de iOS. -->
+                <div class="phone-gesture"></div>
 
                 <div class="tinta-hero">
                   <svg class="tinta-logo" viewBox="0 0 512 512" role="img" aria-label="Ya Viene">
@@ -991,33 +1071,46 @@
                   <div class="paso-toma is-activa" data-toma data-demo="1">
                     <div class="phone-shell phone-shell--paso">
                       <span class="phone-key phone-key--power"></span>
-                      <span class="phone-key phone-key--vol"></span>
+                      <span class="phone-key phone-key--accion"></span>
+                      <span class="phone-key phone-key--vol-sube"></span>
+                      <span class="phone-key phone-key--vol-baja"></span>
                       <div class="phone-screen">
-                        <span class="phone-lens"></span>
+                        <span class="phone-island"></span>
                         <span class="phone-toque" data-el="toque" aria-hidden="true"></span>
                         <div class="phone-map" id="paso-mapa-1">
                           <svg class="routes-svg-layer" id="paso-rutas-1"></svg>
                         </div>
                         <div class="phone-status">
-                          <span>7:23</span>
+                          <span class="phone-status-reloj">7:23</span>
                           <span class="phone-status-glifos">
-                            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
-                              stroke-linejoin="round">
-                              <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                            <!-- Cobertura: las cuatro barras de iOS, no la cuña de Android. -->
+                            <svg class="glifo-cobertura" viewBox="0 0 17 12" fill="currentColor">
+                              <rect x="0" y="8" width="3" height="4" rx="1" opacity="0.35" />
+                              <rect x="4.7" y="5.4" width="3" height="6.6" rx="1" />
+                              <rect x="9.4" y="2.7" width="3" height="9.3" rx="1" />
+                              <rect x="14" y="0" width="3" height="12" rx="1" />
                             </svg>
-                            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
-                              stroke-linejoin="round">
-                              <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                            <!-- Wifi: los tres arcos y el punto, que es como lo dibuja iOS. -->
+                            <svg class="glifo-wifi" viewBox="0 0 16 12" fill="none" stroke="currentColor"
+                              stroke-width="1.7" stroke-linecap="round">
+                              <path d="M0.1 6a11.2 11.2 0 0 1 15.8 0" />
+                              <path d="M2.3 7.3a8 8 0 0 1 11.4 0" />
+                              <path d="M4.9 8.8a4.4 4.4 0 0 1 6.2 0" />
+                              <circle cx="8" cy="10.7" r="0.9" fill="currentColor" stroke="none" />
                             </svg>
-                            <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
-                              <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
-                                stroke-width="1.5" opacity="0.5" />
-                              <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
-                              <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                                opacity="0.5" />
+                            <!-- Batería: contorno a media luz, la carga sólida dentro y el pezón. -->
+                            <svg class="glifo-bateria" viewBox="0 0 25 12" fill="none">
+                              <rect x="0.6" y="0.6" width="20.8" height="10.8" rx="3.2" stroke="currentColor"
+                                stroke-width="1.1" opacity="0.35" />
+                              <rect x="2.2" y="2.2" width="14.6" height="7.6" rx="2" fill="currentColor" />
+                              <path d="M23.2 4.3v3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                                opacity="0.35" />
                             </svg>
                           </span>
                         </div>
+
+                        <!-- El indicador de inicio de iOS. -->
+                        <div class="phone-gesture"></div>
                         <div class="phone-topbar">
                           <div class="app-pill">
                             <span class="app-pill-btn">
@@ -1032,12 +1125,17 @@
                               </span>
                               <span class="app-pill-sub">Toca para buscar tu ruta</span>
                             </span>
-                            <span class="app-pill-btn">
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            <span class="app-pill-btn app-pill-btn--der">
+                              <svg class="icono-tune" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                                 stroke-linecap="round">
                                 <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
                                 <circle cx="15" cy="7" r="2" />
                                 <circle cx="9" cy="17" r="2" />
+                              </svg>
+                              <!-- Con ruta activa el botón deja de ajustar y pasa a limpiar. -->
+                              <svg class="icono-cerrar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                                stroke-linecap="round">
+                                <path d="M7 7l10 10M17 7L7 17" />
                               </svg>
                             </span>
                           </div>
@@ -1065,33 +1163,46 @@
                   <div class="paso-toma" data-toma data-demo="2">
                     <div class="phone-shell phone-shell--paso">
                       <span class="phone-key phone-key--power"></span>
-                      <span class="phone-key phone-key--vol"></span>
+                      <span class="phone-key phone-key--accion"></span>
+                      <span class="phone-key phone-key--vol-sube"></span>
+                      <span class="phone-key phone-key--vol-baja"></span>
                       <div class="phone-screen">
-                        <span class="phone-lens"></span>
+                        <span class="phone-island"></span>
                         <span class="phone-toque" data-el="toque" aria-hidden="true"></span>
                         <div class="phone-map" id="paso-mapa-2">
                           <svg class="routes-svg-layer" id="paso-rutas-2"></svg>
                         </div>
                         <div class="phone-status">
-                          <span>7:23</span>
+                          <span class="phone-status-reloj">7:23</span>
                           <span class="phone-status-glifos">
-                            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
-                              stroke-linejoin="round">
-                              <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                            <!-- Cobertura: las cuatro barras de iOS, no la cuña de Android. -->
+                            <svg class="glifo-cobertura" viewBox="0 0 17 12" fill="currentColor">
+                              <rect x="0" y="8" width="3" height="4" rx="1" opacity="0.35" />
+                              <rect x="4.7" y="5.4" width="3" height="6.6" rx="1" />
+                              <rect x="9.4" y="2.7" width="3" height="9.3" rx="1" />
+                              <rect x="14" y="0" width="3" height="12" rx="1" />
                             </svg>
-                            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
-                              stroke-linejoin="round">
-                              <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                            <!-- Wifi: los tres arcos y el punto, que es como lo dibuja iOS. -->
+                            <svg class="glifo-wifi" viewBox="0 0 16 12" fill="none" stroke="currentColor"
+                              stroke-width="1.7" stroke-linecap="round">
+                              <path d="M0.1 6a11.2 11.2 0 0 1 15.8 0" />
+                              <path d="M2.3 7.3a8 8 0 0 1 11.4 0" />
+                              <path d="M4.9 8.8a4.4 4.4 0 0 1 6.2 0" />
+                              <circle cx="8" cy="10.7" r="0.9" fill="currentColor" stroke="none" />
                             </svg>
-                            <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
-                              <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
-                                stroke-width="1.5" opacity="0.5" />
-                              <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
-                              <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                                opacity="0.5" />
+                            <!-- Batería: contorno a media luz, la carga sólida dentro y el pezón. -->
+                            <svg class="glifo-bateria" viewBox="0 0 25 12" fill="none">
+                              <rect x="0.6" y="0.6" width="20.8" height="10.8" rx="3.2" stroke="currentColor"
+                                stroke-width="1.1" opacity="0.35" />
+                              <rect x="2.2" y="2.2" width="14.6" height="7.6" rx="2" fill="currentColor" />
+                              <path d="M23.2 4.3v3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                                opacity="0.35" />
                             </svg>
                           </span>
                         </div>
+
+                        <!-- El indicador de inicio de iOS. -->
+                        <div class="phone-gesture"></div>
                         <div class="phone-scrim" data-el="scrim"></div>
                         <div class="phone-sheet phone-sheet--fija" data-el="sheet">
                           <span class="sheet-handle"></span>
@@ -1099,50 +1210,80 @@
                             <div class="sheet-head">
                               <span class="sheet-head-title">Elige tu ruta</span>
                             </div>
-                            <span class="sheet-label">EMPRESA</span>
-                            <div class="app-select is-activa" data-el="sel-empresa">
-                              <span class="app-select-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
-                                  stroke-linecap="round" stroke-linejoin="round">
-                                  <path d="M3.5 20.5V9.5l7-3.5" />
+                            <p class="sheet-head-sub">Dos pasos y ves los buses moviéndose.</p>
+
+                            <div class="escalon" data-el="paso-empresa">
+                              <span class="escalon-riel">
+                                <span class="escalon-linea"></span>
+                                <span class="escalon-nodo is-hecho">
+                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M5 12.5l4.5 4.5L19 7.5" />
+                                  </svg>
+                                </span>
+                                <span class="escalon-linea is-visible is-hecho"></span>
+                              </span>
+                              <span class="escalon-ficha">
+                                <div class="app-select is-activa" data-el="sel-empresa">
+                                  <span class="app-select-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                      stroke-linecap="round" stroke-linejoin="round">
+                                      <path d="M3.5 20.5V9.5l7-3.5" />
                                   <path d="M10.5 20.5V4.6a1.6 1.6 0 0 1 1.6-1.6h6.3A1.6 1.6 0 0 1 20 4.6v15.9" />
                                   <path d="M2 20.5h20" />
                                   <path d="M13.5 7.5h3M13.5 11.5h3M13.5 15.5h3" />
-                                </svg>
-                              </span>
-                              <span class="app-select-body">
-                                <span class="app-select-title">Sobusa</span>
-                                <span class="app-select-sub">Empresa de transporte masivo</span>
-                              </span>
-                              <span class="app-select-chevron">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                  stroke-linecap="round" stroke-linejoin="round">
-                                  <path d="M9.5 5l7 7l-7 7" />
-                                </svg>
+                                    </svg>
+                                  </span>
+                                  <span class="app-select-body">
+                                    <span class="app-select-title" data-el="sel-empresa-title">Sobusa</span>
+                                    <span class="app-select-sub" data-el="sel-empresa-sub">Empresa de transporte masivo</span>
+                                  </span>
+                                  <span class="app-select-chevron">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                      stroke-linecap="round" stroke-linejoin="round">
+                                      <path d="M9.5 5l7 7l-7 7" />
+                                    </svg>
+                                  </span>
+                                </div>
                               </span>
                             </div>
-                            <span class="sheet-label">RUTA</span>
-                            <div class="app-select is-activa" data-el="sel-ruta">
-                              <span class="app-select-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
-                                  stroke-linecap="round" stroke-linejoin="round">
-                                  <path d="M4 18h4a4 4 0 0 0 4-4V10a4 4 0 0 1 4-4h4" />
+
+                            <div class="escalon" data-el="paso-ruta">
+                              <span class="escalon-riel">
+                                <span class="escalon-linea is-visible is-hecho"></span>
+                                <span class="escalon-nodo is-hecho">
+                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M5 12.5l4.5 4.5L19 7.5" />
+                                  </svg>
+                                </span>
+                                <span class="escalon-linea"></span>
+                              </span>
+                              <span class="escalon-ficha">
+                                <div class="app-select is-activa" data-el="sel-ruta">
+                                  <span class="app-select-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                      stroke-linecap="round" stroke-linejoin="round">
+                                      <path d="M4 18h4a4 4 0 0 0 4-4V10a4 4 0 0 1 4-4h4" />
                                   <path d="M17 3l3 3l-3 3" />
                                   <circle cx="5" cy="18" r="2" />
-                                </svg>
-                              </span>
-                              <span class="app-select-body">
-                                <span class="app-select-title">C16 Calle 72 Uninorte</span>
-                                <span class="app-select-sub">Granabastos ↔ Uninorte</span>
-                              </span>
-                              <span class="app-select-chevron">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                  stroke-linecap="round" stroke-linejoin="round">
-                                  <path d="M9.5 5l7 7l-7 7" />
-                                </svg>
+                                    </svg>
+                                  </span>
+                                  <span class="app-select-body">
+                                    <span class="app-select-title" data-el="sel-ruta-title">C16 Calle 72 Uninorte</span>
+                                    <span class="app-select-sub" data-el="sel-ruta-sub">Granabastos ↔ Uninorte</span>
+                                  </span>
+                                  <span class="app-select-chevron">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                      stroke-linecap="round" stroke-linejoin="round">
+                                      <path d="M9.5 5l7 7l-7 7" />
+                                    </svg>
+                                  </span>
+                                </div>
                               </span>
                             </div>
-                            <div class="app-launch" data-el="launch">Ver buses en vivo</div>
+
+                            <div class="app-launch is-lista" data-el="launch">Ver buses en vivo</div>
                           </div>
                         </div>
                       </div>
@@ -1152,38 +1293,51 @@
                   <div class="paso-toma" data-toma data-demo="3">
                     <div class="phone-shell phone-shell--paso">
                       <span class="phone-key phone-key--power"></span>
-                      <span class="phone-key phone-key--vol"></span>
+                      <span class="phone-key phone-key--accion"></span>
+                      <span class="phone-key phone-key--vol-sube"></span>
+                      <span class="phone-key phone-key--vol-baja"></span>
                       <div class="phone-screen">
-                        <span class="phone-lens"></span>
+                        <span class="phone-island"></span>
                         <span class="phone-toque" data-el="toque" aria-hidden="true"></span>
                         <div class="phone-map" id="paso-mapa-3">
                           <svg class="routes-svg-layer" id="paso-rutas-3"></svg>
                         </div>
                         <div class="phone-status">
-                          <span>7:23</span>
+                          <span class="phone-status-reloj">7:23</span>
                           <span class="phone-status-glifos">
-                            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
-                              stroke-linejoin="round">
-                              <path d="M20 3.9v15.2c0 .8-.6 1.4-1.4 1.4H4.7c-1.2 0-1.8-1.5-1-2.4L17.6 2.9c.9-.9 2.4-.3 2.4 1z" />
+                            <!-- Cobertura: las cuatro barras de iOS, no la cuña de Android. -->
+                            <svg class="glifo-cobertura" viewBox="0 0 17 12" fill="currentColor">
+                              <rect x="0" y="8" width="3" height="4" rx="1" opacity="0.35" />
+                              <rect x="4.7" y="5.4" width="3" height="6.6" rx="1" />
+                              <rect x="9.4" y="2.7" width="3" height="9.3" rx="1" />
+                              <rect x="14" y="0" width="3" height="12" rx="1" />
                             </svg>
-                            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4"
-                              stroke-linejoin="round">
-                              <path d="M12 20.1 2.4 8.7a15.4 15.4 0 0 1 19.2 0L12 20.1z" />
+                            <!-- Wifi: los tres arcos y el punto, que es como lo dibuja iOS. -->
+                            <svg class="glifo-wifi" viewBox="0 0 16 12" fill="none" stroke="currentColor"
+                              stroke-width="1.7" stroke-linecap="round">
+                              <path d="M0.1 6a11.2 11.2 0 0 1 15.8 0" />
+                              <path d="M2.3 7.3a8 8 0 0 1 11.4 0" />
+                              <path d="M4.9 8.8a4.4 4.4 0 0 1 6.2 0" />
+                              <circle cx="8" cy="10.7" r="0.9" fill="currentColor" stroke="none" />
                             </svg>
-                            <svg class="glifo-bateria" viewBox="0 0 26 24" fill="none">
-                              <rect x="1.9" y="7.9" width="18.2" height="8.2" rx="2.8" stroke="currentColor"
-                                stroke-width="1.5" opacity="0.5" />
-                              <rect x="3.7" y="9.7" width="12.6" height="4.6" rx="1.6" fill="currentColor" />
-                              <path d="M22.4 10.6v2.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                                opacity="0.5" />
+                            <!-- Batería: contorno a media luz, la carga sólida dentro y el pezón. -->
+                            <svg class="glifo-bateria" viewBox="0 0 25 12" fill="none">
+                              <rect x="0.6" y="0.6" width="20.8" height="10.8" rx="3.2" stroke="currentColor"
+                                stroke-width="1.1" opacity="0.35" />
+                              <rect x="2.2" y="2.2" width="14.6" height="7.6" rx="2" fill="currentColor" />
+                              <path d="M23.2 4.3v3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+                                opacity="0.35" />
                             </svg>
                           </span>
                         </div>
+
+                        <!-- El indicador de inicio de iOS. -->
+                        <div class="phone-gesture"></div>
                         <div class="phone-sheet phone-sheet--fija" data-el="sheet">
                           <span class="sheet-handle"></span>
                           <div class="eta-strip eta-strip--cerca" data-el="eta-bar"></div>
                           <div class="eta-route" data-el="eta-route">C16 Calle 72 Uninorte - B-042</div>
-                          <div class="eta-number" data-el="eta-value">640</div>
+                          <div class="eta-number eta-number--cerca" data-el="eta-value">640</div>
                           <div class="eta-unit" data-el="eta-unit">m de ti</div>
                           <div class="eta-detail" data-el="eta-sub">Puedes cambiar de aplicación; no cierres Ya Viene del todo</div>
                           <div class="app-cta active" data-el="alert-btn">
@@ -1197,7 +1351,7 @@
                               <circle cx="12" cy="12" r="9" />
                               <path d="M8 12.5l2.8 2.8L16 10" />
                             </svg>
-                            <span data-el="alert-label">AVISO ACTIVADO</span>
+                            <span data-el="alert-label">Aviso activado</span>
                           </div>
                         </div>
                       </div>

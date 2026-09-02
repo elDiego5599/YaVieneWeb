@@ -83,8 +83,8 @@ const VACIOS = {
  * `selectedRoute` vienen nulos.
  */
 const VACIO_SELECT = {
-  empresa: 'Selecciona una empresa',
-  ruta: 'Selecciona una ruta'
+  empresa: { titulo: 'Empresa', sub: 'Con cuál viajas' },
+  ruta: { titulo: 'Ruta', sub: 'Cuál esperas' }
 } as const;
 
 /**
@@ -480,21 +480,49 @@ export class PhoneSimulator {
    * texto y su gris.
    */
   private setSelector(empresa: boolean, ruta: RutaLanding | null): void {
-    this.setSelect('empresa', empresa ? EMPRESA.nombre : null, EMPRESA.sub);
-    this.setSelect('ruta', ruta ? ruta.nombre : null, ruta ? `${ruta.terminalA} ↔ ${ruta.terminalB}` : '');
+    this.setSelect('empresa', empresa ? EMPRESA.nombre : null, EMPRESA.sub, !empresa);
+    this.setSelect(
+      'ruta',
+      ruta ? ruta.nombre : null,
+      ruta ? `${ruta.terminalA} ↔ ${ruta.terminalB}` : '',
+      empresa && ruta === null
+    );
     const boton = this.el('launch');
     if (!boton) return;
-    boton.textContent = ruta ? 'Ver buses en vivo' : 'Selecciona una ruta para continuar';
-    boton.classList.toggle('app-launch--vacio', ruta === null);
+    // El botón nunca está muerto: dice el paso que falta y, cuando ya no
+    // falta ninguno, se pone verde y promete lo que va a pasar.
+    boton.textContent = ruta
+      ? 'Ver buses en vivo'
+      : empresa
+        ? 'Elegir ruta'
+        : 'Elegir empresa';
+    boton.classList.toggle('is-lista', ruta !== null);
   }
 
-  private setSelect(cual: ClaveSelect, titulo: string | null, sub: string): void {
-    this.el(`sel-${cual}`)?.classList.toggle('is-activa', titulo !== null);
-    this.texto(`sel-${cual}-title`, titulo ?? VACIO_SELECT[cual]);
-    const nodo = this.el(`sel-${cual}-sub`);
-    if (!nodo) return;
-    nodo.textContent = titulo === null ? '' : sub;
-    nodo.hidden = titulo === null;
+  /**
+   * Un peldaño del selector: la ficha que se toca y, a su izquierda, el
+   * nodo del riel —hueco, con punto verde si es el que toca ahora, o
+   * relleno con su palomita cuando ya está resuelto—.
+   */
+  private setSelect(
+    cual: ClaveSelect,
+    titulo: string | null,
+    sub: string,
+    actual: boolean
+  ): void {
+    const hecho = titulo !== null;
+    const vacio = VACIO_SELECT[cual];
+    this.el(`sel-${cual}`)?.classList.toggle('is-activa', hecho);
+    this.texto(`sel-${cual}-title`, titulo ?? vacio.titulo);
+    this.texto(`sel-${cual}-sub`, hecho ? sub : vacio.sub);
+    const paso = this.el(`paso-${cual}`);
+    if (!paso) return;
+    const nodo = paso.querySelector('.escalon-nodo');
+    nodo?.classList.toggle('is-hecho', hecho);
+    nodo?.classList.toggle('is-actual', actual);
+    for (const linea of paso.querySelectorAll('.escalon-linea.is-visible')) {
+      linea.classList.toggle('is-hecho', hecho);
+    }
   }
 
   private a(ms: number, fn: () => void): void {
@@ -558,6 +586,7 @@ export class PhoneSimulator {
     const punto = this.el('pill-dot');
     if (punto) punto.classList.toggle('is-on', ruta !== null);
     this.el('pill-sub')?.classList.toggle('is-activa', ruta !== null);
+    this.el('pill-der')?.classList.toggle('es-cerrar', ruta !== null);
     if (ruta) this.escenaTexto('route-name', ruta.nombre);
     this.escena?.querySelector('[data-escena="route"]')?.classList.toggle('is-on', ruta !== null);
   }
@@ -774,7 +803,7 @@ export class PhoneSimulator {
   private setAviso(puesto: boolean): void {
     this.avisoActivo = puesto;
     this.el('alert-btn')?.classList.toggle('active', puesto);
-    this.texto('alert-label', puesto ? 'AVISO ACTIVADO' : 'AVISARME CUANDO ESTÉ CERCA');
+    this.texto('alert-label', puesto ? 'Aviso activado' : 'Avisarme cuando esté cerca');
     for (const nodo of this.raiz.querySelectorAll<HTMLElement>('[data-grupo="aviso"]')) {
       nodo.hidden = nodo.dataset.icono !== (puesto ? 'visto' : 'campana');
     }
@@ -819,9 +848,9 @@ export class PhoneSimulator {
   }
 
   private colorUrgencia(metros: number): string {
-    if (metros < 300) return 'var(--coral)';
-    if (metros < this.radioAvisoM) return 'var(--warn)';
-    return 'var(--green)';
+    if (metros < 300) return 'var(--app-coral-accessible)';
+    if (metros < this.radioAvisoM) return 'var(--app-warn-accessible)';
+    return 'var(--app-primary-accessible)';
   }
 
   /**
@@ -872,8 +901,13 @@ export class PhoneSimulator {
     this.texto('eta-value', valor);
     this.texto('eta-unit', unidad);
     this.notificacion(bus.placa, metros);
+    // La franja y el número llevan el mismo color: en la app los dos
+    // salen de `stripColor`, no solo la franja.
+    const urgencia = this.colorUrgencia(metros);
     const barra = this.el('eta-bar');
-    if (barra) barra.style.background = this.colorUrgencia(metros);
+    if (barra) barra.style.background = urgencia;
+    const numero = this.el('eta-value');
+    if (numero) numero.style.color = urgencia;
   }
 
   /* ---------- Movimiento sobre la ruta real ---------- */
