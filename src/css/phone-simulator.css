@@ -843,7 +843,11 @@
   border-radius: calc(32 * var(--u)) calc(32 * var(--u)) 0 0;
   box-shadow: 0 calc(-4 * var(--u)) calc(20 * var(--u)) rgba(20, 39, 78, 0.06);
   padding: calc(14 * var(--u)) 0 calc(26 * var(--u) + var(--alto-inferior));
-  overflow: hidden;
+  /* La hoja no recorta a sus hijos: el botón de volver a tu punto cuelga
+     por encima de su borde de arriba, que es donde lo pone la app. Quien
+     recorta el alto que se anima es `.sheet-views`, y el contenido lleva
+     su propio margen lateral, así que aquí no había nada que cortar. */
+  overflow: visible;
   transform: translateY(0);
   transition: transform 0.52s var(--ease-out-cubic),
     opacity 0.5s var(--ease-out-cubic),
@@ -864,6 +868,75 @@
 
 .phone-sheet.hidden-sheet {
   transform: translateY(103%);
+}
+
+/* ── Volver a tu punto: map_recenter_button.dart ────────────────────
+
+   La diana que toda app de mapa tiene y la nuestra no tenía: el encuadre
+   automático lleva la cámara al punto de espera una vez, y en cuanto el
+   dedo arrastra el mapa —lo primero que hace cualquiera— no había forma
+   de regresar. Ocupa la esquina que dejó libre la atribución de MapLibre,
+   que se mudó al menú.
+
+   No flota suelto sobre el vidrio: viaja pegado al borde de arriba de la
+   hoja, dentro de su misma columna. Así sube y baja con ella al cambiar
+   de vista, se hunde con ella cuando el selector ocupa la pantalla y no
+   hay que estarle calculando el hueco.
+   ────────────────────────────────────────────────────────────────────── */
+.phone-recentrar {
+  position: absolute;
+  /* EdgeInsets.only(right: AppSpacing.md, bottom: AppSpacing.sm). */
+  right: calc(16 * var(--u));
+  bottom: 100%;
+  margin-bottom: calc(8 * var(--u));
+  width: calc(48 * var(--u));
+  height: calc(48 * var(--u));
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--divider);
+  /* La misma sombra de las píldoras de arriba: los elementos que flotan
+     sobre el mapa flotan todos a la misma altura. */
+  box-shadow: 0 calc(10 * var(--u)) calc(24 * var(--u)) rgba(20, 39, 78, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--app-primary-accessible);
+}
+
+.phone-recentrar svg {
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+}
+
+/* Sin hoja de la que colgar —el primer momento de la solución es el mapa
+   y el pin, nada más—, el botón se apoya donde se apoyaría la hoja. */
+.phone-recentrar--suelto {
+  bottom: calc(26 * var(--u) + var(--alto-inferior));
+  margin-bottom: 0;
+}
+
+/*
+  En el teléfono que se mueve el botón aparece y desaparece, como en la
+  app: sin punto de espera no hay a dónde volver, y con el selector encima
+  no hay mapa que recentrar. No se queda apagado ocupando sitio, se va
+  —AnimatedScale a 0,85 y AnimatedOpacity, los dos en AppMotion.rapido—.
+*/
+.phone-recentrar--vivo {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.18s var(--ease-out-cubic),
+    transform 0.18s var(--ease-out-cubic);
+}
+
+.phone-recentrar--vivo.is-on {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phone-recentrar--vivo {
+    transition-duration: 0.01ms;
+  }
 }
 
 .sheet-handle {

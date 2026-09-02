@@ -276,6 +276,11 @@ export class PhoneSimulator {
   private altoTarjeta = 0;
   /** Cierre del ciclo en curso: nada nuevo debe volver a asomarse. */
   private cerrando = false;
+  /* Lo que decide si se ve el botón de volver a tu punto, igual que en
+     map_recenter_button.dart: hace falta punto de espera y hace falta que
+     el selector no esté ocupando la pantalla. */
+  private pinPuesto = false;
+  private enSelector = false;
   private rutaActual: RutaLanding;
   private relojes: number[] = [];
   private animId: number | null = null;
@@ -521,7 +526,9 @@ export class PhoneSimulator {
     this.el('scrim')?.classList.toggle('is-on', enSelector);
     // Y con el selector arriba se aparta también el grupo de la cabecera,
     // que es el gesto en espejo de la hoja: cabecera_flotante.dart.
+    this.enSelector = enSelector;
     this.el('topbar')?.classList.toggle('esta-apartada', enSelector);
+    this.refrescarRecentrar();
     this.ajustarAlto();
   }
 
@@ -631,6 +638,26 @@ export class PhoneSimulator {
 
   /* ---------- Superficies de la app ---------- */
 
+  /** El punto de espera, y con él la diana para volver a él. */
+  private mostrarPin(visible: boolean): void {
+    this.pinPuesto = visible;
+    this.map.showPin(visible);
+    this.refrescarRecentrar();
+  }
+
+  /**
+   * El botón de volver a tu punto: se ve cuando hay punto al que volver y
+   * el selector no está encima. Es la misma condición de la app, sin el
+   * "preparando el mapa" —aquí el mosaico ya está pintado antes de que
+   * arranque el guion—.
+   */
+  private refrescarRecentrar(): void {
+    this.el('recentrar')?.classList.toggle(
+      'is-on',
+      this.pinPuesto && !this.enSelector
+    );
+  }
+
   /** Píldora de búsqueda: los dos textos de search_pill_bar.dart. */
   private setPildora(ruta: RutaLanding | null): void {
     this.texto('pill-title', ruta ? ruta.nombre : '¿Qué bus esperas?');
@@ -704,7 +731,7 @@ export class PhoneSimulator {
     );
     this.map.setPin(this.pinT);
     this.map.showRoute(false);
-    this.map.showPin(false);
+    this.mostrarPin(false);
     this.map.showBuses(false);
 
     this.setPildora(null);
@@ -729,7 +756,7 @@ export class PhoneSimulator {
     this.a(1000, () => this.toqueEn(this.miraX, this.miraY));
     this.a(1240, () => {
       this.setChip('manual');
-      this.map.showPin(true);
+      this.mostrarPin(true);
       this.setVacio('sinRuta');
     });
 
@@ -825,7 +852,7 @@ export class PhoneSimulator {
     });
     this.a(21000, () => {
       this.map.showRoute(false);
-      this.map.showPin(false);
+      this.mostrarPin(false);
       this.raiz.classList.add('is-cerrando');
     });
     this.a(22000, () => this.play());
