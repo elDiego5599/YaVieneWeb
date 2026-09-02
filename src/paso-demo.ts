@@ -77,7 +77,7 @@ export class PasoDemo {
     if (sinMovimiento()) {
       this.quieta = true;
       this.mapa.showPin(true);
-      this.colocarBuses([480, 920]);
+      this.colocarBuses([850, 1750]);
       this.mapa.showBuses(true);
       return;
     }
@@ -204,7 +204,15 @@ export class PasoDemo {
 
   /* ---------- Los buses ---------- */
 
-  /** Los coloca a tantos metros por detrás del punto de espera. */
+  /**
+   * Los coloca a tantos metros por detrás del punto de espera.
+   *
+   * Las distancias no son decorativas: a la escala de la cámara —22 m por
+   * píxel— dos buses a menos de 900 m uno del otro se solapan y se ven
+   * como una sola mancha, y uno a menos de 600 m del pin se mete debajo
+   * de la gota. Por eso salen lejos y llegan; y todos por dentro de los
+   * 2 km de `nearbyRadiusMeters`, que es lo que el chip llama «cerca».
+   */
   private colocarBuses(detras: number[]): void {
     const largo = this.mapa.metrosDeRuta;
     this.buses = detras.map((m) => (this.pinT - (largo ? m / largo : 0) + 1) % 1);
@@ -280,10 +288,18 @@ export class PasoDemo {
     this.a(2400, () => {
       // location_status_chip.dart: de "localizando" a la ubicación puesta.
       this.icono('chip', 'pin');
-      this.texto('chip-text', 'Con tu ubicación: 2 buses cerca');
+      this.texto('chip-text', '2 buses cerca de tu punto');
+      const pista = this.el('chip-sub');
+      if (pista) {
+        pista.textContent = 'Arrástralo para moverlo';
+        pista.hidden = false;
+      }
       const accion = this.el('chip-action');
-      if (accion) accion.hidden = false;
-      this.colocarBuses([480, 920]);
+      if (accion) {
+        accion.hidden = false;
+        accion.classList.add('app-chip-action--suave');
+      }
+      this.colocarBuses([850, 1750]);
       this.mapa.showBuses(true);
       this.moverBuses();
     });
@@ -310,7 +326,7 @@ export class PasoDemo {
     this.a(5200, () => {
       this.prender('scrim', false);
       this.prender('sheet', false);
-      this.colocarBuses([320, 980]);
+      this.colocarBuses([800, 1700]);
       this.mapa.showBuses(true);
       this.moverBuses();
     });
@@ -358,8 +374,9 @@ export class PasoDemo {
     this.refresco = ahora;
     this.setMetros(metros);
 
-    // La tarjeta no cambia de texto: dice una línea, «El bus B-042 está
-    // cerca de ti», y el metraje vive en la hoja del teléfono, debajo.
+    // La tarjeta no cambia de texto: dice el título de la notificación de
+    // la app, «C16 Calle 72 Uninorte - B-042 está cerca de ti», y el
+    // metraje vive en la hoja del teléfono, debajo.
     this.prender('notif', this.avisoPuesto && metros <= RADIO_AVISO_M);
   }
 
@@ -372,8 +389,18 @@ export class PasoDemo {
     // _metricParts(): bajo el kilómetro en metros, por encima en kilómetros.
     this.texto('eta-value', m < 1000 ? String(m) : (m / 1000).toFixed(1));
     this.texto('eta-unit', m < 1000 ? 'm de ti' : 'km de ti');
-    // colorUrgencia(): dentro del kilómetro la barra pasa a ámbar.
-    this.el('eta-bar')?.classList.toggle('eta-strip--cerca', m <= RADIO_AVISO_M);
+
+    // _urgencyColor() de eta_bottom_sheet.dart: coral bajo los 300 metros,
+    // ámbar dentro del kilómetro, verde más allá. Y el color va en los dos
+    // sitios, la barra y el número —en la app `stripColor` pinta ambos—,
+    // porque el número es el dato; teñir solo la barra dejaba el aviso a
+    // medias, con la raya verde encima de un número ámbar.
+    const cerca = m < RADIO_AVISO_M;
+    const muyCerca = m < 300;
+    this.el('eta-bar')?.classList.toggle('eta-strip--cerca', cerca && !muyCerca);
+    this.el('eta-bar')?.classList.toggle('eta-strip--muy-cerca', muyCerca);
+    this.el('eta-value')?.classList.toggle('eta-number--cerca', cerca && !muyCerca);
+    this.el('eta-value')?.classList.toggle('eta-number--muy-cerca', muyCerca);
   }
 
   private setAviso(puesto: boolean): void {

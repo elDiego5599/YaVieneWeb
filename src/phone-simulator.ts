@@ -46,9 +46,30 @@ interface EstadoBus {
 
 /** Estados del chip de ubicación, calcados de location_status_chip.dart. */
 const CHIPS = {
-  locating: { icono: 'gps', texto: 'Localizando tu ubicación…', accion: '', tinte: 'verde' },
-  manual: { icono: 'pin', texto: 'Con tu ubicación', accion: 'Quitar', tinte: 'verde' },
-  cerca: { icono: 'pin', texto: 'Con tu ubicación: 2 buses cerca', accion: 'Quitar', tinte: 'verde' }
+  locating: {
+    icono: 'gps',
+    texto: 'Localizando tu ubicación…',
+    sub: '',
+    accion: '',
+    suave: false
+  },
+  // El punto lo puso el dedo en el mapa, así que la app está en modo
+  // manual: el rótulo nombra el punto, no el GPS, y lleva la única
+  // explicación de que el pin se arrastra.
+  manual: {
+    icono: 'pin',
+    texto: 'Tu punto de espera',
+    sub: 'Arrástralo para moverlo',
+    accion: 'Quitar',
+    suave: true
+  },
+  cerca: {
+    icono: 'pin',
+    texto: '2 buses cerca de tu punto',
+    sub: 'Arrástralo para moverlo',
+    accion: 'Quitar',
+    suave: true
+  }
 } as const;
 
 /** Estados vacíos de la hoja, calcados de eta_bottom_sheet.dart. */
@@ -95,22 +116,49 @@ const VACIO_SELECT = {
 const EMPRESA = { nombre: 'Sobusa', sub: 'Empresa de transporte masivo' } as const;
 
 /**
+ * _companyPalette: la paleta fija del selector, en el mismo orden que en
+ * route_selector_sheet.dart. El color de una empresa no se escoge a mano
+ * ni al azar; se saca de su id, y por eso hay que copiar la lista entera
+ * y en orden —cambiar una posición cambiaría el color de todas.
+ */
+const PALETA_EMPRESA = [
+  'var(--electric-blue)',
+  'var(--coral)',
+  'var(--warn)',
+  'var(--navy)',
+  'var(--green)',
+  'var(--app-primary-accessible)'
+] as const;
+
+/**
+ * _companyColor(): suma los códigos del id y toma el resto entre seis. Es
+ * determinista a propósito: la misma empresa sale del mismo color en la
+ * app, en los goldens y aquí. Sobusa (EMP-01) da ámbar; Coolitoral
+ * (EMP-02), navy.
+ */
+function colorEmpresa(id: string): string {
+  let suma = 0;
+  for (const c of id) suma += c.charCodeAt(0);
+  return PALETA_EMPRESA[suma % PALETA_EMPRESA.length];
+}
+
+/**
  * Las empresas que enseña la lista. Sobusa es la del piloto y es siempre la
  * que se elige; las otras tres son las que mueven Barranquilla, y están
  * porque una lista de una sola fila no es una lista —el paso de elegir
  * empresa no se entendería—. Van en orden alfabético, sin trato de favor.
  *
- * Cada insignia lleva los colores de su empresa, no un color de relleno:
- * el verde y rojo de Sobusa, el verde y amarillo de Coolitoral, el azul de
- * Sodis y el navy de Transmetro. Son los tokens de la casa, sin colores
- * nuevos. El rojo sale de --error porque es el único rojo pleno que hay en
- * variables.css; aquí no significa error, es la tinta de la marca.
+ * Cada una viene con su id porque de ahí sale el color, igual que en la
+ * app. Antes las insignias llevaban colores escogidos a mano —el rojo de
+ * Sobusa, el azul de Sodis— y no coincidían con ninguna pantalla real: en
+ * la app las iniciales van siempre en blanco sobre el color que le toca a
+ * la empresa, y ni una sola es azul si su id no cae en esa casilla.
  */
 const EMPRESAS = [
-  { nombre: 'Coolitoral', fondo: 'var(--green)', tinta: 'var(--amber)' },
-  { nombre: 'Sobusa', fondo: 'var(--green)', tinta: 'var(--error)' },
-  { nombre: 'Sodis', fondo: 'var(--electric-blue)', tinta: '#FFFFFF' },
-  { nombre: 'Transmetro', fondo: 'var(--navy)', tinta: '#FFFFFF' }
+  { id: 'EMP-02', nombre: 'Coolitoral' },
+  { id: 'EMP-01', nombre: 'Sobusa' },
+  { id: 'EMP-03', nombre: 'Sodis' },
+  { id: 'EMP-04', nombre: 'Transmetro' }
 ] as const;
 
 const CONECTORES = new Set(['de', 'del', 'la', 'el', 'los', 'las', 'y']);
@@ -177,7 +225,7 @@ export class PhoneSimulator {
    * la pantalla parecía congelada. Es el mismo criterio que ya siguen la
    * demo de los momentos y el mapa de "pruébalo aquí".
    */
-  private readonly metrosPorSegundo = 46;
+  private readonly metrosPorSegundo = 58;
 
   /**
    * A qué distancia por detrás del punto de espera nace cada uno. El
@@ -195,11 +243,11 @@ export class PhoneSimulator {
 
   /*
     Dónde nace cada bus manda sobre todo el tramo final del guion: a 46 m/s,
-    cada metro de más son 22 ms de demo. El primero arrancaba 1350 m detrás
+    cada metro de más son 17 ms de demo. El primero arrancaba 1350 m detrás
     del punto de espera y llegaba al kilómetro —el radio del aviso— a los
     17,3 s, cuando el dedo acababa de armarlo; la notificación salía casi
     encima del toque y parecía que el aviso sólo se puede poner cuando el
-    bus ya lo tienes ahí. Con 1450 el kilómetro cae a los 19,4 s: el dedo
+    bus ya lo tienes ahí. Con 1450 el kilómetro cae a los 16,1 s: el dedo
     arma a 1,3 km y quedan cinco segundos y medio de espera con el número
     bajando, que es justo lo que hay que enseñar.
   */
@@ -346,8 +394,9 @@ export class PhoneSimulator {
           <span class="app-tile-chevron" aria-hidden="true">›</span>`;
         const insignia = fila.querySelector<HTMLElement>('.app-tile-icon')!;
         insignia.textContent = inicialesEmpresa(empresa.nombre);
-        insignia.style.background = empresa.fondo;
-        insignia.style.color = empresa.tinta;
+        insignia.style.background = colorEmpresa(empresa.id);
+        // `iconColor: Colors.white` en la app, sin excepciones.
+        insignia.style.color = '#FFFFFF';
         fila.querySelector('.app-tile-title')!.textContent = empresa.nombre;
         return fila;
       })
@@ -594,10 +643,18 @@ export class PhoneSimulator {
   private setChip(clave: ClaveChip): void {
     const chip = CHIPS[clave];
     this.texto('chip-text', chip.texto);
+    const pista = this.el('chip-sub');
+    if (pista) {
+      pista.textContent = chip.sub;
+      pista.hidden = chip.sub === '';
+    }
     const accion = this.el('chip-action');
     if (accion) {
       accion.textContent = chip.accion;
       accion.hidden = chip.accion === '';
+      // "Quitar" solo deshace: va en gris. El verde queda para la acción
+      // que propone algo ("Fijar"), como en location_status_chip.dart.
+      accion.classList.toggle('app-chip-action--suave', chip.suave);
     }
     for (const nodo of this.raiz.querySelectorAll<HTMLElement>('[data-icono]')) {
       if (nodo.dataset.grupo === 'chip') {
@@ -666,8 +723,8 @@ export class PhoneSimulator {
     // El pasajero toca el mapa y ahí queda el punto de espera con su radio
     // "cerca de ti". El toque va antes que el pin —240 ms antes— porque es
     // lo que lo provoca: al revés se leería como que el pin apareció solo.
-    this.a(1300, () => this.toqueEn(this.miraX, this.miraY));
-    this.a(1540, () => {
+    this.a(1000, () => this.toqueEn(this.miraX, this.miraY));
+    this.a(1240, () => {
       this.setChip('manual');
       this.map.showPin(true);
       this.setVacio('sinRuta');
@@ -676,15 +733,15 @@ export class PhoneSimulator {
     // El pasajero toca la barra y se abre el selector, vacío: dos huecos
     // apagados y un botón que todavía no deja pasar. Cada vista va
     // precedida de su toque, con el mismo cuarto de segundo de por medio.
-    this.a(3100, () => this.toqueSobre(this.el('pill')));
-    this.a(3340, () => this.mostrarVista('selector'));
+    this.a(2500, () => this.toqueSobre(this.el('pill')));
+    this.a(2740, () => this.mostrarVista('selector'));
 
     // Primero la empresa, que es el orden que impone la app: con el hueco
     // de empresa vacío, tocar el de ruta no abre nada.
-    this.a(4300, () => this.toqueSobre(this.el('sel-empresa')));
-    this.a(4540, () => this.mostrarVista('companies'));
-    this.a(5400, () => this.toqueSobre(this.el('tile-empresa')));
-    this.a(5640, () => {
+    this.a(3500, () => this.toqueSobre(this.el('sel-empresa')));
+    this.a(3740, () => this.mostrarVista('companies'));
+    this.a(4500, () => this.toqueSobre(this.el('tile-empresa')));
+    this.a(4740, () => {
       this.mostrarVista('selector');
       this.setSelector(true, null);
     });
@@ -692,26 +749,26 @@ export class PhoneSimulator {
     // Y ahora sí la ruta. La lista se abre por la fila que toca —cada
     // vuelta elige una distinta de las seis— y termina de acomodarse en
     // 560 ms; el dedo llega después, ya con la fila quieta y a la vista.
-    this.a(6500, () => this.toqueSobre(this.el('sel-ruta')));
-    this.a(6740, () => {
+    this.a(5500, () => this.toqueSobre(this.el('sel-ruta')));
+    this.a(5740, () => {
       this.mostrarVista('routes');
       this.desplazarLista();
     });
-    this.a(8100, () => this.toqueSobre(this.filaDeRuta()));
+    this.a(6900, () => this.toqueSobre(this.filaDeRuta()));
 
     // La ruta elegida vuelve al selector y se ve entrar en su hueco: se
     // enciende el ícono, aparecen las dos terminales debajo y el botón de
     // abajo deja de estar deshabilitado. Ése es el remate del selector, y
     // por eso el dedo espera a que se lea antes de pulsarlo.
-    this.a(8340, () => {
+    this.a(7140, () => {
       this.mostrarVista('selector');
       this.setSelector(true, this.rutaActual);
     });
-    this.a(9400, () => this.toqueSobre(this.el('launch')));
+    this.a(8100, () => this.toqueSobre(this.el('launch')));
 
     // "Ver buses en vivo": se va el diálogo, aparece el trazado, la píldora
     // cambia y entran los buses.
-    this.a(9660, () => {
+    this.a(8360, () => {
       this.map.showRoute(true);
       this.setPildora(this.rutaActual);
       this.enVivo();
@@ -722,11 +779,11 @@ export class PhoneSimulator {
     // —que es el que elegiría cualquiera— y sólo entonces sale el número.
     // El toque se calcula en el momento, no antes: el bus se está moviendo
     // y su sitio en pantalla no es el mismo que hace un segundo.
-    this.a(11400, () => {
+    this.a(9900, () => {
       const cerca = this.masCercano();
       if (cerca !== null) this.toqueSobre(this.map.nodoBus(cerca));
     });
-    this.a(11640, () => {
+    this.a(10140, () => {
       const cerca = this.masCercano();
       if (cerca !== null) this.seguirBus(cerca);
     });
@@ -741,11 +798,11 @@ export class PhoneSimulator {
     // todavía lejos y la franja verde: así se ve que esto se deja puesto
     // de antemano y el teléfono avisa solo. Iba a los 17,1 s, con el bus
     // ya casi en el kilómetro, y la notificación salía tan pegada al toque
-    // que parecía dispararla el dedo. Los dos segundos que se le quitan
-    // aquí son los que la tarjeta lleva en pantalla desde que salió el
-    // número (11,64 s): el mismo respiro que hay entre los demás toques.
-    this.a(13600, () => this.toqueSobre(this.el('alert-btn')));
-    this.a(13860, () => {
+    // que parecía dispararla el dedo. El respiro desde que salió el número
+    // (10,14 s) es el mismo que hay entre los demás toques: segundo y
+    // medio, lo que se tarda en leer la tarjeta entera.
+    this.a(11800, () => this.toqueSobre(this.el('alert-btn')));
+    this.a(12060, () => {
       this.setAviso(true);
       // El detalle sólo aparece con el aviso puesto, igual que en la app:
       // mientras hay distancia y no hay aviso, la hoja no dice nada.
@@ -755,7 +812,7 @@ export class PhoneSimulator {
     // El ciclo no corta: primero se recoge lo que sobra —el aviso flotante,
     // el detalle— y después la app se disuelve. Cuando vuelve a entrar ya
     // está recolocada, así que no se ve nada saltar.
-    this.a(26400, () => {
+    this.a(20400, () => {
       this.cerrando = true;
       this.escena?.querySelector('[data-escena="notif"]')?.classList.remove('is-on');
       this.setDetalle('');
@@ -763,26 +820,35 @@ export class PhoneSimulator {
       // cada capa se apaga con la transición que ya tenía.
       this.map.showBuses(false);
     });
-    this.a(27000, () => {
+    this.a(21000, () => {
       this.map.showRoute(false);
       this.map.showPin(false);
       this.raiz.classList.add('is-cerrando');
     });
-    this.a(28000, () => this.play());
+    this.a(22000, () => this.play());
   }
 
   /**
-   * La tarjeta flotante dice lo que dice la notificación de la app, en una
-   * línea: "El bus <placa> está cerca de ti". Y aparece cuando aparecería de
-   * verdad: con el aviso armado y el bus ya dentro del kilómetro. La
-   * distancia no se repite aquí —está en la hoja del teléfono, justo
-   * debajo—, y es la misma tarjeta del paso 3 y de la sección del mapa.
+   * La tarjeta flotante dice lo que dice la notificación de la app: el
+   * título de bus_notification_service.dart, que no nombra "el bus" sino
+   * la etiqueta de routePlateLabel() —"<ruta> - <placa>"—, porque el
+   * pasajero espera una ruta, no una placa suelta. Aparece cuando
+   * aparecería de verdad: con el aviso armado y el bus ya dentro del
+   * kilómetro.
+   *
+   * De las dos líneas de la notificación real solo va el título. La
+   * segunda —"Está a N m de tu ubicación"— repetiría el número que la
+   * hoja del teléfono está dando justo debajo, en grande. Es la misma
+   * tarjeta del paso 3 y de la sección del mapa.
    */
   private notificacion(placa: string, metros: number): void {
     const dentro = !this.cerrando && this.avisoActivo && metros <= this.radioAvisoM;
     const tarjeta = this.escena?.querySelector('[data-escena="notif"]');
     if (dentro) {
-      this.escenaTexto('notif-title', `El bus ${placa} está cerca de ti`);
+      this.escenaTexto(
+        'notif-title',
+        `${this.rutaActual.nombre} - ${placa} está cerca de ti`
+      );
     }
     tarjeta?.classList.toggle('is-on', dentro);
   }

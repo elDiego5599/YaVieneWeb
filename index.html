@@ -198,7 +198,34 @@
             <a href="/empresas.html" class="btn-outline">Para empresas</a>
           </div>
 
-          <p class="hero-subtext">Ya en pruebas con Sobusa y sus 6 rutas reales de Barranquilla.</p>
+          <!--
+            Debajo de los botones ya no va la nota del piloto —eso lo dice
+            el pie de la página, y ahí sigue—: va dónde se consigue la app.
+            Es lo primero que pregunta cualquiera que acaba de leer el
+            titular, y hasta ahora no estaba escrito en ningún sitio.
+
+            Las dos marcas van dibujadas, no en una fuente de iconos: son
+            trazos de un solo camino que heredan el color del texto, así
+            que se leen igual en cualquier tamaño y no cargan una petición
+            más al hero, que es lo que más nos ha costado aligerar.
+          -->
+          <p class="hero-subtext">
+            <span class="hero-subtext-lead">Ya Viene, disponible en</span>
+            <span class="tienda-chips">
+              <span class="tienda-chip">
+              <svg class="tienda-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.476-4.494 2.593-4.559-1.429-2.09-3.623-2.32-4.39-2.372-2-.156-3.675 1.088-4.606 1.088zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
+              </svg>
+                iOS
+              </span>
+              <span class="tienda-chip">
+              <svg class="tienda-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4483.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0989L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3435-4.1021-2.6892-7.5743-6.1185-9.4396" />
+              </svg>
+                Android
+              </span>
+            </span>
+          </p>
         </div>
 
         <!--
@@ -208,28 +235,28 @@
         <div class="hero-scene" aria-hidden="true">
 
           <!-- 1. Bus Arriba a la Derecha (Sobusa) -->
-          <div class="scene-bus scene-bus--sobusa animate-float-slow escena-entra" data-reveal-delay="260">
+          <div class="scene-bus scene-bus--sobusa animate-float-slow escena-entra" data-reveal-delay="190">
             <img src="./src/assets/buses/sobusa.webp" alt="Sobusa"
               width="448" height="560" decoding="async"
               class="scene-bus-img" />
           </div>
 
           <!-- 2. Bus Medio a la Izquierda (Azul / Transmetro / Universidades) -->
-          <div class="scene-bus scene-bus--transmetro animate-float-delayed escena-entra" data-reveal-delay="330">
+          <div class="scene-bus scene-bus--transmetro animate-float-delayed escena-entra" data-reveal-delay="240">
             <img src="./src/assets/buses/transmetro.webp" alt="Ruta Universidades"
               width="448" height="560" decoding="async"
               class="scene-bus-img" />
           </div>
 
           <!-- 3. Bus Medio a la Derecha (Sodetrans) -->
-          <div class="scene-bus scene-bus--sodis animate-float-slow escena-entra" data-reveal-delay="400">
+          <div class="scene-bus scene-bus--sodis animate-float-slow escena-entra" data-reveal-delay="290">
             <img src="./src/assets/buses/sodis.webp" alt="Sodetrans"
               width="448" height="560" decoding="async"
               class="scene-bus-img" />
           </div>
 
           <!-- 4. Bus Abajo a la Izquierda (Coolitoral) -->
-          <div class="scene-bus scene-bus--coolitoral animate-float-delayed escena-entra" data-reveal-delay="470">
+          <div class="scene-bus scene-bus--coolitoral animate-float-delayed escena-entra" data-reveal-delay="340">
             <img src="./src/assets/buses/coolitoral.webp" alt="Coolitoral"
               width="448" height="560" decoding="async"
               class="scene-bus-img" />
@@ -253,7 +280,7 @@
             el mapa, que es el mismo mosaico real con la ruta activa
             dibujada por PhoneMap.
           -->
-          <div class="hero-phone-side hero-phone-side--izq escena-entra" data-reveal-delay="140">
+          <div class="hero-phone-side hero-phone-side--izq escena-entra" data-reveal-delay="100">
             <div class="phone-shell">
               <span class="phone-key phone-key--power"></span>
               <span class="phone-key phone-key--accion"></span>
@@ -501,7 +528,10 @@
                           9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" />
                       </svg>
                     </span>
-                    <span class="app-chip-text" data-el="chip-text">Localizando tu ubicación…</span>
+                    <span class="app-chip-textos">
+                      <span class="app-chip-text" data-el="chip-text">Localizando tu ubicación…</span>
+                      <span class="app-chip-sub" data-el="chip-sub" hidden></span>
+                    </span>
                     <span class="app-chip-action" data-el="chip-action" hidden>Quitar</span>
                   </div>
                 </div>
@@ -639,7 +669,7 @@
                           <path d="M20 12H4M10 6l-6 6l6 6" />
                         </svg>
                       </span>
-                      <span class="sheet-head-title">Selecciona una empresa</span>
+                      <span class="sheet-head-title">Elige empresa</span>
                     </div>
                     <!-- Las empresas las escribe phone-simulator.ts, con las
                          iniciales y el color que sacaría el selector de cada
@@ -655,7 +685,7 @@
                           <path d="M20 12H4M10 6l-6 6l6 6" />
                         </svg>
                       </span>
-                      <span class="sheet-head-title">Selecciona una ruta</span>
+                      <span class="sheet-head-title">Elige ruta</span>
                     </div>
                     <!-- Las seis rutas las escribe phone-simulator.ts con los
                          datos de rutas.json, no están copiadas aquí. -->
@@ -704,12 +734,13 @@
 
           <!--
             Teléfono derecho: la pantalla de entrada (login_screen.dart), la
-            primera que ve cualquiera al abrir la app. La trama de fondo son
-            las tres curvas y la retícula de puntos de MapPatternPainter,
-            resueltas para un lienzo de 402 x 857,5 — el tamaño lógico de
-            esta pantalla, así que las curvas caen donde caen en el teléfono.
+            primera que ve cualquiera al abrir la app. El fondo es su
+            LiveRouteBackdrop: la red de rutas de noche, tres paradas y un
+            bus recorriendo la de arriba. Va resuelto para un lienzo de
+            402 x 857,5 —el tamaño lógico de esta pantalla—, así que las
+            curvas caen donde caen en el teléfono.
           -->
-          <div class="hero-phone-side hero-phone-side--der escena-entra" data-reveal-delay="140">
+          <div class="hero-phone-side hero-phone-side--der escena-entra" data-reveal-delay="100">
             <div class="phone-shell">
               <span class="phone-key phone-key--power"></span>
               <span class="phone-key phone-key--accion"></span>
@@ -719,10 +750,37 @@
               <div class="phone-screen phone-screen--tinta">
                 <span class="phone-island"></span>
 
-                <svg class="tinta-rutas" viewBox="0 0 402 857.5" preserveAspectRatio="none">
-                  <path d="M-19.5 137.2C100.5 68.6 152.8 257.3 249.2 188.6C321.6 137.2 353.8 291.5 421.5 240.1" />
-                  <path d="M48.2 -9.8C24.1 154.4 112.6 223 88.4 411.6" />
-                  <path d="M-19.5 634.5C72.4 566 160.8 754.6 249.2 668.9C321.6 600.2 361.8 737.4 421.5 686" />
+                <svg class="tinta-rutas" viewBox="0 0 402 857.5" preserveAspectRatio="none"
+                  aria-hidden="true">
+                  <defs>
+                    <!-- El difuminado del halo del bus: sigma 14, el mismo
+                         MaskFilter de `_pintarBus`. -->
+                    <filter id="tinta-difuminado" filterUnits="userSpaceOnUse"
+                      x="-60" y="-60" width="522" height="500">
+                      <feGaussianBlur stdDeviation="14" />
+                    </filter>
+                  </defs>
+
+                  <!-- Las dos quietas, detrás. -->
+                  <path class="tinta-ruta" d="M56.28 -20C24.12 137.2 120.6 205.8 96.48 394.45" />
+                  <path class="tinta-ruta" d="M422 51.45C289.44 51.45 345.72 308.7 265.32 377.3" />
+
+                  <!-- La ruta viva y sus tres paradas, al 16, 40 y 84 % del recorrido. -->
+                  <path class="tinta-ruta tinta-ruta--viva" d="M-30 175.79C80.4 169.78 96.48 58.31 209.04 68.6C313.56 77.17 305.52 169.78 432 135.49" />
+                  <circle class="tinta-parada" cx="46.65" cy="149.67" r="3.6" />
+                  <circle class="tinta-parada" cx="145.72" cy="77.48" r="3.6" />
+                  <circle class="tinta-parada" cx="351.12" cy="138.83" r="3.6" />
+
+                  <!-- El bus que la recorre mientras alguien escribe su correo. -->
+                  <g class="tinta-bus">
+                    <path class="tinta-estela-1" d="M-30 175.79C80.4 169.78 96.48 58.31 209.04 68.6C313.56 77.17 305.52 169.78 432 135.49" />
+                    <path class="tinta-estela-2" d="M-30 175.79C80.4 169.78 96.48 58.31 209.04 68.6C313.56 77.17 305.52 169.78 432 135.49" />
+                    <path class="tinta-estela-3" d="M-30 175.79C80.4 169.78 96.48 58.31 209.04 68.6C313.56 77.17 305.52 169.78 432 135.49" />
+                    <path class="tinta-estela-4" d="M-30 175.79C80.4 169.78 96.48 58.31 209.04 68.6C313.56 77.17 305.52 169.78 432 135.49" />
+                    <path class="tinta-bus-halo" d="M-30 175.79C80.4 169.78 96.48 58.31 209.04 68.6C313.56 77.17 305.52 169.78 432 135.49" />
+                    <path class="tinta-bus-disco" d="M-30 175.79C80.4 169.78 96.48 58.31 209.04 68.6C313.56 77.17 305.52 169.78 432 135.49" />
+                    <path class="tinta-bus-nucleo" d="M-30 175.79C80.4 169.78 96.48 58.31 209.04 68.6C313.56 77.17 305.52 169.78 432 135.49" />
+                  </g>
                 </svg>
 
                 <div class="phone-status phone-status--claro">
@@ -825,7 +883,7 @@
               </svg>
             </div>
             <div>
-              <strong data-escena="notif-title">El bus B-042 está cerca de ti</strong>
+              <strong data-escena="notif-title">C16 Calle 72 Uninorte - B-042 está cerca de ti</strong>
             </div>
           </div>
 
@@ -1006,7 +1064,7 @@
             <div class="pasos-pila">
               <div class="pasos-portada" data-pasos-portada>
                 <span class="tracked-eyebrow eyebrow--verde">LA SOLUCIÓN</span>
-                <h2 class="section-title">Tres toques<br />y ya sabes</h2>
+                <h2 class="section-title">Tres pasos<br />y ya sabes</h2>
                 <p class="section-lead">Entras una vez con Google o con tu correo y ya no vuelves a esa
                   pantalla: dinos dónde esperas y elige la ruta, Ya Viene se encarga del resto.</p>
                 <p class="solucion-nota">Puedes guardar el teléfono: el aviso llega con Ya Viene en segundo plano.</p>
@@ -1037,7 +1095,7 @@
                         <h3 class="paso-titulo">Fija tu punto de espera</h3>
                         <p class="paso-texto">Toca el mapa y marca desde dónde esperas. También puedes usar tu GPS
                           para que el mapa te siga.</p>
-                        <p class="paso-nota">De "Localizando tu ubicación…" a "Con tu ubicación: 2 buses cerca".
+                        <p class="paso-nota">De "Localizando tu ubicación…" a "2 buses cerca de tu punto".
                           Siempre sabes qué está pasando.</p>
                       </div>
                     </article>
@@ -1152,8 +1210,12 @@
                                   9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" />
                               </svg>
                             </span>
-                            <span class="app-chip-text" data-el="chip-text">Con tu ubicación: 2 buses cerca</span>
-                            <span class="app-chip-action" data-el="chip-action">Quitar</span>
+                            <span class="app-chip-textos">
+                              <span class="app-chip-text" data-el="chip-text">2 buses cerca de tu punto</span>
+                              <span class="app-chip-sub" data-el="chip-sub">Arrástralo para moverlo</span>
+                            </span>
+                            <span class="app-chip-action app-chip-action--suave"
+                              data-el="chip-action">Quitar</span>
                           </div>
                         </div>
                       </div>
@@ -1374,7 +1436,7 @@
                         </svg>
                       </span>
                       <div>
-                        <strong data-el="notif-title">El bus B-042 está cerca de ti</strong>
+                        <strong data-el="notif-title">C16 Calle 72 Uninorte - B-042 está cerca de ti</strong>
                       </div>
                     </div>
                   </div>

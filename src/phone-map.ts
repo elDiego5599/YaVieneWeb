@@ -7,10 +7,14 @@
  * scripts/gen_mapa_landing.py, así que fondo y trazado comparten el
  * encuadre Web Mercator: la ruta cae sobre las calles que le tocan.
  *
- * La cámara no se mueve. Antes reencuadraba sobre la ruta elegida y el
- * salto de zoom se veía mal; ahora enseña la ciudad entera y quieta, que
- * es como arranca la app (`zoom: 11.0` en map_widget.dart) y deja ver los
- * buses de lejos avanzando por su recorrido.
+ * La cámara no se mueve —reencuadrar en cada ruta hacía un salto de zoom
+ * feo—, pero mira de cerca, no a la ciudad entera. Es lo que hace la app:
+ * camera_fit.dart dejó de enmarcar el recorrido completo porque «elegir
+ * ruta echaba la cámara fuera de la ciudad y a un zoom donde no se
+ * distingue nada», y ahora encuadra lo que está vivo con un lado mínimo
+ * de 0,0225° —unos 2,5 km—. Aquí el encuadre es fijo pero de ese orden:
+ * a la escala de antes el pin y sus buses caían a doce píxeles uno de
+ * otro y se veían como una mancha.
  *
  * Todo vive en el espacio de usuario del SVG: el pin y los buses son
  * elementos SVG, no divs colocados en porcentajes. Antes se convertía de
@@ -26,12 +30,18 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const XLINK = 'http://www.w3.org/1999/xlink';
 
 /**
- * Tamaño en píxeles de pantalla de los marcadores, a cualquier tamaño de
- * teléfono. Se ven pequeños a propósito: la cámara enseña la ciudad
- * entera y un bus tiene que parecer un bus en una ciudad, no una chincheta.
+ * Tamaño de los marcadores en puntos de la pantalla del iPhone, la de
+ * 402 de ancho que el mockup reproduce a escala. En píxeles fijos el bus
+ * salía bien en el teléfono de la solución y pequeño en el del hero, que
+ * es más grande; en puntos mide lo mismo que en la app en los dos.
+ *
+ * Los 30 son los «~28px reales en el mapa» que anota
+ * createFlatTransitMarker(); el pin va a 48 porque su gota es más alta
+ * que la cápsula y en la app se ve así de grande.
  */
-const BUS_PX = 19;
-const PIN_PX = 28;
+const ANCHO_PANTALLA_PT = 402;
+const BUS_PT = 30;
+const PIN_PT = 48;
 
 /** Alto del dibujo original de cada marcador, en unidades del SVG. */
 const BUS_ALTO = 60;
@@ -47,15 +57,22 @@ const RADIO_CERCA_M = 2000;
 /**
  * Encuadre de la cámara sobre el mosaico, en fracciones del mismo.
  *
- * No es un acercamiento: la ventana mide 934 x 1982, exactamente lo que
- * ya cabía en la pantalla del teléfono —la proporción es la misma, 72 a
- * 152,8—, así que el mapa se ve al mismo tamaño de siempre. Lo único que
- * cambia es dónde mira: corrida hasta el borde derecho y pegada arriba,
- * que es donde están el norte de la ciudad, la Vía 40 y Uninorte. Antes
- * el recorte iba centrado y se comía trozos de las seis rutas por el
- * este; así, ninguna baja del 78 % de su trazo a la vista.
+ * La ventana mide 560 x 1188 y va centrada en (975, 1290), sobre el
+ * tronco por el que suben las seis rutas. Va ahí abajo y no más arriba
+ * por una razón boba pero visible: el mosaico es z13 y trae el rótulo
+ * «BARRANQUILLA» dibujado para ese zoom, así que de cerca cruzaba la
+ * pantalla en letras enormes que ningún mapa de calle enseña. Es 1,7 veces más cerca que el
+ * encuadre anterior de 934 x 1982: pasa de 36 a 22 metros por píxel, con
+ * lo que un bus a 480 m del pin se separa 22 píxeles en vez de 13 y deja
+ * de confundirse con él.
+ *
+ * El tamaño no se eligió a ojo. Más cerca de 560 el mosaico —z13, 9,6 m
+ * por unidad— empieza a agrandarse por encima de su resolución y las
+ * calles se emborronan; a 560 cae en uno a uno con la pantalla retina.
+ * Y de las seis rutas, a la peor le quedan dentro el 47 % de su trazo,
+ * suficiente para que `tVisible` siempre tenga recorrido a la vista.
  */
-const CAMARA = { x: 350 / 1284, y: 0, w: 934 / 1284, h: 1 };
+const CAMARA = { x: 695 / 1284, y: 696 / 1982, w: 560 / 1284, h: 1188 / 1982 };
 
 const nuevo = <K extends keyof SVGElementTagNameMap>(tag: K): SVGElementTagNameMap[K] =>
   document.createElementNS(SVG_NS, tag);
@@ -82,6 +99,8 @@ export class PhoneMap {
   private unitsPerPx = 1;
   private busScale = 1;
   private pinScale = 1;
+  /** Radio de las terminales, ya en unidades del mosaico. */
+  private terminalR = 7;
   private pinT: number | null = null;
   private busTs: number[] = [];
 
@@ -102,7 +121,7 @@ export class PhoneMap {
     this.activeRoute = this.rutas[0];
 
     this.svg.replaceChildren();
-    // Encuadre fijo sobre el norte de la ciudad. `slice` lo escala hasta
+    // Encuadre fijo sobre el tronco de las rutas. `slice` lo escala hasta
     // cubrir la pantalla del teléfono y recorta lo que sobre, sin deformar
     // nada. La imagen sigue entrando entera: lo que la recorta es esto.
     this.svg.setAttribute('viewBox',
@@ -121,6 +140,10 @@ export class PhoneMap {
       <linearGradient id="pinGrad" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#4ADE80"/>
         <stop offset="100%" stop-color="#059669"/>
+      </linearGradient>
+      <linearGradient id="pinOjo" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#065F46"/>
+        <stop offset="100%" stop-color="#00A859"/>
       </linearGradient>`;
     this.svg.appendChild(defs);
 
@@ -196,10 +219,23 @@ export class PhoneMap {
     if (rect.width > 0 && rect.height > 0) {
       this.unitsPerPx = Math.min(this.lienzo.w / rect.width, this.lienzo.h / rect.height);
     }
-    this.busScale = (BUS_PX * this.unitsPerPx) / BUS_ALTO;
-    this.pinScale = (PIN_PX * this.unitsPerPx) / PIN_ALTO;
+    const pt = rect.width / ANCHO_PANTALLA_PT;
+    this.busScale = (BUS_PT * pt * this.unitsPerPx) / BUS_ALTO;
+    this.pinScale = (PIN_PT * pt * this.unitsPerPx) / PIN_ALTO;
+    this.terminalR = 7 * pt * this.unitsPerPx;
+    this.drawTerminales();
     this.drawPin();
     this.drawBuses();
+  }
+
+  /** Las terminales también se miden aquí, y no sólo al elegir ruta: si
+   *  no, al cambiar el ancho de la ventana se quedaban con el radio del
+   *  tamaño anterior. */
+  private drawTerminales(): void {
+    const r = this.terminalR.toFixed(1);
+    for (const c of Array.from(this.terminalsEl.children)) {
+      c.setAttribute('r', r);
+    }
   }
 
   /* ---------- Marcadores ---------- */
@@ -235,14 +271,22 @@ export class PhoneMap {
   }
 
   /** Gota verde de assets/icons/pin.svg, anclada en la punta. */
+  /**
+   * Gota verde: los mismos trazos que createPinMarker(), en el mismo
+   * orden. El brillo largo de arriba, el disco blanco, el ojo con su
+   * degradado en diagonal y la chispita descentrada no son adorno: sin
+   * ellos el pin se ve como una calcomanía plana y el de la app no lo es.
+   */
   private static makePin(): SVGGElement {
     const g = nuevo('g');
     g.setAttribute('class', 'map-pin');
     g.innerHTML = `
       <g class="map-pin-art" transform="translate(-40 -76)">
         <path d="M40 76 Q10 48 14 30 A26 26 0 1 1 66 30 Q70 48 40 76 Z" fill="url(#pinGrad)"/>
+        <ellipse cx="40" cy="14" rx="12" ry="4.5" fill="#FFFFFF" opacity="0.2"/>
         <circle cx="40" cy="30" r="12.5" fill="#FFFFFF"/>
-        <circle cx="40" cy="30" r="8.5" fill="#047857"/>
+        <circle cx="40" cy="30" r="8.5" fill="url(#pinOjo)"/>
+        <circle cx="37.5" cy="27" r="2.2" fill="#FFFFFF" opacity="0.85"/>
       </g>`;
     return g;
   }
@@ -263,10 +307,12 @@ export class PhoneMap {
       const c = nuevo('circle');
       c.setAttribute('cx', String(x));
       c.setAttribute('cy', String(y));
-      // `circleRadius: 7` de map_widget.dart son 7 píxeles de pantalla, no
-      // 7 unidades del mosaico: hay que pasarlos a la escala del lienzo o
-      // las terminales salen tres veces más chicas de lo que deben.
-      c.setAttribute('r', (7 * this.unitsPerPx).toFixed(1));
+      // `circleRadius: 7` de map_widget.dart son 7 puntos de la pantalla
+      // del teléfono, no 7 unidades del mosaico ni 7 píxeles de la
+      // ventana: se pasan a la escala del lienzo en `medir()`, igual que
+      // el bus y el pin, para que midan lo mismo en el teléfono grande
+      // del hero y en los chicos de la solución.
+      c.setAttribute('r', this.terminalR.toFixed(1));
       this.terminalsEl.appendChild(c);
     }
 

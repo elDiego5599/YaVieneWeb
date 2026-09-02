@@ -73,10 +73,71 @@
   margin-top: 10px;
 }
 
+/*
+  La línea de debajo de los botones: dónde se consigue la app. Es una sola
+  frase con dos fichas dentro, no una lista, así que va en un `<p>` con las
+  fichas en línea; si el ancho no da, el `wrap` las baja juntas y la frase
+  se sigue leyendo.
+*/
 .hero-subtext {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   font-size: 13.5px;
   color: var(--text-muted);
   margin-top: 2px;
+}
+
+/* El texto se queda a media luz: las marcas son lo que se mira. */
+.hero-subtext-lead {
+  color: var(--text-muted);
+}
+
+/*
+  Las dos marcas van juntas en su propio renglón: en un teléfono la frase
+  no cabe entera y, sueltas, se partía justo entre las dos —«… en iOS» y
+  debajo «Android»—, que se lee como si Android fuera otra cosa.
+*/
+.tienda-chips {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/*
+  Cada ficha es una pastilla blanca sobre el papel del hero, con el mismo
+  filo de un punto que llevan las tarjetas de la app. Van más oscuras que
+  la frase que las presenta —tinta contra el 45 %— porque son el dato, y
+  la frase sólo el sujeto.
+*/
+.tienda-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px 5px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+/*
+  El logo se alinea por el ojo, no por la caja: la manzana tiene la hoja
+  arriba y el robot las antenas, así que los dos cuelgan un pelo por
+  encima de la línea de la letra y hay que bajarlos.
+*/
+.tienda-logo {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  transform: translateY(-0.5px);
 }
 
 /* ── Escena del hero: el escenario de tres teléfonos ───────────────── */
@@ -155,6 +216,11 @@
    buses, que son la ciudad llenándose alrededor—. El turno de cada uno
    lo pone `data-reveal-delay` en el marcado.
 
+   0,62 s y no 0,8: con el último bus entrando a 470 ms, la escena tardaba
+   1,27 s en terminar de armarse —encima del guion del teléfono, que ya
+   empieza a los 1,0 s—, y lo primero que se veía del hero era una espera.
+   Ahora la escena está entera antes del primer toque.
+
    Se animan `opacity` y `scale`, nunca `transform` ni `translate`: esas
    dos ya están ocupadas —`transform` la lleva la levitación de los buses
    y `translate` la respiración del trío— y una animación gana siempre a
@@ -167,8 +233,8 @@
   opacity: 0;
   scale: 0.94;
   transition:
-    opacity 0.8s var(--ease-fluida),
-    scale 0.8s var(--ease-fluida);
+    opacity 0.62s var(--ease-fluida),
+    scale 0.62s var(--ease-fluida);
 }
 
 .escena-entra.is-visible {
@@ -408,12 +474,16 @@
   filter: blur(0);
 }
 
+/* El punto de ruta activa. Verde, como en la píldora de la app
+   (`search_pill_bar.dart:162`, `AppColors.primary`): esta tarjeta es esa
+   píldora sacada del teléfono, y en azul decía otra cosa —el azul de la
+   app es el del trazado en el mapa, no el de un estado. */
 .scene-route-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--electric-blue);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.16);
+  background: var(--green);
+  box-shadow: 0 0 0 4px rgba(0, 168, 89, 0.16);
   flex-shrink: 0;
 }
 

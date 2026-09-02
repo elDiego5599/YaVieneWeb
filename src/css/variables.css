@@ -82,7 +82,12 @@
   --shadow-sm: 0 4px 12px -2px rgba(11, 22, 40, 0.06);
   --shadow-md: 0 12px 28px -6px rgba(11, 22, 40, 0.1);
   --shadow-lg: 0 24px 48px -12px rgba(11, 22, 40, 0.16);
-  --shadow-phone: 0 40px 80px -20px rgba(11, 22, 40, 0.55), 0 14px 30px -10px rgba(11, 22, 40, 0.4);
+  /* La sombra del aparato: ancha, baja y difusa, como la de una foto de
+     producto. La de antes iba al 55 % y a este tamaño manchaba el crema
+     de alrededor: el teléfono no flotaba, chorreaba. */
+  --shadow-phone: 0 48px 96px -32px rgba(11, 22, 40, 0.30),
+    0 20px 44px -20px rgba(11, 22, 40, 0.18),
+    0 4px 12px -6px rgba(11, 22, 40, 0.12);
 
   /* ── Layout ───────────────────────────────────────────────────────────
      La página se compone de paneles que llegan casi al borde de la pantalla
