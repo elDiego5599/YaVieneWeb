@@ -232,6 +232,10 @@ export class PhoneSimulator {
   private relojes: number[] = [];
   private animId: number | null = null;
   private etaId: number | null = null;
+  /** El guion quiere los buses rodando. Otra cosa es que alguien los mire. */
+  private busesEnMarcha = false;
+  /** El teléfono está a la vista, aunque sea de refilón. */
+  private visible = true;
 
   constructor(map: PhoneMap, raiz: HTMLElement) {
     this.map = map;
@@ -246,7 +250,36 @@ export class PhoneSimulator {
     this.rutaActual = this.rutas[this.indiceRuta];
     this.pintarRutas();
     this.pintarEmpresas();
+    this.vigilarVisibilidad();
     this.play();
+  }
+
+  /**
+   * El guion no para nunca: recorre las seis rutas y vuelve a empezar. Eso
+   * está bien mientras el teléfono se vea, pero abajo del todo hay un
+   * carrusel de logos y el bucle de los buses le quitaba cuadros aunque el
+   * teléfono estuviera muy arriba, fuera de la pantalla. De ahí que la cinta
+   * fuera bien a ratos y a ratos se atascara. Fuera de vista se apaga el
+   * bucle —solo el bucle: los relojes del guion siguen, para que al volver
+   * la escena esté donde tocaba y no congelada donde se quedó.
+   */
+  private vigilarVisibilidad(): void {
+    if (typeof IntersectionObserver !== 'function') return;
+    new IntersectionObserver(
+      entradas => {
+        for (const entrada of entradas) {
+          this.visible = entrada.isIntersecting;
+          if (this.visible) {
+            if (this.busesEnMarcha) this.iniciarAnimacion();
+          } else {
+            this.detenerAnimacion();
+          }
+        }
+      },
+      // Un margen para que arranque justo antes de asomarse y nadie
+      // alcance a ver el primer cuadro quieto.
+      { rootMargin: '120px' },
+    ).observe(this.raiz);
   }
 
   /**
@@ -872,8 +905,17 @@ export class PhoneSimulator {
     // El reloj de la distancia lo enciende seguirBus(): los buses ruedan
     // desde que aparecen, pero no hay número que refrescar hasta que se
     // elige uno.
+    this.busesEnMarcha = true;
+    if (this.visible) this.iniciarAnimacion();
+  }
+
+  private iniciarAnimacion(): void {
     if (this.animId !== null) return;
 
+    // `previo` nace en null a propósito cada vez que se enciende: al volver
+    // de estar fuera de vista, el primer cuadro vale dt = 0 y los buses
+    // siguen desde donde estaban, en vez de dar un salto por todo el rato
+    // que la cinta estuvo apagada.
     let previo: number | null = null;
     const bucle = (ahora: number): void => {
       const dt = previo === null ? 0 : Math.min(0.1, (ahora - previo) / 1000);
@@ -884,11 +926,16 @@ export class PhoneSimulator {
     this.animId = requestAnimationFrame(bucle);
   }
 
-  private pararBuses(): void {
+  private detenerAnimacion(): void {
     if (this.animId !== null) {
       cancelAnimationFrame(this.animId);
       this.animId = null;
     }
+  }
+
+  private pararBuses(): void {
+    this.busesEnMarcha = false;
+    this.detenerAnimacion();
     if (this.etaId !== null) {
       clearInterval(this.etaId);
       this.etaId = null;

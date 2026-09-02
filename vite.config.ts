@@ -1,4 +1,6 @@
 /// <reference types="vitest/config" />
+import { readFileSync } from 'node:fs';
+
 import { defineConfig, type Plugin } from 'vite';
 
 /*
@@ -49,6 +51,40 @@ function seoDeRaiz(): Plugin {
       // `config.env` ya trae las VITE_* cargadas del `.env`, así que no hace
       // falta leer el fichero ni arrastrar los tipos de Node para ello.
       sitio = String(config.env.VITE_SITE_URL ?? '').replace(/\/+$/, '');
+
+      /*
+        El `connect-src 'self'` de vercel.json bloquea cualquier fetch a otro
+        origen, y el formulario manda a VITE_CONTACT_ENDPOINT. Con la variable
+        vacía —como está hoy— no pasa nada, porque el formulario se va por
+        WhatsApp. El día que se configure un endpoint externo, el navegador
+        cortaría el envío en producción y el fallo se vería con una empresa
+        real escribiendo. Mejor que reviente aquí, con el arreglo al lado.
+      */
+      const endpoint = String(config.env.VITE_CONTACT_ENDPOINT ?? '').trim();
+      if (endpoint && !endpoint.startsWith('/')) {
+        let origen: string;
+        try {
+          origen = new URL(endpoint).origin;
+        } catch {
+          throw new Error(
+            `VITE_CONTACT_ENDPOINT no es una URL válida ni una ruta relativa: ${endpoint}`
+          );
+        }
+        const csp = String(
+          JSON.parse(readFileSync(new URL('./vercel.json', import.meta.url), 'utf8'))
+            .headers?.[0]?.headers?.find(
+              (h: { key: string }) => h.key === 'Content-Security-Policy'
+            )?.value ?? ''
+        );
+        const conectar = csp.match(/connect-src ([^;]*)/)?.[1] ?? '';
+        if (!conectar.includes(origen)) {
+          throw new Error(
+            `VITE_CONTACT_ENDPOINT apunta a ${origen}, que el CSP de vercel.json ` +
+              `no permite (connect-src ${conectar.trim()}). Añade ${origen} a ` +
+              'connect-src o el navegador bloqueará el formulario en producción.'
+          );
+        }
+      }
     },
 
     generateBundle() {

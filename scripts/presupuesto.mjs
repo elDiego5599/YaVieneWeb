@@ -14,9 +14,13 @@
  */
 
 import { readdirSync, statSync, readFileSync } from 'node:fs';
-import { join, extname } from 'node:path';
+import { join, extname, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const DIST = 'dist';
+// La carpeta se busca desde el script y no desde donde se lance: con 'dist'
+// relativo, correrlo desde la raíz del espacio de trabajo medía el dist de
+// otro proyecto —los APK de la demo— y salía un 35765% de exceso.
+const DIST = join(dirname(dirname(fileURLToPath(import.meta.url))), 'dist');
 const KB = 1024;
 
 /** Topes en KB. Medido el 24/08/2026 y redondeado hacia arriba.

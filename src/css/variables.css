@@ -33,6 +33,10 @@
   --warn: #D97706;
   --arena: #FAF6F0;
   --surface: #FFFFFF;
+  /* El mismo blanco con alfa 0, para degradados que tienen que desvanecerse
+     sin ensuciar. La palabra `transparent` es negro transparente, así que un
+     degradado hacia ella pasa por grises: hay que ir hacia este. */
+  --surface-nada: rgba(255, 255, 255, 0);
 
   /* Tokens que el mockup necesita para pintar la app tal cual: son los
      mismos AppColors de ya_viene_core/lib/core/theme/app_theme.dart. */
