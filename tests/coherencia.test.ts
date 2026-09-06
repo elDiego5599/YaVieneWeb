@@ -82,7 +82,7 @@ describe('la copia dice lo mismo que los datos', () => {
 
     const escritas = Array.from(
       bloque![0].matchAll(
-        /<strong class="rutas-dato-numero">([^<]+)<\/strong><span class="rutas-dato-rotulo">([^<]+)<\/span>/g
+        /<strong class="rutas-dato-numero[^"]*">([^<]+)<\/strong><span class="rutas-dato-rotulo">([^<]+)<\/span>/g
       ),
       (m) => [m[1], m[2]]
     );

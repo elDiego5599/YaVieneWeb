@@ -42,7 +42,10 @@ const dato = (valor: string, rotulo: string): HTMLElement => {
   pieza.className = 'rutas-dato';
 
   const numero = document.createElement('strong');
-  numero.className = 'rutas-dato-numero';
+  // `entra-cuenta` se pone aquí y no sólo en el HTML porque estas tres
+  // piezas se pintan de nuevo al arrancar: lo que hubiera escrito a mano
+  // se perdería, y la cifra se quedaría quieta mientras las demás suben.
+  numero.className = 'rutas-dato-numero entra-cuenta';
   numero.textContent = valor;
 
   pieza.append(numero, trozo('rutas-dato-rotulo', rotulo));

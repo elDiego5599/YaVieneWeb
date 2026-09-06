@@ -1,0 +1,239 @@
+/* ============================================================
+   MOVIMIENTO — las cinco entradas
+   ============================================================
+
+   Antes había una sola: opacidad de 0 a 1 y 24 px de subida, la misma
+   duración y la misma curva para el titular de una sección, para una
+   tarjeta, para una cifra y para una tabla. Eso no es un sistema de
+   movimiento; es un efecto aplicado a todo por igual, y a los tres
+   segundos el ojo deja de mirar porque ya sabe lo que va a pasar.
+
+   Aquí hay cinco, y la regla es que cada tipo de contenido entra de una
+   forma distinta y esa forma dice qué es:
+
+     corte    los titulares se destapan línea a línea
+     ficha    el producto entra desde abajo con un muelle
+     cuenta   las cifras suben desde cero
+     traza    los trazos se dibujan de principio a fin
+     relevo   las series entran en cascada
+
+   Ninguna pieza usa una entrada que no le toque. Si algo no es ninguna de
+   las cinco cosas, no entra: se está quieto, que también es una decisión.
+
+   ── Cómo corren ──────────────────────────────────────────────────────
+
+   Con líneas de tiempo nativas: `animation-timeline: view()` ata el
+   progreso de la animación al paso del elemento por la ventana, y eso lo
+   resuelve el compositor. No hay observador disparando clases, no hay
+   oyente de scroll y el hilo principal no participa, que es la diferencia
+   entre 60 fps y un tirón en un teléfono de gama media.
+
+   Donde `view()` no exista todavía —Safari a día de hoy— entra el
+   respaldo: `entradas.ts` pone `.entrada-viva` con un IntersectionObserver
+   y la misma animación corre como animación normal. El `@supports not`
+   de abajo es lo que separa los dos caminos, y las cejas de cada entrada
+   son las mismas en los dos.
+
+   ── Por qué todo cuelga de `.animable` ───────────────────────────────
+
+   Por lo mismo que colgaba `.reveal`: el estado de partida escondido sólo
+   existe si el guion se ha cargado. Sin guion no hay clase, sin clase no
+   hay nada escondido y la página se lee entera aunque no se anime. Ver
+   animable.ts. Es también lo que vigila la prueba «sin JavaScript».
+   ============================================================ */
+
+/* ── 1 · CORTE ────────────────────────────────────────────────────────
+   Para titulares, y sólo para titulares.
+
+   `titulares.ts` parte el texto en líneas y envuelve cada una en
+   `.ln > i`. La línea recorta (`overflow: hidden`) y la cursiva de dentro
+   —que no es cursiva, es sólo un elemento en línea corto que no significa
+   nada— sube desde debajo del corte. El efecto es el de una máscara que
+   destapa, no el de un texto que se desliza: la diferencia está en que el
+   borde superior no se mueve.
+
+   Si el guion no llega a partirlo, el titular es texto normal y se lee. */
+/* El relleno y el margen negativo van en pareja y con el mismo valor: el
+   relleno ensancha la ventana de recorte lo justo para que la tilde de la
+   «í» por arriba y el rabo de la «j» por abajo quepan dentro, y el margen
+   lo devuelve, de modo que las líneas siguen apiladas donde estaban. Sin
+   esta pareja `overflow: hidden` recorta los trazos que salen de la caja
+   de línea, y con `line-height: 0.92` en los titulares salen siempre. */
+.animable .entra-corte .ln {
+  display: block;
+  overflow: hidden;
+  padding-block: 0.14em 0.22em;
+  margin-block: -0.14em -0.22em;
+}
+
+/* 130 % y no 100 %: la línea que sube mide lo que mide su caja de línea,
+   pero la ventana que la recorta mide eso más el relleno de arriba y el
+   de abajo. Con 100 % asomaría una franja por debajo del corte. */
+.animable .entra-corte .ln > i {
+  display: block;
+  font-style: inherit;
+  transform: translateY(130%);
+}
+
+@keyframes corte {
+  from { transform: translateY(130%); }
+  to { transform: translateY(0); }
+}
+
+/* ── 2 · FICHA ────────────────────────────────────────────────────────
+   Para el producto: los teléfonos, el mapa, el panel de control.
+
+   Sube desde abajo con el muelle y con un grado de rotación que se
+   corrige por el camino. Ese grado es todo el truco: sin él es una caja
+   que sube, con él es un objeto que alguien acaba de dejar en la mesa. */
+.animable .entra-ficha {
+  opacity: 0;
+}
+
+@keyframes ficha {
+  from { opacity: 0; transform: translateY(48px) rotate(1.2deg); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ── 3 · CUENTA ───────────────────────────────────────────────────────
+   Para las cifras. La sube `cifras.ts` con dígitos de ancho fijo, que es
+   lo que impide que el número baile de ancho mientras cuenta. El CSS sólo
+   pone la tipografía; el estado de partida no existe porque la cifra
+   final ya está escrita en el HTML y se lee sin guion. */
+.entra-cuenta {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 4 · TRAZA ────────────────────────────────────────────────────────
+   Para los trazos: las rutas del mapa y la línea de ruta de la página.
+
+   Pide `pathLength="1"` en el `<path>`. Con eso el largo del trazo deja
+   de depender de la geometría —que cambia con cada ruta y con cada
+   tamaño de pantalla— y el guion se puede escribir en fracciones. */
+.animable .entra-traza {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+@keyframes traza {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── 5 · RELEVO ───────────────────────────────────────────────────────
+   Para lo que ya es una serie: filas de una tabla, elementos de una
+   lista, fichas de una tira. Nunca para cosas sueltas que casualmente
+   están al lado; el escalonado dice «esto viene en orden», y si no lo
+   viene, miente.
+
+   El turno de cada uno sale de `--i`, que lo escribe el HTML o
+   `entradas.ts`. 40 ms: por debajo no se distingue de una entrada a la
+   vez, y por encima el último llega tarde. */
+/* `:not(.entra-corte)` porque un titular dentro de una serie ya entra por
+   su cuenta, línea a línea. Si además se le apagara la opacidad, el corte
+   correría con el titular invisible y no se vería nunca. Cuenta turno
+   igual —`entradas.ts` numera a todos los hijos—, sólo no se esconde. */
+.animable .entra-relevo > *:not(.entra-corte) {
+  opacity: 0;
+}
+
+@keyframes relevo {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ══ El camino nativo ═══════════════════════════════════════════════════
+
+   `animation-range: entry 8% cover 32%` quiere decir: empieza cuando el
+   elemento ha asomado un 8% por el borde de abajo y termina cuando lleva
+   recorrido un 32% de la ventana. Es un tramo corto a propósito —la
+   entrada tiene que haber acabado mucho antes de que la pieza llegue al
+   centro— porque una animación que sigue corriendo mientras ya la estás
+   leyendo se siente como una página que no arranca.
+
+   `both` es obligatorio: sin él la pieza vuelve al estado de partida en
+   cuanto sale del tramo, y lo que hay antes del tramo es la parte de
+   abajo de la pantalla. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* El escalonado no puede ir en `animation-delay`: en una línea de
+       tiempo de scroll el retraso en segundos no significa nada, porque
+       el reloj no es el tiempo, es el desplazamiento. El turno se escribe
+       corriendo el tramo de cada línea con `--i`, que pone titulares.ts. */
+    .animable .entra-corte .ln > i {
+      animation: corte 0.72s var(--salida) both;
+      animation-timeline: view();
+      animation-range-start: entry calc(8% + var(--i, 0) * 3%);
+      animation-range-end: cover calc(32% + var(--i, 0) * 3%);
+    }
+
+    .animable .entra-ficha {
+      animation: ficha 0.9s var(--muelle) both;
+      animation-timeline: view();
+      animation-range: entry 6% cover 36%;
+    }
+
+    .animable .entra-traza {
+      animation: traza 1.1s var(--salida) both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
+    }
+
+    .animable .entra-relevo > *:not(.entra-corte) {
+      animation: relevo 0.55s var(--salida) both;
+      animation-timeline: view();
+      animation-range-start: entry calc(8% + var(--i, 0) * 2.5%);
+      animation-range-end: cover calc(34% + var(--i, 0) * 2.5%);
+    }
+  }
+}
+
+/* ══ El respaldo ════════════════════════════════════════════════════════
+
+   Mismas cejas, misma duración, misma curva. Lo único que cambia es quién
+   da la salida: aquí la da `.entrada-viva`, que pone entradas.ts cuando el
+   observador ve la pieza. El escalonado del corte se escribe en el estilo
+   en línea porque cada línea tiene el suyo y no hay forma de saber
+   cuántas van a salir hasta que el texto está partido. */
+@supports not (animation-timeline: view()) {
+  .animable .entrada-viva.entra-corte .ln > i {
+    animation: corte 0.72s var(--salida) both;
+    animation-delay: calc(var(--i, 0) * 60ms);
+  }
+
+  .animable .entrada-viva.entra-ficha {
+    animation: ficha 0.9s var(--muelle) both;
+  }
+
+  .animable .entrada-viva.entra-traza {
+    animation: traza 1.1s var(--salida) both;
+  }
+
+  .animable .entrada-viva.entra-relevo > *:not(.entra-corte) {
+    animation: relevo 0.55s var(--salida) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+}
+
+/* ══ Sin movimiento ═════════════════════════════════════════════════════
+
+   El suelo de animations.css deja todas las duraciones en 0,01 ms, que
+   basta para que nada se vea moverse. Pero una animación con `both` y
+   duración casi cero se queda igualmente en su fotograma final, y el de
+   `corte` y `relevo` está bien —es el estado visible—, mientras que el de
+   partida no lo está. Aquí se apaga la animación del todo y se deja cada
+   pieza donde tiene que quedar. */
+@media (prefers-reduced-motion: reduce) {
+  .animable .entra-corte .ln > i,
+  .animable .entra-ficha,
+  .animable .entra-relevo > *:not(.entra-corte) {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .animable .entra-traza {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+}

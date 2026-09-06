@@ -17,6 +17,7 @@ import './css/layout.css';
 import './css/components.css';
 import './css/phone-simulator.css';
 import './css/animations.css';
+import './css/movimiento.css';
 import './css/accesibilidad.css';
 
 import { marcarAnimable } from './animable';
@@ -33,6 +34,9 @@ import { Reloj } from './reloj';
 import { pintarCifras } from './rutas';
 import { dormirLoQueNoSeVe } from './reposo';
 import { saltosDeMenu } from './salto';
+import { encenderCifras } from './cifras';
+import { encenderEntradas } from './entradas';
+import { partirTitulares } from './titulares';
 import { encenderScrollSuave } from './scroll-suave';
 import { entrarEscena, ScrollEffects } from './scroll-effects';
 import { sinMovimiento } from './scrolly';
@@ -53,6 +57,15 @@ const arrancar = (): void => {
   // El mapa jugable: la única parte de la página que se toca.
   const mapa = document.querySelector<HTMLElement>('[data-mapa-vivo]');
   if (mapa) new MapaVivo(mapa);
+
+  /*
+    Las cinco entradas. El orden importa: primero se parten los titulares
+    en líneas, porque `entradas.ts` puede necesitar dar la salida a esas
+    líneas, y una línea que todavía no existe no recibe nada.
+  */
+  partirTitulares();
+  encenderEntradas();
+  encenderCifras();
 
   // Apariciones al entrar en pantalla: ya está puesto todo lo que mira.
   new ScrollEffects();

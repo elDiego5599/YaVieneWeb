@@ -23,6 +23,7 @@ import './css/components.css';
    legales. Va después, así que en la cascada sigue siendo el último. */
 import './css/componentes/empresas-pagina.css';
 import './css/animations.css';
+import './css/movimiento.css';
 import './css/accesibilidad.css';
 
 import { marcarAnimable } from './animable';
@@ -30,8 +31,14 @@ import { ContactForm } from './contact-form';
 import { NavIsland } from './nav-island';
 import { encenderScrollSuave } from './scroll-suave';
 import { ScrollEffects } from './scroll-effects';
+import { encenderCifras } from './cifras';
+import { encenderEntradas } from './entradas';
+import { partirTitulares } from './titulares';
 
 const arrancar = (): void => {
+  partirTitulares();
+  encenderEntradas();
+  encenderCifras();
   new ScrollEffects();
 
   const isla = document.querySelector<HTMLElement>('.nav-island');

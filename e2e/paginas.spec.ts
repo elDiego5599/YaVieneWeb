@@ -293,7 +293,16 @@ test.describe('sin JavaScript', () => {
          decide el guion, lo decide una consulta de medios, y sigue igual
          con el JavaScript puesto. Lo que se mira es lo que se enseña. */
       const opacos = await page.evaluate(() =>
-        Array.from(document.querySelectorAll<HTMLElement>('.reveal, .escena-entra'))
+        Array.from(
+          document.querySelectorAll<HTMLElement>(
+            /* Las cinco entradas más la escena del hero. Los hijos de una
+               serie entran uno a uno, así que se miran ellos y no sólo el
+               contenedor: es al hijo al que se le apaga la opacidad. Las
+               líneas de un titular partido no se listan porque sin guion
+               no existen —el titular es texto corrido, y así se lee—. */
+            '.escena-entra, .entra-corte, .entra-ficha, .entra-traza, .entra-cuenta, .entra-relevo, .entra-relevo > *'
+          )
+        )
           .filter((el) => {
             const estilo = getComputedStyle(el);
             return estilo.display !== 'none' && estilo.visibility !== 'hidden';
