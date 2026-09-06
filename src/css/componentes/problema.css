@@ -598,3 +598,53 @@
   text-transform: uppercase;
   color: var(--text-muted);
 }
+
+/* ── La franja ─────────────────────────────────────────────────────────
+   El problema dejó de ser la apertura de la página y pasó a ser el
+   refuerzo del final: una banda, no una pantalla. Todo lo de arriba sigue
+   valiendo —el clima, las luces, el reloj—; aquí sólo se ajustan las tres
+   cosas que cambian al perder la pantalla entera: el titular baja un
+   escalón, el reloj se encoge hasta ser un elemento al lado del texto, y
+   el texto se queda con el peso de la columna.
+
+   Va al final del fichero a propósito: pisa a las reglas de la escena
+   completa que hay más arriba, y con la misma especificidad gana la
+   última. Está escrito en la cabecera de este mismo fichero. */
+.pista--franja .problema-escena {
+  align-items: center;
+}
+
+.pista--franja .problema-texto {
+  gap: clamp(18px, 2vw, 28px);
+}
+
+.pista--franja .problema-texto .section-title {
+  font-size: clamp(1.9rem, 1.1rem + 2.4vw, 3.1rem);
+}
+
+.pista--franja .problema-lead {
+  font-size: clamp(21px, 2.2vw, 30px);
+  max-width: 26ch;
+}
+
+/* La esfera baja de «media sección» a «lo que ocupa un párrafo de alto».
+   No se toca nada de su interior: el SVG es de 280 y escala solo. */
+.reloj--franja {
+  width: min(100%, clamp(196px, 21vw, 288px));
+}
+
+@media (min-width: 900px) {
+  .pista--franja .problema-escena {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: clamp(32px, 5vw, 88px);
+    align-items: center;
+  }
+
+  /* En la sección completa el reloj se corría hacia dentro para no irse
+     contra el canto. Aquí ya no hace falta: es pequeño y el aire de la
+     rejilla lo deja donde tiene que estar. */
+  .pista--franja .problema-escena .reloj {
+    justify-self: end;
+    transform: none;
+  }
+}

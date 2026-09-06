@@ -1,4 +1,4 @@
-import { seguirPista, sinMovimiento } from './scrolly';
+import { seguirCruce, seguirPista, sinMovimiento } from './scrolly';
 
 /**
  * El reloj del problema.
@@ -113,7 +113,16 @@ export class Reloj {
     this.pista.classList.add('es-crudo');
     this.asentar();
 
-    this.soltar = seguirPista(pista, (p) => {
+    // De dónde sale el avance. Con pista propia, del recorrido pegado; en
+    // la franja del final no hay recorrido que valga —no secuestra scroll—
+    // y el número sale de lo que lleva cruzado de la ventana. Lo decide el
+    // HTML con `data-reloj-cruce` y no la medida, porque al construir esto
+    // el diseño todavía no está resuelto y una pista alta puede medir cero.
+    const seguir = pista.hasAttribute('data-reloj-cruce')
+      ? seguirCruce
+      : seguirPista;
+
+    this.soltar = seguir(pista, (p) => {
       this.scroll = p;
       this.pintar();
       // Volver hacia arriba baja la lectura por debajo del tope: si el

@@ -110,11 +110,15 @@ const arrancar = (): void => {
     deja fuera lo de abajo y no hay forma de llegar a ello, ni bajando ni
     subiendo. Con las animaciones desactivadas no hay escena pegada que
     valga —el contenido se lee de arriba abajo—, así que ahí no aplica.
+
+    La franja del problema queda fuera por lo mismo: su escena no se pega
+    ni mide una ventana, así que lo que sobre por abajo se alcanza bajando
+    como en cualquier otra sección. Encogerla sólo le quitaría tamaño a la
+    letra sin arreglar nada.
   */
   if (!sinMovimiento()) {
-    for (const escena of document.querySelectorAll<HTMLElement>('.escena')) {
-      encajarEscena(escena);
-    }
+    const escenas = document.querySelectorAll<HTMLElement>('.pista:not(.pista--franja) > .escena');
+    for (const escena of escenas) encajarEscena(escena);
   }
 
   const pistaReloj = document.querySelector<HTMLElement>('[data-reloj-pista]');

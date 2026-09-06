@@ -2,8 +2,13 @@ import { test, expect, type Page } from '@playwright/test';
 
 /**
  * Las dos averías que sólo se ven en un teléfono, y que la gente notó
- * antes que nosotros: la escena del problema temblando al bajar, y los
- * nombres del riel de momentos saliéndose de su tercio.
+ * antes que nosotros: la escena pegada temblando al bajar, y los nombres
+ * del riel de momentos saliéndose de su tercio.
+ *
+ * La primera se descubrió en el problema, que entonces era una pista con
+ * su escena pegada. Hoy el problema es una franja —no se pega, no encoge—
+ * y la única escena pegada que queda es la de «Cómo funciona», que es
+ * donde se comprueba.
  *
  * Las dos aparecen por tamaño de pantalla, no por navegador, y el
  * teléfono del proyecto `movil` —412 de ancho por 915 de alto— es
@@ -48,7 +53,7 @@ test.describe('la escena en un teléfono', () => {
     es la prueba de que eso no pasa.
   */
   for (const { nombre, ancho, alto } of TELEFONOS) {
-    for (const seccion of ['#problema', '#solucion']) {
+    for (const seccion of ['#solucion']) {
       test(`${seccion} no tiembla en ${nombre}`, async ({ page }) => {
         await abrir(page, ancho, alto);
 
@@ -77,17 +82,17 @@ test.describe('la escena en un teléfono', () => {
       });
     }
 
-    test(`la escena del problema cabe entera en ${nombre}`, async ({ page }) => {
+    test(`la escena pegada cabe entera en ${nombre}`, async ({ page }) => {
       await abrir(page, ancho, alto);
 
       const arriba = await page.evaluate(
-        () => document.querySelector('#problema')!.getBoundingClientRect().top + window.scrollY
+        () => document.querySelector('#solucion')!.getBoundingClientRect().top + window.scrollY
       );
       await irA(page, arriba + alto);
       await page.waitForTimeout(300);
 
       const sobra = await page.evaluate(() => {
-        const esc = document.querySelector('#problema .escena') as HTMLElement;
+        const esc = document.querySelector('#solucion .escena') as HTMLElement;
         const dentro = esc.firstElementChild as HTMLElement;
         const cs = getComputedStyle(esc);
         const libre =

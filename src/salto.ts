@@ -3,13 +3,12 @@ import { congelarPistas } from './scrolly';
 /**
  * Saltos del menú sin que las historias se reproduzcan por el camino.
  *
- * Dos de las secciones de la página no se leen: se recorren. «El problema»
- * mide tres ventanas y media y «Cómo funciona» algo más de tres, cada una
- * con su escena pegada arriba, y lo que enseñan depende exactamente de
- * dónde esté el scroll. Un enlace de la píldora manda al navegador a
- * cruzar ese trecho en medio segundo, así que en medio segundo pasaba la
- * historia entera —el reloj dando la vuelta, los tres momentos cruzando—
- * y se llegaba al destino con las transiciones a mitad de camino.
+ * «Cómo funciona» no se lee: se recorre. Mide dos ventanas largas con su
+ * escena pegada arriba, y lo que enseña depende exactamente de dónde esté
+ * el scroll. Un enlace de la píldora manda al navegador a cruzar ese
+ * trecho en medio segundo, así que en medio segundo pasaban los tres
+ * momentos enteros y se llegaba al destino con las transiciones a mitad
+ * de camino.
  *
  * El viaje no se toca: el scroll suave sigue siendo el del navegador, que
  * es el que respeta los ajustes de movimiento del sistema y el que sabe
@@ -18,8 +17,8 @@ import { congelarPistas } from './scrolly';
  * una vez y aparece ya en su sitio.
  *
  * Se congela en cualquier salto interno, no sólo en los que caen dentro de
- * una pista: «Probar el mapa» termina en una sección normal, pero para
- * llegar hay que pasar por encima de las dos.
+ * la pista: «El problema» termina en una franja normal, pero para llegar
+ * hay que pasar por encima de ella.
  *
  * Cuándo ha llegado no lo dice ningún evento que se pueda dar por hecho
  * —`scrollend` es demasiado nuevo para confiar en él—, así que se mira la

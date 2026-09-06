@@ -211,7 +211,37 @@
    desvaneciéndose: el texto se desplaza de un tirón y el teléfono no se
    mueve, así que el mismo relevo se lee en menos recorrido. */
 .pista--pasos {
-  --paso: 68vh;
+  --paso: 34vh;
+}
+
+/* La franja: una pista que no secuestra nada.
+
+   El problema dejó de abrir la página y bajó al final convertido en banda,
+   así que no tiene recorrido propio por el que bajar: la escena no se pega
+   ni mide una ventana, y el bloque ocupa lo que ocupe su contenido. Sigue
+   llamándose pista porque el reloj vive dentro y las luces del clima
+   cuelgan de `.escena` (ver problema.css); lo que cambia es de dónde saca
+   el reloj su avance —del cruce por la ventana, no de la pista— y eso lo
+   dice `data-reloj-cruce` en el HTML.
+
+   La escena se queda posicionada, aunque ya no se pegue: de ella cuelgan
+   las dos capas de luz con `inset: -8%`, y sin ancestro posicionado se
+   irían a buscar el de más arriba. */
+.pista--franja {
+  height: auto;
+}
+
+.pista--franja > .escena {
+  position: relative;
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.pista--franja > .escena .panel-inner {
+  padding-top: clamp(46px, 6vw, 92px);
+  padding-bottom: clamp(46px, 6vw, 92px);
+  zoom: 1;
 }
 
 /* La escena se pega a la ventana entera, pero la ventana entera no está

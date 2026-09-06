@@ -110,6 +110,50 @@ export function seguirPista(
   pista: HTMLElement,
   alAvanzar: (p: number) => void
 ): () => void {
+  return seguir(
+    () => {
+      const caja = pista.getBoundingClientRect();
+      const recorrido = caja.height - altoEscena(pista);
+      return recorrido <= 0 ? 0 : limitar(-caja.top / recorrido);
+    },
+    alAvanzar
+  );
+}
+
+/**
+ * Lo mismo, pero para un bloque que no es una pista: el avance sale de lo
+ * que lleva cruzado de la ventana, no de un recorrido pegado.
+ *
+ * Es lo que necesita una franja —el problema, al final de la página—: no
+ * secuestra scroll, así que no hay recorrido propio del que sacar el
+ * número, y sin embargo el reloj de dentro sigue teniendo que ir de cero a
+ * treinta mientras la banda entra en escena.
+ *
+ * El uno no cae cuando la banda termina de salir por arriba, sino cuando
+ * acaba de colocarse: el viaje va de «asoma por abajo» a «su techo está en
+ * el quinto superior de la ventana». Si llegara al final del cruce, el
+ * reloj marcaría los treinta minutos justo cuando ya no se ve.
+ */
+export function seguirCruce(
+  bloque: HTMLElement,
+  alAvanzar: (p: number) => void
+): () => void {
+  return seguir(
+    () => {
+      const caja = bloque.getBoundingClientRect();
+      const ventana = window.innerHeight;
+      const recorrido = ventana * 0.8;
+      return recorrido <= 0 ? 0 : limitar((ventana - caja.top) / recorrido);
+    },
+    alAvanzar
+  );
+}
+
+/** El motor común: mide con `objetivo` y dosifica lo que entrega. */
+function seguir(
+  objetivo: () => number,
+  alAvanzar: (p: number) => void
+): () => void {
   // Con las animaciones desactivadas no hay nada que dosificar: la escena
   // va donde diga el scroll y punto.
   const amortigua = !sinMovimiento();
@@ -124,13 +168,6 @@ export function seguirPista(
   /** Velocidad del scroll suavizada, en avance de pista por segundo. */
   let velocidad = 0;
   let ultimoMs = 0;
-
-  /** El avance que pide el scroll ahora mismo. */
-  const objetivo = (): number => {
-    const caja = pista.getBoundingClientRect();
-    const recorrido = caja.height - altoEscena(pista);
-    return recorrido <= 0 ? 0 : limitar(-caja.top / recorrido);
-  };
 
   const entregar = (p: number): void => {
     // Medio milésimo de avance no mueve un píxel en pantalla; no vale la
