@@ -1,0 +1,153 @@
+/* ── COBERTURA HOY ─────────────────────────────────────────────────────
+
+   La sección densa. Es un trozo de `components.css` y **el orden importa**:
+   va después de `rutas.css` y `mapa.css`, que son las que hablan del mismo
+   dato, para poder pisarlas si alguna vez comparten selector.
+
+   Todo lo de aquí es tabla de verdad —`<table>`, `<thead>`, `<th scope>`—
+   y no una rejilla de `<div>`. Son datos con dos ejes: quien los lee con
+   la vista los recorre en columna, y quien los escucha necesita que al
+   llegar a «62,6» le digan de qué ruta es. Una rejilla no dice eso.
+   ────────────────────────────────────────────────────────────────────── */
+
+.cobertura-inner {
+  /* Más apretada que el resto: es el contrapeso de tres secciones
+     aireadas, y el aire de las otras aquí sería otra sección igual. */
+  padding-top: clamp(52px, 6vw, 92px);
+  padding-bottom: clamp(52px, 6vw, 92px);
+}
+
+.cobertura-cabecera {
+  max-width: 46ch;
+}
+
+/* El titular de esta sección va un escalón por debajo del de las demás. No
+   es una apertura: llega después de tres secciones que ya han dicho lo
+   suyo, y a tamaño de portada se comía la tabla, que es lo que se viene a
+   ver aquí. */
+.cobertura-cabecera .section-title {
+  font-size: clamp(1.9rem, 1.1rem + 2.2vw, 3rem);
+}
+
+.cobertura-lead {
+  font-size: clamp(16px, 1.25vw, 19px);
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 52ch;
+}
+
+/* En pantalla estrecha la tabla no cabe, y encogerla dejaría los nombres
+   de terminal partidos en tres renglones. Se desplaza de lado dentro de su
+   caja —nunca la página, que eso ya lo vigila una prueba— con el filo
+   redondeado que llevan las tarjetas. */
+.cobertura-tabla-caja {
+  /* Sin tope, la tabla se estira hasta el ancho del panel y deja un hueco
+     de palmo entre el nombre de la ruta y su recorrido. Las cuatro
+     columnas piden lo que piden y el resto sobra. */
+  max-width: 1080px;
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  -webkit-overflow-scrolling: touch;
+}
+
+.cobertura-tabla {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  /* Las cifras alineadas como cifras: una columna de números que no se
+     puede recorrer con la vista no es una columna, es una lista. */
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(14px, 1.05vw, 16px);
+}
+
+.cobertura-tabla thead th {
+  padding: 14px clamp(12px, 1.4vw, 20px);
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.cobertura-tabla tbody td,
+.cobertura-tabla tbody th {
+  padding: clamp(11px, 1.1vw, 15px) clamp(12px, 1.4vw, 20px);
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-secondary);
+  /* Una línea de pelo entre renglones y ninguna entre columnas: con las dos
+     la tabla se lee como una hoja de cálculo y deja de ser una lista. */
+  border-top: 1px solid var(--divider);
+}
+
+.cobertura-tabla tbody tr:first-child td,
+.cobertura-tabla tbody tr:first-child th {
+  border-top: 0;
+}
+
+/* El código interno es referencia, no lectura: se queda en monoespaciado y
+   a media luz, para que el ojo caiga primero en el nombre de la ruta. */
+/* El reparto de columnas: las tres cortas se encogen a su contenido y el
+   recorrido se queda con lo que sobre, que es donde el hueco no molesta
+   —cae detrás de las terminales, no en medio de la lectura—. */
+.cobertura-codigo,
+.cobertura-ruta,
+.cobertura-km {
+  width: 1%;
+}
+
+.cobertura-codigo {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.86em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.cobertura-ruta {
+  font-weight: 800 !important;
+  color: var(--text-primary) !important;
+  white-space: nowrap;
+}
+
+.cobertura-recorrido {
+  width: 100%;
+}
+
+/* La flecha es dibujo: quien escucha la página oye las dos terminales
+   seguidas, igual que en la ficha del mando. */
+.cobertura-flecha {
+  margin: 0 8px;
+  color: var(--text-muted);
+}
+
+.cobertura-km {
+  text-align: right !important;
+  white-space: nowrap;
+}
+
+/* El renglón de totales: el único con peso, y separado por una línea
+   entera en vez de por una de pelo. */
+.cobertura-tabla tfoot th,
+.cobertura-tabla tfoot td {
+  padding: clamp(13px, 1.2vw, 17px) clamp(12px, 1.4vw, 20px);
+  text-align: left;
+  border-top: 2px solid var(--border-subtle);
+  background: var(--arena);
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.cobertura-nota {
+  margin: clamp(18px, 2vw, 26px) 0 0;
+  max-width: 76ch;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}

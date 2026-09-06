@@ -89,4 +89,33 @@ describe('la copia dice lo mismo que los datos', () => {
 
     expect(escritas).toEqual(esperadas);
   });
+
+  /*
+    La tabla de «Cobertura hoy» está escrita renglón a renglón para que la
+    sección se lea aunque el guion no llegue, y por eso es la copia que más
+    fácil se separa de los datos: son veinticuatro celdas a mano. Aquí se
+    comparan todas, en orden, contra `rutas.json`.
+  */
+  it('index.html trae la tabla de cobertura tal como está en los datos', () => {
+    const html = leer('index.html');
+    const cuerpo = html.match(/<tbody>([\s\S]*?)<\/tbody>/);
+    expect(cuerpo, 'ya no hay tabla de cobertura en la portada').not.toBeNull();
+
+    const escritas = Array.from(
+      cuerpo![1].matchAll(
+        /<td class="cobertura-codigo">([^<]*)<\/td>\s*<th scope="row" class="cobertura-ruta">([^<]*)<\/th>\s*<td class="cobertura-recorrido"><span>([^<]*)<\/span><span class="cobertura-flecha" aria-hidden="true">[^<]*<\/span><span>([^<]*)<\/span><\/td>\s*<td class="cobertura-km">([^<]*)<\/td>/g
+      ),
+      (m) => m.slice(1, 6)
+    );
+
+    const esperadas = YV_RUTAS.rutas.map((r) => [
+      r.id,
+      r.nombre,
+      r.terminalA,
+      r.terminalB,
+      String(r.km).replace('.', ','),
+    ]);
+
+    expect(escritas).toEqual(esperadas);
+  });
 });

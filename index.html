@@ -166,6 +166,7 @@
           <nav class="nav-island-links" aria-label="Navegación principal">
             <a href="#mapa" class="nav-link">Mapa en vivo</a>
             <a href="#solucion" class="nav-link">Cómo funciona</a>
+            <a href="#cobertura" class="nav-link">Cobertura</a>
             <a href="/empresas.html" class="nav-link">Para empresas</a>
           </nav>
           <a href="#mapa" class="nav-island-cta">Probar el mapa</a>
@@ -1520,6 +1521,113 @@
     </section>
 
 
+    <!-- ============ COBERTURA HOY ============
+      La sección densa, y la que más credibilidad da. Después del hero, del
+      mapa y del cómo funciona —tres secciones aireadas, con dibujo y
+      movimiento— hace falta una compacta y llena de datos: es lo que separa
+      una página con producto detrás de una plantilla bien pintada.
+
+      Aquí van los dos datos que la ficha del mando se dejó fuera a
+      propósito, el código interno y el kilometraje, porque al lado del mapa
+      la ficha es un botón y un botón se lee de un vistazo. En una tabla no:
+      en una tabla lo que se busca es exactamente eso.
+
+      Sin animación y con cifras tabulares. Una columna de números que
+      aparecen escalonados no se puede sumar con la vista, que es lo único
+      que se hace con una columna de números.
+
+      Los seis renglones están escritos, no calculados: la sección tiene que
+      leerse aunque el guion no llegue. Que digan lo mismo que `rutas.json`
+      lo vigila `tests/coherencia.test.ts`, campo por campo.
+    -->
+    <section class="panel panel--arena cobertura-panel" id="cobertura">
+      <div class="panel-dots" aria-hidden="true"></div>
+
+      <div class="panel-inner panel-inner--ancho cobertura-inner">
+        <header class="section-head cobertura-cabecera">
+          <span class="tracked-eyebrow eyebrow--verde">COBERTURA HOY</span>
+          <h2 class="section-title">Seis rutas reales,<br />no un mapa de ejemplo.</h2>
+          <p class="cobertura-lead">Las de Sobusa, con su trazado, sus terminales y sus kilómetros tal
+            como los opera la empresa. Son las mismas que dibuja el mapa de arriba.</p>
+        </header>
+
+        <div class="cobertura-tabla-caja">
+          <table class="cobertura-tabla">
+            <caption class="solo-lectores">Rutas de Sobusa conectadas hoy, con su código
+              interno, sus terminales de cabecera y su longitud en kilómetros.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Código</th>
+                <th scope="col">Ruta</th>
+                <th scope="col">Recorrido</th>
+                <th scope="col" class="cobertura-km">km</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="cobertura-codigo">R-101</td>
+                <th scope="row" class="cobertura-ruta">B18 Tcherassi</th>
+                <td class="cobertura-recorrido"><span>Ciudad Mallorquín</span><span class="cobertura-flecha" aria-hidden="true">↔</span><span>La Playa</span></td>
+                <td class="cobertura-km">56,9</td>
+              </tr>
+              <tr>
+                <td class="cobertura-codigo">R-102</td>
+                <th scope="row" class="cobertura-ruta">C11 Silencio</th>
+                <td class="cobertura-recorrido"><span>Nevada</span><span class="cobertura-flecha" aria-hidden="true">↔</span><span>El Silencio</span></td>
+                <td class="cobertura-km">62,7</td>
+              </tr>
+              <tr>
+                <td class="cobertura-codigo">R-103</td>
+                <th scope="row" class="cobertura-ruta">C12 Vivero Paraíso</th>
+                <td class="cobertura-recorrido"><span>Vía 40</span><span class="cobertura-flecha" aria-hidden="true">↔</span><span>Paraíso</span></td>
+                <td class="cobertura-km">43,8</td>
+              </tr>
+              <tr>
+                <td class="cobertura-codigo">R-104</td>
+                <th scope="row" class="cobertura-ruta">C13 Carrera 50 Paraíso</th>
+                <td class="cobertura-recorrido"><span>Nevada (Soledad)</span><span class="cobertura-flecha" aria-hidden="true">↔</span><span>Calle 76 (Vía 40)</span></td>
+                <td class="cobertura-km">43,7</td>
+              </tr>
+              <tr>
+                <td class="cobertura-codigo">R-105</td>
+                <th scope="row" class="cobertura-ruta">C14 Carrera 54 Uninorte</th>
+                <td class="cobertura-recorrido"><span>Granabastos</span><span class="cobertura-flecha" aria-hidden="true">↔</span><span>Uninorte</span></td>
+                <td class="cobertura-km">57,1</td>
+              </tr>
+              <tr>
+                <td class="cobertura-codigo">R-106</td>
+                <th scope="row" class="cobertura-ruta">C16 Calle 72 Uninorte</th>
+                <td class="cobertura-recorrido"><span>Granabastos</span><span class="cobertura-flecha" aria-hidden="true">↔</span><span>Uninorte</span></td>
+                <td class="cobertura-km">62,6</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td class="cobertura-codigo" aria-hidden="true"></td>
+                <th scope="row" class="cobertura-ruta">6 rutas</th>
+                <td class="cobertura-recorrido">10 terminales</td>
+                <td class="cobertura-km">326,8</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!--
+          Lo que no es real, dicho aquí y no en letra pequeña al final. Es la
+          misma advertencia que lleva el mapa de arriba, y se repite a
+          propósito: quien llega hasta la tabla es quien se está tomando esto
+          en serio, y es justo a esa persona a la que no se le puede colar
+          que los buses de la demostración son simulados.
+        -->
+        <p class="cobertura-nota">
+          El trazado, las terminales y los kilómetros son los de la empresa. Los buses que
+          se mueven en la demostración están simulados: el GPS va montado en el vehículo, y
+          los datos de verdad empiezan cuando la flota se conecta.
+        </p>
+      </div>
+    </section>
+
+
     <!-- ============ EL PROBLEMA, EN UNA FRANJA ============ -->
     <!--
       Refuerzo, no apertura. Antes esto abría la página y cobraba dos
@@ -1675,6 +1783,7 @@
           <span>Explora</span>
           <a href="#mapa">Las rutas, en vivo</a>
           <a href="#solucion">Cómo funciona</a>
+          <a href="#cobertura">Cobertura hoy</a>
           <a href="#problema">El problema</a>
         </div>
         <div class="footer-nav-group">
