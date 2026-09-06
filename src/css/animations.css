@@ -119,6 +119,13 @@
     animation: none !important;
     transform: none !important;
   }
+  /* El latido de la franja del hero. Sin esto la duración de 0,01ms lo
+     deja parado en el fotograma que le pille, y ése lleva el halo abierto
+     a ocho píxeles: un punto verde con un cerco raro alrededor. */
+  .hero-vivo-pulso {
+    animation: none !important;
+    box-shadow: none !important;
+  }
   /* La respiración del trío del hero anima `translate`, no `transform`:
      hay que apagar esa propiedad y no la otra, que en los laterales
      lleva el desnivel con el que se apoyan bajo el central. */

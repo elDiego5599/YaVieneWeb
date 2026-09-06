@@ -140,6 +140,71 @@
   transform: translateY(-0.5px);
 }
 
+/* ── La franja de estado ──────────────────────────────────────────────
+
+   Cierra el hero por abajo: una sola línea con el operador, las rutas
+   conectadas y dónde. Va del ancho del contenido, con un filo arriba que
+   hace de suelo del escenario —el trío de teléfonos se apoya en él en vez
+   de flotar contra el borde del papel—.
+
+   El punto verde es el único acento de «en vivo» de la portada, y por eso
+   se guarda para aquí: repetido pierde el sentido. Late despacio y no
+   parpadea; lo que dice es «esto está encendido», no «mírame».
+   ────────────────────────────────────────────────────────────────────── */
+.hero-vivo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin: 0;
+  padding-top: clamp(18px, 2vw, 28px);
+  border-top: 1px solid var(--border-subtle);
+  font-size: clamp(13px, 1.05vw, 15px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+  /* El 6 alineado como número y no como letra: es un dato, y en una línea
+     de datos las cifras se leen mejor tabulares. */
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-vivo-marca {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+/* El punto de separación es dibujo, no lectura: quien escucha la página
+   oye los tres datos seguidos y no un punto entre cada uno. */
+.hero-vivo-sep {
+  color: var(--text-muted);
+}
+
+.hero-vivo-pulso {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--green);
+  /* El halo es una sombra y no un pseudoelemento con capa propia: así el
+     latido mueve una sola propiedad y no promueve nada. */
+  box-shadow: 0 0 0 0 var(--green-glow);
+  animation: heroLatido 2.6s var(--ease-out-cubic) infinite;
+}
+
+@keyframes heroLatido {
+  0% {
+    box-shadow: 0 0 0 0 var(--green-glow);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(0, 168, 89, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 168, 89, 0);
+  }
+}
+
 /* ── Escena del hero: el escenario de tres teléfonos ───────────────── */
 /*
   El escenario son tres aparatos: el central, que es la demo que corre

@@ -200,9 +200,14 @@
 
           <!--
             Debajo de los botones ya no va la nota del piloto —eso lo dice
-            el pie de la página, y ahí sigue—: va dónde se consigue la app.
-            Es lo primero que pregunta cualquiera que acaba de leer el
-            titular, y hasta ahora no estaba escrito en ningún sitio.
+            el pie de la página, y ahí sigue—: va en qué teléfonos va a
+            estar la app. Es lo primero que pregunta cualquiera que acaba de
+            leer el titular.
+
+            Dice «pronto en» y no «disponible en» porque hoy no hay nada que
+            descargar: la app está en piloto y se instala a mano. Prometer
+            una tienda que no existe se paga con la primera persona que va a
+            buscarla y no la encuentra.
 
             Las dos marcas van dibujadas, no en una fuente de iconos: son
             trazos de un solo camino que heredan el color del texto, así
@@ -210,7 +215,7 @@
             más al hero, que es lo que más nos ha costado aligerar.
           -->
           <p class="hero-subtext">
-            <span class="hero-subtext-lead">Ya Viene, disponible en</span>
+            <span class="hero-subtext-lead">Ya Viene, pronto en</span>
             <span class="tienda-chips">
               <span class="tienda-chip">
               <svg class="tienda-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -909,6 +914,32 @@
           eliges la empresa Sobusa y una de sus seis rutas, y por último ves los
           buses moverse sobre el mapa de Barranquilla con los metros que faltan
           para que llegue el más cercano.
+        </p>
+
+        <!--
+          La franja de estado, pegada al borde de abajo del hero. Es la línea
+          más convincente de la página: quien acaba de leer el titular quiere
+          saber si esto existe de verdad o es una maqueta, y aquí está el
+          nombre del operador, cuántas rutas van conectadas y dónde.
+
+          Dice lo que hay, no lo que se está moviendo ahora mismo. Un
+          contador de buses en marcha querría preguntárselo al servidor cada
+          vez que alguien abre la página, y hay dos razones para no hacerlo:
+          la política de contenido de `vercel.json` sólo deja hablar con este
+          mismo dominio, y el servidor está apagado a propósito —despertarlo
+          por cada visita se paga—. Así que el dato es cierto y está escrito,
+          que es mejor que un número en vivo que un día dice cero.
+
+          Las seis rutas son las de `rutas.json`; que este «6» siga siendo
+          seis lo vigila `tests/coherencia.test.ts`.
+        -->
+        <p class="hero-vivo">
+          <span class="hero-vivo-pulso" aria-hidden="true"></span>
+          <span class="hero-vivo-marca">Sobusa</span>
+          <span class="hero-vivo-sep" aria-hidden="true">·</span>
+          <span>6 rutas conectadas</span>
+          <span class="hero-vivo-sep" aria-hidden="true">·</span>
+          <span>Barranquilla y Soledad</span>
         </p>
       </div>
     </section>
