@@ -25,6 +25,7 @@ import './css/componentes/empresas-pagina.css';
 import './css/animations.css';
 import './css/accesibilidad.css';
 
+import { marcarAnimable } from './animable';
 import { ContactForm } from './contact-form';
 import { NavIsland } from './nav-island';
 import { encenderScrollSuave } from './scroll-suave';
@@ -40,6 +41,10 @@ const arrancar = (): void => {
   const form = document.querySelector<HTMLFormElement>('#contact-form');
   if (form) new ContactForm(form);
 };
+
+// Lo mismo que en la portada: sin esta marca nada empieza escondido, así
+// que si el guion no llega la página se lee igual. Ver animable.ts.
+marcarAnimable();
 
 encenderScrollSuave();
 

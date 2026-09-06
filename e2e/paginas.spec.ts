@@ -230,9 +230,6 @@ for (const { ruta, nombre } of PAGINAS) {
 */
 
 /*
-  La banda de empresas. Es prueba social: si un logo no carga, no se lee o
-  sale en gris, la banda deja de probar nada y encima señala a la empresa
-/*
   La banda de empresas en /empresas.html. Es prueba social: si un logo no
   carga, no se lee o sale en gris, la banda deja de probar nada. Se
   comprueba que los siete logos estén en color real y cargados.
@@ -265,4 +262,65 @@ test.describe('la banda de empresas', () => {
     expect(logos.filter((p) => p.opacidad < 1).map((p) => p.empresa), 'logos a media tinta').toEqual([]);
     expect(logos.filter((p) => p.alto < 18).map((p) => p.empresa), 'logos demasiado pequeños para leerse').toEqual([]);
   });
+});
+
+/*
+  Sin JavaScript, la página se lee entera.
+
+  Es la avería más cara de todas y la más silenciosa: las apariciones al
+  bajar empezaban escondidas en el CSS y sólo se destapaban cuando el
+  observador las tocaba, así que cualquier cosa que dejara el guion fuera
+  —un despliegue a medias, una extensión, una red que corta el módulo—
+  servía una hoja en blanco con el fondo puesto. Ahora el estado escondido
+  cuelga de una clase que sólo pone el propio guion, y esta prueba lo
+  vigila apagando el JavaScript del todo. Ver animable.ts.
+*/
+test.describe('sin JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  for (const { ruta, nombre } of [
+    { ruta: '/', nombre: 'portada' },
+    { ruta: '/empresas.html', nombre: 'empresas' },
+  ]) {
+    test(`el contenido de ${nombre} se ve aunque el guion no llegue`, async ({ page }) => {
+      await page.goto(ruta, { waitUntil: 'load' });
+
+      // Nadie puso la marca, así que nada tiene derecho a estar escondido.
+      await expect(page.locator('html.animable')).toHaveCount(0);
+
+      /* Se dejan fuera las que el diseño quita en esta anchura —los dos
+         teléfonos de los lados van `display: none` en móvil—: eso no lo
+         decide el guion, lo decide una consulta de medios, y sigue igual
+         con el JavaScript puesto. Lo que se mira es lo que se enseña. */
+      const opacos = await page.evaluate(() =>
+        Array.from(document.querySelectorAll<HTMLElement>('.reveal, .escena-entra'))
+          .filter((el) => {
+            const estilo = getComputedStyle(el);
+            return estilo.display !== 'none' && estilo.visibility !== 'hidden';
+          })
+          .map((el) => ({
+            clase: el.className,
+            opacidad: Number(getComputedStyle(el).opacity),
+            alto: Math.round(el.getBoundingClientRect().height),
+          }))
+      );
+
+      expect(opacos.length, 'la página tiene piezas que aparecen al bajar').toBeGreaterThan(0);
+
+      /* Se busca lo transparente del todo, no lo atenuado: los buses del
+         hero bajan a 0,9 en pantalla estrecha porque así está pensado el
+         dibujo, y eso se ve. Lo que no puede quedar es un 0. */
+      expect(
+        opacos.filter((p) => p.opacidad <= 0.05).map((p) => p.clase),
+        'piezas invisibles sin guion que las destape'
+      ).toEqual([]);
+      expect(
+        opacos.filter((p) => p.alto === 0).map((p) => p.clase),
+        'piezas sin altura sin guion que las despliegue'
+      ).toEqual([]);
+
+      // Y el titular sigue siendo legible, que es lo que se vino a leer.
+      await expect(page.locator('h1')).toBeVisible();
+    });
+  }
 });

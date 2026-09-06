@@ -77,6 +77,11 @@ export const fichaDeRuta = (ruta: RutaLanding): HTMLButtonElement => {
 /**
  * Las tres cifras de cabecera, calculadas de los datos del mapa.
  *
+ * En el HTML ya van escritas: si el guion no llega, la cabecera de la
+ * sección se lee igual en vez de quedarse en blanco. Esto las vuelve a
+ * poner con lo que digan los datos, que es quien manda; que las dos copias
+ * digan lo mismo lo vigila `tests/coherencia.test.ts`.
+ *
  * Se pintan antes que `ScrollEffects` para que el observador las recoja:
  * llevan `.reveal` desde el HTML y pintadas después entrarían ya visibles.
  */

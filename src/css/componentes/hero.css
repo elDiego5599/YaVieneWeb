@@ -229,7 +229,10 @@
 
    Sin `will-change`: son siete elementos y la promoción a capa
    permanente cuesta memoria para algo que pasa una sola vez. */
-.escena-entra {
+/* Colgado de `.animable` igual que `.reveal`: si el guion no llega, el
+   hero se ve entero y quieto en vez de quedarse en blanco esperando a
+   quien lo destape. Ver animable.ts. */
+.animable .escena-entra {
   opacity: 0;
   scale: 0.94;
   transition:

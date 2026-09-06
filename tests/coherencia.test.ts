@@ -59,4 +59,34 @@ describe('la copia dice lo mismo que los datos', () => {
       expect(enlaces.filter((n) => n !== WHATSAPP)).toEqual([]);
     });
   }
+
+  /*
+    Las tres cifras de cabecera de la portada están escritas en el HTML
+    para que la sección no salga vacía si el guion no llega, y `rutas.ts`
+    las recalcula de estos mismos datos al arrancar. Son dos copias del
+    mismo número, y dos copias se separan: la escrita se queda quieta el
+    día que entre una ruta más, y entonces la página diría una cosa antes
+    de cargar y otra después. Esto lo caza ese día.
+  */
+  it('index.html trae escritas las mismas cifras que calcula el guion', () => {
+    const km = YV_RUTAS.rutas.reduce((suma, r) => suma + r.km, 0);
+    const esperadas = [
+      [String(rutas), 'rutas'],
+      [String(terminales), 'terminales'],
+      [String(Number(km.toFixed(1))).replace('.', ','), 'kilómetros'],
+    ];
+
+    const html = leer('index.html');
+    const bloque = html.match(/<div class="rutas-cifras[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/);
+    expect(bloque, 'ya no hay bloque de cifras en la portada').not.toBeNull();
+
+    const escritas = Array.from(
+      bloque![0].matchAll(
+        /<strong class="rutas-dato-numero">([^<]+)<\/strong><span class="rutas-dato-rotulo">([^<]+)<\/span>/g
+      ),
+      (m) => [m[1], m[2]]
+    );
+
+    expect(escritas).toEqual(esperadas);
+  });
 });

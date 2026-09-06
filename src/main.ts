@@ -19,6 +19,7 @@ import './css/phone-simulator.css';
 import './css/animations.css';
 import './css/accesibilidad.css';
 
+import { marcarAnimable } from './animable';
 import { ContactForm } from './contact-form';
 import { encajarEscena } from './encaje';
 import { MapaVivo } from './mapa-vivo';
@@ -153,6 +154,14 @@ const arrancar = (): void => {
     });
   }
 };
+
+/*
+  Lo primero de todo, antes de esperar a que el documento esté listo: la
+  marca que permite que algo empiece escondido. Sin ella la página se ve
+  entera, que es como tiene que verse si este archivo nunca llega. El
+  porqué largo está en animable.ts.
+*/
+marcarAnimable();
 
 // El scroll suave se enciende al final, cuando ya no queda nada por
 // colocar. El porqué está en scroll-suave.ts y en base.css.

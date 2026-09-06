@@ -942,7 +942,17 @@
             datos duros —seis rutas, diez terminales, los kilómetros—, y
             de la demo ya se encarga la pista sobre el mapa.
           -->
-          <div class="rutas-cifras reveal" data-reveal-delay="90" data-rutas-cifras></div>
+          <!-- Las tres cifras van escritas aquí, no sólo calculadas por el
+               guion: sin ellas en el HTML la cabecera de la sección se queda
+               vacía cuando el JavaScript no llega. `rutas.ts` las recalcula de
+               `rutas.json` al arrancar y las vuelve a poner, así que el dato
+               que manda sigue siendo el del mapa; esto es el mismo dato
+               escrito, y `tests/coherencia.test.ts` vigila que no se separen. -->
+          <div class="rutas-cifras reveal" data-reveal-delay="90" data-rutas-cifras>
+            <div class="rutas-dato"><strong class="rutas-dato-numero">6</strong><span class="rutas-dato-rotulo">rutas</span></div>
+            <div class="rutas-dato"><strong class="rutas-dato-numero">10</strong><span class="rutas-dato-rotulo">terminales</span></div>
+            <div class="rutas-dato"><strong class="rutas-dato-numero">326,8</strong><span class="rutas-dato-rotulo">kilómetros</span></div>
+          </div>
         </header>
         <!--
           Ni el aviso ni la pista de toque van encima del mosaico. Estuvieron
