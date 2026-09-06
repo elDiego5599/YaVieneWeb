@@ -26,7 +26,7 @@
    suyo, y a tamaño de portada se comía la tabla, que es lo que se viene a
    ver aquí. */
 .cobertura-cabecera .section-title {
-  font-size: clamp(1.9rem, 1.1rem + 2.2vw, 3rem);
+  font-size: var(--step-h2);
 }
 
 .cobertura-lead {

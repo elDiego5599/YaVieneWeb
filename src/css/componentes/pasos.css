@@ -87,7 +87,7 @@
 
 .pasos-portada .section-title {
   font-family: var(--font-display);
-  font-size: clamp(3.25rem, 1rem + 9vw, 9rem);
+  font-size: clamp(2.8rem, 1rem + 7.2vw, 7.2rem);
   font-weight: 800;
   line-height: 0.86;
   letter-spacing: -0.05em;
@@ -318,7 +318,7 @@
 
 .paso-titulo {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 1.1rem + 2.8vw, 3.6rem);
+  font-size: clamp(1.85rem, 1.05rem + 2.3vw, 3.05rem);
   font-weight: 700;
   line-height: 1.02;
   letter-spacing: -0.035em;

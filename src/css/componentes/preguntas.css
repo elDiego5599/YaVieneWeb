@@ -22,7 +22,7 @@
 }
 
 .preguntas-cabecera .section-title {
-  font-size: clamp(1.9rem, 1.1rem + 2.2vw, 3rem);
+  font-size: var(--step-h2);
 }
 
 .preguntas-lista {
