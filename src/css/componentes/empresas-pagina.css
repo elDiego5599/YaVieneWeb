@@ -252,7 +252,10 @@
   gap: 18px;
 }
 
-.empresa-solicitud h1 {
+/* El titular del formulario dejó de ser el `h1` de la página cuando la
+   portada de arriba se llevó ese sitio; el tamaño se queda donde estaba. */
+.empresa-solicitud h1,
+.empresa-solicitud h2 {
   font-family: var(--font-display);
   font-size: var(--step-h2);
   line-height: 0.98;
@@ -536,4 +539,273 @@
   .empresa-marcas-carrusel::after {
     display: none;
   }
+}
+
+/* ── LAS SIETE SECCIONES ───────────────────────────────────────────────
+   La página pasó de una pantalla a siete secciones, una por pregunta que
+   hace una empresa antes de decir que sí. Lo que sigue es el andamio de
+   esas seis nuevas; lo de arriba —la ficha blanca, la consola, el
+   carrusel y el formulario— se reutiliza tal cual.
+
+   El único truco de todo el bloque es que las tarjetas de las rejillas
+   son iguales en las dos secciones que las usan, aunque una vaya sobre
+   fondo blanco y la otra sobre la crema: lo que cambia entre ellas es el
+   suelo, no las piezas.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── 1 · La portada de la página ───────────────────────────────────── */
+
+.emp-hero {
+  display: grid;
+  gap: clamp(32px, 4vw, 64px);
+  align-items: center;
+}
+
+@media (min-width: 1000px) {
+  .emp-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+  }
+}
+
+.emp-hero-texto h1 {
+  margin: 14px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 1.2rem + 3vw, 3.9rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+}
+
+.emp-hero-lead {
+  margin: clamp(18px, 2vw, 26px) 0 0;
+  font-size: var(--step-lead);
+  line-height: 1.45;
+  color: var(--text-secondary);
+  max-width: 46ch;
+}
+
+.emp-hero-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: clamp(26px, 3vw, 36px);
+}
+
+.emp-hero-consola {
+  min-width: 0;
+}
+
+/* ── Rejilla de tarjetas: «qué instalamos» y «qué ganas» ───────────── */
+
+.emp-rejilla {
+  display: grid;
+  gap: clamp(16px, 1.8vw, 24px);
+}
+
+@media (min-width: 860px) {
+  .emp-rejilla--tres {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.emp-tarjeta {
+  padding: clamp(24px, 2.4vw, 34px);
+  border: 1px solid var(--divider);
+  border-radius: 22px;
+  background: var(--surface);
+}
+
+/* Sobre el blanco de `.panel--arena` una tarjeta blanca desaparecería:
+   ahí el relleno es la crema de la app, y sobre la crema de la banda a
+   sangre es al revés, la tarjeta va en blanco. */
+.panel--arena .emp-tarjeta,
+.panel--arena .emp-estado,
+.panel--arena .emp-paso {
+  background: var(--arena);
+}
+
+.panel--sangre .emp-tarjeta,
+.panel--sangre .emp-estado,
+.panel--sangre .emp-paso {
+  background: var(--surface);
+}
+
+.emp-tarjeta h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.emp-tarjeta p {
+  margin: 12px 0 0;
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* ── 3 · Los tres estados ──────────────────────────────────────────── */
+
+.emp-estados {
+  display: grid;
+  gap: clamp(16px, 1.8vw, 24px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 860px) {
+  .emp-estados {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.emp-estado {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: clamp(22px, 2.2vw, 30px);
+  border: 1px solid var(--divider);
+  border-radius: 20px;
+  background: var(--arena);
+}
+
+/* El mismo punto que pinta el panel de control de verdad, con los mismos
+   tres significados. Que la web y el producto usen la misma señal es
+   justamente lo que se quiere: no hay una leyenda que aprender dos veces. */
+.emp-estado-punto {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.emp-estado-punto--linea {
+  background: var(--green);
+  box-shadow: 0 0 0 4px rgba(0, 168, 89, 0.16);
+}
+
+.emp-estado-punto--oculto {
+  background: transparent;
+  border: 2px solid var(--green);
+}
+
+.emp-estado strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.emp-estado p {
+  margin: 8px 0 0;
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.emp-nota {
+  margin: clamp(24px, 2.6vw, 34px) 0 0;
+  max-width: var(--measure);
+  font-size: var(--step-body);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.emp-nota strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* ── 5 · Los tres pasos ────────────────────────────────────────────── */
+
+.emp-pasos {
+  display: grid;
+  gap: clamp(18px, 2vw, 26px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: paso;
+}
+
+@media (min-width: 860px) {
+  .emp-pasos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.emp-paso {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(24px, 2.4vw, 34px);
+  border-top: 2px solid var(--green);
+  background: var(--arena);
+  border-radius: 0 0 20px 20px;
+}
+
+.emp-paso-numero {
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--green-accessible);
+  font-variant-numeric: tabular-nums;
+}
+
+.emp-paso h3 {
+  margin: 12px 0 0;
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.emp-paso p {
+  margin: 10px 0 0;
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* El tiempo va abajo del todo aunque los textos midan distinto, para que
+   las tres fichas terminen en la misma línea. */
+.emp-paso-tiempo {
+  margin-top: auto;
+  padding-top: 18px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── 6 · Seguridad ─────────────────────────────────────────────────── */
+
+.emp-seguridad .empresa-lista {
+  max-width: 74ch;
+}
+
+/* ── 7 · El cierre ─────────────────────────────────────────────────── */
+
+.emp-ficha-texto {
+  margin: 0;
+  font-size: var(--step-body);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* En el cierre la ficha ya no lleva la consola dentro, así que el hueco
+   de siempre entre sus piezas deja demasiado aire encima del carrusel. */
+.emp-cierre .empresa-ficha {
+  gap: clamp(16px, 1.8vw, 22px);
 }
