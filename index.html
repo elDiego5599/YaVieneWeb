@@ -161,14 +161,42 @@
         <span class="wordmark">YA VIENE</span>
       </a>
 
+      <!--
+        Dónde va el lector, dicho como lo dice un bus por fuera: número de
+        parada y nombre. Sin guion se queda en la primera, que es la que
+        corresponde a una página recién abierta.
+      -->
+      <p class="nav-actual">
+        <span class="nav-actual-num" data-parada-numero>00</span>
+        <span class="nav-actual-nombre" data-parada-nombre-actual>Inicio</span>
+      </p>
+
       <div class="nav-island-reveal" id="nav-island-menu">
         <div class="nav-island-inner">
-          <nav class="nav-island-links" aria-label="Navegación principal">
-            <a href="#mapa" class="nav-link">Mapa en vivo</a>
-            <a href="#solucion" class="nav-link">Cómo funciona</a>
-            <a href="#cobertura" class="nav-link">Cobertura</a>
-            <a href="#preguntas" class="nav-link">Preguntas</a>
-            <a href="/empresas.html" class="nav-link">Para empresas</a>
+          <!--
+            El letrero de ruta: las paradas de la página en orden, con su
+            número, como el cartel del interior de un bus. La actual la
+            marca `paradas.ts` con `aria-current`.
+          -->
+          <nav class="nav-island-links letrero" aria-label="Paradas de la página">
+            <a href="#mapa" class="nav-link letrero-parada">
+              <span class="letrero-num" aria-hidden="true">01</span><span>El mapa</span>
+            </a>
+            <a href="#solucion" class="nav-link letrero-parada">
+              <span class="letrero-num" aria-hidden="true">02</span><span>Cómo funciona</span>
+            </a>
+            <a href="#cobertura" class="nav-link letrero-parada">
+              <span class="letrero-num" aria-hidden="true">03</span><span>Cobertura</span>
+            </a>
+            <a href="#problema" class="nav-link letrero-parada">
+              <span class="letrero-num" aria-hidden="true">04</span><span>El problema</span>
+            </a>
+            <a href="#preguntas" class="nav-link letrero-parada">
+              <span class="letrero-num" aria-hidden="true">05</span><span>Preguntas</span>
+            </a>
+            <a href="/empresas.html" class="nav-link letrero-parada letrero-parada--salida">
+              <span class="letrero-num" aria-hidden="true">&rarr;</span><span>Para empresas</span>
+            </a>
           </nav>
           <a href="#mapa" class="nav-island-cta">Probar el mapa</a>
         </div>
@@ -183,8 +211,12 @@
 
   <main id="contenido">
 
+    <!-- La línea de ruta: baja por el margen izquierdo del contenido entero. -->
+    <div class="riel" aria-hidden="true"></div>
+
     <!-- ============ HERO ============ -->
-    <section class="panel panel--sangre panel--sun hero-panel" id="hero">
+    <section class="panel panel--sangre panel--sun hero-panel" id="hero"
+      data-parada="00" data-parada-nombre="Inicio">
       <div class="panel-dots" aria-hidden="true"></div>
 
       <div class="panel-inner hero-grid">
@@ -1004,7 +1036,13 @@
       documento y sigue en la del pie sin costura, que es lo mismo que
       hace el pie con el borde de abajo de la página.
     -->
-    <section class="panel panel--sangre mapa-panel" id="mapa">
+    <section class="panel panel--sangre mapa-panel" id="mapa"
+      data-parada="01" data-parada-nombre="El mapa">
+
+      <div class="parada" aria-hidden="true">
+        <span class="parada-nodo"></span>
+        <span class="parada-rotulo">01 &middot; El mapa</span>
+      </div>
       <div class="panel-inner panel-inner--ancho mapa-inner">
         <header class="mapa-cabecera entra-relevo">
           <span class="tracked-eyebrow eyebrow--verde">EN OPERACIÓN</span>
@@ -1090,7 +1128,13 @@
       Los teléfonos no son fotos fijas: cada uno repite en bucle el gesto del
       que habla su texto, y sólo corre el que está quieto en el centro.
     -->
-    <section class="panel panel--mint panel--sangre" id="solucion">
+    <section class="panel panel--mint panel--sangre" id="solucion"
+      data-parada="02" data-parada-nombre="Cómo funciona">
+
+      <div class="parada" aria-hidden="true">
+        <span class="parada-nodo"></span>
+        <span class="parada-rotulo">02 &middot; Cómo funciona</span>
+      </div>
       <div class="pista pista--pasos" data-pasos-pista>
         <div class="escena">
           <div class="panel-inner panel-inner--ancho pasos-escena">
@@ -1581,7 +1625,13 @@
       leerse aunque el guion no llegue. Que digan lo mismo que `rutas.json`
       lo vigila `tests/coherencia.test.ts`, campo por campo.
     -->
-    <section class="panel panel--arena cobertura-panel" id="cobertura">
+    <section class="panel panel--arena cobertura-panel" id="cobertura"
+      data-parada="03" data-parada-nombre="Cobertura">
+
+      <div class="parada" aria-hidden="true">
+        <span class="parada-nodo"></span>
+        <span class="parada-rotulo">03 &middot; Cobertura</span>
+      </div>
       <div class="panel-dots" aria-hidden="true"></div>
 
       <div class="panel-inner panel-inner--ancho cobertura-inner">
@@ -1684,7 +1734,13 @@
       en adelante sigue corriendo el tiempo real, igual que antes. Lo dice
       `data-reloj-cruce`; el que elige es reloj.ts.
     -->
-    <section class="panel panel--arena" id="problema" data-clima="sol">
+    <section class="panel panel--arena" id="problema" data-clima="sol"
+      data-parada="04" data-parada-nombre="El problema">
+
+      <div class="parada" aria-hidden="true">
+        <span class="parada-nodo"></span>
+        <span class="parada-rotulo">04 &middot; El problema</span>
+      </div>
       <div class="panel-dots" aria-hidden="true"></div>
 
       <div class="pista pista--franja" data-reloj-pista data-reloj-cruce>
@@ -1813,7 +1869,13 @@
       que es justo donde alguien de una empresa acaba de leer cómo va el
       equipo y quiere preguntar lo suyo.
     -->
-    <section class="panel panel--arena preguntas-panel" id="preguntas">
+    <section class="panel panel--arena preguntas-panel" id="preguntas"
+      data-parada="05" data-parada-nombre="Preguntas">
+
+      <div class="parada" aria-hidden="true">
+        <span class="parada-nodo"></span>
+        <span class="parada-rotulo">05 &middot; Preguntas</span>
+      </div>
       <div class="panel-dots" aria-hidden="true"></div>
 
       <div class="panel-inner panel-inner--ancho preguntas-inner">
@@ -1902,7 +1964,17 @@
 
   </main>
 
-  <footer class="site-footer" id="pie">
+  <!-- El bus: baja por el riel al ritmo del scroll. -->
+  <div class="bus-riel" aria-hidden="true"><span class="bus-punto"></span></div>
+
+  <footer class="site-footer" id="pie" data-parada="&mdash;" data-parada-nombre="Fin de línea">
+
+    <!-- El segundo tramo del riel y la última parada del recorrido. -->
+    <div class="riel riel--fin" aria-hidden="true"></div>
+    <div class="parada" aria-hidden="true">
+      <span class="parada-nodo"></span>
+      <span class="parada-rotulo">&mdash; &middot; Fin de línea</span>
+    </div>
     <div class="footer-cta">
       <span class="tracked-eyebrow eyebrow--ambar">YA VIENE EN BARRANQUILLA</span>
       <h2 class="entra-corte">La ciudad se mueve contigo.</h2>

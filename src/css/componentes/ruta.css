@@ -1,0 +1,367 @@
+/* ============ LA LÍNEA DE RUTA ============
+
+   El motivo de la página. No es una decoración de carretera: es la
+   estructura. La página tiene paradas numeradas en vez de secciones, una
+   línea de dos píxeles baja por el margen izquierdo de punta a punta, cada
+   parada hace un nodo sobre esa línea, y un punto verde —el bus— baja al
+   ritmo exacto del scroll. Es la barra de progreso y el motivo de marca a
+   la vez.
+
+   Tres piezas, y cada una vive donde tiene que vivir:
+
+   - El riel es un solo elemento dentro de `main`, del alto del documento.
+   - Los nodos y los rótulos van dentro de su parada, porque tienen que
+     caer a la altura de su titular y porque así toman el color del campo
+     en el que están.
+   - El bus va fijo a la ventana y lo mueve la línea de tiempo de scroll,
+     sin pasar por el hilo principal.
+*/
+
+/*
+  El riel cruza campos de todos los colores —crema, tinta, verde, coral,
+  blanco— y tiene que verse en los cinco. Un gris fijo se pierde en dos de
+  ellos y `currentColor` no sirve porque el riel está fuera de los paneles
+  y no hereda el color de ninguno.
+
+  `exclusion` con un gris medio lo resuelve de una vez: la fórmula de esa
+  mezcla es `fondo + capa - 2·fondo·capa`, que con la capa en 0,5 da 0,5
+  sea cual sea el fondo. Una línea gris media, la misma, encima de
+  cualquier campo. Donde no se entienda la mezcla queda el gris tal cual,
+  que sobre los campos claros —que son la mayoría— también se ve.
+*/
+/* Cada tramo se mide contra su caja: el primero contra `main` y el segundo
+   contra el pie, que ya venía posicionado. */
+main {
+  position: relative;
+}
+
+.riel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--riel-ancho) / 2);
+  width: var(--riel-trazo);
+  z-index: 5;
+  pointer-events: none;
+  background: #808080;
+  mix-blend-mode: exclusion;
+}
+
+/*
+  El riel va en dos tramos porque el contenido va en dos cajas: el del
+  contenido y el del pie. Uno detrás de otro son una sola línea —tienen la
+  misma anchura, el mismo sitio y la misma mezcla—, y así el recorrido llega
+  hasta abajo del todo sin obligar al `<body>` a ser el marco de referencia
+  de todo lo que hay posicionado en la página.
+
+  Fin de línea: una barra cruzada al final del segundo tramo, como el tope
+  de un plano de recorrido. La línea no se desvanece, termina.
+*/
+/*
+  El margen inferior del último panel se escapa de `main` en lugar de
+  contarse dentro (los márgenes verticales se funden cuando no hay borde ni
+  relleno que los detenga), así que entre el final de `main` y el principio
+  del pie queda un hueco del tamaño de ese margen. El segundo tramo sube esa
+  misma distancia para empalmar con el primero y que la línea no tenga
+  costura. Si algún día el último panel deja de llevar margen, los dos tramos
+  se solapan unos píxeles y no se nota: la mezcla de exclusión sobre gris
+  medio da gris medio otra vez.
+*/
+.riel--fin {
+  top: calc(var(--panel-gap) * -1);
+
+  /*
+    Y por abajo se detiene a la altura del relleno inferior del pie, no en el
+    borde de la ventana: un tope pegado al canto se lee como un corte, y lo
+    que queremos es que se lea como un final.
+  */
+  bottom: 24px;
+}
+
+.riel--fin::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -9px;
+  width: 20px;
+  height: var(--riel-trazo);
+  background: inherit;
+}
+
+/*
+  El hero se pone por delante del riel para taparlo. El recorrido empieza en
+  la primera parada, no en la portada: ahí el cartel se apoya en el borde
+  izquierdo y una línea a 28 puntos le cruzaría la «¿».
+
+  Se hace tapando y no recortando el riel por arriba porque el alto del hero
+  no es un número que el CSS pueda saber —depende de la ventana, del texto y
+  de si los teléfonos caben—, y así el riel arranca exactamente donde
+  termina la portada, mida lo que mida.
+*/
+.hero-panel {
+  z-index: 6;
+}
+
+/*
+  La parada. Un ancla sin tamaño: lo que se ve son sus dos hijos, y los dos
+  se colocan contra ella. Va a la altura del relleno de arriba del panel,
+  que es donde empieza el titular de la sección.
+
+  El desplazamiento lateral depende de si el panel flota o va a sangre: uno
+  empieza en el canalón y el otro en el borde de la ventana, y el nodo
+  tiene que caer sobre el riel en los dos casos.
+*/
+.parada {
+  position: absolute;
+  top: var(--parada-y, clamp(52px, 7vw, 116px));
+  left: calc(var(--riel-ancho) / 2 - var(--gutter));
+  width: 0;
+  height: 0;
+  z-index: 2;
+  pointer-events: none;
+  color: var(--text-primary);
+}
+
+.panel--sangre .parada,
+.site-footer .parada {
+  left: calc(var(--riel-ancho) / 2);
+}
+
+/*
+  El nodo: una barra corta cruzada sobre el riel, como la marca de una
+  parada en un plano de línea. Nada redondo y nada con sombra.
+
+  Al llegar el bus se enciende: se alarga y se pone verde. La transición es
+  larga y con `--salida` porque lo que cambia es un estado del recorrido,
+  no una respuesta al puntero.
+*/
+.parada-nodo {
+  position: absolute;
+  top: 0;
+  left: -9px;
+  width: 20px;
+  height: var(--riel-trazo);
+  background: currentColor;
+  opacity: 0.32;
+  transition:
+    width 0.5s var(--salida),
+    left 0.5s var(--salida),
+    background-color 0.5s var(--salida),
+    opacity 0.5s var(--salida);
+}
+
+.parada.es-pasada .parada-nodo {
+  left: -15px;
+  width: 32px;
+  background: var(--green);
+  opacity: 1;
+}
+
+/*
+  El rótulo, leído de abajo arriba por el margen. Es donde vive el
+  `01 · EL MAPA`: en mono, pequeño y muy espaciado, como el número de una
+  línea de bus.
+
+  `vertical-rl` pone el texto en columna pero leyéndose de arriba abajo, que
+  para un rótulo al margen es el sentido incómodo; el giro de media vuelta
+  lo deja leyéndose de abajo arriba, que es como se rotulan los lomos y los
+  costados. El giro es sobre el centro de la caja, así que no la mueve de
+  donde está.
+*/
+.parada-rotulo {
+  position: absolute;
+  top: 24px;
+  left: 1px;
+  translate: -50% 0;
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+  font-family: var(--font-mono);
+  font-size: var(--step-rotulo);
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: currentColor;
+  opacity: 0.55;
+  transition:
+    color 0.5s var(--salida),
+    opacity 0.5s var(--salida);
+}
+
+.parada.es-pasada .parada-rotulo {
+  color: var(--green);
+  opacity: 1;
+}
+
+/*
+  Por debajo de 900 el margen mide 34 y el rótulo girado no cabe sin
+  meterse en el texto. Se queda el nodo, que es lo que hace la parada; el
+  número y el nombre siguen estando en el letrero de arriba.
+*/
+@media (max-width: 899px) {
+  .parada-rotulo {
+    display: none;
+  }
+}
+
+/* ── El bus ──────────────────────────────────────────────────────────────
+
+   Fijo a la ventana y bajando de arriba abajo mientras la página se
+   recorre. Al final del recorrido el punto está abajo del todo: eso es
+   toda la barra de progreso que hace falta.
+
+   El anillo crema es lo que lo salva del campo verde, donde un punto verde
+   sobre verde no existiría. Es `outline` y no `box-shadow` porque es un
+   anillo, no una sombra, y aquí no hay sombras.
+*/
+.bus-riel {
+  position: fixed;
+  top: 0;
+  left: calc(var(--riel-ancho) / 2);
+  width: 0;
+  height: 100svh;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.bus-punto {
+  position: absolute;
+  top: 0;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+  outline: 3px solid var(--campo-crema);
+  /* Sin línea de tiempo de scroll no hay bus: un punto verde parado en la
+     esquina de arriba no dice nada. Lo que queda es el riel y los nodos,
+     que es lo que lleva la información. */
+  opacity: 0;
+}
+
+@keyframes busBaja {
+  to {
+    translate: 0 calc(100svh - 10px);
+  }
+}
+
+@keyframes busAparece {
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+  Dos animaciones sobre la misma línea de tiempo y con tramos distintos: una
+  baja el punto a lo largo de todo el documento y la otra lo enciende
+  durante la primera pantalla, que es la del hero —donde el riel todavía no
+  se ha visto y un punto suelto sobraría—.
+
+  Va también con movimiento reducido. Esto no es un adorno que se mueve
+  solo: es dónde estás en la página, y quitarlo sería quitar información.
+*/
+@supports (animation-timeline: scroll()) {
+  .bus-punto {
+    animation:
+      busBaja linear both,
+      busAparece linear both;
+    animation-timeline: scroll(root block), scroll(root block);
+    animation-range: 0 100%, 0 70vh;
+  }
+}
+
+/* ── El letrero ──────────────────────────────────────────────────────────
+
+   El menú deja de ser una lista de enlaces y pasa a ser el cartel del
+   interior de un bus: las paradas en orden, numeradas, con la actual
+   marcada. Es la misma información que ya daba —a dónde puedo ir— dicha en
+   el idioma de la página.
+*/
+.letrero {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.letrero-parada {
+  display: grid;
+  grid-template-columns: 2.6ch 1fr;
+  align-items: baseline;
+  gap: 10px;
+  padding: 7px 10px;
+  border-left: var(--riel-trazo) solid var(--linea-tinta);
+  font-family: var(--font-mono);
+  font-size: var(--step-rotulo);
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--sobre-tinta-suave);
+  transition:
+    color 0.24s var(--salida),
+    border-color 0.24s var(--salida),
+    background-color 0.24s var(--salida);
+}
+
+.letrero-parada:hover,
+.letrero-parada:focus-visible {
+  color: var(--sobre-tinta);
+  border-left-color: var(--green);
+}
+
+.letrero-parada[aria-current] {
+  color: var(--sobre-tinta);
+  border-left-color: var(--green);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.letrero-num {
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+}
+
+/* El transbordo: la única de la lista que se va a otra página. Se separa
+   con una línea porque no es una parada más de este recorrido. */
+.letrero-parada--salida {
+  margin-top: 6px;
+  border-top: 1px solid var(--linea-tinta-tenue);
+  padding-top: 12px;
+}
+
+/* ── La parada actual, en la isla ────────────────────────────────────────
+
+   Con el menú cerrado la isla dice en qué parada va el lector, como el
+   letrero de destino de un bus. El ancho del nombre está fijado en
+   caracteres para que la isla no cambie de tamaño cada vez que se pasa de
+   una parada a otra.
+*/
+.nav-actual {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding-left: 12px;
+  border-left: 1px solid var(--linea-tinta);
+  font-family: var(--font-mono);
+  font-size: var(--step-rotulo);
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--sobre-tinta-suave);
+  white-space: nowrap;
+}
+
+.nav-actual-num {
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+}
+
+.nav-actual-nombre {
+  min-width: 13ch;
+  color: var(--sobre-tinta);
+}
+
+/* En pantalla estrecha la isla no tiene sitio para el nombre. Se queda el
+   número, que es lo que cambia. */
+@media (max-width: 700px) {
+  .nav-actual-nombre {
+    display: none;
+  }
+}

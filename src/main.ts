@@ -36,6 +36,7 @@ import { dormirLoQueNoSeVe } from './reposo';
 import { saltosDeMenu } from './salto';
 import { encenderCifras } from './cifras';
 import { encenderTeletipo } from './teletipo';
+import { encenderParadas } from './paradas';
 import { encenderEntradas } from './entradas';
 import { partirTitulares } from './titulares';
 import { encenderScrollSuave } from './scroll-suave';
@@ -70,6 +71,9 @@ const arrancar = (): void => {
 
   // El teletipo del hero: las seis rutas pasando por la franja de abajo.
   encenderTeletipo();
+
+  // En qué parada va el lector: el nodo del margen y el letrero de la isla.
+  encenderParadas();
 
   // Apariciones al entrar en pantalla: ya está puesto todo lo que mira.
   new ScrollEffects();

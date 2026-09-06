@@ -16,6 +16,7 @@
    ===================================== */
 
 @import './componentes/nav.css';
+@import './componentes/ruta.css';
 @import './componentes/botones.css';
 @import './componentes/hero.css';
 @import './componentes/problema.css';
