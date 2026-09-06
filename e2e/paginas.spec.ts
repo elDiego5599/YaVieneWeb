@@ -87,12 +87,22 @@ async function quienSeDesborda(page: Page) {
       const cs = getComputedStyle(el);
       // Lo que ya está escondido a propósito no cuenta.
       if (cs.visibility === 'hidden' || cs.display === 'none' || cs.opacity === '0') continue;
-      // Ni lo que vive dentro de un contenedor que sí puede desplazarse.
+      // Ni lo que vive dentro de un contenedor que lo recorta o que sí
+      // puede desplazarse. `clip` cuenta igual que `hidden`: recorta lo que
+      // se salga y, a diferencia de `hidden`, ni siquiera deja un desplazado
+      // posible dentro. Es lo que usan el cartel del hero, que mide más que
+      // la ventana a propósito, y el teletipo, que es una tira que da
+      // vueltas. Lo que se sale de ellos no llega a la ventana.
       let padre = el.parentElement;
       let dentroDeScroll = false;
       while (padre && padre !== document.body) {
         const pcs = getComputedStyle(padre);
-        if (pcs.overflowX === 'auto' || pcs.overflowX === 'scroll' || pcs.overflowX === 'hidden') {
+        if (
+          pcs.overflowX === 'auto' ||
+          pcs.overflowX === 'scroll' ||
+          pcs.overflowX === 'hidden' ||
+          pcs.overflowX === 'clip'
+        ) {
           dentroDeScroll = true;
           break;
         }

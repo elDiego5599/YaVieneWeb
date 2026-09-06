@@ -122,7 +122,7 @@
   /* El latido de la franja del hero. Sin esto la duración de 0,01ms lo
      deja parado en el fotograma que le pille, y ése lleva el halo abierto
      a ocho píxeles: un punto verde con un cerco raro alrededor. */
-  .hero-vivo-pulso {
+  .hero-pulso {
     animation: none !important;
     box-shadow: none !important;
   }

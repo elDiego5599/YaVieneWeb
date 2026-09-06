@@ -63,6 +63,14 @@
   margin-top: var(--panel-gap);
 }
 
+/* Salvo que la siguiente sea otra banda: dos campos de color seguidos van
+   pegados, y el hueco entre ellos dejaría una raya del fondo en medio. Es
+   lo que separa una parada de la siguiente en esta página: el cambio de
+   campo, no un espacio. */
+.panel--sangre + .panel--sangre {
+  margin-top: 0;
+}
+
 .panel-inner--ancho {
   max-width: var(--content-wide);
 }

@@ -35,6 +35,7 @@ import { pintarCifras } from './rutas';
 import { dormirLoQueNoSeVe } from './reposo';
 import { saltosDeMenu } from './salto';
 import { encenderCifras } from './cifras';
+import { encenderTeletipo } from './teletipo';
 import { encenderEntradas } from './entradas';
 import { partirTitulares } from './titulares';
 import { encenderScrollSuave } from './scroll-suave';
@@ -66,6 +67,9 @@ const arrancar = (): void => {
   partirTitulares();
   encenderEntradas();
   encenderCifras();
+
+  // El teletipo del hero: las seis rutas pasando por la franja de abajo.
+  encenderTeletipo();
 
   // Apariciones al entrar en pantalla: ya está puesto todo lo que mira.
   new ScrollEffects();

@@ -10,67 +10,202 @@
    especificidad. Es el fallo que más veces ha pasado en esta base.
    ────────────────────────────────────────────────────────────────── */
 
-/* ── Hero: copy centrado y el escenario de tres teléfonos ─────────── */
+/* ── Hero: el titular apoyado en el borde y el escenario cortado ────
+
+   El hero era una tarjeta flotante con todo centrado: titular al medio,
+   párrafo al medio, botones al medio y los tres teléfonos al medio y
+   enteros, con aire por debajo. Centrado y completo es la postura de una
+   plantilla —no hay nada que sólo pueda ser de esta página— y el aire de
+   debajo de los aparatos decía que sobraba sitio.
+
+   Ahora es una banda a sangre y el eje es el borde izquierdo: la pregunta
+   arranca ahí, en condensada y del tamaño de un cartel, y la segunda línea
+   se sale por la derecha. El escenario se corta contra el suelo del hero.
+   Las dos cosas dicen lo mismo: esto no cabe, sigue más allá.
+   ────────────────────────────────────────────────────────────────────── */
 .hero-panel {
-  margin-top: calc(var(--gutter) * -1 - 50px);
+  /*
+    Alto de ventana, más lo que el panel sube por encima del borde: sin
+    sumarlo, el suelo del hero —y con él el corte de los teléfonos— queda
+    esa misma distancia por encima del borde de abajo de la pantalla.
+    `svh` y no `vh`: en un teléfono, `vh` cuenta la barra del navegador
+    como si no estuviera y el corte se va fuera de cuadro.
+  */
+  --alza: calc(var(--gutter) + 50px);
+  --sangria: clamp(16px, 3vw, 56px);
+
+  min-height: calc(100svh + var(--alza));
+  display: flex;
+  margin-top: calc(var(--alza) * -1);
   padding-top: 96px;
 }
 
 /*
-  Una sola columna. El titular manda arriba, a lo ancho, y debajo va el
-  escenario; el reparto en dos columnas dejaba el teléfono peleando con el
-  texto por el mismo eje y ninguno de los dos ganaba.
+  Tres renglones: el texto, el escenario y la franja. El del medio es el
+  que cede —`1fr` sobre un contenido más alto que él—, y de ahí sale el
+  corte: los teléfonos miden lo que miden y el hueco que les queda es el
+  que sobra de la ventana.
 */
 .hero-grid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(40px, 4.5vw, 68px);
+  display: grid;
+  grid-template-rows: auto minmax(240px, 1fr) auto;
+  flex: 1;
+  min-width: 0;
+  gap: clamp(22px, 2.8vw, 44px);
   width: 100%;
-  max-width: 1550px;
-  margin: 0 auto;
-  padding: clamp(36px, 4vw, 64px) clamp(24px, 4.5vw, 80px) clamp(24px, 3vw, 44px);
+  max-width: none;
+  margin: 0;
+  padding: clamp(24px, 3vw, 48px) 0 0;
 }
 
 .hero-copy {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 22px;
-  max-width: 940px;
+  align-items: flex-start;
+  text-align: left;
+  gap: clamp(16px, 1.6vw, 24px);
+  max-width: none;
+  /* Para que el cartel, que mide más que la columna, no ensanche la columna
+     y con ella la rejilla: la columna se queda donde está y el titular se
+     sale por encima de ella. */
+  min-width: 0;
+  padding-inline: var(--sangria);
 }
 
+/*
+  El cartel. Un solo renglón, «¿CUÁNTO FALTA PARA TU BUS?» de un tirón, y a
+  un cuerpo que no cabe: la frase mide más que la ventana y el borde derecho
+  la corta en «BUS?». Es la primera cosa que hace la página y dice de qué va
+  todo lo demás —la pregunta es más grande que la pantalla—.
+
+  Va en condensada, el eje `wdth` de Bricolage a 78, que es lo que permite
+  meter veintiséis letras en un renglón de este cuerpo sin que el recorte se
+  coma media frase.
+
+  11.5 vw y no un tamaño en píxeles: el cuerpo y el ancho de la ventana
+  crecen juntos, así que el recorte cae siempre en el mismo sitio de la
+  frase —justo detrás de la «S»— lo mismo en un portátil que en un monitor
+  grande. El tope de 18rem es sólo para pantallas absurdamente anchas.
+
+  `width: max-content` es lo que le deja salirse: la caja mide lo que mide
+  el renglón, no lo que mide el hero, y el panel la recorta por el borde
+  derecho. Recorta el panel y no la ventana, así que la página sigue sin
+  poder desplazarse de lado.
+
+  El margen negativo devuelve la sangría de la columna: el titular se apoya
+  en el borde del papel y todo lo demás empieza un poco más adentro. Un
+  poco, no del todo: pegado al filo, el signo de apertura se lee como si
+  estuviera cortado.
+
+  La frase entera sigue estando en el documento y en el `aria-label` que le
+  pone `titulares.ts`; lo que se recorta es tinta, no texto.
+*/
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(44px, 5.9vw, 92px);
-  font-weight: 900;
-  line-height: 0.92;
-  letter-spacing: -0.04em;
+  font-size: clamp(2.9rem, 11.5vw, 18rem);
+  font-weight: var(--titular-wght);
+  font-stretch: calc(var(--titular-wdth) * 1%);
+  line-height: 0.84;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
   color: var(--text-primary);
-  margin: 0;
+  width: max-content;
+  max-width: none;
+  margin: 0 0 0 calc(var(--sangria) * -1 + clamp(4px, 0.6vw, 12px));
 }
 
+/*
+  En el teléfono el recorte no vale: cortar la frase en una pantalla de 390
+  puntos deja fuera un tercio de la pregunta, y no queda cartel sino ruido.
+  Aquí el titular vuelve a ser un bloque de dos renglones que cabe.
+
+  El corte lo decide el ajuste automático y no un `<br>`: «para tu bus?» va
+  dentro de un `<span>`, y `titulares.ts` trata los elementos como una sola
+  pieza, así que la pregunta nunca se parte por dentro. Cae entera al
+  segundo renglón o no cae.
+*/
+@media (max-width: 767px) {
+  .hero-title {
+    font-size: clamp(2.4rem, 19vw, 8rem);
+    width: auto;
+    max-width: 100%;
+  }
+}
+
+/*
+  La media frase en verde. `nowrap` porque `titulares.ts` la cuenta como
+  una sola pieza al repartir las líneas: si el navegador la partiera por
+  dentro, una de las cajas que recortan mediría dos renglones y el destape
+  saldría a medias. Si algún día no cupiera, se sale y la recorta el panel,
+  que es lo que ya hace el titular entero en pantalla ancha.
+*/
 .hero-title .highlight {
   display: inline;
   color: var(--green);
+  white-space: nowrap;
+}
+
+/*
+  La respuesta a la pregunta, en mono y pequeña. El contraste de tamaño con
+  el cartel es el punto: la pregunta ocupa media pantalla y lo que la
+  contesta cabe en un renglón de once puntos.
+*/
+.hero-respuesta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7em;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--step-rotulo);
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-respuesta-marca {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* El punto de separación es dibujo, no lectura: quien escucha la página
+   oye los tres datos seguidos y no un punto entre cada uno. */
+.hero-sep {
+  color: var(--text-muted);
+}
+
+/* El único acento de «en vivo» de la portada, y por eso se guarda para
+   aquí: repetido pierde el sentido. Late despacio y no parpadea; lo que
+   dice es «esto está encendido», no «mírame». El halo es una sombra y no
+   un pseudoelemento con capa propia: así el latido mueve una sola
+   propiedad y no promueve nada. */
+.hero-pulso {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 0 var(--green-glow);
+  animation: heroLatido 2.6s var(--ease-out-cubic) infinite;
 }
 
 .hero-description {
-  font-size: clamp(18px, 1.6vw, 23px);
+  font-size: clamp(17px, 1.35vw, 21px);
   line-height: 1.5;
   color: var(--text-secondary);
-  max-width: 620px;
-  margin-top: 4px;
+  max-width: 44ch;
+  margin: 0;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 10px;
+  justify-content: flex-start;
+  gap: 14px;
+  margin-top: 2px;
 }
 
 /*
@@ -83,7 +218,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
   font-size: 13.5px;
   color: var(--text-muted);
@@ -140,57 +275,99 @@
   transform: translateY(-0.5px);
 }
 
-/* ── La franja de estado ──────────────────────────────────────────────
+/* ── La franja que cierra el hero ─────────────────────────────────────
 
-   Cierra el hero por abajo: una sola línea con el operador, las rutas
-   conectadas y dónde. Va del ancho del contenido, con un filo arriba que
-   hace de suelo del escenario —el trío de teléfonos se apoya en él en vez
-   de flotar contra el borde del papel—.
+   El suelo contra el que se cortan los teléfonos, y a la vez el renglón de
+   datos de la portada: a la izquierda el teletipo con las seis rutas, a la
+   derecha la atribución del mapa base.
 
-   El punto verde es el único acento de «en vivo» de la portada, y por eso
-   se guarda para aquí: repetido pierde el sentido. Late despacio y no
-   parpadea; lo que dice es «esto está encendido», no «mírame».
+   El teletipo pasa de largo despacio y se para al pasar el puntero. No es
+   adorno: es el gesto de una estación, y es lo que convierte el hero en un
+   sitio donde algo está pasando en vez de una portada quieta. Lo escribe
+   `teletipo.ts` de `rutas.json`.
    ────────────────────────────────────────────────────────────────────── */
-.hero-vivo {
-  display: flex;
-  flex-wrap: wrap;
+.hero-franja {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  margin: 0;
-  padding-top: clamp(18px, 2vw, 28px);
-  border-top: 1px solid var(--border-subtle);
-  font-size: clamp(13px, 1.05vw, 15px);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  gap: clamp(14px, 2vw, 32px);
+  padding: clamp(11px, 1.1vw, 15px) var(--sangria);
+  border-top: 1px solid var(--linea);
+  font-family: var(--font-mono);
+  font-size: var(--step-rotulo);
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
   color: var(--text-secondary);
-  /* El 6 alineado como número y no como letra: es un dato, y en una línea
-     de datos las cifras se leen mejor tabulares. */
   font-variant-numeric: tabular-nums;
 }
 
-.hero-vivo-marca {
-  color: var(--text-primary);
-  font-weight: 800;
+/* Sin guion no hay rutas que pasar, y una tira con un filo y nada dentro
+   se lee como algo que se rompió. Vacío, no ocupa. */
+.hero-teletipo:empty {
+  display: none;
 }
 
-/* El punto de separación es dibujo, no lectura: quien escucha la página
-   oye los tres datos seguidos y no un punto entre cada uno. */
-.hero-vivo-sep {
-  color: var(--text-muted);
+.hero-teletipo {
+  overflow: clip;
+  /* Se desvanece contra los dos extremos: sin esto los renglones aparecen
+     y desaparecen de golpe contra un borde que no existe. */
+  mask-image: linear-gradient(90deg, transparent, #000 3%, #000 94%, transparent);
 }
 
-.hero-vivo-pulso {
-  width: 9px;
-  height: 9px;
+.hero-teletipo-pista {
+  display: flex;
+  width: max-content;
+}
+
+.hero-teletipo-grupo {
+  display: flex;
   flex: none;
-  border-radius: 50%;
-  background: var(--green);
-  /* El halo es una sombra y no un pseudoelemento con capa propia: así el
-     latido mueve una sola propiedad y no promueve nada. */
-  box-shadow: 0 0 0 0 var(--green-glow);
-  animation: heroLatido 2.6s var(--ease-out-cubic) infinite;
+  gap: clamp(22px, 3vw, 48px);
+  padding-right: clamp(22px, 3vw, 48px);
+}
+
+.hero-teletipo-pieza {
+  white-space: nowrap;
+}
+
+@keyframes heroTeletipo {
+  to {
+    /* La mitad exacta: la tira lleva el grupo dos veces, así que al llegar
+       aquí el fotograma es idéntico al de partida y el salto no se ve. */
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-teletipo-pista {
+    animation: heroTeletipo 52s linear infinite;
+  }
+
+  /* Se para para poder leerlo. Es la razón de que el teletipo pueda llevar
+     datos de verdad y no un texto de relleno. */
+  .hero-teletipo:hover .hero-teletipo-pista,
+  .hero-teletipo:focus-within .hero-teletipo-pista {
+    animation-play-state: paused;
+  }
+}
+
+.hero-credito {
+  margin: 0;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* En pantalla estrecha no caben los dos en un renglón: el teletipo se
+   queda con el ancho entero y la atribución baja debajo, a la izquierda. */
+@media (max-width: 700px) {
+  .hero-franja {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .hero-credito {
+    text-align: left;
+  }
 }
 
 @keyframes heroLatido {
@@ -237,21 +414,34 @@
   /* Alto del aparato central: el marco es un Pixel 9, 152,8 × 72 mm. */
   --alto-tel: calc(var(--tel) * 152.8 / 72);
 
-  position: relative;
+  /* Dentro del marco va absoluto y pegado arriba: el escenario mide su
+     alto entero —los carriles y los anclajes de los buses siguen contando
+     sobre él— y lo que se recorta es lo que sobresale por abajo. */
+  position: absolute;
+  inset: 0 0 auto;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   width: 100%;
-  max-width: 1440px;
   min-height: calc(var(--alto-tel) + 72px);
   margin: 0 auto;
   pointer-events: none;
   overflow: visible;
 }
 
+/*
+  El marco. Mide lo que le deja la ventana —es el `1fr` de la rejilla del
+  hero—, siempre menos que el escenario, y recorta la diferencia.
+*/
+.hero-escenario {
+  position: relative;
+  width: 100%;
+  overflow: clip;
+}
+
 @media (min-width: 768px) {
   .hero-scene {
-    --tel: 304px;
+    --tel: 336px;
   }
 }
 
@@ -262,7 +452,7 @@
 */
 @media (min-width: 1400px) {
   .hero-scene {
-    --tel: 340px;
+    --tel: 396px;
     --escenario: calc(var(--tel) + 2 * (var(--lado) - var(--solape)));
   }
 }
@@ -687,4 +877,60 @@
     left: -2%;
   }
 
+}
+
+
+/* ── Parallax de tres capas ───────────────────────────────────────────
+
+   Tres planos que se separan al bajar: la trama del fondo se queda atrás,
+   los teléfonos se quedan un poco atrás y los buses adelantan. Es la
+   diferencia entre una foto que sube y una escena con fondo.
+
+   Se anima `translate` y nunca `transform`: en los buses `transform` la
+   lleva la levitación y en el trío `translate` la lleva la respiración,
+   así que cada capa usa la propiedad que le queda libre. Las dos componen
+   en la GPU y se suman sin pisarse.
+
+   `scroll(root block)` y no `view()`: el hero está en el borde de arriba
+   del documento, y `view()` mide la entrada de un elemento por abajo —el
+   hero ya entró—. Lo que se quiere aquí es el desplazamiento de la página,
+   que es lo que `scroll()` da. El tramo se corta en la primera ventana:
+   pasada esa, el hero ya no se ve y seguir moviéndolo no lo mira nadie.
+
+   Cantidades pequeñas y a contramano entre sí. Con más recorrido los buses
+   se despegan de sus carriles y acaban encima de un teléfono, que es justo
+   lo que la geometría del escenario existe para impedir.
+   ────────────────────────────────────────────────────────────────────── */
+@keyframes heroPlanoFondo {
+  to { translate: 0 54px; }
+}
+
+@keyframes heroPlanoMedio {
+  to { translate: 0 26px; }
+}
+
+@keyframes heroPlanoCerca {
+  to { translate: 0 -44px; }
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-panel .panel-dots {
+      animation: heroPlanoFondo linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 100vh;
+    }
+
+    .hero-panel .hero-stage {
+      animation: heroPlanoMedio linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 100vh;
+    }
+
+    .hero-panel .scene-bus {
+      animation: heroPlanoCerca linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 100vh;
+    }
+  }
 }

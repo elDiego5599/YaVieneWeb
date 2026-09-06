@@ -184,14 +184,54 @@
   <main id="contenido">
 
     <!-- ============ HERO ============ -->
-    <section class="panel panel--sun hero-panel" id="hero">
+    <section class="panel panel--sangre panel--sun hero-panel" id="hero">
       <div class="panel-dots" aria-hidden="true"></div>
 
       <div class="panel-inner hero-grid">
 
         <!-- Columna Izquierda: Mensaje Comercial / Copy -->
         <div class="hero-copy">
+          <!--
+            Sin salto escrito. En pantalla ancha la pregunta va en un solo
+            renglón que no cabe y el borde derecho la corta; en el teléfono
+            el ajuste automático la baja a dos. Un `<br>` habría impuesto
+            los dos renglones en todas partes, y `titulares.ts` lo respeta
+            aunque el CSS lo esconda.
+
+            «para tu bus?» va en un `<span>` porque es lo que se pinta en
+            verde, y de paso queda protegido: `titulares.ts` trata cada
+            elemento como una pieza entera, así que la respuesta a la
+            pregunta nunca se parte por la mitad al bajar de renglón.
+          -->
           <h1 class="hero-title entra-corte">¿Cuánto falta <span class="highlight">para tu bus?</span></h1>
+
+          <!--
+            La respuesta, debajo de la pregunta y en mono: quien acaba de
+            leer el titular quiere saber si esto existe de verdad, y aquí
+            está el operador, cuántas rutas van conectadas y dónde. Estaba
+            al pie del hero, donde llegaba después de los teléfonos y ya no
+            respondía a nada.
+
+            Dice lo que hay, no lo que se está moviendo ahora mismo. Un
+            contador en vivo querría preguntárselo al servidor cada vez que
+            alguien abre la página, y hay dos razones para no hacerlo: la
+            política de contenido de `vercel.json` sólo deja hablar con este
+            mismo dominio, y el servidor está apagado a propósito. El dato
+            es cierto y está escrito, que es mejor que un número en vivo que
+            un día dice cero.
+
+            Las seis rutas son las de `rutas.json`; que este «6» siga siendo
+            seis lo vigila `tests/coherencia.test.ts`.
+          -->
+          <p class="hero-respuesta">
+            <span class="hero-pulso" aria-hidden="true"></span>
+            <span class="hero-respuesta-marca">Sobusa</span>
+            <span class="hero-sep" aria-hidden="true">·</span>
+            <span>6 rutas conectadas</span>
+            <span class="hero-sep" aria-hidden="true">·</span>
+            <span>Barranquilla y Soledad</span>
+          </p>
+
           <p class="hero-description">Tu ciudad en tiempo real: mira el bus moverse en el mapa y te avisamos antes de
             que llegue el tuyo.</p>
 
@@ -239,34 +279,44 @@
           Escena: el teléfono con los 4 buses vectoriales flotantes y las
           superficies reales de la app alrededor.
         -->
+        <!--
+          El marco recorta el escenario por abajo. Los teléfonos siguen
+          midiendo lo que miden —el escenario entero está aquí dentro, con
+          sus carriles y sus anclajes intactos—; lo que cambia es que el
+          marco mide menos que ellos, así que el trío sale por el borde de
+          abajo del hero en vez de caber entero con aire debajo. Un objeto
+          cortado por el borde se lee como algo que sigue más allá de la
+          página; uno que cabe entero se lee como una estampa.
+        -->
+        <div class="hero-escenario">
         <div class="hero-scene" aria-hidden="true">
 
           <!-- 1. Bus Arriba a la Derecha (Sobusa) -->
-          <div class="scene-bus scene-bus--sobusa animate-float-slow escena-entra" data-reveal-delay="190">
+          <div class="scene-bus scene-bus--sobusa escena-entra" data-reveal-delay="190">
             <img src="./src/assets/buses/sobusa.webp" alt="Sobusa"
               width="448" height="560" decoding="async"
-              class="scene-bus-img" />
+              class="scene-bus-img animate-float-slow" />
           </div>
 
           <!-- 2. Bus Medio a la Izquierda (Azul / Transmetro / Universidades) -->
-          <div class="scene-bus scene-bus--transmetro animate-float-delayed escena-entra" data-reveal-delay="240">
+          <div class="scene-bus scene-bus--transmetro escena-entra" data-reveal-delay="240">
             <img src="./src/assets/buses/transmetro.webp" alt="Ruta Universidades"
               width="448" height="560" decoding="async"
-              class="scene-bus-img" />
+              class="scene-bus-img animate-float-delayed" />
           </div>
 
           <!-- 3. Bus Medio a la Derecha (Sodetrans) -->
-          <div class="scene-bus scene-bus--sodis animate-float-slow escena-entra" data-reveal-delay="290">
+          <div class="scene-bus scene-bus--sodis escena-entra" data-reveal-delay="290">
             <img src="./src/assets/buses/sodis.webp" alt="Sodetrans"
               width="448" height="560" decoding="async"
-              class="scene-bus-img" />
+              class="scene-bus-img animate-float-slow" />
           </div>
 
           <!-- 4. Bus Abajo a la Izquierda (Coolitoral) -->
-          <div class="scene-bus scene-bus--coolitoral animate-float-delayed escena-entra" data-reveal-delay="340">
+          <div class="scene-bus scene-bus--coolitoral escena-entra" data-reveal-delay="340">
             <img src="./src/assets/buses/coolitoral.webp" alt="Coolitoral"
               width="448" height="560" decoding="async"
-              class="scene-bus-img" />
+              class="scene-bus-img animate-float-delayed" />
           </div>
 
           <!-- 5. Etiqueta flotante: Ruta Activa (Arriba a la Izquierda) -->
@@ -751,7 +801,6 @@
                 <span class="phone-toque" data-el="toque" aria-hidden="true"></span>
               </div>
             </div>
-            <p class="map-credit">Mapa base © OpenStreetMap · © CARTO</p>
           </div>
 
           <!--
@@ -910,6 +959,7 @@
           </div>
 
           </div>
+        </div>
 
         <p class="solo-lectores">
           La demostración muestra la app: primero localiza tu ubicación, luego
@@ -919,30 +969,20 @@
         </p>
 
         <!--
-          La franja de estado, pegada al borde de abajo del hero. Es la línea
-          más convincente de la página: quien acaba de leer el titular quiere
-          saber si esto existe de verdad o es una maqueta, y aquí está el
-          nombre del operador, cuántas rutas van conectadas y dónde.
+          La franja que cierra el hero: el suelo contra el que se cortan los
+          teléfonos. A la izquierda el teletipo con las seis rutas, que lo
+          escribe `teletipo.ts` de `rutas.json` —no hay una tercera copia de
+          los datos a mano—; a la derecha la atribución del mapa base, que
+          estaba debajo del teléfono central y ahí ahora se la comería el
+          recorte.
 
-          Dice lo que hay, no lo que se está moviendo ahora mismo. Un
-          contador de buses en marcha querría preguntárselo al servidor cada
-          vez que alguien abre la página, y hay dos razones para no hacerlo:
-          la política de contenido de `vercel.json` sólo deja hablar con este
-          mismo dominio, y el servidor está apagado a propósito —despertarlo
-          por cada visita se paga—. Así que el dato es cierto y está escrito,
-          que es mejor que un número en vivo que un día dice cero.
-
-          Las seis rutas son las de `rutas.json`; que este «6» siga siendo
-          seis lo vigila `tests/coherencia.test.ts`.
+          El teletipo nace vacío y `:empty` lo esconde: sin guion no queda
+          una tira con un filo y nada dentro, queda la atribución sola.
         -->
-        <p class="hero-vivo">
-          <span class="hero-vivo-pulso" aria-hidden="true"></span>
-          <span class="hero-vivo-marca">Sobusa</span>
-          <span class="hero-vivo-sep" aria-hidden="true">·</span>
-          <span>6 rutas conectadas</span>
-          <span class="hero-vivo-sep" aria-hidden="true">·</span>
-          <span>Barranquilla y Soledad</span>
-        </p>
+        <div class="hero-franja">
+          <div class="hero-teletipo" data-teletipo aria-hidden="true"></div>
+          <p class="hero-credito">Mapa base © OpenStreetMap · © CARTO</p>
+        </div>
       </div>
     </section>
 
