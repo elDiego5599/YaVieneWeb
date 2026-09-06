@@ -11,113 +11,67 @@
    ────────────────────────────────────────────────────────────────── */
 
 /* ══════════════════════════════════════════════════════════════════════
-   LAS SEIS RUTAS, EN VIVO
+   PARADA 01 · EL MAPA
    ══════════════════════════════════════════════════════════════════════
-   La única parte de la página que se toca, y también la que trae los
-   datos: las tres cifras del catálogo arriba y las seis rutas reales
-   al lado del mapa, que se eligen.
+   La única parte de la página que se toca, y la parada del producto.
 
-   Estuvo sobre tinta y ya no: es la última sección antes del pie, y el
-   pie es crema. Sin fondo propio las dos se leen como una sola bajada,
-   que es justo lo que son —el mapa y las rutas que dibuja—. El mosaico
-   de Barranquilla ya es claro, así que sobre crema no pierde nada; lo
-   que había que rehacer era el cromo de alrededor, que estaba escrito
-   en blancos translúcidos y sobre crema no se veía.
+   Aquí no hay marco. Ni borde, ni filo redondeado, ni sombra: el mosaico
+   es una lámina sobre campo blanco que sale por arriba y por abajo de la
+   ventana. La página no lo acaba de enseñar entero, y eso es lo que le da
+   tamaño.
 
-   Dos piezas, no tres columnas sueltas: el mapa —que conserva la
-   proporción del mosaico, 1284×1982, para no recortar ninguna terminal—
-   y a su lado el mando, con las seis fichas arriba y la lectura debajo. */
-.mapa-inner {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(28px, 3.4vw, 48px);
-}
+   Sangra por el alto y no por el ancho porque el mosaico es vertical
+   —1284 × 1982—: las seis rutas van de Granabastos al norte y cualquier
+   recorte de lado se come una terminal. El generador deja un 5% de aire
+   alrededor de la red (`PAD_FRAC` en `scripts/gen_mapa_landing.py`), así
+   que el sangrado se queda por debajo de ese aire y no se pierde nada.
 
-/* La cabecera ocupa el ancho entero: el titular a la izquierda y las tres
-   cifras de las rutas a su derecha, apoyadas en la misma línea de base.
-   Ahí había una entradilla que contaba lo que la propia demo enseña —que
-   son seis rutas y que al entrar el bus salta el aviso—, así que decía en
-   prosa lo que se ve tocando. Las cifras, en cambio, no se ven en ningún
-   otro sitio de la página. */
-.mapa-cabecera {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  /* La línea que la separa del tablero, a todo el ancho del panel. */
-  padding-bottom: clamp(20px, 2.2vw, 30px);
-  border-bottom: 1px solid rgba(20, 39, 78, 0.14);
-}
+   A la izquierda, sobre el blanco, todo lo demás en monoespaciado: el
+   titular en una línea, las seis rutas como renglones con un filete que
+   se pone verde en la elegida, la distancia en cifras grandes y el
+   resumen del catálogo. Ni una tarjeta. */
 
-/* Este titular no tenía tamaño propio: caía en el `h2` de `base.css`, que
-   son los 2em que trae el navegador y encima con la letra de cuerpo. Al
-   lado del mapa —que ocupa media pantalla— se leía como un pie de foto.
-
-   Ahora es lo que es: la invitación a tocar la única parte de la página
-   que se toca. Va en la de display, medio escalón por encima del titular
-   del problema (4,5rem de techo) y por debajo del de los pasos (9rem),
-   que es el más grande de la página y así sigue siendo. */
-.mapa-cabecera .section-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2.4rem, 1.05rem + 4.4vw, 4.6rem);
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.045em;
-}
-
-@media (min-width: 900px) {
-  .mapa-cabecera {
-    display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-    column-gap: clamp(32px, 4vw, 80px);
-    align-items: end;
-  }
-
-  .mapa-cabecera .tracked-eyebrow,
-  .mapa-cabecera .section-title {
-    grid-column: 1;
-  }
-
-  /* Las cifras caen en la segunda columna, apoyadas en la misma línea de
-     base que el titular: son el dato que lo sostiene, no un pie. */
-  .mapa-cabecera .rutas-cifras {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    align-self: end;
-    margin: 0;
-  }
-}
-
-.mapa-tablero {
+.mapa-panel {
+  /* El campo llega al borde de la ventana y ocupa una pantalla entera.
+     `min-height` y no `height`: en el teléfono el mando va debajo del
+     mapa y la parada mide lo que mida. */
+  min-height: 100svh;
   display: grid;
-  gap: clamp(16px, 1.8vw, 26px);
-  justify-content: center;
-  align-items: start;
 }
 
+/* Cuánto se sale la lámina por arriba y por abajo. Cuatro por ciento de
+   ventana a cada lado, que es menos que el aire que el mosaico trae
+   alrededor de la red. */
+.mapa-tablero {
+  --sangrado-mapa: 4svh;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(22px, 3vh, 40px);
+  min-width: 0;
+}
+
+/*
+  En pantalla ancha, dos columnas: el margen con los datos a la izquierda
+  y la lámina a la derecha, pegada al borde.
+
+  El ancho de la lámina se calcula, no se mide: es el alto de la parada
+  más el sangrado, por la proporción del mosaico. Así la columna tiene
+  medida propia y el mapa puede ir posicionado dentro sin que la columna
+  se quede en cero.
+*/
 @media (min-width: 1060px) {
   .mapa-tablero {
-    /* El mapa a la derecha, que es donde acaba de leerse la fila: primero
-       se elige en la lista y después se mira lo que dibuja.
-
-       El mapa es lo que la sección viene a enseñar, así que se lleva el
-       sitio: pide todo el alto que le cabe en pantalla y su ancho sale
-       solo de la proporción del mosaico —`auto`—, que es vertical.
-
-       El mando lleva techo. Sin él se queda con todo lo que sobra en una
-       pantalla ancha y el mapa acaba pareciendo la ilustración de al
-       lado en vez del centro. El techo es el ancho que piden dos
-       columnas de fichas —unos cuatrocientos por columna, que es lo que
-       mide el nombre de ruta más largo con su tramo debajo— y ni un
-       píxel más. Con él puesto los dos van parejos y el grupo se
-       centra, que es lo que ya hacía `justify-content`. */
-    grid-template-columns: minmax(0, 820px) auto;
+    --ancho-mapa: calc((100svh + 2 * var(--sangrado-mapa)) * 1284 / 1982);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--ancho-mapa);
     align-items: stretch;
+    gap: 0;
+    min-height: 100svh;
   }
 
-  /* El orden del documento deja el mapa primero: apilado en el móvil es lo
-     que hay que tocar, y así llega antes. En ancho se cruzan. */
-  .mapa-tablero > .mapa-mando {
+  /* El orden del documento deja el mapa primero: apilado en el teléfono es
+     lo que hay que tocar, y así llega antes. En ancho se cruzan. */
+  .mapa-tablero > .mapa-margen {
     grid-area: 1 / 1;
   }
 
@@ -126,99 +80,73 @@
   }
 }
 
-/* ── La vista: la banda de aviso y, debajo, el mapa ──
-   Dos piezas en columna. La banda es lo que antes flotaba sobre el
-   mosaico —la pista de toque y la notificación—, y flotando tapaba
-   rutas. Aquí tiene sitio propio y el mapa se queda limpio. */
-.mapa-vista {
+/* ── El margen: todo lo que no es mapa ──
+   Una columna de datos, de arriba abajo, sin una sola caja. El relleno
+   de la izquierda deja pasar el riel de la ruta, que baja por delante. */
+.mapa-margen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(20px, 2.6vh, 34px);
+  min-width: 0;
+  padding: clamp(34px, 5vh, 76px) clamp(20px, 3vw, 56px) clamp(40px, 6vh, 84px)
+    calc(var(--riel-ancho) + clamp(8px, 1.4vw, 26px));
+}
+
+/* ── La cabecera: un antetítulo y una línea ──
+   El titular no va encima del mapa. Lo que esta parada tiene que decir lo
+   dice el mapa en cuanto se toca; el texto sólo lo nombra, así que se
+   queda en el margen y del tamaño de un rótulo. */
+.mapa-cabecera {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-width: 0;
 }
 
-/* Las dos ocupan la misma celda: se relevan sin mover nada de sitio. El
-   alto mínimo es el de la tarjeta de aviso, para que al aparecer no
-   empuje el mapa hacia abajo. */
-.mapa-tira {
-  display: grid;
-  align-items: center;
-  min-height: 58px;
-}
-
-.mapa-tira > * {
-  grid-area: 1 / 1;
-}
-
-/* El mando: rutas arriba, lectura abajo, y nada de aire muerto en medio.
-
-   Es una rejilla de dos filas y no una columna flexible porque lo que
-   sobra de alto tiene que ir a algún sitio concreto: va a las fichas
-   —`1fr`—, que crecen hasta que su última fila queda a la altura de la
-   lectura, y la lectura se queda con lo que pide su contenido. Antes lo
-   que sobraba quedaba suelto entre las dos piezas, y eso es lo que se
-   veía como un hueco. */
-.mapa-mando {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: clamp(16px, 1.6vw, 22px);
-  min-width: 0;
-}
-
-/* En dos columnas las seis fichas ocupan la mitad de alto que en una, y
-   ese alto tiene que ir a algún sitio: se lo reparten las fichas y la
-   lectura en vez de dejarlo suelto entre las dos. La proporción da unas
-   fichas holgadas —son botones, se tocan— y una lectura del tamaño del
-   número que enseña. */
-@media (min-width: 1060px) {
-  .mapa-mando {
-    grid-template-rows: minmax(0, 2.2fr) minmax(0, 1fr);
-  }
-}
-
-.mapa-columna {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-  min-height: 0;
-}
-
-.mapa-rotulo {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
+.mapa-cabecera .section-title {
+  margin: 0;
+  max-width: 30ch;
+  font-family: var(--font-mono);
+  font-size: clamp(0.78rem, 0.7rem + 0.3vw, 0.95rem);
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
-/* El rótulo de las rutas ocupa la misma banda que la tira de al lado, así
-   la primera fila de la lista arranca a la altura del borde de arriba del
-   mapa. Sin esto la lista subía 40 px y la columna quedaba descuadrada. */
-@media (min-width: 1060px) {
-  .mapa-columna--rutas .mapa-rotulo {
-    display: flex;
-    align-items: center;
-    min-height: 58px;
-  }
+/* ── La vista ──
+   El hueco donde vive la lámina. En ancho no tiene contenido en flujo: la
+   lámina va posicionada para poder salirse por arriba y por abajo, y el
+   ancho de la columna ya lo pone la rejilla. */
+.mapa-vista {
+  position: relative;
+  min-width: 0;
 }
 
-/* ── El lienzo ──
-   Va suelto en la rejilla del tablero: tenía una columna de envoltorio
-   que no repartía nada, sólo una capa más entre el mapa y el hueco que
-   dejaba. */
 .mapa-lienzo {
   position: relative;
   /* La proporción del mosaico, para que quepa la ciudad entera. */
   aspect-ratio: 1284 / 1982;
-  height: clamp(440px, 82vh, 780px);
-  border-radius: 22px;
-  overflow: hidden;
+  width: 100%;
+  /* El papel del propio mosaico: lo que se ve si la lámina queda más alta
+     que su proporción. */
   background: #EDE7DE;
-  border: 1px solid rgba(20, 39, 78, 0.12);
-  /* Sobre crema la sombra vuelve a hacer falta: es lo único que separa
-     el mosaico —que también es claro— del papel de la página. */
-  box-shadow: 0 26px 60px -34px rgba(20, 39, 78, 0.55);
+  overflow: hidden;
+}
+
+@media (min-width: 1060px) {
+  /* Pegada a los dos bordes de la columna y salida por arriba y por abajo.
+     Con `inset-block` negativo el alto es el de la parada más el sangrado,
+     y la proporción ya no manda: si la parada creciera por su contenido, el
+     mosaico se queda centrado sobre su propio papel. */
+  .mapa-lienzo {
+    position: absolute;
+    inset-block: calc(var(--sangrado-mapa) * -1);
+    inset-inline: 0;
+    width: auto;
+    aspect-ratio: auto;
+  }
 }
 
 .mapa-svg {
@@ -229,9 +157,6 @@
   touch-action: manipulation;
 }
 
-/* Los trazos van en píxeles de pantalla, no en unidades del mosaico: así
-   la ruta se ve del mismo grosor con el mapa grande y con el mapa
-   pequeño, que es como se dibuja un mapa de verdad. */
 .mv-casing,
 .mv-activa {
   fill: none;
@@ -278,29 +203,21 @@
 }
 
 /* ── La pista de toque ──
-   La misma pastilla de tinta de siempre, centrada sobre el mapa. Lo que
-   cambió no es cómo se ve sino dónde: estaba encima del mosaico y tapaba
-   trazado; ahora se apoya en la banda, justo encima del borde.
-
-   Sin `backdrop-filter`: sobre el mapa desenfocaba el mosaico de detrás y
-   tenía sentido; sobre la crema del documento no hay nada que desenfocar
-   y es de lo más caro que se le puede pedir a un navegador. */
+   Una línea en monoespaciado y nada más. Fue una pastilla de tinta con
+   sombra encima del mapa; era un objeto flotando sobre otro objeto para
+   decir una frase. Aquí es lo que es: un rótulo del margen. */
 .mapa-toque {
-  justify-self: center;
+  justify-self: start;
   margin: 0;
-  padding: 9px 18px;
-  border-radius: 999px;
-  background: rgba(11, 22, 40, 0.92);
-  color: #FFFFFF;
-  box-shadow: 0 10px 24px -12px rgba(11, 22, 40, 0.72);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--step-rotulo);
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--text-muted);
   pointer-events: none;
   transition:
     opacity var(--transition-normal),
-    translate 0.4s var(--ease-out-cubic);
+    translate 0.4s var(--salida);
 }
 
 /* Cuando salta el aviso, la pista se retira: la banda es una sola y el
@@ -308,6 +225,19 @@
 .mapa-tablero.es-avisado .mapa-toque {
   opacity: 0;
   translate: 0 -8px;
+}
+
+/* Las dos ocupan la misma celda: se relevan sin mover nada de sitio. El
+   alto mínimo es el de la tarjeta de aviso, para que al aparecer no
+   empuje lo que tiene debajo. */
+.mapa-tira {
+  display: grid;
+  align-items: center;
+  min-height: 58px;
+}
+
+.mapa-tira > * {
+  grid-area: 1 / 1;
 }
 
 /* La atribución va donde la ponen los mapas: dentro del mosaico, abajo a
@@ -329,139 +259,103 @@
   pointer-events: none;
 }
 
-/* ── Las rutas ── */
+/* En ancho la lámina sale de la ventana por abajo: la atribución sube lo
+   que se sale, para no irse con ella. */
+@media (min-width: 1060px) {
+  .mapa-credito {
+    bottom: calc(var(--sangrado-mapa) + 9px);
+  }
+}
+
+/* ── Los rótulos del margen ── */
+.mapa-rotulo {
+  font-family: var(--font-mono);
+  font-size: var(--step-rotulo);
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── Las rutas ──
+   Seis renglones en columna, uno debajo de otro, separados por una línea
+   de pelo. Eran seis tarjetas blancas con sombra en dos columnas: seis
+   veces la misma forma para elegir una de seis cosas. */
+.mapa-columna {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
 .mv-rutas {
   display: flex;
   flex-direction: column;
-  gap: 7px;
-}
-
-/* Tres y tres. En una sola columna las seis fichas pedían todo el alto
-   del mapa para poner dos palabras por fila, y el mando se quedaba
-   estrecho al lado. En dos columnas la lista ocupa el ancho que le
-   sobraba y cada ficha tiene sitio para el nombre y el tramo debajo.
-
-   Las tres filas se parten el alto a partes iguales (`1fr`) en vez de
-   pedir cada una lo suyo: así llenan justo lo que les toca del mando y
-   la lista termina donde empieza la lectura. */
-@media (min-width: 1060px) {
-  .mv-rutas {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: minmax(0, 1fr);
-    gap: 10px;
-    min-height: 0;
-  }
 }
 
 /* ── La lectura ──
-   Tres estados y tres superficies, y ninguna de las tres es blanca. El
-   blanco translúcido de antes sobre la crema del documento no era un
-   estado: era el cuadro esperando a tener uno, y así se veía —apagado
-   justo cuando el bus viene de camino, que es cuando más se mira—.
+   La distancia al bus más cercano, que es el número por el que existe
+   toda la aplicación. Sin cuadro: el número es lo bastante grande como
+   para no necesitar que nada lo señale.
 
-   El de reposo es `--surface-muted`, el gris azulado con el que la app
-   pinta sus superficies quietas (app_theme.dart). No es un color nuevo
-   ni una decoración: dice «esto está midiendo». Y deja sitio a los otros
-   dos, que sí son avisos: verde cuando el bus entró en el kilómetro,
-   ámbar cuando la ruta ni siquiera pasa cerca. */
+   El rótulo y el nombre del bus a la izquierda, el número a la derecha y
+   ocupando las tres filas. */
 .mapa-lectura {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 3px;
-  padding: 20px 22px;
-  border: 1px solid rgba(37, 99, 235, 0.16);
-  border-radius: 20px;
-  background: var(--surface-muted);
-  transition: border-color var(--transition-normal), background var(--transition-normal);
-}
-
-.mapa-lectura.es-cerca {
-  border-color: rgba(0, 168, 89, 0.5);
-  background: var(--green-tint);
-}
-
-/* Y lo contrario: el punto marcado se salió del alcance de la ruta, así
-   que el número deja de ser una cuenta atrás y pasa a ser un dato.
-
-   El aviso lo da la superficie, no la letra. El ámbar sólo aguanta como
-   fondo —sobre crema no llega al contraste ni siendo texto grande—, y
-   este cuadro existe para leerse. Vivía en `error-404.css`, que no tiene
-   nada que ver; aquí queda al lado de su pareja. */
-.mapa-lectura.es-fuera {
-  border-color: rgba(255, 193, 7, 0.55);
-  background: var(--amber-tint);
-}
-
-.mapa-lectura.es-fuera .mapa-lectura-metros {
-  color: var(--text-secondary);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: clamp(16px, 2vw, 36px);
+  row-gap: 2px;
+  padding-top: clamp(14px, 1.8vh, 22px);
+  border-top: 1px solid var(--linea);
 }
 
 .mapa-lectura .mapa-rotulo {
-  margin-bottom: 6px;
-}
-
-/* Con el ancho del mando la lectura se lee como el cuadro de un
-   aparato: a la izquierda de qué bus hablamos, a la derecha el número
-   grande, que es lo único que de verdad se mira. */
-@media (min-width: 1060px) {
-  .mapa-lectura {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-content: center;
-    align-items: center;
-    column-gap: clamp(20px, 2.4vw, 40px);
-    row-gap: 2px;
-  }
-
-  .mapa-lectura .mapa-rotulo {
-    grid-area: 1 / 1;
-    margin-bottom: 0;
-  }
-
-  .mapa-lectura-bus {
-    grid-area: 2 / 1;
-  }
-
-  .mapa-lectura-pie {
-    grid-area: 3 / 1;
-    margin-top: 6px;
-  }
-
-  .mapa-lectura-metros {
-    grid-area: 1 / 2 / 4 / 3;
-    font-size: clamp(52px, 5.6vw, 92px);
-  }
+  grid-area: 1 / 1;
 }
 
 .mapa-lectura-bus {
-  font-size: 13px;
-  font-weight: 700;
+  grid-area: 2 / 1;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
-/* Del mismo corte que el número grande de la app. */
+.mapa-lectura-pie {
+  grid-area: 3 / 1;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--step-rotulo);
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+/* Del mismo corte que el número grande de la app, y del tamaño que pide
+   ser lo único que de verdad se mira de esta columna. */
 .mapa-lectura-metros {
+  grid-area: 1 / 2 / 4 / 3;
   font-family: var(--font-display);
-  font-size: clamp(38px, 3.6vw, 54px);
+  font-size: clamp(3rem, 6.4vw, 6.4rem);
   font-weight: 300;
-  line-height: 1.05;
-  letter-spacing: -0.04em;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
   font-variant-numeric: tabular-nums;
   color: var(--navy);
   transition: color var(--transition-normal);
 }
 
-/* El verde que aguanta texto: el de marca no llega a 4.5:1 sobre crema
+/* El verde que aguanta texto: el de marca no llega a 4.5:1 sobre blanco
    y este número es el que hay que poder leer. */
 .mapa-lectura.es-cerca .mapa-lectura-metros {
   color: var(--green-accessible);
 }
 
-.mapa-lectura-pie {
-  font-size: 11.5px;
+/* Y lo contrario: el punto marcado se salió del alcance de la ruta, así
+   que el número deja de ser una cuenta atrás y pasa a ser un dato. Ya no
+   hace falta un fondo ámbar para decirlo: basta con que el número deje de
+   pesar. */
+.mapa-lectura.es-fuera .mapa-lectura-metros {
   color: var(--text-secondary);
 }
 
@@ -543,40 +437,29 @@
 }
 
 @media (max-width: 1059px) {
-  /* Apilado el mapa ya va primero en el orden del documento: es lo que
-     hay que tocar. Debajo, el mando con las rutas en un carril. */
-  /* Aquí manda el ancho, no el alto: el mosaico es más alto que ancho y
-     si se pide por altura se sale del marco en el móvil. Se le da el
-     ancho que quepa —con el alto de siempre como techo— y la proporción
-     saca la altura. */
+  /* Apilado el mapa va primero en el orden del documento: es lo que hay
+     que tocar. Aquí sí sangra de lado —el mosaico a todo el ancho de la
+     ventana—, y el mando queda debajo, sobre el campo blanco. */
+  .mapa-tablero {
+    gap: clamp(24px, 4vh, 40px);
+  }
+
+  .mapa-margen {
+    justify-content: flex-start;
+    padding-top: 0;
+    padding-left: calc(var(--riel-ancho) + 12px);
+    padding-right: clamp(18px, 5vw, 40px);
+  }
+
+  /* Techo de alto: en una pantalla apaisada el mosaico entero se comería
+     la ventana y el mando no asomaría. */
   .mapa-lienzo {
-    justify-self: center;
-    width: min(100%, calc(min(76vh, 600px) * 1284 / 1982));
-    height: auto;
+    max-height: 78svh;
+    width: auto;
     margin-inline: auto;
   }
 
-  /* La banda toma el ancho del mapa, no el de la sección: centrada encima
-     de él se lee como su cabecera; a lo ancho del panel parecía un aviso
-     suelto de la página. */
-  .mapa-tira {
-    width: min(100%, calc(min(76vh, 600px) * 1284 / 1982));
-    margin-inline: auto;
-  }
-
-  .mv-rutas {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 6px;
-    scrollbar-width: none;
-  }
-
-  .mv-rutas::-webkit-scrollbar {
-    display: none;
-  }
-
-  .ruta-ficha {
-    flex: 0 0 auto;
-    width: 230px;
+  .mapa-lectura-metros {
+    font-size: clamp(2.6rem, 13vw, 4.4rem);
   }
 }

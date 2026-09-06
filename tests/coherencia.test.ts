@@ -98,7 +98,7 @@ describe('la copia dice lo mismo que los datos', () => {
   */
   it('index.html trae la tabla de cobertura tal como está en los datos', () => {
     const html = leer('index.html');
-    const cuerpo = html.match(/<tbody>([\s\S]*?)<\/tbody>/);
+    const cuerpo = html.match(/<tbody[^>]*>([\s\S]*?)<\/tbody>/);
     expect(cuerpo, 'ya no hay tabla de cobertura en la portada').not.toBeNull();
 
     const escritas = Array.from(

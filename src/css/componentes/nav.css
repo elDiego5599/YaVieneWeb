@@ -370,56 +370,18 @@
   transform: translateY(-6px) rotate(-90deg);
 }
 
-/* ── En pantalla ancha: se despliega en horizontal ─────────────────── */
+/* ── En pantalla ancha: el mismo letrero, colgado ─────────────────────
+
+   Antes el menú se desplegaba en horizontal, hacia dentro de la píldora.
+   Con el letrero de paradas eso ya no vale: son seis paradas numeradas y
+   en fila ocuparían el ancho de la ventana. El letrero es una columna
+   —así se lee un cartel de recorrido— y por eso en ancho hace lo mismo
+   que en móvil: cuelga de la píldora como un panel.
+
+   Lo que cambia con puntero es sólo cómo se abre: basta pasar por encima.
+   ────────────────────────────────────────────────────────────────────── */
 
 @media (min-width: 880px) {
-  .nav-island-reveal {
-    position: static;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: none;
-    box-shadow: none;
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    /* El pliegue: de 0fr a 1fr, con el contenido recortado mientras dura. */
-    display: grid;
-    grid-template-columns: 0fr;
-    /* Recoger es más corto que abrir: cerrar tiene que sentirse resuelto,
-       no verse. */
-    transition: grid-template-columns 0.32s var(--ease-out-cubic);
-  }
-
-  .nav-island.is-open > .nav-island-reveal {
-    grid-template-columns: 1fr;
-    /* Medio segundo, pero con la curva fluida el ancho ya casi está a los
-       200 ms y el resto es el frenado. Con `ease-out-cubic` los 550 ms
-       anteriores se repartían parejos y por eso se sentía lenta. */
-    transition: grid-template-columns 0.5s var(--ease-fluida);
-  }
-
-  .nav-island-inner {
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    overflow: hidden;
-    padding-left: 6px;
-  }
-
-  /* En horizontal las piezas entran desde la izquierda, empujadas por el
-     propio pliegue, y no desde arriba como en el panel de móvil. */
-  .nav-island-inner .nav-link,
-  .nav-island-inner .nav-island-cta {
-    transform: translateX(-12px);
-  }
-
-  .nav-island-links {
-    flex-direction: row;
-    gap: 2px;
-  }
-
   /* Con puntero el despliegue es el hover: el botón se queda como pista
      visual de que la píldora se abre, y sigue funcionando al tocarlo. */
   .nav-island.is-open .nav-island-grip {
@@ -438,26 +400,14 @@
     transition: none;
   }
 
-  .nav-island-reveal,
-  .nav-island-inner .nav-link,
-  .nav-island-inner .nav-island-cta {
+  /* El panel sigue abriéndose y cerrándose —es dónde están los enlaces—,
+     pero sin recorrido: aparece puesto en su sitio. */
+  .nav-island.is-open > .nav-island-reveal,
+  .nav-island.is-open .nav-island-inner .nav-link,
+  .nav-island.is-open .nav-island-inner .nav-island-cta {
     opacity: 1;
     visibility: visible;
     transform: none;
-  }
-
-  .nav-island-toggle {
-    display: none;
-  }
-
-  @media (min-width: 880px) {
-    .nav-island-reveal {
-      grid-template-columns: 1fr;
-    }
-
-    .nav-island-inner {
-      opacity: 1;
-    }
   }
 }
 

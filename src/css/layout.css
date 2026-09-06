@@ -82,6 +82,30 @@
 }
 
 /*
+  Campo blanco. Sólo debajo de producto, que es la única regla de este
+  color: la parada del mapa. El blanco no es un fondo más, es lo que hace
+  que el mosaico se lea como una lámina suelta y no como una ilustración
+  metida dentro de una tarjeta.
+*/
+.panel--blanco {
+  background: var(--campo-blanco);
+}
+
+/*
+  Campo verde pleno. Una sola parada de toda la página lo lleva —la
+  cobertura, que es la más densa— y por eso no se reparte: si el verde
+  saliera en tres sitios dejaría de ser el contrapeso y sería la paleta.
+
+  El color de texto va aquí y no en la sección porque el campo es quien
+  manda: todo lo que caiga encima hereda el tinte oscuro que aguanta 8.9:1
+  sobre este verde.
+*/
+.panel--verde {
+  background: var(--campo-verde);
+  color: var(--sobre-verde);
+}
+
+/*
   El fondo del hero. Era un #F8FAFC plano —blanco azulado de laboratorio,
   de una sola pieza— y con la trama encima acababa pareciendo la sala de
   espera de una consulta. Ahora es luz en vez de pintura: blanco limpio

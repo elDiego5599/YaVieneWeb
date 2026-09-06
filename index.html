@@ -1036,72 +1036,81 @@
       documento y sigue en la del pie sin costura, que es lo mismo que
       hace el pie con el borde de abajo de la página.
     -->
-    <section class="panel panel--sangre mapa-panel" id="mapa"
+    <section class="panel panel--sangre panel--blanco mapa-panel" id="mapa"
       data-parada="01" data-parada-nombre="El mapa">
 
       <div class="parada" aria-hidden="true">
         <span class="parada-nodo"></span>
         <span class="parada-rotulo">01 &middot; El mapa</span>
       </div>
-      <div class="panel-inner panel-inner--ancho mapa-inner">
-        <header class="mapa-cabecera entra-relevo">
-          <span class="tracked-eyebrow eyebrow--verde">EN OPERACIÓN</span>
-          <h2 class="section-title entra-corte">Prueba el mapa<br />con rutas en vivo.</h2>
+
+      <div class="mapa-tablero" data-mapa-vivo>
+        <!--
+          El mapa va primero en el documento porque en el teléfono es lo
+          primero que hay que tocar. En pantalla ancha las dos columnas se
+          cruzan con la rejilla y el mapa se va a la derecha.
+        -->
+        <div class="mapa-vista">
+          <div class="mapa-lienzo" data-mapa-lienzo>
+            <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
+            <p class="mapa-credito">Mapa base &copy; OpenStreetMap &middot; &copy; CARTO</p>
+          </div>
+        </div>
+
+        <div class="mapa-margen">
+          <header class="mapa-cabecera entra-relevo">
+            <span class="tracked-eyebrow eyebrow--verde">EN OPERACIÓN</span>
+            <!--
+              Una línea y en monoespaciado, no un titular encima del mapa.
+              Lo que esta parada tiene que decir lo dice el mapa en cuanto
+              se toca; el texto sólo lo nombra.
+            -->
+            <h2 class="section-title mapa-titulo">Prueba el mapa con rutas en vivo</h2>
+          </header>
+
+          <div class="mapa-columna mapa-columna--rutas">
+            <span class="mapa-rotulo">Elige una ruta</span>
+            <div class="mv-rutas" data-mapa-rutas role="group" aria-label="Rutas disponibles"></div>
+          </div>
+
           <!--
-            En la columna derecha de la cabecera van las cifras, no un
-            párrafo: al lado del mapa lo que sostiene el titular son los
-            datos duros —seis rutas, diez terminales, los kilómetros—, y
-            de la demo ya se encarga la pista sobre el mapa.
+            La pista y el aviso comparten celda y se relevan: la pista
+            mientras no ha pasado nada, el aviso cuando el bus entra. Nunca
+            se ven los dos, así que la banda no reserva hueco de más. Van en
+            el margen y no sobre el mosaico: encima tapaban justo la ruta y
+            el círculo del kilómetro, que es lo que hay que mirar.
           -->
+          <div class="mapa-tira">
+            <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
+            <div class="mapa-aviso" data-mapa-aviso role="status" aria-live="polite">
+              <div class="mapa-aviso-icono" aria-hidden="true">
+                <img src="/logo.svg" alt="" width="20" height="20">
+              </div>
+              <div class="mapa-aviso-texto">
+                <span class="mapa-aviso-app">Ya Viene &middot; ahora</span>
+                <strong class="mapa-aviso-titulo" data-mapa-aviso-titulo></strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="mapa-lectura" data-mapa-lectura>
+            <span class="mapa-rotulo">Bus más cercano</span>
+            <span class="mapa-lectura-bus" data-mapa-bus></span>
+            <span class="mapa-lectura-metros" data-mapa-metros></span>
+            <span class="mapa-lectura-pie" data-mapa-lectura-pie>en línea recta hasta tu punto</span>
+          </div>
+
           <!-- Las tres cifras van escritas aquí, no sólo calculadas por el
-               guion: sin ellas en el HTML la cabecera de la sección se queda
-               vacía cuando el JavaScript no llega. `rutas.ts` las recalcula de
-               `rutas.json` al arrancar y las vuelve a poner, así que el dato
-               que manda sigue siendo el del mapa; esto es el mismo dato
-               escrito, y `tests/coherencia.test.ts` vigila que no se separen. -->
+               guion: sin ellas en el HTML la parada se queda sin el dato del
+               catálogo cuando el JavaScript no llega. `rutas.ts` las
+               recalcula de `rutas.json` al arrancar y las vuelve a poner,
+               así que el dato que manda sigue siendo el del mapa; esto es el
+               mismo dato escrito, y `tests/coherencia.test.ts` vigila que no
+               se separen. -->
           <div class="rutas-cifras" data-rutas-cifras>
             <div class="rutas-dato"><strong class="rutas-dato-numero entra-cuenta">6</strong><span class="rutas-dato-rotulo">rutas</span></div>
             <div class="rutas-dato"><strong class="rutas-dato-numero entra-cuenta">10</strong><span class="rutas-dato-rotulo">terminales</span></div>
             <div class="rutas-dato"><strong class="rutas-dato-numero entra-cuenta">326,8</strong><span class="rutas-dato-rotulo">kilómetros</span></div>
-          </div>
-        </header>
-        <!--
-          Ni el aviso ni la pista de toque van encima del mosaico. Estuvieron
-          ahí y tapaban justo lo que hay que mirar —la ruta y el círculo del
-          kilómetro—. Ahora comparten una banda propia sobre el mapa: la
-          pista mientras no ha pasado nada, el aviso cuando el bus entra.
-          Nunca se ven las dos, así que la banda no reserva hueco de más.
-        -->
-        <div class="mapa-tablero" data-mapa-vivo>
-          <div class="mapa-vista">
-            <div class="mapa-tira">
-              <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
-              <div class="mapa-aviso" data-mapa-aviso role="status" aria-live="polite">
-                <div class="mapa-aviso-icono" aria-hidden="true">
-                  <img src="/logo.svg" alt="" width="20" height="20">
-                </div>
-                <div class="mapa-aviso-texto">
-                  <span class="mapa-aviso-app">Ya Viene · ahora</span>
-                  <strong class="mapa-aviso-titulo" data-mapa-aviso-titulo></strong>
-                </div>
-              </div>
-            </div>
-            <div class="mapa-lienzo" data-mapa-lienzo>
-              <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
-              <p class="mapa-credito">Mapa base © OpenStreetMap · © CARTO</p>
-            </div>
-          </div>
-          <div class="mapa-mando">
-            <div class="mapa-columna mapa-columna--rutas">
-              <span class="mapa-rotulo">Elige una ruta</span>
-              <div class="mv-rutas" data-mapa-rutas role="group" aria-label="Rutas disponibles"></div>
-            </div>
-            <div class="mapa-lectura" data-mapa-lectura>
-              <span class="mapa-rotulo">Bus más cercano</span>
-              <span class="mapa-lectura-bus" data-mapa-bus></span>
-              <span class="mapa-lectura-metros" data-mapa-metros></span>
-              <span class="mapa-lectura-pie" data-mapa-lectura-pie>en línea recta hasta tu punto</span>
-            </div>
           </div>
         </div>
       </div>
@@ -1128,7 +1137,7 @@
       Los teléfonos no son fotos fijas: cada uno repite en bucle el gesto del
       que habla su texto, y sólo corre el que está quieto en el centro.
     -->
-    <section class="panel panel--mint panel--sangre" id="solucion"
+    <section class="panel panel--arena panel--sangre" id="solucion"
       data-parada="02" data-parada-nombre="Cómo funciona">
 
       <div class="parada" aria-hidden="true">
@@ -1625,24 +1634,23 @@
       leerse aunque el guion no llegue. Que digan lo mismo que `rutas.json`
       lo vigila `tests/coherencia.test.ts`, campo por campo.
     -->
-    <section class="panel panel--arena cobertura-panel" id="cobertura"
+    <section class="panel panel--sangre panel--verde cobertura-panel" id="cobertura"
       data-parada="03" data-parada-nombre="Cobertura">
 
       <div class="parada" aria-hidden="true">
         <span class="parada-nodo"></span>
         <span class="parada-rotulo">03 &middot; Cobertura</span>
       </div>
-      <div class="panel-dots" aria-hidden="true"></div>
 
-      <div class="panel-inner panel-inner--ancho cobertura-inner">
-        <header class="section-head cobertura-cabecera">
-          <span class="tracked-eyebrow eyebrow--verde">COBERTURA HOY</span>
-          <h2 class="section-title entra-corte">Seis rutas reales,<br />no un mapa de ejemplo.</h2>
+      <div class="cobertura-inner">
+        <header class="cobertura-cabecera">
+          <span class="cobertura-cintillo">Cobertura hoy</span>
+          <h2 class="cobertura-titulo entra-corte">Seis rutas reales,<br />no un mapa de ejemplo.</h2>
           <p class="cobertura-lead">Las de Sobusa, con su trazado, sus terminales y sus kilómetros tal
             como los opera la empresa. Son las mismas que dibuja el mapa de arriba.</p>
         </header>
 
-        <div class="cobertura-tabla-caja">
+        <div class="cobertura-tira">
           <table class="cobertura-tabla">
             <caption class="solo-lectores">Rutas de Sobusa conectadas hoy, con su código
               interno, sus terminales de cabecera y su longitud en kilómetros.</caption>
@@ -1654,7 +1662,7 @@
                 <th scope="col" class="cobertura-km">km</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="entra-relevo">
               <tr>
                 <td class="cobertura-codigo">R-101</td>
                 <th scope="row" class="cobertura-ruta">B18 Tcherassi</th>

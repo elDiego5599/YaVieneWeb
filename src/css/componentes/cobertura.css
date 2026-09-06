@@ -1,90 +1,128 @@
-/* ── COBERTURA HOY ─────────────────────────────────────────────────────
+/* ── 03 · COBERTURA ────────────────────────────────────────────────────
 
-   La sección densa. Es un trozo de `components.css` y **el orden importa**:
-   va después de `rutas.css` y `mapa.css`, que son las que hablan del mismo
-   dato, para poder pisarlas si alguna vez comparten selector.
+   La parada más densa de la página y la única en color pleno. El verde no
+   se reparte en acentos por seis sitios: se gasta entero aquí, de borde a
+   borde de la ventana, y por eso el resto de la página puede ser papel.
 
    Todo lo de aquí es tabla de verdad —`<table>`, `<thead>`, `<th scope>`—
    y no una rejilla de `<div>`. Son datos con dos ejes: quien los lee con
    la vista los recorre en columna, y quien los escucha necesita que al
-   llegar a «62,6» le digan de qué ruta es. Una rejilla no dice eso.
+   llegar a «62,6» le digan de qué ruta es. Una rejilla no dice eso, y
+   cambiarle el `display` a una tabla le quita el papel a cada celda.
+
+   La caja se ha ido: ni borde, ni radio, ni sombra, ni superficie propia.
+   Lo que separa un renglón del siguiente es una línea de pelo del mismo
+   tinte oscuro que el texto, y lo que separa la tabla del titular es el
+   aire. Sobre un campo de color, una tarjeta clara sería un agujero.
    ────────────────────────────────────────────────────────────────────── */
 
+/* Los tres tintes de la sección: el texto en su plena intensidad, el
+   secundario para lo que acompaña y la línea de pelo. Los tres salen del
+   mismo `--sobre-verde` (#06231A), que sobre este verde da 8.9:1. */
+.cobertura-panel {
+  --cob-suave: rgba(6, 35, 26, 0.68);
+  --cob-tenue: rgba(6, 35, 26, 0.46);
+  --cob-linea: rgba(6, 35, 26, 0.2);
+  --cob-linea-fuerte: rgba(6, 35, 26, 0.42);
+}
+
+/* A sangre y sin caja central: el contenido arranca donde termina el riel
+   y se estira hasta donde le deje la ventana. Nada de `margin: auto`, que
+   dejaría el bloque flotando en medio de un campo de color. */
 .cobertura-inner {
-  /* Más apretada que el resto: es el contrapeso de tres secciones
-     aireadas, y el aire de las otras aquí sería otra sección igual. */
-  padding-top: clamp(52px, 6vw, 92px);
-  padding-bottom: clamp(52px, 6vw, 92px);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(30px, 4vh, 56px);
+  padding: clamp(56px, 7vh, 108px) clamp(22px, 4vw, 72px) clamp(48px, 6vh, 92px)
+    calc(var(--riel-ancho) + clamp(10px, 1.6vw, 30px));
 }
 
 .cobertura-cabecera {
-  max-width: 46ch;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-/* El titular de esta sección va un escalón por debajo del de las demás. No
-   es una apertura: llega después de tres secciones que ya han dicho lo
-   suyo, y a tamaño de portada se comía la tabla, que es lo que se viene a
-   ver aquí. */
-.cobertura-cabecera .section-title {
-  font-size: var(--step-h2);
+.cobertura-cintillo {
+  font-family: var(--font-mono);
+  font-size: var(--step-rotulo);
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--cob-tenue);
+}
+
+/* El titular de la parada, condensado. Un escalón por debajo del tamaño de
+   parada a propósito: aquí la cifra grande es el kilometraje, y un titular
+   a tamaño de portada le quitaría el sitio a lo que se viene a ver. */
+.cobertura-titulo {
+  margin: 0;
+  max-width: 18ch;
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 1rem + 3.4vw, 4.2rem);
+  font-weight: var(--titular-wght);
+  font-variation-settings: 'wdth' var(--titular-wdth);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  color: var(--sobre-verde);
+  text-wrap: balance;
 }
 
 .cobertura-lead {
-  font-size: clamp(16px, 1.25vw, 19px);
-  line-height: 1.55;
-  color: var(--text-secondary);
   margin: 0;
-  max-width: 52ch;
+  max-width: 46ch;
+  font-size: clamp(15px, 1.1vw, 17.5px);
+  line-height: 1.55;
+  color: var(--cob-suave);
 }
 
 /* En pantalla estrecha la tabla no cabe, y encogerla dejaría los nombres
-   de terminal partidos en tres renglones. Se desplaza de lado dentro de su
-   caja —nunca la página, que eso ya lo vigila una prueba— con el filo
-   redondeado que llevan las tarjetas. */
-.cobertura-tabla-caja {
-  /* Sin tope, la tabla se estira hasta el ancho del panel y deja un hueco
-     de palmo entre el nombre de la ruta y su recorrido. Las cuatro
-     columnas piden lo que piden y el resto sobra. */
-  max-width: 1080px;
+   de terminal partidos en tres renglones. Se desplaza de lado dentro de
+   su tira —nunca la página, que eso ya lo vigila una prueba—. La tira no
+   es una caja: no tiene borde ni fondo, sólo es lo que se mueve. */
+.cobertura-tira {
   overflow-x: auto;
-  border: 1px solid var(--border-subtle);
-  border-radius: 18px;
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
   -webkit-overflow-scrolling: touch;
+  scrollbar-color: var(--cob-linea-fuerte) transparent;
 }
 
 .cobertura-tabla {
   width: 100%;
-  min-width: 620px;
+  min-width: 640px;
   border-collapse: collapse;
   /* Las cifras alineadas como cifras: una columna de números que no se
      puede recorrer con la vista no es una columna, es una lista. */
   font-variant-numeric: tabular-nums;
-  font-size: clamp(14px, 1.05vw, 16px);
+  text-align: left;
 }
 
+/* La cabecera de la tabla es rótulo, no titular: monoespaciada, pequeña y
+   muy espaciada, igual que el rótulo de parada del margen. */
 .cobertura-tabla thead th {
-  padding: 14px clamp(12px, 1.4vw, 20px);
+  padding: 0 clamp(10px, 1.2vw, 20px) 12px 0;
   text-align: left;
-  font-size: 11.5px;
-  font-weight: 800;
-  letter-spacing: 0.09em;
+  font-family: var(--font-mono);
+  font-size: var(--step-rotulo);
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border-subtle);
+  color: var(--cob-tenue);
+  border-bottom: 2px solid var(--cob-linea-fuerte);
   white-space: nowrap;
 }
 
 .cobertura-tabla tbody td,
 .cobertura-tabla tbody th {
-  padding: clamp(11px, 1.1vw, 15px) clamp(12px, 1.4vw, 20px);
+  padding: clamp(14px, 1.8vh, 22px) clamp(10px, 1.2vw, 20px) clamp(14px, 1.8vh, 22px) 0;
   text-align: left;
+  vertical-align: baseline;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--cob-suave);
   /* Una línea de pelo entre renglones y ninguna entre columnas: con las dos
      la tabla se lee como una hoja de cálculo y deja de ser una lista. */
-  border-top: 1px solid var(--divider);
+  border-top: 1px solid var(--cob-linea);
 }
 
 .cobertura-tabla tbody tr:first-child td,
@@ -92,8 +130,6 @@
   border-top: 0;
 }
 
-/* El código interno es referencia, no lectura: se queda en monoespaciado y
-   a media luz, para que el ojo caiga primero en el nombre de la ruta. */
 /* El reparto de columnas: las tres cortas se encogen a su contenido y el
    recorrido se queda con lo que sobre, que es donde el hueco no molesta
    —cae detrás de las terminales, no en medio de la lectura—. */
@@ -103,51 +139,188 @@
   width: 1%;
 }
 
+/* El código interno es referencia, no lectura: se queda en monoespaciado y
+   a media luz, para que el ojo caiga primero en el nombre de la ruta. */
 .cobertura-codigo {
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-  font-size: 0.86em;
-  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--step-rotulo);
+  letter-spacing: 0.06em;
+  color: var(--cob-tenue);
   white-space: nowrap;
 }
 
 .cobertura-ruta {
-  font-weight: 800 !important;
-  color: var(--text-primary) !important;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 0.85rem + 0.8vw, 1.65rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--sobre-verde) !important;
   white-space: nowrap;
 }
 
 .cobertura-recorrido {
   width: 100%;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.45;
+  color: var(--cob-suave);
 }
 
 /* La flecha es dibujo: quien escucha la página oye las dos terminales
    seguidas, igual que en la ficha del mando. */
 .cobertura-flecha {
   margin: 0 8px;
-  color: var(--text-muted);
+  color: var(--cob-tenue);
 }
 
+/* Los kilómetros, en grande. Es la cifra que hace densa a esta parada: seis
+   números tabulares en la letra de titulares, alineados por la derecha, que
+   se pueden sumar con la vista de arriba abajo. */
 .cobertura-km {
   text-align: right !important;
   white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 1rem + 3.4vw, 3.6rem) !important;
+  font-weight: 300 !important;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  color: var(--sobre-verde) !important;
 }
 
-/* El renglón de totales: el único con peso, y separado por una línea
-   entera en vez de por una de pelo. */
+.cobertura-tabla thead th.cobertura-km {
+  text-align: right !important;
+  font-family: var(--font-mono);
+  font-size: var(--step-rotulo) !important;
+  font-weight: 500 !important;
+  line-height: inherit;
+  letter-spacing: var(--rotulo-track);
+  color: var(--cob-tenue) !important;
+}
+
+/* El renglón de totales: separado por una línea entera en vez de por una
+   de pelo, y con el total a tamaño de titular. Es el final del recuento y
+   se lee como tal —326,8 es la cifra que se recuerda de esta parada—. */
 .cobertura-tabla tfoot th,
 .cobertura-tabla tfoot td {
-  padding: clamp(13px, 1.2vw, 17px) clamp(12px, 1.4vw, 20px);
+  padding: clamp(16px, 2vh, 26px) clamp(10px, 1.2vw, 20px) 0 0;
   text-align: left;
-  border-top: 2px solid var(--border-subtle);
-  background: var(--arena);
-  font-weight: 800;
-  color: var(--text-primary);
+  vertical-align: baseline;
+  border-top: 2px solid var(--cob-linea-fuerte);
+  color: var(--sobre-verde);
+}
+
+.cobertura-tabla tfoot .cobertura-ruta,
+.cobertura-tabla tfoot .cobertura-recorrido {
+  font-family: var(--font-mono) !important;
+  font-size: var(--step-rotulo) !important;
+  font-weight: 500 !important;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--cob-suave) !important;
+}
+
+.cobertura-tabla tfoot .cobertura-km {
+  font-size: clamp(3rem, 1rem + 7vw, 6.4rem) !important;
+  font-weight: 400 !important;
 }
 
 .cobertura-nota {
-  margin: clamp(18px, 2vw, 26px) 0 0;
-  max-width: 76ch;
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--text-muted);
+  margin: 0;
+  max-width: 68ch;
+  padding-top: clamp(18px, 2.4vh, 28px);
+  border-top: 1px solid var(--cob-linea);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  color: var(--cob-suave);
+}
+
+/* En ancho de sobremesa el titular y la entradilla van uno al lado del
+   otro, apoyados en la misma línea de base: así la cabecera es una banda y
+   no dos, y la tabla empieza dentro de la primera ventana. */
+@media (min-width: 900px) {
+  .cobertura-cabecera {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    align-items: end;
+    column-gap: clamp(30px, 5vw, 96px);
+    row-gap: 14px;
+  }
+
+  .cobertura-cintillo {
+    grid-column: 1 / -1;
+  }
+
+  .cobertura-lead {
+    padding-bottom: 0.5em;
+  }
+}
+
+@media (max-width: 899px) {
+  .cobertura-inner {
+    padding-left: calc(var(--riel-ancho) + 12px);
+    padding-right: clamp(18px, 5vw, 40px);
+  }
+
+  .cobertura-cabecera {
+    max-width: none;
+  }
+
+  /*
+    Las cuatro columnas caben, pero sólo si se les quita el ancho mínimo y
+    se les deja partir el texto. La alternativa era dejar la tabla
+    desplazándose de lado, y ahí los kilómetros —que son la cifra de esta
+    parada— quedaban fuera de la pantalla: hay que saber que existen para
+    ir a buscarlos.
+  */
+  .cobertura-tabla {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .cobertura-codigo,
+  .cobertura-ruta,
+  .cobertura-km {
+    white-space: normal;
+  }
+
+  /* Los anchos en porcentaje y no en `ch`: con `table-layout: fixed` manda
+     lo que diga la primera fila, y un `ch` medido sobre la cifra grande de
+     los kilómetros vale el triple que uno medido sobre el código. */
+  .cobertura-codigo {
+    width: 12%;
+  }
+
+  .cobertura-ruta {
+    width: 32%;
+    font-size: clamp(0.95rem, 3.4vw, 1.15rem) !important;
+  }
+
+  .cobertura-recorrido {
+    width: auto;
+    font-size: 9.5px;
+    letter-spacing: 0.05em;
+  }
+
+  .cobertura-flecha {
+    margin: 0 5px;
+  }
+
+  .cobertura-km {
+    width: 28%;
+    font-size: clamp(1.4rem, 6.4vw, 2.2rem) !important;
+  }
+
+  .cobertura-tabla tfoot .cobertura-km {
+    font-size: clamp(1.9rem, 8.4vw, 2.8rem) !important;
+  }
+
+  .cobertura-tabla tbody td,
+  .cobertura-tabla tbody th {
+    padding-right: 10px;
+  }
 }

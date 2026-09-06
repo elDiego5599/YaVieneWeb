@@ -193,6 +193,21 @@ main {
 }
 
 /*
+  Sobre el campo verde una parada encendida no existe: se enciende en verde
+  y el campo ya es verde. Ahí lo que marca el paso del bus es la tinta
+  oscura del propio campo a plena intensidad —la misma que lleva todo lo que
+  cae encima—, que hace el mismo salto de contraste que el verde hace en los
+  demás campos. Es la misma cuenta que el anillo crema del punto del bus.
+*/
+.panel--verde .parada.es-pasada .parada-nodo {
+  background: var(--sobre-verde);
+}
+
+.panel--verde .parada.es-pasada .parada-rotulo {
+  color: var(--sobre-verde);
+}
+
+/*
   Por debajo de 900 el margen mide 34 y el rótulo girado no cabe sin
   meterse en el texto. Se queda el nodo, que es lo que hace la parada; el
   número y el nombre siguen estando en el letrero de arriba.
