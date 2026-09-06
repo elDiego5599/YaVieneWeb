@@ -15,9 +15,27 @@
    pueden precargar desde el <head> sin esperar a ningún CSS y el
    empaquetador les pone hash para cachearlos para siempre.
 
-   Ambas familias son variables (`font-weight: 200 800`): un único
-   fichero cubre todo el rango de grosores. Por eso da igual cuántos
-   pesos use la hoja de estilos, no se descarga ni un byte de más.
+   Las tres familias son variables: un único fichero cubre todo el rango
+   de grosores, así que da igual cuántos pesos use la hoja de estilos, no
+   se descarga ni un byte de más.
+
+   Bricolage además trae el eje `wdth`, y ahí está el cambio del rediseño.
+   El fichero que servíamos antes venía recortado a `font-stretch: 100%`:
+   sólo el ancho normal. Un titular sólo podía crecer, y una tipografía
+   agrandada no es lo mismo que una tipografía apretada —es la diferencia
+   entre un cartel y un titular de periódico—. Ahora el fichero lleva el
+   eje entero, de 75% a 100%, y los titulares se ponen a 78%.
+
+   Que eso no costara peso hizo falta trabajarlo. El woff2 que sirve
+   Google con los tres ejes (`opsz`, `wght`, `wdth`) pesa 128 KB. Se ha
+   fijado `opsz` en 96 —el tamaño óptico de titular, que es para lo único
+   que usamos esta familia— y se ha recortado el rango de grosores a
+   400–800, que es el que la hoja de estilos pide de verdad. Resultado:
+   72,8 KB, dos kilobytes menos que el fichero de un solo ancho que
+   había antes. Reproducible con fontTools:
+
+     fonttools varLib.instancer <original>.woff2 opsz=96 wght=400:800 \
+       -o bri.ttf && fonttools ttLib.woff2 compress bri.ttf
 
    Los `unicode-range` mantienen el mismo troceado de Google: el
    subconjunto `latin-ext` sólo se descarga si aparece en pantalla un
@@ -28,14 +46,17 @@
    expresamente alojarlas por cuenta propia. Ver assets/fonts/LICENCIA.
    ============================================================ */
 
-/* ---------- Bricolage Grotesque (display: titulares) ---------- */
+/* ---------- Bricolage Grotesque (display: titulares) ----------
+
+   `font-stretch: 75% 100%` es lo que abre el eje: sin esa línea el
+   navegador no deja pedir otro ancho aunque el fichero lo traiga. */
 
 /* latin */
 @font-face {
   font-family: 'Bricolage Grotesque';
   font-style: normal;
-  font-weight: 200 800;
-  font-stretch: 100%;
+  font-weight: 400 800;
+  font-stretch: 75% 100%;
   font-display: swap;
   src: url('../assets/fonts/bricolage-grotesque-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
@@ -47,8 +68,8 @@
 @font-face {
   font-family: 'Bricolage Grotesque';
   font-style: normal;
-  font-weight: 200 800;
-  font-stretch: 100%;
+  font-weight: 400 800;
+  font-stretch: 75% 100%;
   font-display: swap;
   src: url('../assets/fonts/bricolage-grotesque-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
@@ -77,6 +98,45 @@
   font-weight: 200 800;
   font-display: swap;
   src: url('../assets/fonts/plus-jakarta-sans-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ---------- Geist Mono (datos, rótulos y etiquetas) ----------
+
+   La tercera familia, y la que faltaba para que la página se lea como un
+   producto y no como un folleto. Va en todo lo que es dato o etiqueta:
+   los códigos de ruta, los kilómetros, los rótulos de parada, las notas
+   al margen y los estados del panel. Siempre con cifras de ancho fijo,
+   que para eso es monoespaciada.
+
+   Pesa 22,6 KB el subconjunto latino. No se precarga: se usa en texto
+   pequeño, donde el intercambio de fuente no se ve, y adelantarla
+   competiría con el mapa —que es el elemento LCP de la portada— por el
+   mismo ancho de banda.
+
+   Licencia SIL Open Font License 1.1, igual que las otras dos. */
+
+/* latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url('../assets/fonts/geist-mono-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* latin-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url('../assets/fonts/geist-mono-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
     U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
     U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;

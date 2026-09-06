@@ -137,6 +137,93 @@
   --transition-hover: 0.22s var(--ease-out-cubic);
   --transition-normal: 0.3s var(--ease-out-cubic);
   --transition-smooth: 0.6s var(--ease-fluida);
+
+  /* ════════════════════════════════════════════════════════════════════
+     REDISEÑO v2 — «la página es una ruta»
+     Ver docs/rediseno-v2.md. Lo de arriba sigue vivo: son los colores de
+     marca y los tokens que el mockup del teléfono necesita para pintar la
+     app tal cual. Lo de aquí abajo es el sistema con el que se compone la
+     página alrededor de ese producto.
+     ════════════════════════════════════════════════════════════════════ */
+
+  /* ── Campos ───────────────────────────────────────────────────────────
+     La página no es un fondo con acentos: es una sucesión de campos de
+     color que llegan al borde de la ventana. La regla que los gobierna es
+     que dos paradas seguidas nunca comparten campo. */
+  --campo-crema: #FAF6F0;
+  --campo-tinta: #0B1628;
+  --campo-verde: #00A859;
+  --campo-coral: #E86A5E;
+  --campo-blanco: #FFFFFF;
+
+  /* El texto de cada campo. Medidos sobre su propio fondo: el crema claro
+     sobre tinta da 12.4:1, el tinta sobre verde 8.9:1 y sobre coral 9.6:1.
+     El tono suave sobre tinta se queda en 6.1:1, que sigue pasando AA para
+     texto pequeño. */
+  --sobre-tinta: #F1EDE7;
+  --sobre-tinta-suave: #9FB0C4;
+  --sobre-verde: #06231A;
+  --sobre-coral: #3A0F0A;
+
+  /* ── Líneas ───────────────────────────────────────────────────────────
+     Lo que separa bloques. Antes era un borde de 1px alrededor de una
+     tarjeta con sombra; ahora es una línea y nada más. Los tres valores
+     son el mismo gris cálido a tres intensidades: la fuerte para separar
+     secciones, la tenue para filas dentro de una lista, y la de tinta
+     para lo mismo sobre campo oscuro. */
+  --linea: #D9D1C6;
+  --linea-tenue: #EBE4DA;
+  --linea-tinta: rgba(255, 255, 255, 0.16);
+  --linea-tinta-tenue: rgba(255, 255, 255, 0.08);
+
+  /* ── El riel ──────────────────────────────────────────────────────────
+     La línea de ruta que baja por el margen izquierdo de toda la página,
+     con un nodo por parada y el punto verde bajando al ritmo del scroll.
+     En móvil se estrecha pero no desaparece: es el motivo de marca. */
+  --riel-ancho: 34px;
+  --riel-trazo: 2px;
+
+  /* ── Tipografía ───────────────────────────────────────────────────────
+     El tercer papel: los datos. Ver fonts.css. */
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* El ancho al que se ponen los titulares. 78 de 100 es una condensada
+     de verdad; 100 es lo que se servía antes. Como variable y no fijo en
+     cada regla porque hay dos sitios —el rótulo de parada y las cifras
+     grandes— que quieren un ancho distinto y conviene verlos juntos. */
+  --titular-wdth: 78;
+  --titular-wght: 800;
+
+  /* El cartel: el titular de la portada, el único que se corta contra el
+     borde de la ventana. */
+  --step-cartel: clamp(3rem, 1rem + 10.4vw, 9.5rem);
+  /* El titular de una parada. */
+  --step-parada: clamp(2.4rem, 1rem + 6.6vw, 6rem);
+  /* El rótulo de parada: monoespaciado, pequeño, muy espaciado. Es el
+     `01 · EL MAPA` del margen. */
+  --step-rotulo: 0.7rem;
+  --rotulo-track: 0.16em;
+
+  /* ── Curvas ───────────────────────────────────────────────────────────
+     Dos, y ninguna más. `--salida` para todo lo que entra: sale disparada
+     y frena larguísimo, que es lo que hace que algo grande se sienta
+     ligero. `--muelle` para lo que responde al puntero, con un rebote del
+     4% —lo justo para que se note vivo y no para que dé saltos—.
+
+     `linear()` con una lista de puntos y no `cubic-bezier`: una bezier no
+     puede pasarse de 1 y volver más de una vez, y un muelle sí. Donde no
+     se entienda `linear()` la declaración se descarta y queda la anterior,
+     que por eso va justo encima. */
+  --salida: cubic-bezier(0.16, 1, 0.3, 1);
+  --muelle: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --muelle: linear(0, 0.28 7%, 0.63 14%, 0.9 20%, 1.04 25%, 1.06 31%,
+    1.02 41%, 0.998 55%, 1);
+
+  /* ── Rejilla ──────────────────────────────────────────────────────────
+     Doce columnas y un canal. Nada se centra por defecto: los titulares
+     arrancan en la columna 1, el texto ocupa de la 3 a la 7 y los datos
+     se van a la derecha. La asimetría es la posición de reposo. */
+  --rejilla-canal: 24px;
 }
 
 @media (min-width: 900px) {
@@ -144,5 +231,7 @@
     --gutter: 20px;
     --panel-radius: 40px;
     --panel-gap: 20px;
+    --riel-ancho: 56px;
+    --rejilla-canal: 32px;
   }
 }
