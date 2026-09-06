@@ -167,6 +167,7 @@
             <a href="#mapa" class="nav-link">Mapa en vivo</a>
             <a href="#solucion" class="nav-link">Cómo funciona</a>
             <a href="#cobertura" class="nav-link">Cobertura</a>
+            <a href="#preguntas" class="nav-link">Preguntas</a>
             <a href="/empresas.html" class="nav-link">Para empresas</a>
           </nav>
           <a href="#mapa" class="nav-island-cta">Probar el mapa</a>
@@ -1755,6 +1756,110 @@
     </section>
 
 
+
+    <!-- ============ PREGUNTAS, Y EL BLOQUE DE EMPRESAS ============
+      Las seis dudas que de verdad se tienen antes de creerse esto, con la
+      del GPS la primera porque es la que más se pregunta y la que peor
+      contesta casi todo el mundo.
+
+      El desplegable es `<details>`, no un guion. Se abre, se cierra, se
+      anuncia solo y funciona con el JavaScript apagado: escribir esto a
+      mano sería cambiar algo que el navegador ya hace bien por algo que
+      hay que mantener y que se rompe con la página en blanco.
+
+      Al lado, y no en una sección propia, el bloque para empresas. En una
+      sección aparte sería la cuarta llamada a la acción de la página y la
+      página ya se estaba haciendo larga; aquí acompaña a las preguntas,
+      que es justo donde alguien de una empresa acaba de leer cómo va el
+      equipo y quiere preguntar lo suyo.
+    -->
+    <section class="panel panel--arena preguntas-panel" id="preguntas">
+      <div class="panel-dots" aria-hidden="true"></div>
+
+      <div class="panel-inner panel-inner--ancho preguntas-inner">
+        <div class="preguntas-columna">
+          <header class="section-head preguntas-cabecera">
+            <span class="tracked-eyebrow eyebrow--verde">PREGUNTAS</span>
+            <h2 class="section-title">Lo que se pregunta<br />antes de creérselo.</h2>
+          </header>
+
+          <div class="preguntas-lista">
+            <details class="pregunta">
+              <summary class="pregunta-titulo">
+                <span>¿El GPS lo pone el conductor con su teléfono?</span>
+                <span class="pregunta-signo" aria-hidden="true"></span>
+              </summary>
+              <div class="pregunta-cuerpo">
+                <p>No. El equipo va montado en el vehículo y reporta solo, encendido con el bus. No hay ninguna app que el conductor tenga que abrir, ni un teléfono del que dependa que la ruta se vea. Es lo primero que preguntan las empresas y la respuesta importa: un sistema que depende de que alguien se acuerde de abrir algo no es un sistema.</p>
+              </div>
+            </details>
+            <details class="pregunta">
+              <summary class="pregunta-titulo">
+                <span>¿Por qué dice metros y no minutos?</span>
+                <span class="pregunta-signo" aria-hidden="true"></span>
+              </summary>
+              <div class="pregunta-cuerpo">
+                <p>Porque los minutos serían inventados. Un bus a un kilómetro puede tardar tres minutos o quince según el tráfico de esa hora, y dar un número exacto que luego no se cumple es peor que no darlo. La distancia es un dato medido: se sabe, y el pasajero decide con ella igual de bien.</p>
+              </div>
+            </details>
+            <details class="pregunta">
+              <summary class="pregunta-titulo">
+                <span>¿Dónde funciona hoy?</span>
+                <span class="pregunta-signo" aria-hidden="true"></span>
+              </summary>
+              <div class="pregunta-cuerpo">
+                <p>En Barranquilla y Soledad, sobre las seis rutas de Sobusa que están en la tabla de aquí arriba. No hay más ciudades conectadas y no vale la pena decir que sí las hay.</p>
+              </div>
+            </details>
+            <details class="pregunta">
+              <summary class="pregunta-titulo">
+                <span>¿Los buses que se mueven en esta página son de verdad?</span>
+                <span class="pregunta-signo" aria-hidden="true"></span>
+              </summary>
+              <div class="pregunta-cuerpo">
+                <p>No. El trazado, las terminales, los kilómetros y el mapa son los reales; los buses que se ven moverse en la demostración están simulados. Lo dice también encima del mapa, porque es la clase de cosa que no se puede enseñar sin decirla.</p>
+              </div>
+            </details>
+            <details class="pregunta">
+              <summary class="pregunta-titulo">
+                <span>¿Puedo descargarla ya?</span>
+                <span class="pregunta-signo" aria-hidden="true"></span>
+              </summary>
+              <div class="pregunta-cuerpo">
+                <p>Todavía no. La app está en piloto y se instala a mano con las empresas que están probándola. Cuando esté en las tiendas se dirá aquí; mientras tanto las etiquetas de arriba dicen «pronto en» y no otra cosa.</p>
+              </div>
+            </details>
+            <details class="pregunta">
+              <summary class="pregunta-titulo">
+                <span>¿Qué pasa con la ubicación del pasajero?</span>
+                <span class="pregunta-signo" aria-hidden="true"></span>
+              </summary>
+              <div class="pregunta-cuerpo">
+                <p>Se usa para saber a qué distancia está el bus de donde esperas y para avisarte cuando se acerca. Nada más. El detalle entero está en la política de privacidad.</p>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <aside class="empresas-tarjeta" aria-labelledby="empresas-tarjeta-titulo">
+          <span class="tracked-eyebrow eyebrow--verde">PARA EMPRESAS</span>
+          <h3 id="empresas-tarjeta-titulo">¿Operas una flota?</h3>
+          <p>El equipo se monta en el vehículo y desde ese día la empresa ve dónde está cada
+            bus, y el pasajero también. Sin app de conductor y sin cambiar cómo se trabaja.</p>
+          <ul class="empresas-tarjeta-lista">
+            <li>Equipo montado en el bus, no un teléfono</li>
+            <li>Panel de control para Windows y macOS</li>
+            <li>Rutas, paradas y flota, en un sitio</li>
+          </ul>
+          <div class="empresas-tarjeta-acciones">
+            <a href="/empresas.html" class="btn-primary btn-green">Ver cómo se conecta</a>
+            <a href="https://wa.me/573004438626" class="btn-outline" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+
   </main>
 
   <footer class="site-footer" id="pie">
@@ -1785,6 +1890,7 @@
           <a href="#solucion">Cómo funciona</a>
           <a href="#cobertura">Cobertura hoy</a>
           <a href="#problema">El problema</a>
+          <a href="#preguntas">Preguntas</a>
         </div>
         <div class="footer-nav-group">
           <span>Conecta</span>

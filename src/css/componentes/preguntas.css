@@ -1,0 +1,198 @@
+/* ── Preguntas, y la tarjeta de empresas ──────────────────────────────
+   Dos columnas cuando hay sitio: las dudas a la izquierda, porque son lo
+   que se viene a leer, y la tarjeta de empresas a la derecha, pegada
+   arriba mientras se baja por la lista.
+
+   El desplegable es `<details>` nativo. El triángulo que pinta el
+   navegador se quita y en su sitio va un signo dibujado con dos rayas,
+   que es lo único que hay que girar al abrir.
+   ────────────────────────────────────────────────────────────────── */
+
+.preguntas-inner {
+  padding-block: clamp(64px, 7vw, 104px);
+}
+
+.preguntas-columna {
+  min-width: 0;
+}
+
+.preguntas-cabecera {
+  max-width: 44ch;
+  margin-bottom: clamp(28px, 3vw, 44px);
+}
+
+.preguntas-cabecera .section-title {
+  font-size: clamp(1.9rem, 1.1rem + 2.2vw, 3rem);
+}
+
+.preguntas-lista {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.pregunta {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.pregunta-titulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: clamp(18px, 1.7vw, 24px) 0;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-display);
+  font-size: clamp(1.02rem, 0.94rem + 0.4vw, 1.24rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--text-primary);
+  transition: color 0.2s var(--ease-out-cubic);
+}
+
+/* Safari todavía pinta el triángulo con su propio pseudo-elemento. */
+.pregunta-titulo::-webkit-details-marker {
+  display: none;
+}
+
+.pregunta-titulo:hover {
+  color: var(--green);
+}
+
+.pregunta-titulo:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+/* El signo: una raya siempre y otra que desaparece al abrir. */
+.pregunta-signo {
+  position: relative;
+  flex: none;
+  width: 15px;
+  height: 15px;
+}
+
+.pregunta-signo::before,
+.pregunta-signo::after {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--text-muted);
+  transform: translateY(-50%);
+  transition: opacity 0.2s var(--ease-out-cubic), background 0.2s var(--ease-out-cubic);
+}
+
+.pregunta-signo::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.pregunta[open] .pregunta-signo::after {
+  opacity: 0;
+}
+
+.pregunta[open] .pregunta-titulo {
+  color: var(--green);
+}
+
+.pregunta[open] .pregunta-signo::before {
+  background: var(--green);
+}
+
+.pregunta-cuerpo {
+  padding-bottom: clamp(20px, 2vw, 28px);
+  max-width: 62ch;
+}
+
+.pregunta-cuerpo p {
+  margin: 0;
+  font-size: clamp(0.95rem, 0.9rem + 0.25vw, 1.06rem);
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+/* ── La tarjeta ───────────────────────────────────────────────────── */
+
+.empresas-tarjeta {
+  align-self: start;
+  margin-top: clamp(34px, 5vw, 48px);
+  padding: clamp(26px, 2.4vw, 36px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.empresas-tarjeta h3 {
+  margin: 12px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 1.1rem + 0.9vw, 1.8rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+
+.empresas-tarjeta > p {
+  margin: 14px 0 0;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.empresas-tarjeta-lista {
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.empresas-tarjeta-lista li {
+  position: relative;
+  padding-left: 24px;
+  font-size: 0.93rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.empresas-tarjeta-lista li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.52em;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 2px solid var(--green);
+}
+
+.empresas-tarjeta-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.empresas-tarjeta-acciones .btn-primary,
+.empresas-tarjeta-acciones .btn-outline {
+  flex: 1 1 auto;
+  justify-content: center;
+  text-align: center;
+}
+
+@media (min-width: 960px) {
+  .preguntas-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+    gap: clamp(40px, 4vw, 72px);
+    align-items: start;
+  }
+
+  .empresas-tarjeta {
+    margin-top: 0;
+    position: sticky;
+    top: 96px;
+  }
+}
