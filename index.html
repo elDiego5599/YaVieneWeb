@@ -215,9 +215,69 @@
     <div class="riel" aria-hidden="true"></div>
 
     <!-- ============ HERO ============ -->
-    <section class="panel panel--sangre panel--sun hero-panel" id="hero"
+    <section class="panel panel--sangre panel--consola hero-panel" id="hero"
       data-parada="00" data-parada-nombre="Inicio">
-      <div class="panel-dots" aria-hidden="true"></div>
+
+      <!--
+        La red. Seis líneas paralelas cruzando el pie de la portada, cada
+        una del color de una ruta, con dos trasbordos y las dos cabeceras
+        marcadas como se marcan en un plano de transporte: la cápsula que
+        cruza el haz y el punto de anillo blanco.
+
+        Es el dibujo con el que se explica una red de buses desde hace
+        noventa años, y aquí hace de suelo: los teléfonos no flotan sobre
+        un fondo, se apoyan sobre la red. El vehículo que recorre la línea
+        verde es lo único que se mueve solo, y va despacio a propósito.
+
+        Todo el dibujo es una sola geometría —`#hero-arco`— repetida seis
+        veces y desplazada en vertical; en un trazado con quiebros de 45°
+        un desplazamiento vertical es una paralela de verdad, que es como
+        se dibujan los haces en estos planos.
+      -->
+      <div class="hero-red" aria-hidden="true">
+        <svg class="hero-red-svg" viewBox="0 0 1440 560" preserveAspectRatio="xMidYMax slice"
+          fill="none" focusable="false">
+          <defs>
+            <path id="hero-arco" d="M -80 300 H 250 L 390 160 H 1050 L 1190 300 H 1520" />
+          </defs>
+
+          <g class="hero-red-lineas" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+            <use href="#hero-arco" class="hr-linea hr-linea--1" />
+            <use href="#hero-arco" class="hr-linea hr-linea--2" />
+            <use href="#hero-arco" class="hr-linea hr-linea--3" />
+            <use href="#hero-arco" class="hr-linea hr-linea--4" />
+            <use href="#hero-arco" class="hr-linea hr-linea--5" />
+            <use href="#hero-arco" class="hr-linea hr-linea--6" />
+          </g>
+
+          <!-- Los dos trasbordos: una cápsula que cruza el haz entero. -->
+          <g class="hero-red-nodos">
+            <rect class="hr-trasbordo" x="444" y="32" width="26" height="256" rx="13" />
+            <rect class="hr-trasbordo" x="966" y="32" width="26" height="256" rx="13" />
+          </g>
+
+          <!-- Las cabeceras: un punto por línea, en los dos extremos. -->
+          <g class="hero-red-paradas">
+            <circle class="hr-parada" cx="150" cy="190" r="7" />
+            <circle class="hr-parada" cx="150" cy="234" r="7" />
+            <circle class="hr-parada" cx="150" cy="278" r="7" />
+            <circle class="hr-parada" cx="150" cy="322" r="7" />
+            <circle class="hr-parada" cx="150" cy="366" r="7" />
+            <circle class="hr-parada" cx="150" cy="410" r="7" />
+            <circle class="hr-parada" cx="1330" cy="190" r="7" />
+            <circle class="hr-parada" cx="1330" cy="234" r="7" />
+            <circle class="hr-parada" cx="1330" cy="278" r="7" />
+            <circle class="hr-parada" cx="1330" cy="322" r="7" />
+            <circle class="hr-parada" cx="1330" cy="366" r="7" />
+            <circle class="hr-parada" cx="1330" cy="410" r="7" />
+          </g>
+
+          <g class="hr-carril">
+            <circle class="hr-vehiculo-halo" r="15" />
+            <circle class="hr-vehiculo" r="7.5" />
+          </g>
+        </svg>
+      </div>
 
       <div class="panel-inner hero-grid">
 

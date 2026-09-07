@@ -248,6 +248,23 @@
   --radio-consola: 16px;
   --radio-chip: 10px;
 
+  /*
+    Los colores de línea. Una red de transporte se explica dando un color
+    a cada ruta y repitiéndolo en todas partes —en el plano, en la lista,
+    en la tabla de cobertura—, que es lo que hace que el color signifique
+    algo en vez de decorar. Son seis porque son seis las rutas de Sobusa
+    conectadas, y salen de la paleta caribe: ninguno es un pastel.
+
+    Todos por encima de 4.5:1 sobre `--consola-fondo`, porque cualquiera
+    de ellos puede acabar siendo texto de un rótulo de ruta.
+  */
+  --linea-1: #A78BFA;
+  --linea-2: #38C8F0;
+  --linea-3: #00D473;
+  --linea-4: #FFC53D;
+  --linea-5: #FF7B6B;
+  --linea-6: #FF5C93;
+
   /* ── Rejilla ──────────────────────────────────────────────────────────
      Doce columnas y un canal. Nada se centra por defecto: los titulares
      arrancan en la columna 1, el texto ocupa de la 3 a la 7 y los datos

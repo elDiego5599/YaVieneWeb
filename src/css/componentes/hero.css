@@ -23,7 +23,21 @@
    se sale por la derecha. El escenario se corta contra el suelo del hero.
    Las dos cosas dicen lo mismo: esto no cabe, sigue más allá.
    ────────────────────────────────────────────────────────────────────── */
+/*
+  El campo del hero es tinta plana, no un degradado. Fue crema con halo
+  tibio, y luego tinta con tres resplandores de color difuminados por
+  detrás; los dos eran fondo, y un fondo es lo que se mira cuando no hay
+  nada que mirar. Aquí el color no está detrás del contenido: es el
+  contenido —la red de líneas del pie— y por eso el campo puede callarse.
+
+  El degradado que queda es sólo profundidad: arriba más oscuro que
+  abajo, para que el titular tenga tinta debajo y la red tenga aire.
+*/
 .hero-panel {
+  position: relative;
+  background-color: #081527;
+  background-image: linear-gradient(178deg, #081527 0%, #0B2040 54%, #0A1B34 100%);
+
   /*
     Alto de ventana, más lo que el panel sube por encima del borde: sin
     sumarlo, el suelo del hero —y con él el corte de los teléfonos— queda
@@ -40,6 +54,126 @@
   padding-top: 96px;
 }
 
+/* ── La red ────────────────────────────────────────────────────────────
+
+   Ocupa el pie del hero y nada más: por encima de ella no hay dibujo, que
+   es lo que deja al titular leerse sobre tinta limpia. `xMidYMax slice`
+   la ancla por abajo y la recorta por los lados, así que en un teléfono
+   se ve el centro del haz —los quiebros y un trasbordo— y no los
+   extremos, que es la parte que menos dice.
+   ────────────────────────────────────────────────────────────────────── */
+.hero-red {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 0;
+  height: min(62%, 620px);
+  pointer-events: none;
+}
+
+.hero-red-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+  Las seis paralelas. El desplazamiento en vertical vale como paralela
+  porque el trazado sólo tiene tramos horizontales y quiebros de 45°: en
+  los horizontales la separación es la que se ve, y en los diagonales es
+  esa misma dividida por √2, que es como se dibujan los haces en un plano
+  de metro y por lo que los quiebros quedan escalonados y no clavados.
+*/
+.hr-linea--1 { stroke: var(--linea-1); transform: translateY(-110px); }
+.hr-linea--2 { stroke: var(--linea-2); transform: translateY(-66px); }
+.hr-linea--3 { stroke: var(--linea-3); transform: translateY(-22px); }
+.hr-linea--4 { stroke: var(--linea-4); transform: translateY(22px); }
+.hr-linea--5 { stroke: var(--linea-5); transform: translateY(66px); }
+.hr-linea--6 { stroke: var(--linea-6); transform: translateY(110px); }
+
+/* El trasbordo: relleno del color del campo y anillo blanco, para que se
+   lea como una pieza sólida delante del haz y no como un hueco. */
+.hr-trasbordo {
+  fill: #081527;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 5;
+}
+
+.hr-parada {
+  fill: #081527;
+  stroke: rgba(255, 255, 255, 0.82);
+  stroke-width: 4;
+}
+
+/* El vehículo va por la línea verde, que es la de la marca. El carril lo
+   pone a su altura y la animación lo lleva por los cinco tramos. */
+.hr-carril {
+  transform: translateY(-22px);
+}
+
+.hr-vehiculo {
+  fill: #FFFFFF;
+}
+
+.hr-vehiculo-halo {
+  fill: rgba(0, 212, 115, 0.28);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Las líneas se dibujan de izquierda a derecha, escalonadas, como se
+     traza un plano a mano. `1800` es la longitud del trazado redondeada
+     hacia arriba: de sobra para que ningún tramo quede sin cubrir. */
+  .hr-linea {
+    stroke-dasharray: 1800;
+    stroke-dashoffset: 1800;
+    animation: hr-trazo 1.5s var(--ease-out-cubic) forwards;
+  }
+
+  .hr-linea--1 { animation-delay: 0.05s; }
+  .hr-linea--2 { animation-delay: 0.13s; }
+  .hr-linea--3 { animation-delay: 0.21s; }
+  .hr-linea--4 { animation-delay: 0.29s; }
+  .hr-linea--5 { animation-delay: 0.37s; }
+  .hr-linea--6 { animation-delay: 0.45s; }
+
+  .hero-red-nodos,
+  .hero-red-paradas {
+    opacity: 0;
+    animation: hr-aparece 0.7s var(--ease-out-cubic) 1.15s forwards;
+  }
+
+  .hr-vehiculo,
+  .hr-vehiculo-halo {
+    animation: hr-recorrido 19s linear 1.4s infinite;
+  }
+}
+
+@keyframes hr-trazo {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes hr-aparece {
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+  El recorrido: los cinco tramos del trazado, con el reparto de tiempo
+  proporcional a su longitud —310, 198, 660, 198 y 310 unidades sobre
+  1676— para que el vehículo mantenga la velocidad en los quiebros en vez
+  de acelerar en las diagonales.
+*/
+@keyframes hr-recorrido {
+  0% { transform: translate(-80px, 300px); }
+  19.7% { transform: translate(250px, 300px); }
+  31.5% { transform: translate(390px, 160px); }
+  70.9% { transform: translate(1050px, 160px); }
+  82.7% { transform: translate(1190px, 300px); }
+  100% { transform: translate(1520px, 300px); }
+}
+
 /*
   Tres renglones: el texto, el escenario y la franja. El del medio es el
   que cede —`1fr` sobre un contenido más alto que él—, y de ahí sale el
@@ -47,6 +181,8 @@
   que sobra de la ventana.
 */
 .hero-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-rows: auto minmax(240px, 1fr) auto;
   flex: 1;
@@ -73,75 +209,47 @@
 }
 
 /*
-  El cartel. Un solo renglón, «¿CUÁNTO FALTA PARA TU BUS?» de un tirón, y a
-  un cuerpo que no cabe: la frase mide más que la ventana y el borde derecho
-  la corta en «BUS?». Es la primera cosa que hace la página y dice de qué va
-  todo lo demás —la pregunta es más grande que la pantalla—.
+  El titular. Fue un cartel: veintiséis letras en condensada a 11,5 vw, de
+  un tirón y cortadas por el borde derecho de la ventana. Decía «esto no
+  cabe, sigue más allá», y lo decía bien, pero era voz de periódico y no
+  de producto: lo primero que se veía de la página era tinta recortada.
 
-  Va en condensada, el eje `wdth` de Bricolage a 78, que es lo que permite
-  meter veintiséis letras en un renglón de este cuerpo sin que el recorte se
-  coma media frase.
+  Ahora es un titular contenido, con la caja del texto midiendo lo que
+  mide el texto. Ancho normal en vez del eje `wdth` a 78 —una condensada
+  es una decisión editorial, y ésta es una portada de aplicación—, caja
+  baja en vez de versales, y peso 600 en vez de 800: sobre tinta el negro
+  entero engorda y las contraformas se cierran.
 
-  11.5 vw y no un tamaño en píxeles: el cuerpo y el ancho de la ventana
-  crecen juntos, así que el recorte cae siempre en el mismo sitio de la
-  frase —justo detrás de la «S»— lo mismo en un portátil que en un monitor
-  grande. El tope de 18rem es sólo para pantallas absurdamente anchas.
-
-  `width: max-content` es lo que le deja salirse: la caja mide lo que mide
-  el renglón, no lo que mide el hero, y el panel la recorta por el borde
-  derecho. Recorta el panel y no la ventana, así que la página sigue sin
-  poder desplazarse de lado.
-
-  El margen negativo devuelve la sangría de la columna: el titular se apoya
-  en el borde del papel y todo lo demás empieza un poco más adentro. Un
-  poco, no del todo: pegado al filo, el signo de apertura se lee como si
-  estuviera cortado.
-
-  La frase entera sigue estando en el documento y en el `aria-label` que le
-  pone `titulares.ts`; lo que se recorta es tinta, no texto.
+  La frase entera sigue en el documento y en el `aria-label` que le pone
+  `titulares.ts`; lo que cambia es cómo se compone.
 */
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(2.9rem, 11.5vw, 18rem);
-  font-weight: var(--titular-wght);
-  font-stretch: calc(var(--titular-wdth) * 1%);
-  line-height: 0.84;
-  letter-spacing: -0.035em;
-  text-transform: uppercase;
-  color: var(--text-primary);
-  width: max-content;
-  max-width: none;
-  margin: 0 0 0 calc(var(--sangria) * -1 + clamp(4px, 0.6vw, 12px));
+  font-size: clamp(2.6rem, 1.1rem + 4.9vw, 5.6rem);
+  font-weight: 600;
+  font-stretch: 100%;
+  line-height: 1;
+  letter-spacing: -0.042em;
+  text-transform: none;
+  color: var(--consola-texto);
+  width: auto;
+  max-width: 14ch;
+  margin: 0;
 }
 
-/*
-  En el teléfono el recorte no vale: cortar la frase en una pantalla de 390
-  puntos deja fuera un tercio de la pregunta, y no queda cartel sino ruido.
-  Aquí el titular vuelve a ser un bloque de dos renglones que cabe.
-
-  El corte lo decide el ajuste automático y no un `<br>`: «para tu bus?» va
-  dentro de un `<span>`, y `titulares.ts` trata los elementos como una sola
-  pieza, así que la pregunta nunca se parte por dentro. Cae entera al
-  segundo renglón o no cae.
-*/
 @media (max-width: 767px) {
   .hero-title {
-    font-size: clamp(2.4rem, 19vw, 8rem);
-    width: auto;
+    font-size: clamp(2.2rem, 9.4vw, 3.4rem);
     max-width: 100%;
   }
 }
 
-/*
-  La media frase en verde. `nowrap` porque `titulares.ts` la cuenta como
-  una sola pieza al repartir las líneas: si el navegador la partiera por
-  dentro, una de las cajas que recortan mediría dos renglones y el destape
-  saldría a medias. Si algún día no cupiera, se sale y la recorta el panel,
-  que es lo que ya hace el titular entero en pantalla ancha.
-*/
 .hero-title .highlight {
   display: inline;
-  color: var(--green);
+  /* El mismo verde de la línea 3, que es la que cruza el pie del hero: la
+     media frase que contesta la pregunta y la línea que se mueve son la
+     misma cosa dicha dos veces. */
+  color: var(--linea-3);
   white-space: nowrap;
 }
 
@@ -151,29 +259,33 @@
   contesta cabe en un renglón de once puntos.
 */
 .hero-respuesta {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.7em;
   margin: 0;
+  padding: 7px 14px;
+  border: 1px solid var(--consola-borde);
+  border-radius: 999px;
+  background: var(--consola-superficie);
   font-family: var(--font-mono);
   font-size: var(--step-rotulo);
   font-weight: 500;
   letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: var(--consola-texto-suave);
   font-variant-numeric: tabular-nums;
 }
 
 .hero-respuesta-marca {
-  color: var(--text-primary);
+  color: var(--consola-texto);
   font-weight: 600;
 }
 
 /* El punto de separación es dibujo, no lectura: quien escucha la página
    oye los tres datos seguidos y no un punto entre cada uno. */
 .hero-sep {
-  color: var(--text-muted);
+  color: var(--consola-texto-tenue);
 }
 
 /* El único acento de «en vivo» de la portada, y por eso se guarda para
@@ -186,16 +298,16 @@
   height: 8px;
   flex: none;
   border-radius: 50%;
-  background: var(--green);
+  background: var(--verde-vivo);
   box-shadow: 0 0 0 0 var(--green-glow);
   animation: heroLatido 2.6s var(--ease-out-cubic) infinite;
 }
 
 .hero-description {
   font-size: clamp(17px, 1.35vw, 21px);
-  line-height: 1.5;
-  color: var(--text-secondary);
-  max-width: 44ch;
+  line-height: 1.55;
+  color: var(--consola-texto-suave);
+  max-width: 42ch;
   margin: 0;
 }
 
@@ -221,13 +333,13 @@
   justify-content: flex-start;
   gap: 8px;
   font-size: 13.5px;
-  color: var(--text-muted);
+  color: var(--consola-texto-tenue);
   margin-top: 2px;
 }
 
 /* El texto se queda a media luz: las marcas son lo que se mira. */
 .hero-subtext-lead {
-  color: var(--text-muted);
+  color: var(--consola-texto-tenue);
 }
 
 /*
@@ -253,10 +365,10 @@
   gap: 6px;
   padding: 5px 12px 5px 10px;
   border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-sm);
-  color: var(--text-primary);
+  background: var(--consola-superficie-alta);
+  border: 1px solid var(--consola-borde);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  color: var(--consola-texto);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -292,12 +404,12 @@
   align-items: center;
   gap: clamp(14px, 2vw, 32px);
   padding: clamp(11px, 1.1vw, 15px) var(--sangria);
-  border-top: 1px solid var(--linea);
+  border-top: 1px solid var(--consola-borde);
   font-family: var(--font-mono);
   font-size: var(--step-rotulo);
   letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: var(--consola-texto-suave);
   font-variant-numeric: tabular-nums;
 }
 
@@ -353,7 +465,7 @@
 
 .hero-credito {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--consola-texto-tenue);
   text-align: right;
 }
 
