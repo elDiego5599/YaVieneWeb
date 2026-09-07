@@ -902,3 +902,462 @@
     transition: none !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   CÓMO FUNCIONA: LOS TRES PASOS, DE UNO EN UNO
+
+   Los tres siguen ahí —es la misma fila de tres teléfonos—, pero ya no
+   compiten por el ancho de la página. La sección se clava mientras se
+   baja: la pista mide varias pantallas de alto y la escena se pega
+   arriba, así que durante todo ese recorrido la página no avanza y lo
+   que se mueve es la fila.
+
+   El paso que manda se pone en el centro de la ventana a tamaño entero;
+   los otros dos esperan a los lados, más pequeños y apagados, lo justo
+   para que se vea que hay uno antes y otro después. Al seguir bajando la
+   fila corre una posición: el que estaba grande se encoge y el siguiente
+   crece en su sitio. Quién manda lo decide `paso-foco.ts` con el avance
+   de la pista.
+
+   El desplazamiento va en `transform` sobre la fila entera y el tamaño
+   en `scale` sobre cada columna: ni uno ni otro tocan la maquetación, así
+   que el pase corre sin recalcular nada.
+   ══════════════════════════════════════════════════════════════════════ */
+.pasos-escena {
+  display: grid;
+  justify-items: stretch;
+  align-content: center;
+  gap: clamp(18px, 2.8vh, 40px);
+  /* La fila se sale por los lados a propósito; el visor la recorta. */
+  overflow: visible;
+}
+
+/* La sección respira menos que las demás: el aire vertical se lo lleva el
+   visor, que es lo que hay que ver. Con el relleno de siempre la escena no
+   cabía en una pantalla y `encaje.ts` la encogía entera —de ahí venía que
+   la sección se viera pequeña y estrecha en un monitor grande—. */
+#solucion .panel-inner {
+  padding-top: clamp(12px, 2vh, 28px);
+  padding-bottom: clamp(16px, 2.6vh, 40px);
+}
+
+.escena .pasos-escena {
+  padding-top: clamp(10px, 1.4vh, 22px);
+  padding-bottom: clamp(10px, 1.4vh, 22px);
+}
+
+/* ── La cabecera ──
+   El titular es la frase, no la etiqueta: «Cómo funciona» pasa a rótulo y
+   lo que se lee grande es lo que la sección promete. Alineado a la
+   izquierda y a dos líneas, como el resto de la página. */
+.pasos-cabecera {
+  max-width: none;
+  justify-self: stretch;
+  text-align: left;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.pasos-cabecera .seccion-titulo {
+  margin: 0;
+  max-width: 18ch;
+  font-size: clamp(34px, 4.3vw, 64px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+/* ── La rejilla ──
+   Visor ancho a la izquierda, pasos a la derecha, como el bloque de
+   producto de Vercel: la imagen manda y el texto la acompaña. */
+.pasos-rejilla {
+  display: grid;
+  /* El visor se lleva ocho de cada doce. Con la proporción de antes los
+     teléfonos de los lados salían cortados por el filo del cuadro; el
+     carril de la derecha, en cambio, lleva tres títulos y un párrafo y
+     le sobraba sitio. */
+  grid-template-columns: minmax(0, 8.4fr) minmax(0, 3.6fr);
+  gap: clamp(24px, 3.4vw, 64px);
+  align-items: stretch;
+  width: 100%;
+}
+
+/* ── El visor ──
+   Un solo cuadro para los tres teléfonos, no una caja por aparato: lo que
+   se enseña es una escena, y las tres tomas son la misma escena en tres
+   momentos. El recorte usa `clip` y no `hidden` —`hidden` vuelve al padre
+   contenedor de scroll y el pegado dejaría de funcionar (ver layout.css). */
+.pasos-cuadro {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: clamp(18px, 2.4vh, 40px) clamp(8px, 1vw, 18px);
+  border: 1px solid var(--linea);
+  border-radius: clamp(20px, 2.4vw, 34px);
+  background: radial-gradient(128% 96% at 50% 0%, var(--papel) 0%, var(--arena) 58%, var(--banda) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 34px 74px -38px rgba(11, 22, 40, 0.24);
+  overflow: clip;
+}
+
+/* ── La fila ──
+   Una carrusel, no una fila quieta: el teléfono del paso que se está
+   leyendo se queda siempre en el eje del visor y los otros dos se corren
+   a los lados. La fila entera se desplaza lo que mide una columna con su
+   hueco, que es justo lo que hace falta para centrar el de turno. Antes
+   el encendido era el primero, el segundo o el tercero según el paso y el
+   ojo tenía que ir a buscarlo cada vez.
+
+   El ancho del aparato sale del alto de la ventana —es lo que limita, no
+   el ancho— y se topa contra el ancho del visor para que en una ventana
+   baja y ancha no se salga. */
+.pasos-pase {
+  --col-paso: min(clamp(180px, 26.5vh, 340px), 30vw);
+  --hueco-paso: clamp(6px, 1.2vw, 24px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--hueco-paso);
+  width: 100%;
+  min-width: 0;
+  transform: translateX(var(--corrida, 0px));
+  transition: transform 0.7s var(--ease-fluida);
+}
+
+.pasos-pase[data-activo='0'] {
+  --corrida: calc(var(--col-paso) + var(--hueco-paso));
+}
+
+.pasos-pase[data-activo='2'] {
+  --corrida: calc(-1 * (var(--col-paso) + var(--hueco-paso)));
+}
+
+.paso-columna {
+  flex: 0 0 var(--col-paso);
+  width: var(--col-paso);
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  /* Fuera de turno: encogido, apagado, desenfocado y sin capturar el
+     ratón. El desenfoque es lo que deja el paso encendido solo en la
+     escena sin tener que esconder los otros dos. */
+  opacity: 0.45;
+  filter: blur(4px) saturate(0.68);
+  transform: scale(0.7);
+  transform-origin: center center;
+  pointer-events: none;
+  transition: opacity 0.55s var(--ease-out-cubic),
+    filter 0.55s var(--ease-out-cubic),
+    transform 0.7s var(--ease-fluida);
+}
+
+.paso-columna.is-activa {
+  opacity: 1;
+  filter: none;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+/* El teléfono ya no lleva caja propia: el cuadro es uno solo y dentro de
+   él los aparatos van sueltos, que es lo que deja al de turno ocupar todo
+   el alto disponible. */
+.paso-marco {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+}
+
+.pasos-pase .phone-shell--paso {
+  --ancho: var(--col-paso);
+}
+
+/* El halo azulado de la cinta no pega con el papel claro: aquí el
+   aparato se despega con un velo verde muy flojo, y sólo el que manda. */
+.pasos-pase .paso-toma::before {
+  inset: -6% -24%;
+  background: radial-gradient(closest-side, rgba(0, 168, 89, 0.16), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out-cubic);
+}
+
+.paso-columna.is-activa .paso-toma::before {
+  opacity: 1;
+}
+
+/* ── El lado: entrada, rótulo y pasos clicables ──
+   La lista manda al mismo sitio que el scroll: cada botón baja la pista
+   hasta su tramo y el PasoFoco hace el resto, así que clic y scroll nunca
+   discrepan. Ver main.ts `irAPaso`. */
+.pasos-lado {
+  display: grid;
+  align-content: start;
+  gap: clamp(14px, 2vh, 26px);
+  padding-top: clamp(2px, 1vh, 14px);
+  min-width: 0;
+}
+
+.pasos-lado-lead {
+  margin: 0;
+  max-width: 34ch;
+  font-size: clamp(15px, 1.05vw, 18px);
+  line-height: 1.55;
+  color: var(--tinta-media);
+}
+
+.pasos-lado-rotulo {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--tinta-tenue);
+}
+
+.pasos-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  position: relative;
+}
+
+/*
+  La línea que dice por dónde vas: un solo trazo verde sobre el riel
+  gris de los botones, que baja de 0 a 1 con el recorrido de la pista
+  (lo pone `main.ts` desde el avance crudo de `PasoFoco`). Va en `scale`
+  y no en `height` para que lo mueva el compositor sin rehacer el layout
+  en cada cuadro; el pasito de transición redondea lo escalonado del
+  scroll sin que se note que va por detrás.
+*/
+.pasos-lista::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--green);
+  transform: scaleY(var(--avance-lista, 0));
+  transform-origin: 50% 0;
+  transition: transform 0.12s linear;
+  pointer-events: none;
+}
+
+.paso-boton {
+  display: grid;
+  gap: 5px;
+  width: 100%;
+  padding: clamp(11px, 1.5vh, 18px) 6px clamp(11px, 1.5vh, 18px) 18px;
+  border: 0;
+  border-left: 2px solid var(--linea);
+  border-radius: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.35s var(--ease-out-cubic),
+    border-color 0.35s var(--ease-out-cubic);
+}
+
+.paso-boton:hover {
+  opacity: 0.8;
+}
+
+.paso-boton:focus-visible {
+  outline: 2px solid var(--green-accessible);
+  outline-offset: -2px;
+}
+
+.paso-boton.is-activa {
+  border-left-color: var(--green);
+  opacity: 1;
+}
+
+.paso-boton .columna-indice {
+  margin-bottom: 0;
+}
+
+.paso-boton .columna-titulo {
+  font-size: clamp(17px, 1.35vw, 21px);
+}
+
+/* La explicación del paso sólo está puesta en el que manda. Se abre con
+   la fila de la rejilla —de 0fr a 1fr— para que el resto de la lista se
+   acomode con el mismo movimiento y no dé un salto. */
+.paso-boton-texto {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.5s var(--ease-fluida),
+    opacity 0.35s var(--ease-out-cubic);
+}
+
+.paso-boton-texto > span {
+  overflow: hidden;
+}
+
+.paso-boton.is-activa .paso-boton-texto {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.columna-indice {
+  display: block;
+  margin-bottom: 7px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--tinta-tenue);
+  transition: color 0.45s var(--ease-out-cubic);
+}
+
+.paso-boton.is-activa .columna-indice {
+  color: var(--acento);
+}
+
+.columna-titulo {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(19px, 2.1vh, 26px);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--tinta);
+}
+
+.columna-texto {
+  display: block;
+  padding-top: 6px;
+  max-width: 36ch;
+  font-size: clamp(13.5px, 0.95vw, 15.5px);
+  line-height: 1.55;
+  color: var(--tinta-media);
+}
+
+/* Pantalla mediana: el visor pasa arriba y los pasos debajo, a lo ancho. */
+@media (max-width: 1023px) {
+  .pasos-rejilla {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(18px, 3vh, 32px);
+  }
+
+  .pasos-pase {
+    --col-paso: min(clamp(168px, 22vh, 260px), 46vw);
+  }
+
+  .pasos-lado-lead {
+    max-width: none;
+  }
+}
+
+/* Pantalla estrecha: el que manda ocupa casi todo el ancho y de los otros
+   dos asoma un canto, que es lo que dice que la fila sigue. */
+@media (max-width: 859px) {
+  .pasos-cabecera .seccion-titulo {
+    max-width: 14ch;
+    font-size: clamp(29px, 7.6vw, 44px);
+  }
+
+  /* En vertical el alto es lo escaso, y lo poco que hay se lo tiene que
+     llevar el aparato. La lista se aprieta: el rótulo sobra —el titular
+     ya dice que son tres pasos—, el número se mete en la misma línea del
+     título y sólo el paso de turno gasta las dos líneas de explicación. */
+  .pasos-lado {
+    gap: 12px;
+  }
+
+  .pasos-lado-rotulo {
+    display: none;
+  }
+
+  .paso-boton {
+    display: block;
+    padding: 9px 0 9px 14px;
+  }
+
+  .paso-boton .columna-indice {
+    display: inline;
+    margin-right: 9px;
+    font-size: 10px;
+    vertical-align: 1px;
+  }
+
+  .paso-boton .columna-titulo {
+    display: inline;
+    font-size: 17px;
+  }
+
+  .paso-boton .columna-texto {
+    padding-top: 5px;
+    font-size: 14px;
+  }
+
+  /* Aquí sólo cabe uno de frente: de los otros dos asoma un canto. La
+     corrida que los centra es la misma de siempre, la de arriba. */
+  .pasos-pase {
+    --col-paso: min(clamp(150px, 21.5vh, 240px), 58vw);
+    --hueco-paso: clamp(14px, 5vw, 28px);
+  }
+
+  .pasos-lado-lead {
+    display: none;
+  }
+
+  .pasos-escena {
+    gap: 16px;
+  }
+
+  .pasos-rejilla {
+    gap: 16px;
+  }
+
+  #solucion .panel-inner {
+    padding-top: 10px;
+    padding-bottom: 12px;
+  }
+}
+
+/* Sin animaciones no hay pista que recorrer: la escena se suelta, las
+   tres columnas se leen una debajo de otra y ninguna se apaga. */
+@media (prefers-reduced-motion: reduce) {
+  .pasos-pase {
+    flex-direction: column;
+    gap: clamp(40px, 6vw, 72px);
+    transform: none;
+  }
+
+  .paso-columna,
+  .paso-columna.is-activa {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .paso-columna {
+    width: min(100%, 340px);
+    flex: 0 0 auto;
+  }
+
+  .pasos-pase .paso-toma::before {
+    opacity: 1;
+  }
+
+  .paso-boton,
+  .paso-boton.is-activa {
+    opacity: 1;
+  }
+
+  .paso-boton-texto,
+  .paso-boton.is-activa .paso-boton-texto {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}

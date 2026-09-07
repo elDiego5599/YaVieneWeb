@@ -111,8 +111,18 @@ toque. Se respeta `prefers-reduced-motion`.
    la lista de rutas a un lado y la distancia al bus leyéndose en grande.
 4. **Cómo funciona** — tres pasos en tres columnas, cada uno con un recorte
    real de la app debajo. Sin iconos dibujados.
-5. **Qué resuelve** — la sección del problema comprimida en una banda de
-   tres afirmaciones cortas con su cifra. Deja de ser una parada entera.
+5. **Qué resuelve** — una sola banda con un interruptor de dos
+   posiciones, «A ciegas» y «Con Ya Viene», y un mismo escenario debajo
+   que se reordena al cambiar de lado. A ciegas es una escena
+   desparramada: una maraña de líneas que no llega a ningún sitio, los
+   chispazos de lo que se pierde, cuatro trozos de lo que se dice en el
+   paradero y una alerta roja en medio —nadie sabe dónde va el bus—, con
+   las tres fichas fuera de su fila. Con Ya Viene se apaga todo eso, la
+   alerta se convierte en una píldora verde con el logo que dice «Ya
+   Viene», y de ella baja un árbol de líneas que deja cada ficha en su
+   sitio. El texto de las tres afirmaciones no se pierde: cada ficha
+   tiene el suyo por un lado y su reverso por el otro. Deja de ser una
+   parada entera.
 6. **Rutas y cobertura** — la tabla de las seis rutas con cabeceras y
    kilometraje. Es el punto denso de la página y son datos verdaderos.
 7. **Para empresas de transporte** — banda propia, no una nota dentro de

@@ -89,7 +89,7 @@
   font-weight: 500;
   letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
-  color: var(--tinta-tenue);
+  color: var(--acento);
 }
 
 .seccion-titulo {
@@ -135,6 +135,29 @@
   color: la afirmación va en tinta plena y lo que la matiza se apaga, en
   el mismo tamaño y el mismo peso. Se lee primero lo uno y después lo otro.
 */
+/*
+  Lo que va dentro de una columna: un titular corto y un párrafo. No hay
+  icono ni número: tres iconos genéricos encima de tres párrafos es el
+  adorno que más veces se ha puesto en una página sin que aporte nada, y
+  numerarlas diría que hay un orden que no hay.
+*/
+.columna-titulo {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 0.95rem + 0.35vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--tinta);
+}
+
+.columna-texto {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--tinta-media);
+}
+
 .apagado {
   color: var(--tinta-tenue);
 }

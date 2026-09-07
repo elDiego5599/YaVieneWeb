@@ -13,9 +13,7 @@
   transform: translateY(0);
 }
 
-/* Aceleración de hardware y renderizado vectorial nítido HD para buses y elementos flotantes */
-.scene-bus,
-.scene-bus-img,
+/* Aceleración de hardware para los elementos flotantes que quedan */
 .animate-float-slow,
 .animate-float-delayed {
   transform: translateZ(0);
@@ -26,7 +24,7 @@
   will-change: transform;
 }
 
-/* Levitación de los buses vectoriales y tarjetas del hero */
+/* Levitación de las tarjetas flotantes que quedan */
 @keyframes floatSlow {
   0%, 100% {
     transform: translateY(0px);

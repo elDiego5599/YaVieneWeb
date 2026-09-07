@@ -65,27 +65,34 @@
   marino—, que es lo que hace que un dato parezca un adorno. Ahora los
   tres van en tinta y lo que los distingue es el rótulo.
 */
-.mapa-inner > .rutas-cifras {
+/*
+  Las tres cifras dejaron de ser una banda debajo del marco y son ahora el
+  pie de la lista de rutas, dentro del mando. Como pie van en pequeño: el
+  número grande de esta sección es el de la lectura —la distancia al bus—,
+  y tres cifras de tamaño de titular al lado le quitaban el sitio.
+*/
+.mapa-mando > .rutas-cifras {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: clamp(20px, 3vw, 40px);
-  margin-top: clamp(28px, 3.4vw, 44px);
-  padding-top: clamp(22px, 2.4vw, 32px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.4vw, 24px);
+  margin: 0;
+  padding-top: clamp(14px, 1.4vw, 20px);
   border-top: 1px solid var(--linea);
 }
 
-.mapa-inner .rutas-dato-numero,
-.mapa-inner .rutas-dato:nth-child(2) .rutas-dato-numero,
-.mapa-inner .rutas-dato:nth-child(3) .rutas-dato-numero {
-  font-size: clamp(1.7rem, 1.1rem + 1.5vw, 2.4rem);
+.mapa-mando .rutas-dato-numero,
+.mapa-mando .rutas-dato:nth-child(2) .rutas-dato-numero,
+.mapa-mando .rutas-dato:nth-child(3) .rutas-dato-numero {
+  font-size: clamp(1.15rem, 0.9rem + 0.7vw, 1.55rem);
   font-weight: 600;
-  letter-spacing: -0.035em;
+  line-height: 1;
+  letter-spacing: -0.03em;
   color: var(--tinta);
 }
 
-.mapa-inner .rutas-dato-rotulo {
+.mapa-mando .rutas-dato-rotulo {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 500;
   letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
@@ -115,7 +122,7 @@
        mide el nombre de ruta más largo con su tramo debajo— y ni un
        píxel más. Con él puesto los dos van parejos y el grupo se
        centra, que es lo que ya hacía `justify-content`. */
-    grid-template-columns: minmax(0, 820px) auto;
+    grid-template-columns: minmax(0, 960px) auto;
     align-items: stretch;
   }
 
@@ -164,7 +171,7 @@
    veía como un hueco. */
 .mapa-mando {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto auto;
   gap: clamp(16px, 1.6vw, 22px);
   min-width: 0;
 }
@@ -182,7 +189,8 @@
 */
 @media (min-width: 1060px) {
   .mapa-mando {
-    grid-template-rows: auto auto;
+    /* Tres piezas: la lista, sus cifras y la lectura. */
+    grid-template-rows: auto auto auto;
     /* La lista arriba y la lectura abajo, apoyada en el filo inferior del
        mapa: las dos columnas cierran a la misma altura y lo que sobra
        queda en medio, que es donde no se lee como un descuido. */
@@ -228,8 +236,10 @@
   aspect-ratio: 1284 / 1982;
   /* Más bajo que antes. A 780 px el mosaico sacaba media pantalla de alto
      y la columna de al lado —seis fichas y la lectura— se quedaba con un
-     agujero debajo del tamaño de la propia lista. */
-  height: clamp(420px, 66vh, 640px);
+     agujero debajo del tamaño de la propia lista. El techo volvió a subir
+     con la pista ancha, ahora que la columna de al lado tiene con qué
+     llenarlo: la lista, sus cifras y la lectura. */
+  height: clamp(380px, 50vh, 540px);
   border-radius: var(--radio-tarjeta);
   overflow: hidden;
   background: #EDE7DE;
@@ -357,6 +367,10 @@
   pointer-events: none;
 }
 
+.mapa-credito a {
+  color: inherit;
+  pointer-events: auto;
+}
 /* ── Las rutas ── */
 .mv-rutas {
   display: flex;

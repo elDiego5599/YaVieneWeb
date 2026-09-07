@@ -87,6 +87,15 @@ export class NavIsland {
     });
 
     window.addEventListener('scroll', () => this.cerrar(), { passive: true });
+
+    // Fundido con el hero: arriba la cabecera es el mismo papel, sin velo
+    // ni línea; al bajar aparecen los dos. Ver nav.css `.is-arriba`.
+    const cabecera = isla.closest('.site-header');
+    const marcarArriba = (): void => {
+      cabecera?.classList.toggle('is-arriba', window.scrollY <= 4);
+    };
+    marcarArriba();
+    window.addEventListener('scroll', marcarArriba, { passive: true });
   }
 
   private abrir(): void {

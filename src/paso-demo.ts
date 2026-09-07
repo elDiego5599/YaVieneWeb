@@ -1,6 +1,8 @@
 import { encajeDe } from './encaje';
 import type { PhoneMap } from './phone-map';
 import { sinMovimiento } from './scrolly';
+import { EMPRESA, VACIO_SELECT, carrilEmpresas, carrilRutas } from './selector';
+import type { RutaLanding } from './types';
 
 /**
  * El teléfono de cada momento de la solución, moviéndose solo.
@@ -18,6 +20,15 @@ import { sinMovimiento } from './scrolly';
 
 /** La C16, la misma ruta que enseñan el hero y el selector. */
 const RUTA = 'R-106';
+
+/*
+  Lo que el guion del segundo momento elige en el selector es la misma
+  empresa y la misma ruta que el HTML trae ya escritas: esa es la foto
+  final del momento —la que se queda si no llega el JavaScript— y el guion
+  la vacía al empezar el bucle para volver a llenarla a cada toque. Los
+  textos no se copian aquí: la empresa sale de `selector.ts` y la ruta, de
+  rutas.json, que son los mismos que dibujan las dos listas.
+*/
 
 /**
  * El reloj del guion corre más rápido que el de la calle. Un bus real
@@ -54,6 +65,14 @@ export class PasoDemo {
   private avisoPuesto = false;
   private refresco = 0;
 
+  /** La ruta que el guion elige, tal como la trae rutas.json. */
+  private readonly ruta: RutaLanding;
+  /** El envoltorio cuyo alto se anima al cambiar de vista; sólo el 2º lo tiene. */
+  private readonly vistasEl: HTMLElement | null;
+  private readonly vistas: HTMLElement[];
+  /** Lo que mide la tarjeta del selector: las listas se dibujan con ella. */
+  private altoTarjeta = 0;
+
   constructor(paso: HTMLElement, mapa: PhoneMap, guion: number) {
     const pantalla = paso.querySelector<HTMLElement>('.phone-screen');
     if (!pantalla) throw new Error('PasoDemo: el momento no trae teléfono');
@@ -62,6 +81,14 @@ export class PasoDemo {
     this.pantalla = pantalla;
     this.mapa = mapa;
     this.guion = guion;
+    this.ruta = mapa.rutas.find((r) => r.id === RUTA) ?? mapa.rutas[0];
+
+    this.vistasEl = this.el('views');
+    this.vistas = Array.from(paso.querySelectorAll<HTMLElement>('.sheet-view'));
+    // Las dos listas del selector se escriben una sola vez, con los mismos
+    // datos que las del hero: nunca están copiadas en el HTML.
+    this.el('company-list')?.replaceChildren(carrilEmpresas());
+    this.el('route-list')?.replaceChildren(carrilRutas(mapa.rutas));
 
     this.mapa.setRoute(RUTA);
     this.mapa.showRoute(true);
@@ -125,10 +152,19 @@ export class PasoDemo {
     this.el(nombre)?.classList.toggle('is-on', encendido);
   }
 
-  /** Deja visible el ícono que toca de un grupo que se intercambia. */
+  /**
+   * Deja visible el ícono que toca de un grupo que se intercambia.
+   *
+   * Se escribe el atributo y no la propiedad: los íconos son SVG, y
+   * `hidden` es propiedad de `HTMLElement`, no de `SVGElement`. Puesta
+   * como propiedad se quedaba en una marca suelta del objeto que no
+   * llegaba al documento, y en pantalla mandaba el atributo del HTML —el
+   * de la foto final—, así que el aviso enseñaba el visto desde el primer
+   * cuadro y el chip del primer momento nunca pasaba de la diana al pin.
+   */
   private icono(grupo: string, cual: string): void {
     for (const nodo of this.pantalla.querySelectorAll<HTMLElement>(`[data-grupo="${grupo}"]`)) {
-      nodo.hidden = nodo.dataset.icono !== cual;
+      nodo.toggleAttribute('hidden', nodo.dataset.icono !== cual);
     }
   }
 
@@ -180,9 +216,13 @@ export class PasoDemo {
     son los mismos; cuando no cabe va encogida, y entre unos y otros hay
     el factor que dice `--encaje`. Sin dividir, el dedo cae fuera del
     botón que dice estar tocando.
+
+    Recibe el nombre de una pieza del mockup o el nodo pelado, porque hay
+    cosas que se tocan y no llevan `data-el`: los buses del mapa los dibuja
+    phone-map.ts y se piden por índice.
   */
-  private toqueSobre(nombre: string): void {
-    const objetivo = this.el(nombre);
+  private toqueSobre(cual: string | Element | null): void {
+    const objetivo = typeof cual === 'string' ? this.el(cual) : cual;
     if (!objetivo) return;
     const caja = objetivo.getBoundingClientRect();
     const marco = this.pantalla.getBoundingClientRect();
@@ -261,12 +301,140 @@ export class PasoDemo {
       if (accion) accion.hidden = true;
     }
 
+    if (this.guion === 2) {
+      // Todavía no hay ruta elegida, así que el mapa no tiene ninguna que
+      // dibujar: el recorrido entra cuando el guion lo elige, no antes.
+      this.mapa.showRoute(false);
+      this.setSelector(0);
+      this.mostrarVista('selector');
+      this.desplazarLista('company-list', null);
+      this.desplazarLista('route-list', null);
+    }
+
     if (this.guion === 3) {
+      this.mapa.setBusElegido(null);
       this.setAviso(false);
-      this.setMetros(1150);
+      this.setMetros(1250);
       const detalle = this.el('eta-sub');
       if (detalle) detalle.hidden = true;
     }
+  }
+
+  /**
+   * El selector, según cuántas de sus dos casillas están llenas: ninguna,
+   * la empresa, o las dos.
+   *
+   * Es el `isActive` de _SelectorTile —ficha apagada contra ficha
+   * encendida— y con él el riel de al lado, que dice en cuál de los dos
+   * pasos se está. Sin esto las dos fichas salían llenas desde el primer
+   * cuadro y el dedo tocaba encima de algo que ya estaba hecho: se veía el
+   * gesto, pero no el paso.
+   */
+  private setSelector(hechos: 0 | 1 | 2): void {
+    const empresaHecha = hechos >= 1;
+    const rutaHecha = hechos === 2;
+
+    // El tramo que une los dos nodos son dos mitades, una en cada escalón:
+    // la de abajo del primero y la de arriba del segundo. Se pintan de
+    // verde a la vez, en cuanto la empresa está elegida.
+    const mitades = [
+      this.el('paso-empresa')?.querySelectorAll<HTMLElement>('.escalon-linea')[1],
+      this.el('paso-ruta')?.querySelectorAll<HTMLElement>('.escalon-linea')[0],
+    ];
+    for (const mitad of mitades) {
+      mitad?.classList.add('is-visible');
+      mitad?.classList.toggle('is-hecho', empresaHecha);
+    }
+
+    const nodoEmpresa = this.el('paso-empresa')?.querySelector('.escalon-nodo');
+    nodoEmpresa?.classList.toggle('is-hecho', empresaHecha);
+    nodoEmpresa?.classList.toggle('is-actual', !empresaHecha);
+
+    const nodoRuta = this.el('paso-ruta')?.querySelector('.escalon-nodo');
+    nodoRuta?.classList.toggle('is-hecho', rutaHecha);
+    nodoRuta?.classList.toggle('is-actual', empresaHecha && !rutaHecha);
+
+    this.el('sel-empresa')?.classList.toggle('is-activa', empresaHecha);
+    this.texto('sel-empresa-title', empresaHecha ? EMPRESA.nombre : VACIO_SELECT.empresa.titulo);
+    this.texto('sel-empresa-sub', empresaHecha ? EMPRESA.sub : VACIO_SELECT.empresa.sub);
+
+    this.el('sel-ruta')?.classList.toggle('is-activa', rutaHecha);
+    this.texto('sel-ruta-title', rutaHecha ? this.ruta.nombre : VACIO_SELECT.ruta.titulo);
+    this.texto(
+      'sel-ruta-sub',
+      rutaHecha ? `${this.ruta.terminalA} ↔ ${this.ruta.terminalB}` : VACIO_SELECT.ruta.sub
+    );
+
+    // El botón de abajo nunca está muerto: dice qué falta, y sólo se pone
+    // verde cuando ya no falta nada.
+    let rotulo = 'Elegir empresa';
+    if (rutaHecha) rotulo = 'Ver buses en vivo';
+    else if (empresaHecha) rotulo = 'Elegir ruta';
+    this.el('launch')?.classList.toggle('is-lista', rutaHecha);
+    this.texto('launch', rotulo);
+  }
+
+  /* ---------- Las vistas del selector ---------- */
+
+  /**
+   * Cambia de vista dentro de la hoja. Son las tres de la app —la tarjeta
+   * con los dos pasos y las dos listas—, y entrar en una lista es lo que
+   * pasa de verdad al tocar un hueco: el hueco no se llena solo.
+   */
+  private mostrarVista(vista: string): void {
+    if (!this.vistasEl) return;
+    for (const v of this.vistas) v.classList.toggle('active', v.dataset.view === vista);
+    this.ajustarAlto();
+  }
+
+  /**
+   * El alto de la hoja, animado: el AnimatedSize del selector.
+   *
+   * Dentro del selector no cambia. route_selector_sheet.dart mide la
+   * tarjeta principal una sola vez —`_cardHeight`— y dibuja las dos listas
+   * con esa misma altura, así que el diálogo se queda quieto mientras se
+   * entra y se sale de ellas; sin eso la hoja daba un brinco en cada paso
+   * y el mockup se sentía armado a cortes.
+   */
+  private ajustarAlto(): void {
+    if (!this.vistasEl) return;
+    const activa = this.vistas.find((v) => v.classList.contains('active'));
+    if (!activa) return;
+    if (activa.dataset.view === 'selector') this.altoTarjeta = activa.offsetHeight;
+    const alto = this.altoTarjeta > 0 ? this.altoTarjeta : activa.offsetHeight;
+    this.vistasEl.style.height = `${alto}px`;
+  }
+
+  /**
+   * Desplaza una lista hasta dejar una fila a la vista, y marca con qué
+   * bordes se desvanece —arriba si queda algo por encima, abajo si queda
+   * algo por debajo—. Lo que se mueve es el carril de filas y no la
+   * ventana, que es como se mueve una lista de verdad.
+   *
+   * Hace falta porque la C16 es la última de las seis y en la ventana de
+   * la tarjeta no cabe: sin esto el dedo iría a tocar una fila que está
+   * fuera de la pantalla.
+   */
+  private desplazarLista(nombre: string, fila: HTMLElement | null): void {
+    const lista = this.el(nombre);
+    const carril = lista?.querySelector<HTMLElement>('.sheet-lista-inner');
+    if (!lista || !carril) return;
+
+    // Escondida no hay nada que medir —la ventana da cero—: se deja al
+    // principio, que es como la encuentra el bucle siguiente.
+    const ventana = lista.clientHeight;
+    if (ventana === 0) {
+      carril.style.transform = 'translateY(0)';
+      lista.classList.remove('hay-arriba', 'hay-abajo');
+      return;
+    }
+
+    const tope = Math.min(0, ventana - carril.scrollHeight);
+    const centrada = fila ? -(fila.offsetTop + fila.offsetHeight / 2 - ventana / 2) : 0;
+    const y = Math.max(tope, Math.min(0, centrada));
+    carril.style.transform = `translateY(${y}px)`;
+    lista.classList.toggle('hay-arriba', y < -1);
+    lista.classList.toggle('hay-abajo', y > tope + 1);
   }
 
   private ciclo(): void {
@@ -314,53 +482,134 @@ export class PasoDemo {
 
   /* ---------- 2. Elige tu ruta ---------- */
 
+  /**
+   * Los dos pasos del selector, dados de uno en uno y con sus listas.
+   *
+   * El hueco no se llena solo: tocar «Empresa» entra en la lista de
+   * empresas y tocar «Ruta» entra en la de rutas, que es lo que hace la
+   * app. Se elige una fila y la hoja vuelve a la tarjeta con ese paso ya
+   * resuelto —la ficha encendida con el nombre dentro, el nodo del riel
+   * marcado, la línea llegando al paso siguiente y el botón de abajo con
+   * otro recado—.
+   *
+   * El orden es siempre el mismo: primero el dedo, y 240 ms después lo que
+   * el dedo consigue. Ese cuarto de segundo es todo el asunto: es lo que
+   * hace que la pantalla se lea como respuesta a un toque y no como una
+   * diapositiva que venía detrás.
+   *
+   * La C16 es la última de las seis rutas, así que antes de tocarla la
+   * lista se desplaza hasta ella: primero se ve la lista entera, después
+   * se busca, y sólo entonces cae el dedo.
+   *
+   * El recorrido no está dibujado hasta el final. Mientras se elige, el
+   * mapa sólo tiene el punto de espera; la línea de la C16 y sus buses
+   * entran al pulsar «Ver buses en vivo», que es de lo que trata el botón.
+   */
   private guionRuta(): void {
     this.mapa.showPin(true);
-    this.a(600, () => {
+
+    this.a(500, () => {
       this.prender('scrim', true);
       this.prender('sheet', true);
     });
-    this.a(1900, () => this.toqueSobre('sel-empresa'));
-    this.a(3200, () => this.toqueSobre('sel-ruta'));
-    this.a(4600, () => this.toqueSobre('launch'));
-    this.a(5200, () => {
+
+    this.a(1600, () => this.toqueSobre('sel-empresa'));
+    this.a(1840, () => {
+      this.mostrarVista('companies');
+      this.desplazarLista('company-list', null);
+    });
+
+    this.a(3100, () => this.toqueSobre('tile-empresa'));
+    this.a(3340, () => {
+      this.mostrarVista('selector');
+      this.setSelector(1);
+    });
+
+    this.a(4600, () => this.toqueSobre('sel-ruta'));
+    this.a(4840, () => {
+      this.mostrarVista('routes');
+      this.desplazarLista('route-list', null);
+    });
+    this.a(5400, () => this.desplazarLista('route-list', this.filaDeRuta()));
+
+    this.a(6600, () => this.toqueSobre(this.filaDeRuta()));
+    this.a(6840, () => {
+      this.mostrarVista('selector');
+      this.setSelector(2);
+    });
+
+    this.a(8100, () => this.toqueSobre('launch'));
+    this.a(8360, () => {
       this.prender('scrim', false);
       this.prender('sheet', false);
+      this.mapa.showRoute(true);
       this.colocarBuses([800, 1700]);
       this.mapa.showBuses(true);
       this.moverBuses();
     });
-    this.a(8400, () => {
+
+    this.a(13600, () => {
       this.pararBuses();
       this.mapa.showBuses(false);
+      this.mapa.showRoute(false);
       this.mapa.showPin(false);
     });
-    this.a(9200, () => this.ciclo());
+    this.a(14500, () => this.ciclo());
+  }
+
+  /** La fila de la C16 en la lista de rutas: la que el dedo va a tocar. */
+  private filaDeRuta(): HTMLElement | null {
+    return this.raiz.querySelector<HTMLElement>(`[data-ruta="${RUTA}"]`);
   }
 
   /* ---------- 3. Te avisamos ---------- */
 
+  /**
+   * El aviso, con sus pasos a la vista: se toca el bus, sale su hoja, se
+   * arma el aviso y el aviso suena solo cuando toca.
+   *
+   * Empezaba con la hoja ya arriba y el dedo tocando el botón al segundo,
+   * y de ahí no se movía nada más: nueve segundos de un número bajando.
+   * Faltaba lo primero que se hace en la app —tocar un bus del mapa para
+   * que la hoja le siga el rastro, `empty-pick-bus`—, y con ello el motivo
+   * por el que la hoja habla de ese bus y no de otro.
+   *
+   * El resto lo lleva la distancia, no el reloj: la tarjeta del aviso sale
+   * cuando el bus cruza el kilómetro de `proximity_alerts_provider.dart`,
+   * unos segundos después de armarlo, para que no parezca disparada por el
+   * dedo. Sale a 1250 m justo para que ese cruce caiga dentro del bucle.
+   */
   private guionAviso(): void {
     this.mapa.showPin(true);
-    this.prender('sheet', true);
-    this.colocarBuses([1150]);
-    this.mapa.showBuses(true);
-    this.moverBuses((metros) => this.alAcercarse(metros));
 
-    this.a(900, () => this.toqueSobre('alert-btn'));
-    this.a(1240, () => {
+    this.a(500, () => {
+      this.colocarBuses([1250]);
+      this.mapa.showBuses(true);
+      this.moverBuses((metros) => this.alAcercarse(metros));
+    });
+
+    this.a(1500, () => this.toqueSobre(this.mapa.nodoBus(0)));
+    this.a(1740, () => {
+      this.mapa.setBusElegido(0);
+      this.prender('sheet', true);
+    });
+
+    this.a(3100, () => this.toqueSobre('alert-btn'));
+    this.a(3340, () => {
       this.setAviso(true);
       const detalle = this.el('eta-sub');
       if (detalle) detalle.hidden = false;
     });
-    this.a(10400, () => {
+
+    this.a(12200, () => {
       this.pararBuses();
       this.prender('notif', false);
       this.prender('sheet', false);
+      this.mapa.setBusElegido(null);
       this.mapa.showBuses(false);
       this.mapa.showPin(false);
     });
-    this.a(11300, () => this.ciclo());
+    this.a(13100, () => this.ciclo());
   }
 
   /**
@@ -375,8 +624,8 @@ export class PasoDemo {
     this.setMetros(metros);
 
     // La tarjeta no cambia de texto: dice el título de la notificación de
-    // la app, «C16 Calle 72 Uninorte - B-042 está cerca de ti», y el
-    // metraje vive en la hoja del teléfono, debajo.
+    // la app, «Bus B-042 está cerca de ti», y el metraje vive en la hoja
+    // del teléfono, debajo.
     this.prender('notif', this.avisoPuesto && metros <= RADIO_AVISO_M);
   }
 

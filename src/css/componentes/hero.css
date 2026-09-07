@@ -25,8 +25,24 @@
    hasta ahora había que bajar hasta el pie para averiguarlo.
    ────────────────────────────────────────────────────────────────── */
 .hero-panel {
-  margin-top: 0;
-  padding-top: 0;
+  /* El macro-lienzo con la cabecera: el panel se mete bajo la barra
+     (como en main) y el degradado nace en el píxel 0, detrás del logo y
+     los enlaces. La cabecera es transparente arriba (`.is-arriba`). */
+  margin-top: calc(-1 * var(--nav-alto));
+  padding-top: var(--nav-alto);
+  /* El lienzo inset, como la referencia: con cuneta a los lados y filo
+     redondeado entero. El degradado nace en el píxel 0, detrás del logo
+     y los enlaces. */
+  margin-inline: var(--calle);
+  background-color: #FAF6F0;
+  background-image:
+    radial-gradient(circle at 12% 88%, rgba(0, 168, 89, 0.2) 0%, transparent 55%),
+    radial-gradient(circle at 87% 62%, rgba(43, 92, 184, 0.3) 0%, transparent 42%),
+    radial-gradient(circle at 50% 0%, rgba(0, 168, 89, 0.07) 0%, transparent 50%);
+  border-bottom-left-radius: 32px;
+  border-bottom-right-radius: 32px;
+  /* El filo redondeado corta los teléfonos: el escenario sangra. */
+  overflow: hidden;
 }
 
 /*
@@ -38,11 +54,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(44px, 5vw, 76px);
+  gap: clamp(36px, 4vw, 56px);
   width: 100%;
   max-width: 1550px;
   margin: 0 auto;
-  padding: clamp(56px, 7vh, 104px) var(--calle) clamp(24px, 3vw, 44px);
+  padding: clamp(56px, 7vh, 104px) var(--calle) 0;
 }
 
 .hero-copy {
@@ -56,30 +72,30 @@
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(40px, 2.1rem + 2.9vw, 68px);
-  font-weight: 600;
+  font-size: clamp(48px, 2.5rem + 3.5vw, 84px);
+  font-weight: 800;
   line-height: 1.02;
-  letter-spacing: -0.035em;
-  color: var(--tinta);
+  letter-spacing: -0.04em;
+  color: #0B1628;
   text-wrap: balance;
   margin: 0;
 }
 
 /*
-  El corte del titular. `.highlight` se conserva porque el marcado lo
-  usa en varias páginas, pero aquí ya no pinta de verde: baja la tinta.
-  Dos tonos de lo mismo separan la pregunta de su objeto sin gritar.
+  El corte va en el verde de la marca, como la referencia: primera línea
+  en oscuro, segunda en verde. Con más contraste pedido se usa el verde
+  accesible (ver accesibilidad.css).
 */
 .hero-title .highlight {
   display: inline;
-  color: var(--tinta-media);
+  color: var(--green);
 }
 
 .hero-description {
   font-size: clamp(16.5px, 1rem + 0.25vw, 18.5px);
   line-height: 1.6;
   color: var(--tinta-media);
-  max-width: 52ch;
+  max-width: 36rem;
   margin: 20px 0 0;
 }
 
@@ -90,6 +106,25 @@
   justify-content: center;
   gap: 12px;
   margin-top: 32px;
+}
+
+/* Los dos CTA en píldora completa. El primario es verde sólido con sombra
+   suave; el secundario, gris translúcido sin bordes duros. */
+.hero-actions .btn-primary,
+.hero-actions .btn-outline {
+  border-radius: 9999px;
+  height: 48px;
+  padding: 0 26px;
+}
+
+.hero-actions .btn-green {
+  border-color: transparent;
+  box-shadow: 0 8px 20px -10px var(--green-glow);
+}
+
+.hero-actions .btn-outline {
+  border-color: transparent;
+  background: rgba(11, 22, 32, 0.05);
 }
 
 /*
@@ -167,84 +202,79 @@
 
       escenario = central + 2 × (lateral − solape)
 
-  Ese número es la referencia de todo lo demás. A cada lado queda un
-  carril —`50% − escenario/2 − aire`— y ahí van, sin tocarse, la tarjeta de
-  ruta y dos buses a la izquierda, y dos buses y el aviso a la derecha. Al
-  estar anclados con la misma cuenta, cambiar el tamaño del teléfono
+  Ese número es la referencia del grupo: cambiar el tamaño del teléfono
   recoloca la escena entera sola, sin números a ojo.
 */
 .hero-scene {
-  --tel: 288px;
+  --tel: 312px;
   /* Las proporciones del grupo salen de medir la referencia: los laterales
      casi tan altos como el central y metidos un dedo por debajo, para que
      los tres se lean como un solo objeto y no como tres estampas. */
   --lado: calc(var(--tel) * 0.93);
-  --solape: calc(var(--lado) * 0.16);
-  /* Mientras los laterales no estén en pantalla el escenario es el
-     teléfono central a secas, y los carriles vuelven a ser los de antes. */
+  --solape: calc(var(--lado) * 0.3);
+  /* Mientras los laterales no estén en pantalla el escenario es un
+     solo teléfono. */
   --escenario: var(--tel);
-  /* Aire entre el marco del aparato de la punta y lo que caiga al lado. */
-  --aire: 20px;
-  --carril: calc(50% - var(--escenario) / 2 - var(--aire));
   /* Alto del aparato central: el marco es un Pixel 9, 152,8 × 72 mm. */
   --alto-tel: calc(var(--tel) * 152.8 / 72);
+  /* Lo que se hunde el trío tras el filo de abajo del lienzo. Supera por
+     mucho la respiración (±7 px) y el encogido de entrada (×0,94). */
+  --sangrado: calc(var(--alto-tel) * 0.12);
 
   position: relative;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  /* Sin caja propia: los teléfonos van directos sobre el lienzo y el filo
+     redondeado del panel los corta. */
   width: 100%;
   max-width: 1440px;
-  min-height: calc(var(--alto-tel) + 72px);
   margin: 0 auto;
+  background: none;
+  border: 0;
   pointer-events: none;
   overflow: visible;
 }
 
 @media (min-width: 768px) {
   .hero-scene {
-    --tel: 304px;
+    --tel: 320px;
   }
 }
 
 /*
-  Los laterales sólo entran cuando hay carril de sobra para ellos y para
-  las tarjetas: por debajo de esto el grupo se comería los avisos, así que
-  la escena vuelve a ser un solo teléfono.
+  Los laterales sólo entran cuando hay ancho de sobra para el grupo:
+  por debajo de esto la escena vuelve a ser un solo teléfono.
 */
 @media (min-width: 1400px) {
   .hero-scene {
-    --tel: 340px;
+    --tel: 360px;
     --escenario: calc(var(--tel) + 2 * (var(--lado) - var(--solape)));
   }
 }
 
 .hero-stage {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* El trío sangra por debajo: el filo del lienzo lo corta. */
+  margin-bottom: calc(-1 * var(--sangrado));
 }
 
 /* ── La entrada de la escena ──────────────────────────────────────────
-   El trío de teléfonos y los cuatro buses aparecían todos a la vez y ya
-   levitando: se leía como «aquí todo se mueve» en vez de como un momento
-   dirigido. Ahora entran por turnos —primero el aparato central, que es
-   la tesis; luego los laterales, que lo vuelven un grupo; y al final los
-   buses, que son la ciudad llenándose alrededor—. El turno de cada uno
+   El trío entra por turnos —primero el aparato central, que es la tesis;
+   luego los laterales, que lo vuelven un grupo—. El turno de cada uno
    lo pone `data-reveal-delay` en el marcado.
 
-   0,62 s y no 0,8: con el último bus entrando a 470 ms, la escena tardaba
-   1,27 s en terminar de armarse —encima del guion del teléfono, que ya
-   empieza a los 1,0 s—, y lo primero que se veía del hero era una espera.
-   Ahora la escena está entera antes del primer toque.
-
    Se animan `opacity` y `scale`, nunca `transform` ni `translate`: esas
-   dos ya están ocupadas —`transform` la lleva la levitación de los buses
-   y `translate` la respiración del trío— y una animación gana siempre a
-   una declaración normal, así que una tercera regla peleándose por ellas
-   no se vería. `scale` está libre en ambos y compone en la GPU igual.
+   dos ya están ocupadas —`translate` la lleva la respiración del trío—
+   y una animación gana siempre a una declaración normal, así que una
+   tercera regla peleándose por ellas no se vería. `scale` está libre
+   en ambos y compone en la GPU igual.
 
-   Sin `will-change`: son siete elementos y la promoción a capa
+   Sin `will-change`: son tres elementos y la promoción a capa
    permanente cuesta memoria para algo que pasa una sola vez. */
 .escena-entra {
   opacity: 0;
@@ -268,10 +298,14 @@
   z-index: 10;
 }
 
-/* El aparato mide lo que dice la escena: si los dos números se separaran,
-   los carriles dejarían de cuadrar con el marco. */
+/* El aparato mide lo que dice la escena. El central va al frente con
+   sombra realista de dos capas; los laterales ya quedan detrás por su
+   z-index menor. */
 .hero-phone-wrap .phone-shell {
   --ancho: var(--tel);
+  filter:
+    drop-shadow(0 40px 48px rgba(11, 22, 32, 0.22))
+    drop-shadow(0 10px 20px rgba(11, 22, 32, 0.12));
 }
 
 /*
@@ -359,75 +393,49 @@
   }
 }
 
-/* La atribución acompaña al teléfono central y queda justo bajo su marco. */
-.hero-phone-wrap .map-credit {
-  margin: 12px 0 0;
-  font-size: 11px;
+/*
+  Por debajo de 1400 px sólo cabe un teléfono, y ese uno tiene que ser el
+  que se mueve: la demo, que ahora vive en el de la derecha. La pantalla de
+  entrada se queda para las ventanas anchas, donde los tres se ven juntos.
+  El de la derecha pasa a ocupar el centro: ancho del central, sin el
+  solape ni la bajada que sólo tienen sentido cuando hay tres.
+*/
+@media (max-width: 1399px) {
+  .hero-phone-wrap {
+    display: none;
+  }
+
+  .hero-phone-side--der {
+    display: block;
+    margin-left: 0;
+    transform: none;
+  }
+
+  .hero-phone-side--der .phone-shell {
+    --ancho: var(--tel);
+  }
+
+  .hero-phone-side--der .phone-shell::before {
+    opacity: 1;
+  }
+}
+
+/* La atribución del mosaico vive en la esquina de abajo a la izquierda
+   del lienzo, como calcomanía y no como franja: así no hay tira blanca
+   entre el filo redondeado y la sección que sigue. */
+.hero-credit {
+  position: absolute;
+  left: calc(var(--calle) + 6px);
+  bottom: 12px;
+  z-index: 2;
+  margin: 0;
+  font-size: 10.5px;
   color: var(--text-muted);
-  text-align: center;
   line-height: 1.4;
 }
 
-/* Buses flotantes vectoriales con fix de nitidez y aceleración */
-.scene-bus {
-  position: absolute;
-  z-index: 20;
-  /* Nunca más anchos que su carril: si el carril se estrecha, el bus se
-     encoge antes que asomarse fuera de la escena. */
-  width: min(clamp(144px, 16vw, 176px), var(--carril));
-  filter: drop-shadow(0 16px 28px rgba(11, 22, 40, 0.16)) drop-shadow(0 4px 10px rgba(11, 22, 40, 0.08));
-  pointer-events: none;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-font-smoothing: subpixel-antialiased;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: high-quality;
-  will-change: transform;
-}
-
-.scene-bus-img {
-  width: 100%;
-  height: auto;
-  display: block;
-  object-fit: contain;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-font-smoothing: subpixel-antialiased;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: high-quality;
-}
-
-/*
-  Los cuatro buses viven en los carriles, anclados por su borde interior al
-  costado del escenario: nunca pisan un teléfono, por construcción. Se
-  reparten tres alturas distintas a cada lado para que no queden en fila.
-*/
-/* Carril derecho, arriba — la tarjeta de ruta ocupa el izquierdo. */
-.scene-bus--sobusa {
-  top: 5%;
-  right: auto;
-  left: calc(50% + var(--escenario) / 2 + var(--aire));
-}
-
-/* Carril izquierdo, a media altura. */
-.scene-bus--transmetro {
-  top: 34%;
-  left: auto;
-  right: calc(50% + var(--escenario) / 2 + var(--aire));
-}
-
-/* Carril derecho, a media altura. */
-.scene-bus--sodis {
-  top: 41%;
-  right: auto;
-  left: calc(50% + var(--escenario) / 2 + var(--aire));
-}
-
-/* Carril izquierdo, abajo — el aviso ocupa el derecho. */
-.scene-bus--coolitoral {
-  bottom: 3%;
-  left: auto;
-  right: calc(50% + var(--escenario) / 2 + var(--aire));
+.hero-credit a {
+  color: inherit;
 }
 
 /* Píldoras de Estado Flotantes */
@@ -465,56 +473,6 @@
   color: var(--text-secondary);
 }
 
-/* Píldora 1: Ruta activa. Va en el carril de la izquierda, pegada al
-   marco por su borde interior y sin pisarlo. Dice "Ruta activa", así que
-   sólo se enseña cuando la demo ya tiene una ruta puesta. */
-.scene-card--route {
-  top: 4%;
-  left: auto;
-  right: calc(50% + var(--escenario) / 2 + var(--aire));
-  width: max-content;
-  max-width: min(var(--carril), 290px);
-}
-
-/* Entran y salen sólo con opacidad y desenfoque: el `transform` ya lo lleva
-   la levitación, y dos reglas peleándose por él no se ven. */
-.scene-card--route,
-.scene-card--notif {
-  opacity: 0;
-  filter: blur(3px);
-  transition: opacity 0.45s var(--ease-out-cubic), filter 0.45s var(--ease-out-cubic);
-}
-
-.scene-card--route.is-on,
-.scene-card--notif.is-on {
-  opacity: 1;
-  filter: blur(0);
-}
-
-/* El punto de ruta activa. Verde, como en la píldora de la app
-   (`search_pill_bar.dart:162`, `AppColors.primary`): esta tarjeta es esa
-   píldora sacada del teléfono, y en azul decía otra cosa —el azul de la
-   app es el del trazado en el mapa, no el de un estado. */
-.scene-route-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 0 4px rgba(0, 168, 89, 0.16);
-  flex-shrink: 0;
-}
-
-/* Píldora 2: Alerta cerca. El carril de la derecha, abajo, por el mismo
-   procedimiento. Nace escondida: la enciende el guion cuando el bus entra
-   en el kilómetro, que es cuando la app manda la notificación de verdad. */
-.scene-card--notif {
-  bottom: 4%;
-  right: auto;
-  left: calc(50% + var(--escenario) / 2 + var(--aire));
-  width: max-content;
-  max-width: min(var(--carril), 290px);
-}
-
 /*
   Va con el `.scene-card` delante a propósito. La regla de al lado
   —`.scene-card span`— vale (0,1,1) y ésta, con la clase sola, valía
@@ -541,49 +499,12 @@
   flex-shrink: 0;
 }
 
-/* Responsividad para pantallas medianas y móviles */
-/*
-  Sin los laterales el escenario vuelve a ser un teléfono y los carriles se
-  ensanchan solos: aquí sólo hace falta subir los buses de la izquierda,
-  que si no se juntan con la tarjeta de ruta en un carril más corto.
-*/
-@media (max-width: 1399px) {
-  .scene-bus--sobusa {
-    top: 3%;
-  }
-
-  .scene-bus--transmetro {
-    top: 33%;
-  }
-
-  .scene-bus--sodis {
-    top: 46%;
-  }
-
-  .scene-bus--coolitoral {
-    bottom: 4%;
-  }
-}
-
-/*
-  Las dos tarjetas sincronizadas viven en el carril, y por debajo de esta
-  anchura el carril ya no da para una línea de texto decente: antes que
-  partir cada frase en seis renglones, se van.
-*/
-@media (max-width: 860px) {
-  .scene-card {
-    display: none;
-  }
-}
-
+/* Responsividad para pantallas medianas y móviles: la tarjeta base
+   también viste la del tercer momento (scene-card--paso), así que el
+   relleno y la tipografía chica se quedan aunque el hero ya no tenga
+   flotantes. */
 @media (max-width: 768px) {
-  .scene-bus {
-    width: clamp(90px, 14vw, 120px);
-    opacity: 0.95;
-  }
-
   .scene-card {
-    /* El ancho ya lo pone el carril; aquí sólo se aprieta el relleno. */
     padding: 10px 14px;
   }
 
@@ -594,46 +515,4 @@
   .scene-card span {
     font-size: 10.5px;
   }
-}
-
-/*
-  Por debajo de esto ya no hay carril: la escena mide menos que el teléfono
-  más dos buses. Los buses dejan de anclarse al costado del escenario y se
-  montan sobre las esquinas del aparato, que es donde caben. Las tarjetas
-  no caben de ninguna manera y se van.
-*/
-@media (max-width: 640px) {
-  .scene-bus {
-    width: 80px;
-    opacity: 0.9;
-  }
-
-  /* Sin carriles laterales que valgan la pena, los buses se montan sobre el
-     teléfono a propósito: pasan por encima del mapa, nunca sobre la hoja de
-     abajo, que es donde vive el botón. */
-  .scene-bus--sobusa {
-    top: 1%;
-    left: auto;
-    right: -2%;
-  }
-
-  .scene-bus--transmetro {
-    top: 24%;
-    right: auto;
-    left: -2%;
-  }
-
-  .scene-bus--sodis {
-    top: 40%;
-    left: auto;
-    right: -2%;
-  }
-
-  .scene-bus--coolitoral {
-    top: 52%;
-    bottom: auto;
-    right: auto;
-    left: -2%;
-  }
-
 }
