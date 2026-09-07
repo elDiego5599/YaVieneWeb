@@ -106,6 +106,91 @@
 }
 
 /*
+  Campo consola. Es el ambiente de las paradas que enseñan producto: tinta
+  profunda con luz de color detrás, rejilla técnica de fondo y todo lo que
+  cae encima resuelto con un borde de un pelo.
+
+  El fondo son cuatro capas y ninguna es un color plano. Debajo del todo la
+  tinta; encima, tres focos —el verde de la marca arriba a la derecha,
+  donde cae el mapa; el coral abajo a la izquierda, donde cae el mando; y
+  un lavado de azul marino en el centro que ata los dos—. A esta
+  saturación no se leen como manchas de color: se leen como que el fondo
+  tiene profundidad y una fuente de luz.
+
+  Es lo contrario de lo que hace un campo claro. Ahí el color se pone
+  delante —el verde pleno de la cobertura— y aquí se queda detrás, para que
+  lo que se mire sea el mapa y las cifras.
+*/
+.panel--consola {
+  background-color: var(--consola-fondo);
+  background-image:
+    radial-gradient(1150px 680px at 82% 4%, rgba(0, 168, 89, 0.26), rgba(0, 168, 89, 0) 62%),
+    radial-gradient(980px 620px at 2% 98%, rgba(232, 106, 94, 0.18), rgba(232, 106, 94, 0) 64%),
+    radial-gradient(1500px 980px at 40% 52%, rgba(30, 58, 109, 0.42), rgba(30, 58, 109, 0) 72%);
+  color: var(--consola-texto);
+}
+
+/*
+  La rejilla. Cuadrícula de 72 en líneas de un pelo, del mismo blanco a muy
+  poca luz, apagándose hacia los bordes: sin la máscara llega a las esquinas
+  y se lee como fondo de plantilla en vez de como el papel milimetrado que
+  hay debajo de un plano.
+
+  Va en un pseudo y no en la capa de fondo del panel para que la máscara
+  sea suya y no recorte también los focos de color.
+*/
+.panel--consola::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 90% 76% at 50% 42%, #000 20%,
+    rgba(0, 0, 0, 0.42) 66%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 76% at 50% 42%, #000 20%,
+    rgba(0, 0, 0, 0.42) 66%, transparent 100%);
+}
+
+/*
+  La costura de arriba: una línea de un pelo encendida en el centro, que es
+  por donde el campo empieza. Sustituye al borde que tendría una tarjeta y
+  hace de junta entre el panel de antes y éste —la banda a sangre no tiene
+  otra forma de decir dónde empieza—.
+*/
+.panel--consola::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2) 16%,
+    rgba(58, 221, 132, 0.6) 50%,
+    rgba(255, 255, 255, 0.2) 84%,
+    transparent
+  );
+}
+
+/* Sobre el campo oscuro el nodo verde de la parada se apaga: el verde de
+   marca está pensado para blanco. Se usa el verde subido de luz, que es el
+   que aguanta esta tinta. */
+.panel--consola .parada.es-pasada .parada-nodo {
+  background: var(--verde-vivo);
+}
+
+.panel--consola .parada.es-pasada .parada-rotulo {
+  color: var(--verde-vivo);
+}
+
+/*
   El fondo del hero. Era un #F8FAFC plano —blanco azulado de laboratorio,
   de una sola pieza— y con la trama encima acababa pareciendo la sala de
   espera de una consulta. Ahora es luz en vez de pintura: blanco limpio

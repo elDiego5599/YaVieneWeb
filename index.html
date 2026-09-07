@@ -1036,7 +1036,7 @@
       documento y sigue en la del pie sin costura, que es lo mismo que
       hace el pie con el borde de abajo de la página.
     -->
-    <section class="panel panel--sangre panel--blanco mapa-panel" id="mapa"
+    <section class="panel panel--sangre panel--consola mapa-panel" id="mapa"
       data-parada="01" data-parada-nombre="El mapa">
 
       <div class="parada" aria-hidden="true">
@@ -1051,9 +1051,24 @@
           cruzan con la rejilla y el mapa se va a la derecha.
         -->
         <div class="mapa-vista">
-          <div class="mapa-lienzo" data-mapa-lienzo>
-            <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
-            <p class="mapa-credito">Mapa base &copy; OpenStreetMap &middot; &copy; CARTO</p>
+          <!--
+            El mapa va dentro de un marco con su barra, como la ventana de
+            un programa: una tira de estado arriba —el punto que respira, de
+            qué ciudad es el plano y que lo que se ve está pasando ahora— y
+            debajo la lámina. Antes era una lámina suelta sangrando por
+            arriba y por abajo; se leía como una ilustración de fondo y no
+            como la pantalla de un producto que se puede tocar.
+          -->
+          <div class="mapa-marco">
+            <div class="mapa-marco-barra" aria-hidden="true">
+              <span class="mapa-marco-punto"></span>
+              <span class="mapa-marco-titulo">Barranquilla &middot; red Sobusa</span>
+              <span class="mapa-marco-estado">En vivo</span>
+            </div>
+            <div class="mapa-lienzo" data-mapa-lienzo>
+              <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
+              <p class="mapa-credito">Mapa base &copy; OpenStreetMap &middot; &copy; CARTO</p>
+            </div>
           </div>
         </div>
 

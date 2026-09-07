@@ -12,47 +12,47 @@
    sumado en el resumen— y el código sigue en la tabla de cobertura y en
    `rutas.json`, que es donde lo usan la app y el backend.
 
-   Y dejaron de ser tarjetas. Eran seis rectángulos blancos con borde,
-   filo redondeado y sombra, en dos columnas: seis veces la misma forma
-   para elegir una de seis cosas. Ahora son seis renglones separados por
-   una línea de pelo, y lo que dice cuál está puesta es un filete verde
-   a la izquierda —el mismo gesto que el letrero de paradas de la isla—.
+   Van sobre campo consola, así que son una sola pieza: seis renglones
+   dentro de una lista con borde y filo, separados por una línea de un
+   pelo, con un filete encendido en la elegida. Ni seis tarjetas —que era
+   repetir seis veces la misma forma para elegir una de seis cosas— ni
+   seis renglones sueltos sobre el fondo, que sobre tinta no se leen como
+   un control. El envoltorio está en `mapa.css` (`.mv-rutas`).
 
    Las pinta `src/rutas.ts` desde los mismos datos que dibujan el mapa.
    ────────────────────────────────────────────────────────────────── */
 
 /* ── El resumen del catálogo ──
-   Una línea de datos en monoespaciado, no tres cifras de escaparate.
-   Estaban en tres colores distintos —verde, coral y tinta— y a tamaño de
-   titular: era la pieza más llamativa de una parada cuya pieza principal
-   es un mapa. Aquí abajo, pequeñas y del mismo color, dicen lo que
-   tienen que decir sin pelearse con nada. */
+   Tres pastillas en monoespaciado, no tres cifras de escaparate. En una
+   parada cuya pieza principal es un mapa, el catálogo es contexto: se
+   lee de un vistazo y no le quita el sitio a la distancia. */
 .rutas-cifras {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 14px;
+  gap: 8px;
   margin: 0;
   font-family: var(--font-mono);
   font-size: var(--step-rotulo);
   letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
-  color: var(--text-secondary);
 }
 
 .rutas-dato {
   display: flex;
   align-items: baseline;
   gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--consola-borde);
+  border-radius: 999px;
+  background: var(--consola-superficie);
 }
 
-/* El punto medio que separa un dato del siguiente. Va en el pseudo y no
-   escrito, porque el guion vuelve a pintar estas tres piezas al arrancar
-   y lo que estuviera escrito en medio se perdería. */
+/* El punto medio que separaba un dato del siguiente sobra ahora que cada
+   uno tiene su pastilla. Se anula aquí y no se borra la regla porque el
+   guion vuelve a pintar estas tres piezas al arrancar y conviene que la
+   forma esté descrita en un solo sitio. */
 .rutas-dato + .rutas-dato::before {
-  content: '·';
-  margin-right: 10px;
-  color: var(--text-muted);
+  content: none;
 }
 
 .rutas-dato-numero {
@@ -63,7 +63,7 @@
   /* Cifras de ancho fijo: son tres números en fila y con anchos variables
      la línea se lee torcida. */
   font-variant-numeric: tabular-nums;
-  color: var(--text-primary);
+  color: var(--consola-texto);
 }
 
 .rutas-dato-rotulo {
@@ -71,7 +71,7 @@
   font-weight: 400;
   letter-spacing: inherit;
   text-transform: inherit;
-  color: var(--text-muted);
+  color: var(--consola-texto-tenue);
 }
 
 /* ── El renglón de ruta ──
@@ -79,19 +79,19 @@
    se le dice otra cosa: eso es lo que hacen las primeras declaraciones.
 
    Dos líneas: el nombre arriba en la de display y el tramo debajo en
-   monoespaciado. El filete de la izquierda es el que trabaja —transparente
-   en reposo, gris al pasar el puntero, verde en la elegida—, así que la
-   línea de pelo de separación va arriba y no a los lados: dos rayas
-   verticales seguidas serían dos cosas distintas diciendo lo mismo. */
+   monoespaciado. El filete de la izquierda es el que trabaja —invisible
+   en reposo, verde encendido en la elegida— y va en un pseudo para poder
+   llegar de arriba abajo del renglón sin pelearse con la línea de
+   separación. */
 .ruta-ficha {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 3px;
   margin: 0;
-  padding: clamp(9px, 1.2vh, 13px) 0 clamp(9px, 1.2vh, 13px) 14px;
+  padding: clamp(9px, 1.2vh, 13px) 14px clamp(9px, 1.2vh, 13px) 16px;
   border: 0;
-  border-top: 1px solid var(--linea-tenue);
-  border-left: 2px solid transparent;
+  border-top: 1px solid var(--consola-borde);
   border-radius: 0;
   background: none;
   box-shadow: none;
@@ -99,54 +99,75 @@
   text-align: left;
   color: inherit;
   cursor: pointer;
-  /* `translate` y no `transform`: es de las dos propiedades que el
-     compositor resuelve solo, sin repintar. */
   transition:
-    border-left-color var(--transition-hover),
-    color var(--transition-hover),
-    translate var(--transition-hover);
+    background-color var(--transition-hover),
+    color var(--transition-hover);
 }
 
-.mv-rutas > .ruta-ficha:last-child {
-  border-bottom: 1px solid var(--linea-tenue);
+.mv-rutas > .ruta-ficha:first-child {
+  border-top: 0;
+}
+
+.ruta-ficha::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: transparent;
+  transition: background-color var(--transition-hover);
 }
 
 /* El foco fuera del guarda, el puntero dentro. Ver botones.css. */
 .ruta-ficha:focus-visible {
-  border-left-color: var(--linea);
+  background: var(--consola-superficie-alta);
 }
 
 @media (hover: hover) {
   .ruta-ficha:hover {
-    border-left-color: var(--linea);
-    translate: 3px 0;
+    background: var(--consola-superficie-alta);
+  }
+
+  .ruta-ficha:hover::before {
+    background: var(--consola-borde-fuerte);
   }
 }
 
 /* El acuse del dedo, que en el teléfono es el único que hay. */
 .ruta-ficha:active {
-  translate: 0 0;
   transition-duration: 0.09s;
 }
 
 /* La elegida: la que el mapa está dibujando ahora mismo. Tiene que
-   ganarle al `:hover` de cualquier otra, por eso va después. */
+   ganarle al `:hover` de cualquier otra, por eso va después. El filete
+   lleva halo —es la misma luz que echa el mapa sobre el campo— y el
+   fondo se tiñe apenas, lo justo para que el renglón se lea puesto sin
+   convertirse en un bloque de color. */
 .ruta-ficha[aria-pressed='true'] {
-  border-left-color: var(--green);
-  translate: none;
+  background: linear-gradient(
+    90deg,
+    rgba(58, 221, 132, 0.16),
+    rgba(58, 221, 132, 0.02) 72%
+  );
+}
+
+.ruta-ficha[aria-pressed='true']::before {
+  background: var(--verde-vivo);
+  box-shadow: 0 0 12px 0 rgba(58, 221, 132, 0.7);
 }
 
 .ruta-ficha[aria-pressed='true'] .ruta-ficha-nombre {
-  color: var(--green-accessible);
+  color: var(--verde-vivo);
 }
 
 .ruta-ficha-nombre {
   font-family: var(--font-display);
-  font-size: clamp(0.95rem, 0.85rem + 0.35vw, 1.2rem);
-  font-weight: 700;
+  font-size: clamp(0.95rem, 0.85rem + 0.35vw, 1.15rem);
+  font-weight: 600;
   line-height: 1.15;
   letter-spacing: -0.025em;
-  color: var(--text-primary);
+  color: var(--consola-texto);
   transition: color var(--transition-hover);
 }
 
@@ -160,9 +181,9 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1.4;
-  color: var(--text-muted);
+  color: var(--consola-texto-tenue);
 }
 
 .ruta-ficha-flecha {
-  color: var(--green-accessible);
+  color: var(--verde-vivo);
 }

@@ -219,6 +219,35 @@
   --muelle: linear(0, 0.28 7%, 0.63 14%, 0.9 20%, 1.04 25%, 1.06 31%,
     1.02 41%, 0.998 55%, 1);
 
+  /* ── La consola ───────────────────────────────────────────────────────
+     El ambiente de las paradas de producto: un campo de tinta profunda con
+     rejilla de fondo, resplandores de color en las esquinas y todo lo que
+     va encima resuelto con un borde de un pelo y un filo redondeado. Es
+     precisión de panel de control, no papel: bordes finos, superficies
+     translúcidas, rótulos en monoespaciado y color de verdad detrás.
+
+     Las superficies son blancos con alfa y no colores planos a propósito:
+     así una tarjeta sobre el resplandor verde se tiñe de verde y otra
+     sobre el coral se tiñe de coral, sin escribir una regla por campo. */
+  --consola-fondo: #060D19;
+  --consola-superficie: rgba(255, 255, 255, 0.045);
+  --consola-superficie-alta: rgba(255, 255, 255, 0.08);
+  --consola-borde: rgba(255, 255, 255, 0.12);
+  --consola-borde-fuerte: rgba(255, 255, 255, 0.24);
+  --consola-texto: #F3F6FA;
+  --consola-texto-suave: #9DABBF;
+  --consola-texto-tenue: #6A7789;
+
+  /* El verde de marca sobre tinta se apaga; este es el mismo verde subido
+     de luz para que aguante sobre campo oscuro. 8.4:1 sobre --consola-fondo. */
+  --verde-vivo: #3ADD84;
+  --coral-vivo: #FF8A7A;
+
+  /* Los filos de la consola. Vuelven, y sólo aquí: lo que es panel de
+     control tiene filo, lo que es página no. */
+  --radio-consola: 16px;
+  --radio-chip: 10px;
+
   /* ── Rejilla ──────────────────────────────────────────────────────────
      Doce columnas y un canal. Nada se centra por defecto: los titulares
      arrancan en la columna 1, el texto ocupa de la 3 a la 7 y los datos

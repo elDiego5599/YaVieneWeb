@@ -1,6 +1,6 @@
 /* ── MAPA ──────────────────────────────────────────────
 
-   El mapa en vivo: lienzo, rutas, lectura y aviso.
+   El mapa en vivo: marco, lienzo, rutas, lectura y aviso.
 
    Este fichero es un trozo de `components.css`, que llegó a 3050 líneas.
    Se carga desde ahí y **el orden importa**: hay reglas que se pisan
@@ -13,23 +13,21 @@
 /* ══════════════════════════════════════════════════════════════════════
    PARADA 01 · EL MAPA
    ══════════════════════════════════════════════════════════════════════
-   La única parte de la página que se toca, y la parada del producto.
+   La única parte de la página que se toca, y la parada del producto. Va
+   sobre campo consola —tinta con luz de color detrás y rejilla técnica—,
+   y todo lo que cae encima está resuelto igual: superficie translúcida,
+   borde de un pelo, filo de 14 o 18, rótulo en monoespaciado.
 
-   Aquí no hay marco. Ni borde, ni filo redondeado, ni sombra: el mosaico
-   es una lámina sobre campo blanco que sale por arriba y por abajo de la
-   ventana. La página no lo acaba de enseñar entero, y eso es lo que le da
-   tamaño.
+   El mapa dejó de ser una lámina suelta que sangraba por arriba y por
+   abajo. Ahora es una ventana: un marco con su barra de estado, su
+   bisel y su sombra, apoyado sobre el campo. La diferencia no es de
+   adorno —una lámina a sangre se lee como ilustración de fondo, y esto
+   es lo único de la página que responde al dedo—.
 
-   Sangra por el alto y no por el ancho porque el mosaico es vertical
-   —1284 × 1982—: las seis rutas van de Granabastos al norte y cualquier
-   recorte de lado se come una terminal. El generador deja un 5% de aire
-   alrededor de la red (`PAD_FRAC` en `scripts/gen_mapa_landing.py`), así
-   que el sangrado se queda por debajo de ese aire y no se pierde nada.
-
-   A la izquierda, sobre el blanco, todo lo demás en monoespaciado: el
-   titular en una línea, las seis rutas como renglones con un filete que
-   se pone verde en la elegida, la distancia en cifras grandes y el
-   resumen del catálogo. Ni una tarjeta. */
+   A la izquierda, el mando: el titular, las seis rutas dentro de una
+   lista con borde, la distancia en un cuadro de lectura y el resumen del
+   catálogo en tres pastillas. Cada bloque es una pieza con su borde, no
+   texto suelto sobre un fondo. */
 
 .mapa-panel {
   /* El campo llega al borde de la ventana y ocupa una pantalla entera.
@@ -39,11 +37,10 @@
   display: grid;
 }
 
-/* Cuánto se sale la lámina por arriba y por abajo. Cuatro por ciento de
-   ventana a cada lado, que es menos que el aire que el mosaico trae
-   alrededor de la red. */
 .mapa-tablero {
-  --sangrado-mapa: 4svh;
+  /* Por encima de la rejilla del campo, que va en el pseudo del panel. */
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: clamp(22px, 3vh, 40px);
@@ -51,20 +48,22 @@
 }
 
 /*
-  En pantalla ancha, dos columnas: el margen con los datos a la izquierda
-  y la lámina a la derecha, pegada al borde.
+  En pantalla ancha, dos columnas: el mando a la izquierda y la ventana
+  del mapa a la derecha.
 
-  El ancho de la lámina se calcula, no se mide: es el alto de la parada
-  más el sangrado, por la proporción del mosaico. Así la columna tiene
-  medida propia y el mapa puede ir posicionado dentro sin que la columna
-  se quede en cero.
+  La columna del mapa se mide sola —`auto`—: el marco tiene alto fijo y
+  proporción conocida, así que la rejilla ya sabe cuánto ocupa sin que
+  haya que calcularle el ancho a mano.
 */
 @media (min-width: 1060px) {
   .mapa-tablero {
-    --ancho-mapa: calc((100svh + 2 * var(--sangrado-mapa)) * 1284 / 1982);
     display: grid;
-    grid-template-columns: minmax(0, 1fr) var(--ancho-mapa);
-    align-items: stretch;
+    /* El mando tiene techo —una lista de seis renglones a 800 de ancho no
+       es una lista, es una tabla— y el mapa se queda con el resto y se
+       centra en él. Lo que sobra alrededor del marco no es hueco muerto:
+       es donde cae el resplandor. */
+    grid-template-columns: minmax(0, 620px) minmax(0, 1fr);
+    align-items: center;
     gap: 0;
     min-height: 100svh;
   }
@@ -80,53 +79,186 @@
   }
 }
 
-/* ── El margen: todo lo que no es mapa ──
-   Una columna de datos, de arriba abajo, sin una sola caja. El relleno
-   de la izquierda deja pasar el riel de la ruta, que baja por delante. */
+/* ── El mando: todo lo que no es mapa ── */
 .mapa-margen {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: clamp(20px, 2.6vh, 34px);
+  gap: clamp(18px, 2.4vh, 30px);
   min-width: 0;
   padding: clamp(34px, 5vh, 76px) clamp(20px, 3vw, 56px) clamp(40px, 6vh, 84px)
     calc(var(--riel-ancho) + clamp(8px, 1.4vw, 26px));
 }
 
-/* ── La cabecera: un antetítulo y una línea ──
-   El titular no va encima del mapa. Lo que esta parada tiene que decir lo
-   dice el mapa en cuanto se toca; el texto sólo lo nombra, así que se
-   queda en el margen y del tamaño de un rótulo. */
+/* ── La cabecera ── */
 .mapa-cabecera {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 16px;
 }
 
+/*
+  El antetítulo, como pastilla de estado. Sobre campo claro un antetítulo
+  puede ser sólo letra pequeña en color; sobre tinta se pierde, y además
+  aquí dice algo que conviene que se lea como un indicador y no como un
+  rótulo: que esto está operando. Borde de un pelo, fondo apenas encendido
+  y un punto verde delante.
+*/
+.mapa-panel .tracked-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 10px;
+  border: 1px solid rgba(58, 221, 132, 0.34);
+  border-radius: 999px;
+  background: rgba(58, 221, 132, 0.09);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--verde-vivo);
+}
+
+.mapa-panel .tracked-eyebrow::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--verde-vivo);
+  box-shadow: 0 0 0 3px rgba(58, 221, 132, 0.2);
+  animation: latido-consola 2.4s var(--ease-out-cubic) infinite;
+}
+
+/* Un latido lento, no un parpadeo. Lo que dice es «esto sigue vivo», y
+   para eso basta con que el halo respire. */
+@keyframes latido-consola {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(58, 221, 132, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(58, 221, 132, 0);
+  }
+}
+
+/*
+  El titular vuelve a ser un titular. Estuvo en monoespaciado y a tamaño
+  de rótulo, con la idea de que el mapa hablara solo; el resultado era una
+  parada de producto sin voz. Aquí es letra de display sin condensar y con
+  un degradado de blanco a gris azulado, que es lo que hace que un titular
+  sobre tinta no se lea como pintado encima sino como iluminado.
+*/
 .mapa-cabecera .section-title {
   margin: 0;
-  max-width: 30ch;
-  font-family: var(--font-mono);
-  font-size: clamp(0.78rem, 0.7rem + 0.3vw, 0.95rem);
-  font-weight: 500;
-  line-height: 1.6;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--text-primary);
+  max-width: 15ch;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 1.05rem + 2.1vw, 3.1rem);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-transform: none;
+  color: var(--consola-texto);
+  background: linear-gradient(168deg, #FFFFFF 12%, #A9BACE 92%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-wrap: balance;
 }
 
-/* ── La vista ──
-   El hueco donde vive la lámina. En ancho no tiene contenido en flujo: la
-   lámina va posicionada para poder salirse por arriba y por abajo, y el
-   ancho de la columna ya lo pone la rejilla. */
+/* ── La ventana del mapa ── */
 .mapa-vista {
   position: relative;
+  display: grid;
+  place-items: center;
   min-width: 0;
+  padding: clamp(24px, 3.4vh, 56px) clamp(20px, 2.6vw, 52px);
 }
 
+/* El resplandor de debajo del marco. No es una sombra de color: es la luz
+   que el propio mapa echa sobre el campo, y por eso es más ancha que el
+   marco y va desenfocada. */
+.mapa-vista::before {
+  content: '';
+  position: absolute;
+  inset: clamp(10px, 1.6vh, 26px) clamp(6px, 1vw, 20px);
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  background:
+    radial-gradient(60% 50% at 50% 34%, rgba(58, 221, 132, 0.3), transparent 70%),
+    radial-gradient(70% 60% at 50% 84%, rgba(30, 58, 109, 0.55), transparent 72%);
+  filter: blur(46px);
+}
+
+/*
+  El marco. Bisel de dos capas —el borde de un pelo pegado al contenido y
+  un anillo muy tenue por fuera—, sombra larga que lo despega del campo y
+  una superficie translúcida que deja pasar el color de detrás.
+*/
+.mapa-marco {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--consola-borde);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+    0 0 0 5px rgba(255, 255, 255, 0.024),
+    0 34px 90px -28px rgba(0, 0, 0, 0.9);
+}
+
+/* La barra de estado del marco. La misma altura y el mismo rótulo que
+   llevan las barras de las herramientas de las que sale este lenguaje:
+   punto de estado, nombre de lo que se está viendo, y a la derecha lo que
+   ese punto significa. */
+.mapa-marco-barra {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--consola-borde);
+  background: rgba(255, 255, 255, 0.035);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--consola-texto-suave);
+}
+
+.mapa-marco-punto {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--verde-vivo);
+  animation: latido-consola 2.4s var(--ease-out-cubic) infinite;
+}
+
+.mapa-marco-titulo {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mapa-marco-estado {
+  margin-left: auto;
+  padding-left: 12px;
+  color: var(--verde-vivo);
+  white-space: nowrap;
+}
+
+/*
+  El lienzo. En ancho manda el alto —una ventana no puede crecer con la
+  página— y la proporción del mosaico saca el ancho; así la rejilla puede
+  medir la columna sola.
+*/
 .mapa-lienzo {
   position: relative;
-  /* La proporción del mosaico, para que quepa la ciudad entera. */
   aspect-ratio: 1284 / 1982;
   width: 100%;
   /* El papel del propio mosaico: lo que se ve si la lámina queda más alta
@@ -136,16 +268,11 @@
 }
 
 @media (min-width: 1060px) {
-  /* Pegada a los dos bordes de la columna y salida por arriba y por abajo.
-     Con `inset-block` negativo el alto es el de la parada más el sangrado,
-     y la proporción ya no manda: si la parada creciera por su contenido, el
-     mosaico se queda centrado sobre su propio papel. */
   .mapa-lienzo {
-    position: absolute;
-    inset-block: calc(var(--sangrado-mapa) * -1);
-    inset-inline: 0;
+    /* La barra se descuenta del alto de la ventana: el marco entero es lo
+       que tiene que caber, no sólo el plano. */
+    height: min(66svh, 720px);
     width: auto;
-    aspect-ratio: auto;
   }
 }
 
@@ -203,9 +330,8 @@
 }
 
 /* ── La pista de toque ──
-   Una línea en monoespaciado y nada más. Fue una pastilla de tinta con
-   sombra encima del mapa; era un objeto flotando sobre otro objeto para
-   decir una frase. Aquí es lo que es: un rótulo del margen. */
+   Una línea en monoespaciado y nada más: es un rótulo del mando, no un
+   objeto flotando encima del mapa. */
 .mapa-toque {
   justify-self: start;
   margin: 0;
@@ -213,7 +339,7 @@
   font-size: var(--step-rotulo);
   letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--consola-texto-tenue);
   pointer-events: none;
   transition:
     opacity var(--transition-normal),
@@ -241,9 +367,7 @@
 }
 
 /* La atribución va donde la ponen los mapas: dentro del mosaico, abajo a
-   la izquierda, que es la esquina por la que no pasa ninguna ruta. Es
-   letra pequeña sobre una pastilla del propio color del papel del mapa,
-   así que no compite con nada y tampoco tapa. */
+   la izquierda, que es la esquina por la que no pasa ninguna ruta. */
 .mapa-credito {
   position: absolute;
   left: 10px;
@@ -259,28 +383,20 @@
   pointer-events: none;
 }
 
-/* En ancho la lámina sale de la ventana por abajo: la atribución sube lo
-   que se sale, para no irse con ella. */
-@media (min-width: 1060px) {
-  .mapa-credito {
-    bottom: calc(var(--sangrado-mapa) + 9px);
-  }
-}
-
-/* ── Los rótulos del margen ── */
+/* ── Los rótulos del mando ── */
 .mapa-rotulo {
   font-family: var(--font-mono);
   font-size: var(--step-rotulo);
   font-weight: 500;
   letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--consola-texto-tenue);
 }
 
 /* ── Las rutas ──
-   Seis renglones en columna, uno debajo de otro, separados por una línea
-   de pelo. Eran seis tarjetas blancas con sombra en dos columnas: seis
-   veces la misma forma para elegir una de seis cosas. */
+   Seis renglones dentro de una sola pieza con borde. Ver rutas.css: aquí
+   sólo va el envoltorio, que es lo que hace que las seis se lean como un
+   mando y no como seis cosas sueltas. */
 .mapa-columna {
   display: flex;
   flex-direction: column;
@@ -291,23 +407,29 @@
 .mv-rutas {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--consola-borde);
+  border-radius: 14px;
+  background: var(--consola-superficie);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
 }
 
 /* ── La lectura ──
    La distancia al bus más cercano, que es el número por el que existe
-   toda la aplicación. Sin cuadro: el número es lo bastante grande como
-   para no necesitar que nada lo señale.
-
-   El rótulo y el nombre del bus a la izquierda, el número a la derecha y
-   ocupando las tres filas. */
+   toda la aplicación. Va en su propio cuadro —borde, filo y una superficie
+   apenas encendida— porque en esta parada es el resultado, y el resultado
+   no puede ser texto suelto entre dos bloques que sí tienen forma. */
 .mapa-lectura {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   column-gap: clamp(16px, 2vw, 36px);
   row-gap: 2px;
-  padding-top: clamp(14px, 1.8vh, 22px);
-  border-top: 1px solid var(--linea);
+  padding: clamp(14px, 1.8vh, 20px) clamp(16px, 1.6vw, 22px);
+  border: 1px solid var(--consola-borde);
+  border-radius: 14px;
+  background: var(--consola-superficie);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
 }
 
 .mapa-lectura .mapa-rotulo {
@@ -319,7 +441,7 @@
   font-family: var(--font-mono);
   font-size: 12.5px;
   font-weight: 500;
-  color: var(--text-primary);
+  color: var(--consola-texto);
 }
 
 .mapa-lectura-pie {
@@ -328,53 +450,54 @@
   font-family: var(--font-mono);
   font-size: var(--step-rotulo);
   letter-spacing: 0.04em;
-  color: var(--text-secondary);
+  color: var(--consola-texto-suave);
 }
 
 /* Del mismo corte que el número grande de la app, y del tamaño que pide
-   ser lo único que de verdad se mira de esta columna. */
+   ser lo único que de verdad se mira de este cuadro. */
 .mapa-lectura-metros {
   grid-area: 1 / 2 / 4 / 3;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 6.4vw, 6.4rem);
+  font-size: clamp(2.4rem, 1.4rem + 2.4vw, 4.2rem);
   font-weight: 300;
   line-height: 0.92;
   letter-spacing: -0.045em;
   font-variant-numeric: tabular-nums;
-  color: var(--navy);
+  color: var(--consola-texto);
   transition: color var(--transition-normal);
 }
 
-/* El verde que aguanta texto: el de marca no llega a 4.5:1 sobre blanco
-   y este número es el que hay que poder leer. */
+/* Cerca: el número se enciende, y el cuadro entero con él —el borde toma
+   el verde y por debajo aparece un resplandor—. Es el único momento de la
+   parada en que algo cambia de color, así que puede permitírselo. */
+.mapa-lectura.es-cerca {
+  border-color: rgba(58, 221, 132, 0.42);
+  background:
+    linear-gradient(180deg, rgba(58, 221, 132, 0.12), rgba(58, 221, 132, 0.03));
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 0 34px -8px rgba(58, 221, 132, 0.34);
+}
+
 .mapa-lectura.es-cerca .mapa-lectura-metros {
-  color: var(--green-accessible);
+  color: var(--verde-vivo);
 }
 
 /* Y lo contrario: el punto marcado se salió del alcance de la ruta, así
-   que el número deja de ser una cuenta atrás y pasa a ser un dato. Ya no
-   hace falta un fondo ámbar para decirlo: basta con que el número deje de
-   pesar. */
+   que el número deja de ser una cuenta atrás y pasa a ser un dato. */
 .mapa-lectura.es-fuera .mapa-lectura-metros {
-  color: var(--text-secondary);
+  color: var(--consola-texto-suave);
 }
 
 /* ── El aviso ──
    La misma notificación que sale en el teléfono, con la línea que arma
    la app. Aparece cuando un bus entra en el kilómetro y se queda.
 
-   Estuvo encima del mosaico, apoyada en el borde de abajo. Ahí tapaba
-   trazado justo cuando más se mira el mapa —con el bus dentro del
-   kilómetro—, que es lo contrario de lo que tiene que hacer. Ahora
-   ocupa la banda de arriba, en la celda de la pista de toque: no
-   reserva hueco de más, porque las dos nunca se ven a la vez.
-
-   Se diferencia de todo lo demás sin necesidad de un marco: toma
-   prestado el lenguaje de `.scene-card` —la tarjeta de aviso del hero y
-   de los pasos, que ya es la notificación de esta casa—; radio de 16,
-   borde blanco de un pelo y la misma sombra de dos capas, una corta que
-   la apoya y otra larga que la levanta. Los cuadros de al lado son
-   planos y de borde tinta. */
+   Es la única pieza clara de todo el campo, y a propósito: no es parte de
+   la consola, es lo que la consola produce —la notificación tal cual la
+   ve quien espera el bus—. Por eso conserva el blanco, el radio de 16 y
+   la sombra de dos capas de `.scene-card`, y sólo se le añade el halo
+   verde que la despega de la tinta. */
 .mapa-aviso {
   justify-self: stretch;
   align-items: center;
@@ -385,8 +508,9 @@
   background: rgba(255, 255, 255, 0.97);
   border: 1px solid rgba(255, 255, 255, 0.85);
   box-shadow:
-    0 4px 12px -2px rgba(11, 22, 40, 0.06),
-    0 18px 40px -10px rgba(11, 22, 40, 0.18);
+    0 4px 12px -2px rgba(0, 0, 0, 0.3),
+    0 18px 40px -10px rgba(0, 0, 0, 0.55),
+    0 0 40px -12px rgba(58, 221, 132, 0.45);
   opacity: 0;
   transform: translateY(-10px) scale(0.97);
   visibility: hidden;
@@ -438,10 +562,19 @@
 
 @media (max-width: 1059px) {
   /* Apilado el mapa va primero en el orden del documento: es lo que hay
-     que tocar. Aquí sí sangra de lado —el mosaico a todo el ancho de la
-     ventana—, y el mando queda debajo, sobre el campo blanco. */
+     que tocar. El marco se queda —es lo que le da cuerpo a la ventana— y
+     el mando cae debajo. */
   .mapa-tablero {
-    gap: clamp(24px, 4vh, 40px);
+    gap: clamp(20px, 3vh, 34px);
+  }
+
+  /* Apilado, la ventana es lo primero de la parada y la isla flota encima
+     de todo: el hueco de arriba es el de la isla más su aire, o la barra
+     de estado del marco queda debajo del logotipo. El de los lados sale
+     del riel, para que el marco no se apoye sobre la línea de ruta. */
+  .mapa-vista {
+    padding: calc(var(--nav-alto) + clamp(16px, 2.4vh, 28px))
+      calc(var(--riel-ancho) + 8px) 0;
   }
 
   .mapa-margen {
@@ -454,12 +587,21 @@
   /* Techo de alto: en una pantalla apaisada el mosaico entero se comería
      la ventana y el mando no asomaría. */
   .mapa-lienzo {
-    max-height: 78svh;
+    max-height: 62svh;
     width: auto;
     margin-inline: auto;
   }
 
   .mapa-lectura-metros {
-    font-size: clamp(2.6rem, 13vw, 4.4rem);
+    font-size: clamp(2.4rem, 11vw, 4rem);
+  }
+}
+
+/* El latido se queda quieto para quien pide menos movimiento: el punto
+   sigue verde, que es lo que dice el estado. */
+@media (prefers-reduced-motion: reduce) {
+  .mapa-panel .tracked-eyebrow::before,
+  .mapa-marco-punto {
+    animation: none;
   }
 }
