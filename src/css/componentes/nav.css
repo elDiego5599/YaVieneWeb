@@ -490,3 +490,182 @@
     inset: -3px;
   }
 }
+
+/* ── La barra del rediseño v3 ──────────────────────────────────────────
+
+   La isla flotante se retira. Era una píldora azul marino con degradado,
+   borde de luz y una sombra de dieciséis píxeles suspendida sobre la
+   página: la primera cosa que se veía del sitio y la que más lo delataba
+   como plantilla. Ninguna herramienta seria navega así.
+
+   En su sitio queda una barra de sesenta píxeles pegada arriba, del mismo
+   papel que la página, con una línea de un píxel abajo y el contenido
+   dentro del mismo contenedor de 1160 que todo lo demás. La marca a la
+   izquierda, los enlaces a la derecha y un solo botón.
+
+   El armazón de plegado en móvil se conserva entero —el mismo botón, el
+   mismo `aria-expanded`, el mismo JavaScript—; lo que cambia es que el
+   panel que se despliega es blanco con borde de pelo en vez de un bloque
+   de azul marino.
+   ────────────────────────────────────────────────────────────────────── */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  display: block;
+  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: saturate(1.6) blur(12px);
+  -webkit-backdrop-filter: saturate(1.6) blur(12px);
+  border-bottom: 1px solid var(--linea);
+}
+
+.nav-island {
+  width: 100%;
+  max-width: var(--contenedor);
+  height: var(--nav-alto);
+  margin: 0 auto;
+  padding: 0 var(--calle);
+  gap: 16px;
+  justify-content: space-between;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  transition: none;
+}
+
+.nav-island.is-open {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.nav-island-brand {
+  color: var(--tinta);
+}
+
+.nav-island-logo {
+  box-shadow: none;
+}
+
+/* El nombre de la marca deja el espaciado de cartel: a 0.22em una palabra
+   de ocho letras ocupa lo que un enlace y medio del menú. */
+.site-header .wordmark {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* ── El pliegue, en papel ──────────────────────────────────────────── */
+
+.nav-island-reveal {
+  top: calc(100% + 9px);
+  left: var(--calle);
+  right: var(--calle);
+  padding: 8px;
+  border-radius: var(--radio-tarjeta);
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  box-shadow: 0 18px 40px -20px rgba(11, 18, 32, 0.24);
+}
+
+.nav-island-inner .nav-link,
+.nav-island-inner .nav-island-cta {
+  color: var(--tinta);
+}
+
+/* ── Los enlaces ───────────────────────────────────────────────────── */
+
+.nav-link {
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--tinta-media);
+  transition: color var(--transition-hover);
+}
+
+/* El halo de píldora que se encendía detrás del enlace al pasar por
+   encima se retira: en una barra clara basta con que el texto pase de
+   tinta media a tinta plena. */
+.nav-link::before {
+  content: none;
+}
+
+@media (hover: hover) {
+  .nav-link:hover {
+    color: var(--tinta);
+  }
+}
+
+.nav-link:focus-visible {
+  outline: 2px solid var(--green-accessible);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.nav-island-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 15px;
+  border: 1px solid var(--tinta);
+  border-radius: 8px;
+  background: var(--tinta);
+  color: var(--text-white);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  box-shadow: none;
+  transition: background-color var(--transition-hover), border-color var(--transition-hover);
+}
+
+@media (hover: hover) {
+  .nav-island-cta:hover {
+    border-color: #24304A;
+    background: #24304A;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.nav-island-toggle {
+  color: var(--tinta);
+  background: none;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+}
+
+.nav-island-grip,
+.nav-island-grip::before {
+  background: var(--tinta);
+}
+
+@media (min-width: 880px) {
+  .nav-island-reveal {
+    position: static;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .nav-island-inner {
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(18px, 2.2vw, 32px);
+  }
+
+  .nav-island-links {
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(18px, 2.2vw, 32px);
+  }
+}

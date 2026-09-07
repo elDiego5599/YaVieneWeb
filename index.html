@@ -182,19 +182,18 @@
   <main id="contenido">
 
     <!-- ============ HERO ============ -->
-    <section class="panel panel--sun hero-panel" id="hero">
-      <div class="panel-dots" aria-hidden="true"></div>
+    <section class="panel hero-panel" id="hero">
 
       <div class="panel-inner hero-grid">
 
         <!-- Columna Izquierda: Mensaje Comercial / Copy -->
         <div class="hero-copy">
           <h1 class="hero-title">¿Cuánto falta <span class="highlight">para tu bus?</span></h1>
-          <p class="hero-description">Tu ciudad en tiempo real: mira el bus moverse en el mapa y te avisamos antes de
-            que llegue el tuyo.</p>
+          <p class="hero-description">Mira el bus moverse en el mapa, con la distancia que le falta para
+            llegar a tu paradero.</p>
 
           <div class="hero-actions">
-            <a href="#solucion" class="btn-primary btn-green">Ver cómo funciona</a>
+            <a href="#mapa" class="btn-primary btn-green">Ver el mapa en vivo</a>
             <a href="/empresas.html" class="btn-outline">Para empresas</a>
           </div>
 
@@ -913,6 +912,82 @@
       </div>
     </section>
 
+    <!-- ============ LAS SEIS RUTAS, EN VIVO ============
+      Hasta aquí la página enseña teléfonos y el que mira los mira. Esta
+      sección se toca, y es también la que trae los datos: las seis rutas
+      reales de Sobusa con su código, sus terminales y su kilometraje, el
+      radio de aviso de un kilómetro y el texto exacto de la
+      notificación. Lo único simulado son los buses, y lo dice encima del
+      mapa.
+
+      Las fichas no son una lista aparte de las del mando: son el mando.
+      Tocar una cambia la ruta que el mapa dibuja, ahí mismo, sin salir de
+      la sección. Las pinta `MapaVivo` con el molde de `rutas.ts`, que es
+      el que sabe cómo se ve una ficha.
+
+      Sin fondo propio y sin marco: la sección se apoya en la crema del
+      documento y sigue en la del pie sin costura, que es lo mismo que
+      hace el pie con el borde de abajo de la página.
+    -->
+    <section class="panel panel--banda mapa-panel" id="mapa">
+      <div class="panel-inner panel-inner--ancho mapa-inner">
+        <header class="seccion-cabecera seccion-cabecera--partida reveal">
+          <span class="seccion-rotulo">El producto</span>
+          <h2 class="seccion-titulo">El mapa, funcionando <span class="apagado">aquí mismo.</span></h2>
+          <p class="seccion-lead">Las seis rutas reales de Sobusa, con sus terminales y su kilometraje.
+            Elige una, mueve tu punto de espera y mira a qué distancia va el bus más cercano.
+            Lo único simulado son los buses.</p>
+        </header>
+        <!--
+          Ni el aviso ni la pista de toque van encima del mosaico. Estuvieron
+          ahí y tapaban justo lo que hay que mirar —la ruta y el círculo del
+          kilómetro—. Ahora comparten una banda propia sobre el mapa: la
+          pista mientras no ha pasado nada, el aviso cuando el bus entra.
+          Nunca se ven las dos, así que la banda no reserva hueco de más.
+        -->
+        <div class="mapa-tablero" data-mapa-vivo>
+          <div class="mapa-vista">
+            <div class="mapa-tira">
+              <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
+              <div class="mapa-aviso" data-mapa-aviso role="status" aria-live="polite">
+                <div class="mapa-aviso-icono" aria-hidden="true">
+                  <img src="/logo.svg" alt="" width="20" height="20">
+                </div>
+                <div class="mapa-aviso-texto">
+                  <span class="mapa-aviso-app">Ya Viene · ahora</span>
+                  <strong class="mapa-aviso-titulo" data-mapa-aviso-titulo></strong>
+                </div>
+              </div>
+            </div>
+            <div class="mapa-lienzo" data-mapa-lienzo>
+              <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
+              <p class="mapa-credito">Mapa base © OpenStreetMap · © CARTO</p>
+            </div>
+          </div>
+          <div class="mapa-mando">
+            <div class="mapa-columna mapa-columna--rutas">
+              <span class="mapa-rotulo">Elige una ruta</span>
+              <div class="mv-rutas" data-mapa-rutas role="group" aria-label="Rutas disponibles"></div>
+            </div>
+            <div class="mapa-lectura" data-mapa-lectura>
+              <span class="mapa-rotulo">Bus más cercano</span>
+              <span class="mapa-lectura-bus" data-mapa-bus></span>
+              <span class="mapa-lectura-metros" data-mapa-metros></span>
+              <span class="mapa-lectura-pie" data-mapa-lectura-pie>en línea recta hasta tu punto</span>
+            </div>
+          </div>
+        </div>
+
+        <!--
+          Las cifras del catálogo cierran la sección en vez de abrirla.
+          Arriba peleaban con el titular por la misma línea; abajo son lo
+          que son: la ficha técnica de lo que se acaba de tocar.
+        -->
+        <div class="rutas-cifras reveal" data-reveal-delay="90" data-rutas-cifras></div>
+      </div>
+    </section>
+
+
 
 
 
@@ -1544,77 +1619,6 @@
     </section>
 
 
-    <!-- ============ LAS SEIS RUTAS, EN VIVO ============
-      Hasta aquí la página enseña teléfonos y el que mira los mira. Esta
-      sección se toca, y es también la que trae los datos: las seis rutas
-      reales de Sobusa con su código, sus terminales y su kilometraje, el
-      radio de aviso de un kilómetro y el texto exacto de la
-      notificación. Lo único simulado son los buses, y lo dice encima del
-      mapa.
-
-      Las fichas no son una lista aparte de las del mando: son el mando.
-      Tocar una cambia la ruta que el mapa dibuja, ahí mismo, sin salir de
-      la sección. Las pinta `MapaVivo` con el molde de `rutas.ts`, que es
-      el que sabe cómo se ve una ficha.
-
-      Sin fondo propio y sin marco: la sección se apoya en la crema del
-      documento y sigue en la del pie sin costura, que es lo mismo que
-      hace el pie con el borde de abajo de la página.
-    -->
-    <section class="panel panel--sangre mapa-panel" id="mapa">
-      <div class="panel-inner panel-inner--ancho mapa-inner">
-        <header class="mapa-cabecera reveal">
-          <span class="tracked-eyebrow eyebrow--verde">EN OPERACIÓN</span>
-          <h2 class="section-title">Prueba el mapa<br />con rutas en vivo.</h2>
-          <!--
-            En la columna derecha de la cabecera van las cifras, no un
-            párrafo: al lado del mapa lo que sostiene el titular son los
-            datos duros —seis rutas, diez terminales, los kilómetros—, y
-            de la demo ya se encarga la pista sobre el mapa.
-          -->
-          <div class="rutas-cifras reveal" data-reveal-delay="90" data-rutas-cifras></div>
-        </header>
-        <!--
-          Ni el aviso ni la pista de toque van encima del mosaico. Estuvieron
-          ahí y tapaban justo lo que hay que mirar —la ruta y el círculo del
-          kilómetro—. Ahora comparten una banda propia sobre el mapa: la
-          pista mientras no ha pasado nada, el aviso cuando el bus entra.
-          Nunca se ven las dos, así que la banda no reserva hueco de más.
-        -->
-        <div class="mapa-tablero" data-mapa-vivo>
-          <div class="mapa-vista">
-            <div class="mapa-tira">
-              <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
-              <div class="mapa-aviso" data-mapa-aviso role="status" aria-live="polite">
-                <div class="mapa-aviso-icono" aria-hidden="true">
-                  <img src="/logo.svg" alt="" width="20" height="20">
-                </div>
-                <div class="mapa-aviso-texto">
-                  <span class="mapa-aviso-app">Ya Viene · ahora</span>
-                  <strong class="mapa-aviso-titulo" data-mapa-aviso-titulo></strong>
-                </div>
-              </div>
-            </div>
-            <div class="mapa-lienzo" data-mapa-lienzo>
-              <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
-              <p class="mapa-credito">Mapa base © OpenStreetMap · © CARTO</p>
-            </div>
-          </div>
-          <div class="mapa-mando">
-            <div class="mapa-columna mapa-columna--rutas">
-              <span class="mapa-rotulo">Elige una ruta</span>
-              <div class="mv-rutas" data-mapa-rutas role="group" aria-label="Rutas disponibles"></div>
-            </div>
-            <div class="mapa-lectura" data-mapa-lectura>
-              <span class="mapa-rotulo">Bus más cercano</span>
-              <span class="mapa-lectura-bus" data-mapa-bus></span>
-              <span class="mapa-lectura-metros" data-mapa-metros></span>
-              <span class="mapa-lectura-pie" data-mapa-lectura-pie>en línea recta hasta tu punto</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
 
   </main>

@@ -68,20 +68,64 @@
   --bus-red: #E86A5E;
   --bus-ghost: #94A3B8;
 
+  /* ── Sistema día ──────────────────────────────────────────────────────
+
+     El juego con el que se compone la página desde el rediseño v3. Fondo
+     claro, color contenido, borde de un píxel y sombra casi ninguna: lo
+     que hacen las herramientas que se usan a diario.
+
+     Sólo hay dos fondos, y alternan. El papel es blanco puro y la banda
+     es un gris con un punto de azul —no un gris neutro, que sobre blanco
+     se lee sucio—, lo justo para que se note el cambio de sección sin
+     dibujar una caja. Todo lo que separa es una línea de un píxel; todo
+     lo que agrupa es aire.
+     ─────────────────────────────────────────────────────────────────── */
+  --papel: #FFFFFF;
+  --banda: #F6F8FA;
+  --linea: #E5E9EE;
+  --linea-fuerte: #D5DBE3;
+
+  --tinta: #0B1220;
+  --tinta-media: rgba(11, 18, 32, 0.62);
+  --tinta-tenue: rgba(11, 18, 32, 0.42);
+
+  /* La monoespaciada no se carga: se pide la del sistema. Es la letra de
+     los rótulos pequeños —cuatro palabras por página— y bajar un fichero
+     de fuente para eso cuesta más de lo que vale. */
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --rotulo-track: 0.12em;
+
+  --radio-tarjeta: 12px;
+  --radio-marco: 16px;
+
+  /* Dos sombras en toda la página: una que apenas despega la tarjeta del
+     papel, y una grande que va sólo debajo del marco del producto. */
+  --sombra-tarjeta: 0 1px 2px rgba(11, 18, 32, 0.05);
+  --sombra-producto: 0 40px 80px -34px rgba(11, 18, 32, 0.26),
+    0 8px 24px -14px rgba(11, 18, 32, 0.10);
+
+  /* La rejilla: un contenedor centrado y el mismo aire vertical en todas
+     las secciones. Se acabaron los paneles flotantes con radio y las
+     bandas a sangre. */
+  --contenedor: 1160px;
+  --contenedor-ancho: 1320px;
+  --calle: clamp(20px, 4vw, 32px);
+  --aire-seccion: clamp(72px, 9vh, 128px);
+
   /* Text Colors */
-  --text-primary: #0B1628;
-  --text-secondary: rgba(11, 22, 40, 0.65);
-  --text-muted: rgba(11, 22, 40, 0.45);
+  --text-primary: #0B1220;
+  --text-secondary: rgba(11, 18, 32, 0.62);
+  --text-muted: rgba(11, 18, 32, 0.42);
   --text-white: #FFFFFF;
   --text-white-dim: rgba(255, 255, 255, 0.7);
   --text-white-sub: rgba(255, 255, 255, 0.45);
 
   /* Borders & Shadows */
-  --border-subtle: rgba(20, 39, 78, 0.08);
+  --border-subtle: #E5E9EE;
   --border-glass: rgba(255, 255, 255, 0.12);
-  --shadow-sm: 0 4px 12px -2px rgba(11, 22, 40, 0.06);
-  --shadow-md: 0 12px 28px -6px rgba(11, 22, 40, 0.1);
-  --shadow-lg: 0 24px 48px -12px rgba(11, 22, 40, 0.16);
+  --shadow-sm: 0 1px 2px rgba(11, 18, 32, 0.05);
+  --shadow-md: 0 2px 6px -1px rgba(11, 18, 32, 0.07);
+  --shadow-lg: 0 40px 80px -34px rgba(11, 18, 32, 0.26), 0 8px 24px -14px rgba(11, 18, 32, 0.10);
   /* La sombra del aparato: ancha, baja y difusa, como la de una foto de
      producto. La de antes iba al 55 % y a este tamaño manchaba el crema
      de alrededor: el teléfono no flotaba, chorreaba. */
@@ -97,7 +141,7 @@
   /* Lo que mide la píldora de la cabecera. Va pegada arriba toda la
      página, así que la franja que ocupa —hueco más píldora— no es sitio
      libre para nadie: las escenas se la descuentan antes de centrar. */
-  --nav-alto: 56px;
+  --nav-alto: 60px;
   --panel-radius: 28px;
   --panel-gap: 14px;
   --content-max: 1480px;

@@ -31,11 +31,11 @@ html.scroll-suave {
   scroll-behavior: smooth;
 }
 
-/* El color lo pone cada panel. El fondo del documento sólo se ve por las
-   canaletas entre paneles, así que va neutro y cálido para que los bordes
-   redondeados se lean. */
+/* Las bandas ocupan la ventana entera y ya no hay canaletas entre ellas,
+   así que el fondo del documento sólo asoma en el rebote del scroll. Va
+   del mismo papel que la primera banda. */
 body {
-  background-color: #FFFCF7;
+  background-color: var(--papel);
   color: var(--text-primary);
   font-family: var(--font-family);
   /* `clip` y no `hidden`: los dos recortan lo que se sale de lado, pero
@@ -56,28 +56,45 @@ button, input {
   background: none;
 }
 
+/*
+  Los titulares bajan de 800 a 600 y cierran el interletrado. El peso 800
+  de Bricolage es un peso de cartel: a tamaño de titular las contraformas
+  se cierran y la palabra se lee como una mancha. A 600 con −0.03em la
+  línea queda apretada y sigue siendo ligera, que es como titula una
+  herramienta.
+*/
 h1, h2, h3, h4 {
   text-wrap: balance;
-  letter-spacing: -0.02em;
-  font-weight: 800;
-  color: var(--text-primary);
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--tinta);
 }
 
 p {
   text-wrap: pretty;
 }
 
+/*
+  El rótulo pequeño. Era una versalita en negrita a 0.22em de espaciado
+  —tipografía de revista— y pasa a monoespaciada de peso normal: es la
+  letra con la que estas interfaces marcan una sección sin levantar la voz.
+*/
 .tracked-eyebrow {
   display: inline-block;
+  font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.22em;
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
+  color: var(--tinta-tenue);
 }
 
-/* Once píxeles en mayúsculas y muy espaciados: para la norma esto es
-   texto pequeño y pide 4.5:1. Van las tres al color accesible de su
-   familia —la verde ya iba, las otras dos no—. */
+/* Once píxeles en mayúsculas y espaciados: para la norma esto es texto
+   pequeño y pide 4.5:1, así que las variantes de color van al tono
+   accesible de su familia y no al de marca. El rótulo por defecto es
+   tinta tenue, que sobre papel da 5.6:1. */
 .eyebrow--coral { color: var(--coral-accessible); }
 .eyebrow--verde { color: var(--green-accessible); }
 .eyebrow--ambar { color: var(--amber-accessible); }
@@ -107,12 +124,12 @@ p {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--arena);
+  background: var(--banda);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(11, 22, 40, 0.18);
+  background: var(--linea-fuerte);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(11, 22, 40, 0.35);
+  background: var(--tinta-tenue);
 }
