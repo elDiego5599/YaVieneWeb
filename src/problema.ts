@@ -12,17 +12,28 @@
  *
  *   reposo → aspira → carga → brota → reposo
  *
- * En `aspira` la alerta roja se encoge hasta ser el logo y el escenario
- * entero se va hacia él: primero se apaga el circuito, luego se van los
- * chispazos, luego las voces del paradero y al final las tres fichas.
- * El orden es el del tamaño, de lo más pequeño a lo más grande, que es
- * como se vacía algo de verdad —lo ligero se va enseguida y lo pesado
- * cuesta— y de paso deja el argumento para el final: lo último que se
- * lleva no es el ruido, es el problema. En `carga` el logo late y cambia
- * de color. En `brota` se vuelve a abrir como «Ya Viene», baja el árbol
- * y las fichas salen del logo una a una hasta plantarse en su fila.
- * Contado así, no es que el desorden desaparezca: es que alguien se lo
- * lleva y devuelve otra cosa en su sitio.
+ * En `aspira` la alerta roja se encoge hasta ser el logo y la sección
+ * entera se va hacia él: primero se apaga el circuito, luego se van los
+ * chispazos, luego las voces del paradero, después las tres fichas y al
+ * final el titular y la frase que los presentan. El orden es el del
+ * tamaño, de lo más pequeño a lo más grande, que es como se vacía algo
+ * de verdad —lo ligero se va enseguida y lo pesado cuesta— y de paso
+ * deja el argumento para el final: lo último que cruza la pantalla no es
+ * el ruido, es la frase que lo explica. Que se lleve también el titular
+ * es lo que cierra la idea: si el problema se lo lleva entero, tiene que
+ * llevarse hasta cómo se enuncia.
+ *
+ * Y el logo engorda con lo que se traga. Cada llegada le da un tirón
+ * —se ensancha de golpe y se recompone— y de una a otra queda un poco
+ * más grande que antes, así que al terminar el escenario está vacío y el
+ * logo mide la mitad más que cuando empezó. Es la diferencia entre un
+ * sitio donde las cosas se apagan y uno donde alguien se las lleva: lo
+ * que se lleva tiene que notarse en quien se lo lleva. En `carga` ese
+ * bulto late y cambia de color. En `brota` se vuelve a abrir como «Ya
+ * Viene» soltando de golpe todo lo que había engordado, baja el árbol y
+ * salen del logo el titular, la frase y las tres fichas hasta plantarse
+ * en su sitio. Contado así, no es que el desorden desaparezca: es que
+ * alguien se lo lleva y devuelve otra cosa en su lugar.
  *
  * El viaje de cada pieza hasta el logo se calcula aquí y no en el CSS
  * porque depende de dónde esté cada una en ese momento y de dónde esté el
@@ -83,16 +94,30 @@ const RELEVO_MS = 600;
 // sobran son el escenario vacío, que es la mitad de lo que se cuenta.
 const ASPIRA_MS = VIAJE_MS + RELEVO_MS + 150;
 const CARGA_MS = 460;
-const BROTA_MS = 1250;
+// Cinco piezas vuelven ahora, no tres, y salen despacio: la última
+// arranca a los 610 y tarda otros 940 en plantarse.
+const BROTA_MS = 1620;
 
 /**
  * El despliegue de las fichas: cuánto espera la primera a que el árbol
  * arranque, cuánto va de una a la siguiente y lo que tarda cada una en
  * plantarse.
  */
-const ESPERA_FICHA_MS = 160;
-const RELEVO_FICHA_MS = 110;
-const DESPLIEGUE_MS = 720;
+const ESPERA_FICHA_MS = 150;
+const RELEVO_FICHA_MS = 115;
+const DESPLIEGUE_MS = 940;
+
+/**
+ * Cuánto se abre del camino recto lo que sale del logo, en tanto por uno
+ * de lo que le queda por recorrer. Es el `REMOLINO` de la entrada con el
+ * signo cambiado: lo que entró girando hacia un lado sale girando hacia
+ * el otro. Más abierto que el de entrada porque salir a chorro es lo que
+ * hace que después se note que se colocan.
+ */
+const CHORRO = 0.15;
+
+/** Cuánto se pasa de largo cada pieza antes de asentarse en su sitio. */
+const PASADA = 0.045;
 
 /**
  * Cuánto se desvía cada pieza del camino recto al centro, en tanto por
@@ -104,6 +129,27 @@ const REMOLINO = 0.3;
 
 /** Lo que mide la píldora una vez encogida: un círculo con el logo dentro. */
 const NUCLEO_PX = 46;
+
+/**
+ * El engorde. `GORDO` es lo que mide el logo al acabar de tragárselo
+ * todo, en tanto por uno de su tamaño de partida; `TRAGO` es el tirón
+ * de más que da en cada llegada, y `REVIENTA` lo que se estira en el
+ * instante de abrirse. Medio tamaño más es mucho para un adorno y poco
+ * para lo que aquí se está contando: tiene que verse sin mirarlo.
+ */
+const GORDO = 1.34;
+const TRAGO = 0.1;
+const REVIENTA = 1.46;
+
+/**
+ * Dos llegadas más juntas que esto se cuentan como un solo trago. Sin
+ * esto son trece tirones de 46 ms encabalgados, que no es engordar: es
+ * vibrar.
+ */
+const TRAGO_MINIMO_MS = 150;
+
+/** Lo que tarda el logo en soltar el bulto al abrirse. */
+const SUELTA_MS = 340;
 
 export class Problema {
   private readonly seccion: HTMLElement;
@@ -324,7 +370,9 @@ export class Problema {
     };
 
     const piezas = Array.from(
-      this.seccion.querySelectorAll<HTMLElement>('.chispa, .ruido, .ficha')
+      this.seccion.querySelectorAll<HTMLElement>(
+        '.chispa, .ruido, .ficha, .seccion-titulo, .seccion-lead'
+      )
     )
       .map((pieza) => {
         const caja = pieza.getBoundingClientRect();
@@ -342,9 +390,16 @@ export class Problema {
 
     const ultima = Math.max(1, piezas.length - 1);
     this.idas = [];
+    const llegadas: number[] = [];
 
     piezas.forEach(({ pieza, dx, dy }, turno) => {
-      const tarjeta = pieza.classList.contains('ficha');
+      // Lo que vuelve: las fichas y los dos textos de arriba. El ruido y
+      // los chispazos se los queda el logo, que para eso se los llevó.
+      const vuelve =
+        pieza.classList.contains('ficha') ||
+        pieza.classList.contains('seccion-titulo') ||
+        pieza.classList.contains('seccion-lead');
+      const tarjeta = vuelve;
       const espera = (turno / ultima) * RELEVO_MS;
 
       // El desvío es perpendicular al camino recto y del mismo signo
@@ -393,13 +448,17 @@ export class Problema {
         }
       );
 
-      if (tarjeta) {
+      llegadas.push(espera + (tarjeta ? VIAJE_MS + 90 : VIAJE_MS));
+
+      if (vuelve) {
         this.vuelosFicha.push(vuelo);
         this.idas.push({ ficha: pieza, dx, dy });
       } else {
         this.vuelos.push(vuelo);
       }
     });
+
+    this.engordar(llegadas);
 
     // El orden de la vuelta es el de la fila, no el del viaje: la de la
     // izquierda se planta primero aunque se haya ido la última.
@@ -410,10 +469,92 @@ export class Problema {
   }
 
   /**
-   * La vuelta. Las fichas salen del logo, no aparecen en su sitio: cada
-   * una crece desde el centro hasta plantarse, con un punto de rebote al
-   * final. Se sueltan escalonadas y de izquierda a derecha, así que
-   * mientras el árbol baja la fila se va montando debajo.
+   * El logo engorda con lo que se traga.
+   *
+   * Se le da un tirón por cada llegada —se ensancha de golpe, rebota y
+   * se recompone— y entre tirón y tirón el tamaño de reposo sube un
+   * escalón, así que al final del viaje mide `GORDO`. Dos llegadas muy
+   * juntas cuentan como una sola: trece tirones encabalgados no se leen
+   * como engordar sino como vibrar.
+   *
+   * Va todo en una animación y no en clases porque los tiempos son los
+   * de los viajes, y ésos los reparte el ancho de la ventana. Sigue
+   * corriendo durante la carga —ahí el bulto se tensa— y muere en la
+   * primera parte de `brota`, soltando de golpe lo que llevaba encima:
+   * la píldora se abre justo mientras se desinfla.
+   *
+   * El tirón es redondo, no un aplastado. Un círculo achatado no se lee
+   * como un golpe encajado sino como un círculo recortado por arriba: el
+   * filo plano se ve antes que el gesto. Lo que da el golpe es el
+   * encogido de un punto justo antes de recibir y el muelle de después,
+   * no la deformación.
+   */
+  private engordar(llegadas: number[]): void {
+    if (!this.estado) return;
+
+    const tragos: number[] = [];
+    for (const cuando of [...llegadas].sort((a, b) => a - b)) {
+      const anterior = tragos[tragos.length - 1];
+      if (anterior === undefined || cuando - anterior >= TRAGO_MINIMO_MS) {
+        tragos.push(cuando);
+      }
+    }
+    if (!tragos.length) return;
+
+    const total = ASPIRA_MS + CARGA_MS + SUELTA_MS;
+    const punto = (ms: number): number => Math.min(1, Math.max(0, ms / total));
+    const bulto = (paso: number): number => 1 + (paso / tragos.length) * (GORDO - 1);
+
+    const cuadros: Keyframe[] = [{ offset: 0, transform: 'scale(1)' }];
+    const marcar = (ms: number, tamano: number, salida?: string): void => {
+      const offset = punto(ms);
+      const ultimo = cuadros[cuadros.length - 1]?.offset;
+      if (typeof ultimo === 'number' && offset < ultimo) return;
+      const cuadro: Keyframe = { offset, transform: `scale(${tamano.toFixed(3)})` };
+      if (salida) cuadro.easing = salida;
+      cuadros.push(cuadro);
+    };
+
+    tragos.forEach((cuando, i) => {
+      const antes = bulto(i);
+      const luego = bulto(i + 1);
+
+      // Se encoge un punto justo antes de recibir: es lo que hace que
+      // el tirón siguiente se lea como un golpe y no como un escalón.
+      marcar(cuando - 60, antes * 0.98, 'cubic-bezier(0.5, 0, 0.75, 0.15)');
+      // El tirón.
+      marcar(cuando, luego + TRAGO, 'cubic-bezier(0.16, 1, 0.3, 1)');
+      // Y se recompone en su tamaño nuevo.
+      marcar(cuando + 130, luego, 'cubic-bezier(0.34, 1.56, 0.64, 1)');
+    });
+
+    // Lleno. Durante la carga el bulto se tensa hacia dentro y en el
+    // último instante revienta: ahí es donde la píldora se abre.
+    marcar(ASPIRA_MS, GORDO, 'cubic-bezier(0.34, 1.56, 0.64, 1)');
+    marcar(ASPIRA_MS + CARGA_MS * 0.45, GORDO * 0.97, 'cubic-bezier(0.5, 0, 0.75, 0.15)');
+    marcar(ASPIRA_MS + CARGA_MS, REVIENTA, 'cubic-bezier(0.16, 1, 0.3, 1)');
+    cuadros.push({ offset: 1, transform: 'scale(1)' });
+
+    this.vuelos.push(
+      this.estado.animate(cuadros, {
+        duration: total,
+        easing: 'linear',
+        fill: 'forwards',
+      })
+    );
+  }
+
+  /**
+   * La vuelta: el logo escupe lo que se tragó y aquello se ordena solo.
+   *
+   * Nada aparece en su sitio. Cada pieza sale disparada del logo, abierta
+   * hacia un lado y girada, se pasa de largo de donde tiene que quedarse
+   * y sólo entonces se cuadra: primero el titular, luego la frase y
+   * después las tres fichas, escalonadas y de arriba abajo, que es el
+   * orden en que se lee la sección. Se sueltan tan seguidas que los
+   * primeros fotogramas son un chorro y no cinco viajes, y los últimos
+   * son cinco piezas colocándose. Ahí está lo que se cuenta: no es que
+   * salga otra cosa, es que sale lo mismo puesto en orden.
    *
    * El vuelo no se queda pegado al final —`fill` de ida y no de vuelta—:
    * en cuanto termina manda otra vez el CSS de la cara ordenada, que es
@@ -424,19 +565,43 @@ export class Problema {
     this.vuelosFicha = [];
 
     this.idas.forEach(({ ficha, dx, dy }, turno) => {
+      // El chorro es el remolino de la entrada con el signo cambiado:
+      // lo que se tragó girando hacia un lado sale girando hacia el
+      // otro. Se abre poco: lo justo para que el camino sea una curva y
+      // no una recta, porque salir en línea recta se lee como aparecer.
+      const abreX = dy * CHORRO;
+      const abreY = -dx * CHORRO;
+
+      // Alternando el giro no salen cinco piezas iguales en fila: sale
+      // un puñado. Poca cosa, porque una frase ladeada se deja de leer
+      // antes que una tarjeta y aquí lo que importa es que se coloque,
+      // no que dé volteretas.
+      const lado = turno % 2 === 0 ? 1 : -1;
+      const giro = lado * (ficha.classList.contains('ficha') ? 7 : 3.5);
+
       this.vuelosFicha.push(
         ficha.animate(
           [
             {
-              transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(0.06)`,
+              // No sale de la nada: sale ya con cuerpo, que es lo que
+              // separa una pieza que el logo suelta de una que aparece.
+              transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(0.22) rotate(${giro.toFixed(1)}deg)`,
               opacity: 0,
-              easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+              easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
             },
             {
-              offset: 0.45,
-              transform: `translate(${(dx * 0.2).toFixed(1)}px, ${(dy * 0.2).toFixed(1)}px) scale(0.74)`,
+              offset: 0.36,
+              transform: `translate(${(dx * 0.5 + abreX).toFixed(1)}px, ${(dy * 0.5 + abreY).toFixed(1)}px) scale(0.8) rotate(${(giro * 0.55).toFixed(1)}deg)`,
               opacity: 1,
-              easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+              easing: 'cubic-bezier(0.33, 0, 0.15, 1)',
+            },
+            {
+              // Se pasa un pelo de largo y ya derecha: de aquí en
+              // adelante lo único que queda por hacer es cuadrarla.
+              offset: 0.7,
+              transform: `translate(${(-dx * PASADA).toFixed(1)}px, ${(-dy * PASADA).toFixed(1)}px) scale(1.015) rotate(${(giro * -0.08).toFixed(2)}deg)`,
+              opacity: 1,
+              easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
             },
             { transform: 'none', opacity: 1 },
           ],

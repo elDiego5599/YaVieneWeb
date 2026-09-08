@@ -510,16 +510,16 @@
   «Nadie sabe dónde va el bus» sobre la píldora verde, y las fichas se
   desplegaban con el texto viejo todavía encima.
 
-  Sólo dentro del escenario. El titular y la frase de arriba no los aspiró
-  nadie, así que ésos sí se relevan a la vista, como siempre.
+  Va a toda la sección, titular y frase incluidos: desde que también se
+  los traga el logo, tampoco ellos pueden salir despidiéndose de nada.
 */
-[data-fase='brota'] .escenario .cara--ciego {
+[data-fase='brota'] .cara--ciego {
   opacity: 0;
   visibility: hidden;
   transition: none;
 }
 
-[data-fase='brota'] .escenario .cara--claro {
+[data-fase='brota'] .cara--claro {
   opacity: 1;
   visibility: visible;
   transform: none;
