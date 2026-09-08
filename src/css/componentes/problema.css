@@ -501,6 +501,31 @@
   transform: scale(1);
 }
 
+/*
+  Lo que se despliega ya no puede estar despidiéndose de nada. El relevo
+  normal cruza las dos caras en 0,38 s con su turno, y eso está bien
+  cuando se cambia de lado con el interruptor: se ve el cambio. Dentro de
+  la ceremonia no: aquí el escenario se vació entero y lo que sale del
+  logo tiene que salir ya con lo suyo puesto. Sin este corte se leía
+  «Nadie sabe dónde va el bus» sobre la píldora verde, y las fichas se
+  desplegaban con el texto viejo todavía encima.
+
+  Sólo dentro del escenario. El titular y la frase de arriba no los aspiró
+  nadie, así que ésos sí se relevan a la vista, como siempre.
+*/
+[data-fase='brota'] .escenario .cara--ciego {
+  opacity: 0;
+  visibility: hidden;
+  transition: none;
+}
+
+[data-fase='brota'] .escenario .cara--claro {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: none;
+}
+
 /* La carga: el color cruza de la alerta a la marca y el logo da un
    latido. Corto a propósito —un latido largo se vuelve espera—. */
 [data-fase='carga'] .escenario-estado {
@@ -610,8 +635,13 @@
   vector-effect: non-scaling-stroke;
   /* `pathLength="1"` en el marcado: el trazo mide 1 sea cual sea su
      largo, así que las tres bajadas se dibujan en el mismo tiempo aunque
-     la del centro sea más corta que las de los lados. */
-  stroke-dasharray: 1;
+     la del centro sea más corta que las de los lados.
+
+     El hueco mide 2 y no 1 para que el final del trazo caiga siempre
+     dentro del hueco: con `1 1` el desfase de 1 deja el final justo en
+     el filo del siguiente trazo y el remate redondo pinta ahí un punto,
+     que era la mota que quedaba flotando sobre cada ficha. */
+  stroke-dasharray: 1 2;
   stroke-dashoffset: 1;
   transition: stroke-dashoffset 0.6s var(--ease-out-cubic);
 }
@@ -756,38 +786,80 @@
     transition: opacity 0.45s var(--ease-out-cubic);
   }
 
+  /*
+    `pathLength="1"` va en el marcado: el trazo de cada cable mide 1 sea
+    cual sea su largo, así que todos se recogen en el mismo tiempo aunque
+    unos den más vuelta que otros. En reposo el desfase es 0 —el cable
+    entero a la vista— y no hay transición que lo mueva.
+
+    El hueco mide 2 y no 1 por lo mismo que en la red: con `1 1` el final
+    del cable recogido cae en el filo del siguiente trazo y el remate
+    redondo deja ahí un punto.
+  */
   .circuito-cable {
     stroke: var(--hilo-alerta);
     stroke-width: 2.2;
     stroke-linecap: round;
     stroke-linejoin: round;
     vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1 2;
+    stroke-dashoffset: 0;
   }
 
   [data-cara='claro'] .escenario-circuito {
     opacity: 0;
   }
 
-  /* El enredo entero cede al remolino: gira un grado y medio y se cierra
-     un 3% mientras se recoge. Es poco a propósito —el viaje de verdad lo
-     hacen los cables con su trazo— pero es lo que hace que el fondo
-     acompañe en vez de quedarse quieto viendo cómo se lo llevan. */
+  /* El enredo entero cede al remolino: se cierra sobre la píldora, que
+     es el origen que se le pone al encogido —el centro de la marca, no
+     el del cuadro—. Es poco a propósito; el viaje de verdad lo hacen los
+     cables recogiéndose, pero es lo que hace que el fondo acompañe en
+     vez de quedarse quieto viendo cómo se lo llevan. */
   .escenario-circuito {
-    transform-origin: center;
-    transition:
-      opacity 0.34s var(--ease-out-cubic),
-      transform 0.7s var(--ease-out-cubic);
+    transform-origin: 50% 11%;
+    transition: transform 0.72s var(--ease-out-cubic);
   }
 
-  /* El circuito es lo más fino que hay en el escenario, así que es lo
-     primero que se va: se apaga mientras se cierra sobre sí mismo, y
-     para cuando salen las voces ya no queda ni una línea. Sin esto el
-     enredo se quedaba entero de fondo mientras se llevaban todo lo
-     demás, que es justo lo contrario de vaciar el escenario. */
+  /*
+    Los cables no se apagan: se recogen. Cada trazo se va por su punta
+    más lejana y vuelve hasta donde nace, que en los tres que salen de la
+    alerta es la píldora misma —el desfase positivo borra el trazo por el
+    final, no por el principio—. Apagarlos era lo que hacía que el enredo
+    se desvaneciera en vez de que se lo llevaran, que es lo contrario de
+    lo que cuenta la escena.
+
+    Primero se van los puentes entre fichas, que son los que están más
+    lejos del centro, y detrás las tres bajadas. La curva es la misma de
+    los vuelos de las piezas: sale despacio y entra de golpe.
+  */
   [data-fase='aspira'] .escenario-circuito,
   [data-fase='carga'] .escenario-circuito {
-    opacity: 0;
-    transform: rotate(1.6deg) scale(0.97);
+    transform: scale(0.9);
+  }
+
+  [data-fase='aspira'] .circuito-cable,
+  [data-fase='carga'] .circuito-cable {
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.58s cubic-bezier(0.5, 0, 0.75, 0.15);
+  }
+
+  [data-fase='aspira'] .circuito-cable--inter-1,
+  [data-fase='carga'] .circuito-cable--inter-1,
+  [data-fase='aspira'] .circuito-cable--inter-3,
+  [data-fase='carga'] .circuito-cable--inter-3 {
+    transition-delay: 0.05s;
+  }
+
+  [data-fase='aspira'] .circuito-cable--1,
+  [data-fase='carga'] .circuito-cable--1,
+  [data-fase='aspira'] .circuito-cable--3,
+  [data-fase='carga'] .circuito-cable--3 {
+    transition-delay: 0.18s;
+  }
+
+  [data-fase='aspira'] .circuito-cable--2,
+  [data-fase='carga'] .circuito-cable--2 {
+    transition-delay: 0.24s;
   }
 
   .escenario-arbol {
