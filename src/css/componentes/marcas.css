@@ -1,60 +1,143 @@
 /* ── MARCAS: cinta de empresas ────────────────────────────────────
 
-   Los mismos siete logos en la portada (banda oscura bajo el hero) y en
-   `/empresas.html` (al pie de la ficha). Una sola fuente: este fichero lo
-   cargan las dos páginas desde el paquete común.
+   Los mismos siete logos en la portada (una fila quieta sobre blanco) y
+   en `/empresas.html` (un carrusel al pie de la ficha). Una sola fuente:
+   este fichero lo cargan las dos páginas desde el paquete común.
    ────────────────────────────────────────────────────────────────── */
 
-/* La banda de la portada: rótulo fijo a la izquierda y cinta continua
-   a la derecha, con las medidas grandes de aquí (más que en empresas).
-   En móvil se apila: el rótulo arriba y la cinta a todo lo ancho. */
+/* ── La banda de la portada ────────────────────────────────────────────
+
+   Siete logos que no se parecen en nada: un sello cuadrado, una firma
+   seis veces más ancha que alta, tres palabras y un dibujo. Puestos en
+   fila y a su aire, cada uno tira del ojo hacia un lado y la banda se
+   lee como siete recortes pegados. Puestos cada uno en una casilla del
+   mismo tamaño, con el logo plantado en el centro a su altura óptica,
+   se lee como una fila: lo que se repite es la casilla, y lo que cambia
+   dentro de ella es la marca, que es justo lo que hay que mirar.
+
+   El número de columnas está escrito y no lo decide el envoltorio: con
+   siete piezas, cualquier reparto automático deja una suelta al final
+   de la última línea. Dos, tres y siete son los tres repartos en los
+   que eso no pasa —y en los dos primeros la séptima ocupa la línea
+   entera, centrada, en vez de quedarse arrinconada a un lado.
+   ────────────────────────────────────────────────────────────────── */
 .marcas-claras {
   background: var(--papel);
   padding: clamp(36px, 4vw, 60px) var(--calle) 48px;
 }
 
-/* La fila quieta de la portada: los siete logos sobre blanco, en una
-   sola fila que se envuelve en móvil. Reusa las medidas de abajo, así
-   que son los mismos tamaños que en empresas. En blanco y negro hasta
-   que el ratón pasa encima: ahí cada uno recupera su color. */
+/* El rótulo estaba sólo en el `aria-label` de la sección: se oía y no se
+   leía. Siete logos sin nada que los presente no dicen qué son —¿clientes,
+   alianzas, medios?—, y ésa es justo la frase que hace que valgan. */
+.marcas-claras-rotulo {
+  margin: 0 0 clamp(26px, 3vw, 40px);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--tinta-tenue);
+}
+
 .marcas-claras-fila {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(28px, 4vw, 64px);
-  max-width: 1280px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 32px) clamp(14px, 2vw, 26px);
+  max-width: 1180px;
   margin: 0 auto;
 }
 
+/* La séptima, sola en su línea, se pone a lo ancho para quedar centrada
+   bajo las demás en vez de descolgada a la izquierda. */
+.marcas-claras-fila .marca-casilla:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.marca-casilla {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  height: clamp(46px, 5vw, 58px);
+}
+
+@media (min-width: 640px) {
+  .marcas-claras-fila {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .marcas-claras-fila .marca-casilla:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+
+  .marcas-claras-fila .marca-casilla:last-child:nth-child(3n + 1) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1100px) {
+  .marcas-claras-fila {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .marcas-claras-fila .marca-casilla:last-child:nth-child(3n + 1) {
+    grid-column: auto;
+  }
+}
+
+/*
+  Apagados, no ennegrecidos, y apagados los siete al mismo tono.
+
+  Quitarles el color a todos por igual no los iguala: los ficheros no
+  vienen igual de oscuros. Sobusa y Transmetro son casi negros y
+  Transmecar es un gris claro, así que el mismo tratamiento dejaba una
+  fila a dos tintas —tres manchas y cuatro fantasmas—, que es lo que
+  hacía que no se leyera como un conjunto.
+
+  Cada logo lleva por eso su corrección. `--tono` aclara u oscurece, y
+  `--vela` es cuánto se levanta del papel. Hacen falta las dos: el brillo
+  no aclara el negro puro —multiplicar cero por lo que sea sigue dando
+  cero, y la marca de Transmetro es negra maciza—, así que a los muy
+  oscuros se les baja además el cuerpo. El color entero se guarda para
+  cuando el ratón se para encima de uno.
+*/
 .marcas-claras-fila .empresa-marcas-logo {
-  /* Oscuro pero sin empastar: el brillo a la mitad baja todo sin
-     aplastar los trazos finos como hacía el negro puro. */
-  filter: grayscale(1) brightness(0.5);
-  transition: filter 0.35s var(--ease-out-cubic);
+  filter: grayscale(1) brightness(var(--tono, 1));
+  opacity: var(--vela, 0.7);
+  transition:
+    filter 0.35s var(--ease-out-cubic),
+    opacity 0.35s var(--ease-out-cubic);
 }
 
-.marcas-claras-fila .empresa-marcas-logo:hover {
+.marcas-claras .empresa-marcas-logo--sobusa     { --tono: 1.15; --vela: 0.6; }
+.marcas-claras .empresa-marcas-logo--sodis      { --tono: 1.05; --vela: 0.7; }
+.marcas-claras .empresa-marcas-logo--coolitoral { --tono: 1.1;  --vela: 0.65; }
+.marcas-claras .empresa-marcas-logo--transmetro { --tono: 1.2;  --vela: 0.52; }
+.marcas-claras .empresa-marcas-logo--coochofal  { --tono: 1.15; --vela: 0.6; }
+.marcas-claras .empresa-marcas-logo--transmecar { --tono: 0.66; --vela: 0.95; }
+.marcas-claras .empresa-marcas-logo--trasalfa   { --tono: 0.78; --vela: 0.9; }
+
+.marca-casilla:hover .empresa-marcas-logo {
   filter: none;
+  opacity: 1;
 }
 
-/* En la portada los logos van más grandes que en empresas. */
-.marcas-claras .empresa-marcas-item {
-  height: 60px;
-}
-
+/* En la portada los logos van más grandes que en empresas. El alto de
+   cada uno no es el mismo número: un sello cuadrado necesita más alto
+   que una firma alargada para pesar lo mismo en la fila. El ancho lo
+   pone la casilla, y quien se pase se ajusta a ella. */
 .marcas-claras .empresa-marcas-logo {
   max-height: 38px;
-  max-width: 240px;
+  max-width: 100%;
 }
 
-.marcas-claras .empresa-marcas-logo--sobusa     { max-height: 35px; }
+.marcas-claras .empresa-marcas-logo--sobusa     { max-height: 34px; }
 .marcas-claras .empresa-marcas-logo--sodis      { max-height: 37px; }
 .marcas-claras .empresa-marcas-logo--coolitoral { max-height: 30px; }
-.marcas-claras .empresa-marcas-logo--transmetro { max-height: 42px; }
-.marcas-claras .empresa-marcas-logo--coochofal  { max-height: 28px; }
-.marcas-claras .empresa-marcas-logo--transmecar { max-height: 33px; }
-.marcas-claras .empresa-marcas-logo--trasalfa   { max-height: 42px; }
+.marcas-claras .empresa-marcas-logo--transmetro { max-height: 46px; }
+.marcas-claras .empresa-marcas-logo--coochofal  { max-height: 27px; }
+.marcas-claras .empresa-marcas-logo--transmecar { max-height: 34px; }
+.marcas-claras .empresa-marcas-logo--trasalfa   { max-height: 52px; }
 
 /* ── Marcas: carrusel continuo al pie de la ficha ─────────────────── */
 

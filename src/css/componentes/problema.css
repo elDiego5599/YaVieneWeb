@@ -774,6 +774,21 @@
     margin: -32px;
   }
 
+  /*
+    Menos mientras dura la ceremonia. Los dos anillos salen del borde de
+    la píldora y llegan casi tres veces más lejos: por arriba se pasan de
+    los 32 de aire, y el recorte los cortaba en seco dejando un filo
+    recto justo encima del logo. Aquí el recorte no hace falta —los
+    cables se recogen hacia dentro, el ruido viaja hacia la píldora y lo
+    que brota acaba en su sitio—, así que se levanta y los anillos se
+    abren enteros.
+  */
+  [data-fase='aspira'] .escenario,
+  [data-fase='carga'] .escenario,
+  [data-fase='brota'] .escenario {
+    overflow: visible;
+  }
+
   .escenario-circuito {
     display: block;
     position: absolute;
