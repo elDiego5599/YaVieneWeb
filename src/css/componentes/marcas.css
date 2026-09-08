@@ -97,13 +97,15 @@
   Cada logo lleva por eso su corrección. `--tono` aclara u oscurece, y
   `--vela` es cuánto se levanta del papel. Hacen falta las dos: el brillo
   no aclara el negro puro —multiplicar cero por lo que sea sigue dando
-  cero, y la marca de Transmetro es negra maciza—, así que a los muy
-  oscuros se les baja además el cuerpo. El color entero se guarda para
-  cuando el ratón se para encima de uno.
+  cero, y la marca de Transmetro es negra maciza—.
+
+  De momento los siete van a todo color: la fila apagada no se leía
+  como conjunto. Quedan `--tono` y `--vela` con sus valores por si
+  hay que volver.
 */
 .marcas-claras-fila .empresa-marcas-logo {
-  filter: grayscale(1) brightness(var(--tono, 1));
-  opacity: var(--vela, 0.7);
+  filter: none;
+  opacity: 1;
   transition:
     filter 0.35s var(--ease-out-cubic),
     opacity 0.35s var(--ease-out-cubic);
@@ -156,6 +158,7 @@
 
 .empresa-marcas-titulo {
   display: block;
+  color: var(--ink);
 }
 
 .empresa-marcas-carrusel {

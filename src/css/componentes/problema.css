@@ -36,6 +36,18 @@
   gap: 16px 24px;
 }
 
+#problema .seccion-rotulo {
+  transition: color 0.5s var(--ease-out-cubic);
+}
+
+#problema[data-cara='ciego'] .seccion-rotulo {
+  color: var(--coral-accessible);
+}
+
+#problema[data-cara='claro'] .seccion-rotulo {
+  color: var(--acento);
+}
+
 @media (min-width: 900px) {
 
   /* En la cabecera partida ocupa la fila entera, la que antes era del

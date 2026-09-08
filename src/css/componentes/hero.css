@@ -206,20 +206,23 @@
   recoloca la escena entera sola, sin números a ojo.
 */
 .hero-scene {
-  --tel: 312px;
+  /* Tamaño fijo: el trío no cambia al minimizar ni al zumear —los
+     360 px son los del diseño aprobado y el corte de abajo esconde el
+     botón del teléfono derecho con margen, como en la referencia. */
+  --tel: 360px;
   /* Las proporciones del grupo salen de medir la referencia: los laterales
      casi tan altos como el central y metidos un dedo por debajo, para que
      los tres se lean como un solo objeto y no como tres estampas. */
   --lado: calc(var(--tel) * 0.93);
   --solape: calc(var(--lado) * 0.3);
-  /* Mientras los laterales no estén en pantalla el escenario es un
-     solo teléfono. */
-  --escenario: var(--tel);
+  /* El trío se muestra siempre: el escenario es central + laterales. */
+  --escenario: calc(var(--tel) + 2 * (var(--lado) - var(--solape)));
   /* Alto del aparato central: el marco es un Pixel 9, 152,8 × 72 mm. */
   --alto-tel: calc(var(--tel) * 152.8 / 72);
-  /* Lo que se hunde el trío tras el filo de abajo del lienzo. Supera por
-     mucho la respiración (±7 px) y el encogido de entrada (×0,94). */
-  --sangrado: calc(var(--alto-tel) * 0.12);
+  /* Lo que se hunde el trío tras el filo de abajo del lienzo: esconde el
+     botón de aviso del teléfono derecho con margen (el botón asomaba
+     2 px y la respiración lo movía ±7), sin comerse el 940. */
+  --sangrado: calc(var(--alto-tel) * 0.14);
 
   position: relative;
   display: flex;
@@ -236,22 +239,9 @@
   overflow: visible;
 }
 
-@media (min-width: 768px) {
-  .hero-scene {
-    --tel: 320px;
-  }
-}
-
-/*
-  Los laterales sólo entran cuando hay ancho de sobra para el grupo:
-  por debajo de esto la escena vuelve a ser un solo teléfono.
-*/
-@media (min-width: 1400px) {
-  .hero-scene {
-    --tel: 360px;
-    --escenario: calc(var(--tel) + 2 * (var(--lado) - var(--solape)));
-  }
-}
+/* El trío mide lo mismo en cualquier ancho: sin escalones por
+   puntos de ruptura —achicar la ventana recorta los laterales por
+   los lados, nunca reordena ni reescala los aparatos. */
 
 .hero-stage {
   position: relative;
@@ -268,11 +258,10 @@
    luego los laterales, que lo vuelven un grupo—. El turno de cada uno
    lo pone `data-reveal-delay` en el marcado.
 
-   Se animan `opacity` y `scale`, nunca `transform` ni `translate`: esas
-   dos ya están ocupadas —`translate` la lleva la respiración del trío—
-   y una animación gana siempre a una declaración normal, así que una
-   tercera regla peleándose por ellas no se vería. `scale` está libre
-   en ambos y compone en la GPU igual.
+    Se animan `opacity` y `scale`, nunca `transform` ni `translate`: esas
+    dos ya están ocupadas —`transform` la lleva el desnivel de los
+    laterales— y una animación gana siempre a una declaración normal,
+    así que una tercera regla peleándose por ellas no se vería.
 
    Sin `will-change`: son tres elementos y la promoción a capa
    permanente cuesta memoria para algo que pasa una sola vez. */
@@ -314,7 +303,7 @@
   emborronaban el hueco entre aparatos.
 */
 .hero-phone-side {
-  display: none;
+  display: block;
   position: relative;
   z-index: 5;
   /* Los laterales bajan un pelo, lo justo para que el central sobresalga.
@@ -361,52 +350,42 @@
   sin pisarse. Además compone en el hilo de composición, igual que un
   `transform`, así que no cuesta un reflujo por cuadro.
 */
-@keyframes heroRespira {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  50% {
-    translate: 0 calc(var(--respiro, 7px) * -1);
-  }
-}
-
-.hero-phone-wrap {
-  animation: heroRespira 9s ease-in-out infinite;
-}
-
+/*
+  Los aparatos quedan quietos: la respiración movía el trío ±7 px y con
+  él la línea de corte del filo —el botón escondido asomaba por turnos.
+  La única moción del hero es la entrada (`.escena-entra`, una vez) y la
+  demo que corre dentro del teléfono derecho.
+*/
 .hero-phone-side--izq {
   --respiro: 5px;
   margin-right: calc(var(--solape) * -1);
-  animation: heroRespira 11.5s ease-in-out -4.2s infinite;
 }
 
 .hero-phone-side--der {
   --respiro: 4px;
   margin-left: calc(var(--solape) * -1);
-  animation: heroRespira 10.4s ease-in-out -7.6s infinite;
 }
 
-@media (min-width: 1400px) {
-  .hero-phone-side {
-    display: block;
+/* En ventana angosta no cabe el trío y el que importa es el que se
+   mueve: la demo vive en el de la derecha, así que ese ocupa el centro
+   con el mismo tamaño fijo (360) y el mismo corte de abajo —los otros
+   dos se esconden, nada se reescala. Sin esto el panel de 390 px
+   mordería los cantos del central. */
+@media (max-width: 719px) {
+  .hero-panel {
+    margin-inline: 12px;
   }
-}
 
-/*
-  Por debajo de 1400 px sólo cabe un teléfono, y ese uno tiene que ser el
-  que se mueve: la demo, que ahora vive en el de la derecha. La pantalla de
-  entrada se queda para las ventanas anchas, donde los tres se ven juntos.
-  El de la derecha pasa a ocupar el centro: ancho del central, sin el
-  solape ni la bajada que sólo tienen sentido cuando hay tres.
-*/
-@media (max-width: 1399px) {
-  .hero-phone-wrap {
+  .hero-grid {
+    padding-inline: 0;
+  }
+
+  .hero-phone-wrap,
+  .hero-phone-side--izq {
     display: none;
   }
 
   .hero-phone-side--der {
-    display: block;
     margin-left: 0;
     transform: none;
   }
