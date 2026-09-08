@@ -1507,22 +1507,30 @@
           </svg>
 
           <!--
-            El árbol: un tronco que baja del estado, una viga que va del
-            centro de la primera ficha al de la última y tres ramas que
-            caen sobre cada una. Líneas de un píxel y no un SVG, porque
-            tiene que medir lo que mide la rejilla de fichas a cualquier
-            ancho. El tronco y las ramas crecen con el hueco que sobra,
-            así que el escenario mide lo mismo en las dos caras y la
-            página no da un salto al cambiar de lado.
+            La red («Con Ya Viene»): los mismos cables del circuito de la
+            otra cara —mismo grosor, mismas esquinas redondeadas, mismo
+            remate— pero puestos en orden, uno por ficha, saliendo todos
+            de la píldora. El desorden y el orden se cuentan con la misma
+            pieza; lo único que cambia es el trazado.
+
+            El lienzo ocupa el hueco entero que queda entre la píldora y
+            las fichas, y dentro de él las tres bajadas caen sobre el
+            centro de cada columna: 158, 500 y 842 de 1000 son los tres
+            centros de una rejilla de tres, así que caen en su sitio a
+            cualquier ancho sin tener que medir nada. El contenedor sigue
+            creciendo con el hueco que sobra, que es lo que hace que el
+            escenario mida lo mismo en las dos caras y la página no dé un
+            salto al cambiar de lado.
           -->
           <div class="escenario-arbol" aria-hidden="true">
-            <span class="arbol-tronco"></span>
-            <span class="arbol-viga"></span>
-            <span class="arbol-ramas">
-              <span class="arbol-rama"></span>
-              <span class="arbol-rama"></span>
-              <span class="arbol-rama"></span>
-            </span>
+            <svg class="escenario-red" viewBox="0 0 1000 200" fill="none" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+              <!-- Bajada al centro: recta, sin esquina que doblar. -->
+              <path class="red-cable red-cable--centro" pathLength="1" d="M 500 8 V 192" />
+              <!-- Bajada a la izquierda, con las dos esquinas del circuito. -->
+              <path class="red-cable red-cable--izquierda" pathLength="1" d="M 430 8 V 60 Q 430 76 414 76 H 174 Q 158 76 158 92 V 192" />
+              <!-- Bajada a la derecha, espejo de la anterior. -->
+              <path class="red-cable red-cable--derecha" pathLength="1" d="M 570 8 V 60 Q 570 76 586 76 H 826 Q 842 76 842 92 V 192" />
+            </svg>
           </div>
 
           <div class="escenario-fichas">

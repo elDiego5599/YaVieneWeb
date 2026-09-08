@@ -203,14 +203,15 @@
 
 /* ── El escenario ──────────────────────────────────────────────────────
 
-   `--hueco` es el único número que comparten la rejilla de fichas y el
-   árbol: la viga se calcula con él para acabar justo sobre el centro de
-   la primera y de la última ficha.
+   `--hueco` es la separación de la rejilla de fichas, y de ahí sale
+   también dónde caen las bajadas de la red: los tres centros de una
+   rejilla de tres son siempre los mismos, se abra lo que se abra.
 
-   Los dos colores son de aquí y no de `variables.css` porque no los usa
+   Los tres colores son de aquí y no de `variables.css` porque no los usa
    nada más: `--hilo` es el verde de `--acento` aclarado hasta poder ser
-   una línea de un píxel sin gritar, y `--chispazo` tiene que verse sobre
-   la banda sin llamar la atención antes que las fichas.
+   un filo de un píxel sin gritar, `--hilo-alerta` es el rojo de los
+   cables del circuito y `--chispazo` tiene que verse sobre la banda sin
+   llamar la atención antes que las fichas.
    ────────────────────────────────────────────────────────────────────── */
 
 .escenario {
@@ -566,20 +567,21 @@
     0 10px 24px rgba(4, 116, 84, 0.16);
 }
 
-/* ── El árbol ──────────────────────────────────────────────────────────
+/* ── La red ────────────────────────────────────────────────────────────
 
-   Tres piezas: el tronco que baja del estado, la viga que va del centro
-   de la primera ficha al de la última y las tres ramas que caen sobre
-   cada una. Líneas de un píxel y no un SVG, porque tiene que medir lo
-   que mide la rejilla de fichas a cualquier ancho.
+   La otra cara del circuito. Son los mismos cables —mismo grosor, mismas
+   esquinas redondeadas, mismo remate—, y esa es la idea: las dos caras se
+   dibujan con la misma pieza y lo único que cambia es el trazado. Allí
+   los cables se cruzan, esquivan y se enredan; aquí salen los tres de la
+   píldora y caen cada uno sobre su ficha.
 
-   El tronco y las ramas se reparten a partes iguales todo el alto que
-   quede libre entre el estado y las fichas. De ahí sale que las dos
-   caras midan lo mismo sin tener que cuadrar ningún número a mano.
+   El lienzo se estira sobre el hueco que queda entre la píldora y las
+   fichas, así que no hay ningún número que cuadrar a mano: el contenedor
+   crece con lo que sobra y las dos caras miden lo mismo.
 
-   Se dibuja de arriba abajo, con un retardo por pieza: primero baja el
-   tronco, luego se abre la viga y al final caen las ramas. Es el gesto
-   que dice que el orden viene de un sitio.
+   Se dibujan solos, del trazo entero escondido al trazo entero a la
+   vista: primero la bajada del centro y luego las dos de los lados, que
+   es el gesto que dice que el orden viene de un sitio.
    ────────────────────────────────────────────────────────────────────── */
 
 .escenario-circuito,
@@ -587,83 +589,44 @@
   display: none;
 }
 
-.arbol-tronco,
-.arbol-rama {
-  width: 1px;
-  margin: 0 auto;
-  background: var(--hilo);
-  transform-origin: top center;
-}
-
-/*
-  El punto donde la rama toca su ficha. Es lo último que aparece, cuando
-  la línea ya ha bajado: sin él el árbol acaba en el aire y la ficha
-  parece estar debajo por casualidad.
-*/
-.arbol-rama {
-  position: relative;
-}
-
-.arbol-rama::after {
-  content: '';
+/* Absoluto y no en el flujo: un `<svg>` con `viewBox` y sin medidas trae
+   su propia proporción, y como elemento flexible la usaba para pedir
+   alto —el escenario crecía 37 px al pasar a esta cara y la página daba
+   el salto que el hueco existe justo para evitar. Sacado del flujo, el
+   hueco vuelve a medir lo que sobra y el lienzo se estira encima. */
+.escenario-red {
   position: absolute;
-  bottom: -2px;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  margin-left: -2.5px;
-  border-radius: 50%;
-  background: var(--acento);
-  opacity: 0;
-  transform: scale(0.4);
-  transition:
-    opacity 0.3s var(--ease-out-cubic),
-    transform 0.4s var(--ease-spring);
-}
-
-/*
-    El punto flota sobre el filo de la ficha en vez de tocarlo: cuelga
-    del final de la rama y entre los dos queda aire. Es posición
-    absoluta —no mueve el alto de nada— y sólo existe en esta cara.
-  */
-[data-cara='claro'] .arbol-rama::after {
-  bottom: -2px;
-  opacity: 1;
-  transform: scale(1);
-  transition-delay: 0.8s;
-}
-
-.arbol-viga {
+  inset: 0;
   display: block;
-  height: 1px;
-  /* La mitad de una columna a cada lado: (100% − 2 huecos) / 3 / 2. */
-  margin-inline: calc((100% - 2 * var(--hueco)) / 6);
-  background: var(--hilo);
-  transform-origin: center;
+  width: 100%;
+  height: 100%;
 }
 
-.arbol-ramas {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--hueco);
+.red-cable {
+  stroke: var(--acento);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  /* `pathLength="1"` en el marcado: el trazo mide 1 sea cual sea su
+     largo, así que las tres bajadas se dibujan en el mismo tiempo aunque
+     la del centro sea más corta que las de los lados. */
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.6s var(--ease-out-cubic);
 }
 
-.arbol-tronco,
-.arbol-viga,
-.arbol-rama {
-  opacity: 0;
-  transition:
-    transform 0.42s var(--ease-out-cubic),
-    opacity 0.42s var(--ease-out-cubic);
+[data-cara='claro'] .red-cable {
+  stroke-dashoffset: 0;
 }
 
-[data-cara='ciego'] .arbol-tronco,
-[data-cara='ciego'] .arbol-rama {
-  transform: scaleY(0);
+[data-cara='claro'] .red-cable--centro {
+  transition-delay: 0.12s;
 }
 
-[data-cara='ciego'] .arbol-viga {
-  transform: scaleX(0);
+[data-cara='claro'] .red-cable--izquierda,
+[data-cara='claro'] .red-cable--derecha {
+  transition-delay: 0.34s;
 }
 
 /* ── Las fichas ────────────────────────────────────────────────────────
@@ -828,48 +791,15 @@
   }
 
   .escenario-arbol {
-    display: flex;
+    display: block;
+    position: relative;
     flex: 1;
-    flex-direction: column;
     width: 100%;
-    padding-block: 16px;
-  }
-
-  .arbol-tronco,
-  .arbol-rama {
-    flex: 1;
-    height: auto;
-  }
-
-  .arbol-rama {
-    justify-self: center;
-  }
-
-  .arbol-ramas {
-    flex: 1;
   }
 
   .escenario-fichas {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     margin-top: 0;
-  }
-
-  [data-cara='claro'] .arbol-tronco {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.12s;
-  }
-
-  [data-cara='claro'] .arbol-viga {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.32s;
-  }
-
-  [data-cara='claro'] .arbol-rama {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.5s;
   }
 
   /* Dónde cae cada cosa del enredo. Los números están escogidos a ojo
@@ -1023,28 +953,17 @@
    la respuesta aparezca y que la respuesta se plante.
    ────────────────────────────────────────────────────────────────────── */
 
-[data-fase='brota'] .arbol-tronco,
-[data-fase='brota'] .arbol-viga,
-[data-fase='brota'] .arbol-rama {
-  transition:
-    transform 0.5s var(--ease-spring),
-    opacity 0.34s var(--ease-out-cubic);
+[data-fase='brota'] .red-cable {
+  transition: stroke-dashoffset 0.52s var(--ease-out-cubic);
 }
 
-[data-fase='brota'] .arbol-tronco {
-  transition-delay: 0.06s;
+[data-fase='brota'] .red-cable--centro {
+  transition-delay: 0.08s;
 }
 
-[data-fase='brota'] .arbol-viga {
-  transition-delay: 0.26s;
-}
-
-[data-fase='brota'] .arbol-rama {
-  transition-delay: 0.42s;
-}
-
-[data-fase='brota'] .arbol-rama::after {
-  transition-delay: 0.68s;
+[data-fase='brota'] .red-cable--izquierda,
+[data-fase='brota'] .red-cable--derecha {
+  transition-delay: 0.3s;
 }
 
 [data-fase='brota'] .ficha {
