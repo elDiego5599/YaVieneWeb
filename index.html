@@ -920,7 +920,10 @@
             <div class="pasos-rejilla">
             <div class="pasos-cuadro">
             <div class="pasos-pase" data-pasos-columnas>
-          <article class="paso-columna" data-paso-columna>
+          <!-- El primer paso viene ya encendido: las tomas se apilan y sólo
+               se ve la marcada, así que sin esto el visor saldría vacío
+               hasta que la sección entra en pantalla. -->
+          <article class="paso-columna is-activa" data-paso-columna>
             <div class="paso-marco">
               <div class="paso-toma" data-toma data-demo="1">
                 <div class="phone-shell phone-shell--paso">
@@ -1316,7 +1319,7 @@
               <p class="pasos-lado-rotulo">Pasos</p>
               <ol class="pasos-lista" data-pasos-lista>
                 <li>
-                  <button type="button" class="paso-boton" data-paso-boton="0">
+                  <button type="button" class="paso-boton is-activa" data-paso-boton="0">
                     <span class="columna-indice">Paso 1</span>
                     <span class="columna-titulo">Fija tu punto de espera</span>
                     <span class="paso-boton-texto"><span class="columna-texto">Toca el mapa y marca desde dónde esperas. También puedes usar tu GPS para que el mapa te siga.</span></span>

@@ -1019,82 +1019,68 @@
   overflow: clip;
 }
 
-/* ── La fila ──
-   Una carrusel, no una fila quieta: el teléfono del paso que se está
-   leyendo se queda siempre en el eje del visor y los otros dos se corren
-   a los lados. La fila entera se desplaza lo que mide una columna con su
-   hueco, que es justo lo que hace falta para centrar el de turno. Antes
-   el encendido era el primero, el segundo o el tercero según el paso y el
-   ojo tenía que ir a buscarlo cada vez.
+/* ── El aparato ──
+   Un solo teléfono en el eje del visor, y lo que cambia con los pasos es
+   lo que se ve en su pantalla. Antes había tres, uno por paso, y la fila
+   entera se corría para poner en el eje el de turno: eran tres aparatos
+   distintos contando tres momentos de la misma app, cuando el aparato es
+   siempre el mismo y lo único que avanza es la pantalla.
+
+   Las tres tomas siguen existiendo en el HTML —cada una con su bucle— y
+   aquí se apilan en la misma celda de la rejilla, de modo que sus marcos
+   caen exactamente uno encima de otro. Como el marco es idéntico en las
+   tres, lo único que se ve cambiar es el contenido de la pantalla.
 
    El ancho del aparato sale del alto de la ventana —es lo que limita, no
    el ancho— y se topa contra el ancho del visor para que en una ventana
    baja y ancha no se salga. */
-/*
-  `--corrida-pasos` es cuántas columnas le faltan al paso de turno para
-  quedar en el eje —1, 0 y −1 con tres columnas—, y aquí sólo se
-  multiplica por lo que mide una columna con su hueco.
-
-  El número lo pone `paso-foco.ts` de golpe, en el momento en que se
-  cambia de paso, y el viaje entero lo dibuja esta transición. Antes venía
-  con decimales y la fila iba pegada al dedo: bajando despacio se
-  arrastraba y bajando de un tirón cruzaba los tres teléfonos de una vez.
-  Quien decide cuánto dura el gesto tiene que ser el gesto, no la rueda.
-*/
 .pasos-pase {
-  --col-paso: min(clamp(180px, 26.5vh, 340px), 30vw);
-  --hueco-paso: clamp(6px, 1.2vw, 24px);
-  --corrida-pasos: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: var(--hueco-paso);
+  --col-paso: min(clamp(200px, 30vh, 330px), 34vw);
+  display: grid;
+  place-items: center;
   width: 100%;
   min-width: 0;
-  transform: translateX(
-    calc(var(--corrida-pasos) * (var(--col-paso) + var(--hueco-paso)))
-  );
-  transition: transform var(--paso-viaje) var(--paso-curva);
 }
 
 /*
-  Fuera de turno: encogido, apagado, desenfocado y sin capturar el ratón.
-  El desenfoque es lo que deja el paso encendido solo en la escena sin
-  tener que esconder los otros dos.
+  Las tres tomas, apiladas en la misma celda. Sólo se ve la de turno; el
+  relevo es un fundido, y el fundido está montado para que no se note
+  ningún bajón a mitad de camino.
 
-  Dos estados y nada en medio. Antes esto colgaba de un `--cerca` que el
-  scroll movía fotograma a fotograma, y los tres teléfonos estaban
-  siempre a medio crecer y a medio enfocar: ninguno acababa de ser el que
-  manda. Ahora el cambio lo lleva la clase y el camino lo pone la
-  transición, siempre el mismo y siempre igual de largo.
+  El truco está en el reparto: la que entra se aclara por encima —de 0 a
+  1, con la misma curva y el mismo tiempo que el resto de la sección— y
+  la que sale se queda quieta y opaca por debajo hasta que el viaje
+  termina; sólo entonces se apaga, ya tapada del todo. De ahí el `0s` con
+  retardo en la regla de reposo: no es que no haya transición, es que el
+  cambio ocurre entero al final. Cruzar las dos opacidades a la vez daría
+  un instante translúcido en medio —dos marcos al 50% dejan pasar el
+  fondo— y ese parpadeo es justo lo que delata que son dos aparatos.
 
-  El enfocado acaba en `filter: none` y no en `blur(0px)`: un desenfoque
-  de cero sigue costando una capa aparte y ablanda el texto de la
-  pantalla. Se puede transitar entre los dos porque `none` cuenta como la
-  lista de identidad de la otra —`blur(0) saturate(1)`—.
+  `visibility` va del mismo modo para que la que está en reposo no reciba
+  clics ni la lea un lector de pantalla.
 */
 .paso-columna {
-  flex: 0 0 var(--col-paso);
+  grid-area: 1 / 1;
   width: var(--col-paso);
   min-width: 0;
   display: grid;
   justify-items: center;
-  opacity: 0.45;
-  filter: blur(4px) saturate(0.68);
-  transform: scale(0.7);
-  transform-origin: center center;
+  opacity: 0;
+  visibility: hidden;
   pointer-events: none;
   transition:
-    opacity var(--paso-viaje) var(--paso-curva),
-    filter var(--paso-viaje) var(--paso-curva),
-    transform var(--paso-viaje) var(--paso-curva);
+    opacity 0s linear var(--paso-viaje),
+    visibility 0s linear var(--paso-viaje);
 }
 
 .paso-columna.is-activa {
+  z-index: 2;
   opacity: 1;
-  filter: none;
-  transform: scale(1);
+  visibility: visible;
   pointer-events: auto;
+  transition:
+    opacity var(--paso-viaje) var(--paso-curva),
+    visibility 0s linear 0s;
 }
 
 /* El teléfono ya no lleva caja propia: el cuadro es uno solo y dentro de
@@ -1112,15 +1098,13 @@
 }
 
 /* El halo azulado de la cinta no pega con el papel claro: aquí el
-   aparato se despega con un velo verde muy flojo, y sólo el que manda. */
+   aparato se despega con un velo verde muy flojo. Va siempre encendido y
+   no sólo en la toma de turno: como las tres se apilan en el mismo sitio,
+   el velo cae siempre donde mismo y durante el relevo no hay dos velos
+   que sumar, sino uno solo pasando de una toma a otra. */
 .pasos-pase .paso-toma::before {
   inset: -6% -24%;
   background: radial-gradient(closest-side, rgba(0, 168, 89, 0.16), transparent 70%);
-  opacity: 0;
-  transition: opacity var(--paso-viaje) var(--paso-curva);
-}
-
-.paso-columna.is-activa .paso-toma::before {
   opacity: 1;
 }
 
@@ -1298,7 +1282,7 @@
   }
 
   .pasos-pase {
-    --col-paso: min(clamp(168px, 22vh, 260px), 46vw);
+    --col-paso: min(clamp(190px, 26vh, 290px), 52vw);
   }
 
   .pasos-lado-lead {
@@ -1306,8 +1290,7 @@
   }
 }
 
-/* Pantalla estrecha: el que manda ocupa casi todo el ancho y de los otros
-   dos asoma un canto, que es lo que dice que la fila sigue. */
+/* Pantalla estrecha: el aparato se lleva casi todo el ancho del visor. */
 @media (max-width: 859px) {
   .pasos-cabecera .seccion-titulo {
     max-width: 14ch;
@@ -1348,11 +1331,8 @@
     font-size: 14px;
   }
 
-  /* Aquí sólo cabe uno de frente: de los otros dos asoma un canto. La
-     corrida que los centra es la misma de siempre, la de arriba. */
   .pasos-pase {
-    --col-paso: min(clamp(150px, 21.5vh, 240px), 58vw);
-    --hueco-paso: clamp(14px, 5vw, 28px);
+    --col-paso: min(clamp(160px, 24vh, 270px), 62vw);
   }
 
   .pasos-lado-lead {
@@ -1373,32 +1353,24 @@
   }
 }
 
-/* Sin animaciones no hay pista que recorrer: la escena se suelta, las
-   tres columnas se leen una debajo de otra y ninguna se apaga. */
+/* Sin animaciones no hay pista que recorrer ni relevo que hacer: si las
+   tomas siguieran apiladas, quien no quiere movimiento vería una sola y
+   se perdería los otros dos pasos. Se desapilan y se leen una debajo de
+   otra, con las tres a la vista. */
 @media (prefers-reduced-motion: reduce) {
   .pasos-pase {
-    flex-direction: column;
+    grid-auto-flow: row;
     gap: clamp(40px, 6vw, 72px);
-    transform: none;
-    transition: none;
   }
 
   .paso-columna,
   .paso-columna.is-activa {
+    grid-area: auto;
+    width: min(100%, 340px);
     opacity: 1;
-    filter: none;
-    transform: none;
+    visibility: visible;
     pointer-events: auto;
     transition: none;
-  }
-
-  .paso-columna {
-    width: min(100%, 340px);
-    flex: 0 0 auto;
-  }
-
-  .pasos-pase .paso-toma::before {
-    opacity: 1;
   }
 
   .paso-boton,

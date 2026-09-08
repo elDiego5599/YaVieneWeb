@@ -174,20 +174,44 @@ const arrancar = (): void => {
       boton.addEventListener('click', () => irAPaso(i));
     });
 
+    /*
+      Lo que dura el relevo de una toma a la siguiente, en milisegundos.
+      Es el mismo `--paso-viaje` de pasos.css: allí lo gasta el fundido y
+      aquí hay que esperarlo, porque la toma que sale sigue a la vista
+      todo ese rato. Un pelo de más para no apagarla justo en el límite.
+    */
+    const RELEVO = 880;
+    let apagado = 0;
+
     if (pista && columnas.length > 0) {
       new PasoFoco({
         pista,
-        pase: columnasPasos,
         columnas,
         marcas,
         alCambiar: (indice) => {
-          demos.forEach((demo, i) => demo.activar(i === indice));
+          clearTimeout(apagado);
 
           // Con la sección fuera de vista sólo se paran los bucles. La
           // lista se queda con su paso encendido: apagarla cerraría de
           // golpe la explicación abierta, y eso se ve al volver.
-          if (indice < 0) return;
+          if (indice < 0) {
+            demos.forEach((demo) => demo.activar(false));
+            return;
+          }
+
           botones.forEach((boton, i) => boton.classList.toggle('is-activa', i === indice));
+
+          /*
+            El bucle del paso de turno arranca ya, con su toma todavía
+            aclarándose; los otros dos siguen corriendo hasta que el
+            fundido los ha tapado. Pararlos en el acto devuelve su
+            pantalla a la foto de partida, y ese salto se vería por
+            debajo del que entra.
+          */
+          demos[indice]?.activar(true);
+          apagado = window.setTimeout(() => {
+            demos.forEach((demo, i) => demo.activar(i === indice));
+          }, RELEVO);
         },
       });
     }

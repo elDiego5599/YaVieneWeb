@@ -35,8 +35,7 @@ function topar(v: number, min: number, max: number): number {
 export interface PasoFocoPiezas {
   /** El bloque alto que se recorre mientras la escena está pegada. */
   pista: HTMLElement;
-  /** La fila de los tres pasos, la que se desplaza. */
-  pase: HTMLElement;
+  /** Las tres tomas apiladas en el visor, una por paso. */
   columnas: HTMLElement[];
   marcas: HTMLElement[];
   /** El paso que pasa a mandar, o `-1` con la sección fuera de vista. */
@@ -93,25 +92,18 @@ export class PasoFoco {
   }
 
   /**
-   * Enciende el paso que manda. La fila se corre lo que le falta a su
-   * columna para quedar en el eje —`--corrida-pasos`, en columnas, que el
-   * CSS traduce a píxeles— y las clases hacen el resto.
+   * Enciende el paso que manda: la toma de turno se marca y el CSS hace
+   * el relevo por encima de la anterior.
    *
    * Fuera de vista sólo se avisa hacia fuera, para que se paren los
-   * bucles; ni la corrida ni las clases se tocan, de modo que al volver
-   * la escena está ya donde se dejó.
+   * bucles; las clases no se tocan, de modo que al volver la escena está
+   * ya donde se dejó.
    */
   private aplicar(indice: number): void {
     if (indice === this.actual) return;
     this.actual = indice;
 
     if (indice >= 0) {
-      const centro = (this.piezas.columnas.length - 1) / 2;
-      this.piezas.pase.style.setProperty(
-        '--corrida-pasos',
-        String(centro - indice)
-      );
-
       this.piezas.columnas.forEach((columna, i) => {
         columna.classList.toggle('is-activa', i === indice);
       });
