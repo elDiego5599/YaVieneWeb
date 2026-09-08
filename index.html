@@ -865,8 +865,10 @@
   </section>
 
     <!-- ============ MARCAS ============
-      Los mismos siete logos de empresas.html, con las mismas medidas.
-      Quietos sobre blanco, en una sola fila que se envuelve en móvil.
+      Los mismos siete logos de empresas.html, con las medidas grandes
+      de la portada. Quietos y centrados sobre blanco, en una sola fila
+      que se envuelve en móvil. En blanco y negro hasta que el ratón
+      pasa encima: ahí recuperan su color.
     -->
     <section class="marcas-claras" aria-label="Empresas que ya conectan su flota">
       <div class="marcas-claras-fila">
@@ -1424,11 +1426,34 @@
             <span class="ruido">¿ya pasó el bus?</span>
             <span class="ruido">llevo 30 minutos esperando</span>
             <span class="ruido">¿me voy caminando?</span>
-            <span class="ruido">el tercero iba lleno</span>
+            <span class="ruido">iba llegando y pasó</span>
             <span class="ruido">me iré en taxi</span>
           </div>
 
           <p class="escenario-estado">
+            <!--
+              El núcleo. Mientras dura la ceremonia la píldora se encoge
+              hasta este círculo y todo lo suelto del escenario se va
+              hacia él; en reposo no se ve. Es decorativo: lo que dice
+              está en las dos caras de al lado.
+            -->
+            <span class="estado-nucleo" aria-hidden="true">
+              <svg viewBox="0 0 512 512" aria-hidden="true" focusable="false">
+                <circle cx="256" cy="256" r="256" fill="#00A859" />
+                <path d="M 120 130 A 200 200 0 0 1 392 130" fill="none" stroke="#FFFFFF" stroke-width="32"
+                stroke-linecap="round" opacity="0.5" />
+                <path d="M 176 190 A 130 130 0 0 1 336 190" fill="none" stroke="#FFFFFF" stroke-width="32"
+                stroke-linecap="round" />
+                <rect x="136" y="240" width="240" height="180" rx="36" fill="#14274E" />
+                <rect x="166" y="270" width="180" height="72" rx="16" fill="#FFFFFF" />
+                <rect x="290" y="270" width="30" height="72" fill="#14274E" opacity="0.1" />
+                <circle cx="180" cy="375" r="16" fill="#FFC107" />
+                <circle cx="332" cy="375" r="16" fill="#FFC107" />
+                <rect x="160" y="410" width="32" height="24" rx="8" fill="#0A1428" />
+                <rect x="320" y="410" width="32" height="24" rx="8" fill="#0A1428" />
+              </svg>
+            </span>
+
             <span class="dos-caras">
               <span class="cara cara--ciego">
                 <svg class="estado-icono" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
@@ -1459,6 +1484,29 @@
           </p>
 
           <!--
+            El circuito («A ciegas»): líneas ortogonales con esquinas redondeadas
+            que conectan la alerta roja («Nadie sabe dónde va el bus») con las
+            tres fichas de dolor, estilo diagrama de incidentes / circuitos.
+          -->
+          <svg class="escenario-circuito" viewBox="0 0 1160 548" fill="none" aria-hidden="true" preserveAspectRatio="none">
+            <!-- Cable 1: hacia «Tres minutos o treinta» -->
+            <path class="circuito-cable circuito-cable--1" d="M 480 51 H 226 Q 210 51 210 67 V 265" />
+            <!-- Cable 2: hacia «Bajo el sol o la lluvia» con quiebre de esquiva -->
+            <path class="circuito-cable circuito-cable--2" d="M 535 60 V 124 Q 535 140 551 140 H 594 Q 610 140 610 156 V 215" />
+            <!-- Cable 3: hacia «Ese tiempo suma» entrando por la derecha -->
+            <path class="circuito-cable circuito-cable--3" d="M 680 51 H 749 Q 765 51 765 67 V 124 Q 765 140 781 140 H 1044 Q 1060 140 1060 156 V 320" />
+
+            <!-- Interconexión 1: Puente directo entre Ficha 1 y Ficha 2 -->
+            <path class="circuito-cable circuito-cable--inter-1" d="M 330 290 H 380 Q 395 290 395 274 V 246 Q 395 230 411 230 H 455" />
+
+            <!-- Interconexión 2: Enlace por debajo entre Ficha 1 y Ficha 3 -->
+            <path class="circuito-cable circuito-cable--inter-bajo" d="M 250 460 V 498 Q 250 514 266 514 H 884 Q 900 514 900 498 V 460" />
+
+            <!-- Interconexión 3: Puente lateral entre Ficha 2 y Ficha 3 -->
+            <path class="circuito-cable circuito-cable--inter-3" d="M 760 260 H 824 Q 840 260 840 276 V 330 Q 840 346 856 346 H 890" />
+          </svg>
+
+          <!--
             El árbol: un tronco que baja del estado, una viga que va del
             centro de la primera ficha al de la última y tres ramas que
             caen sobre cada una. Líneas de un píxel y no un SVG, porque
@@ -1485,7 +1533,7 @@
               </span>
               <div class="dos-caras">
                 <div class="cara cara--ciego">
-                  <h3 class="columna-titulo">Tres minutos o treinta</h3>
+                  <h3 class="columna-titulo">Esperar una eternidad</h3>
                   <p class="columna-texto">No hay tablero, ni horario que se cumpla, ni nadie a quien preguntar.
                     Se espera adivinando, y se decide si seguir esperando también adivinando.</p>
                 </div>
@@ -1538,10 +1586,6 @@
         </div>
       </div>
     </section>
-
-
-
-
 
     <!-- ============ LAS SEIS RUTAS, EN VIVO ============
       Esta sección se toca, y es también la que trae los datos: las seis

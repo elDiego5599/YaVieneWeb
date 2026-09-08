@@ -5,14 +5,18 @@
    cargan las dos páginas desde el paquete común.
    ────────────────────────────────────────────────────────────────── */
 
-/* La fila quieta de la portada: los siete logos sobre blanco, en una
-   sola fila que se envuelve en móvil. Reusa las medidas de abajo, así
-   que son los mismos tamaños que en empresas. */
+/* La banda de la portada: rótulo fijo a la izquierda y cinta continua
+   a la derecha, con las medidas grandes de aquí (más que en empresas).
+   En móvil se apila: el rótulo arriba y la cinta a todo lo ancho. */
 .marcas-claras {
   background: var(--papel);
   padding: clamp(36px, 4vw, 60px) var(--calle) 48px;
 }
 
+/* La fila quieta de la portada: los siete logos sobre blanco, en una
+   sola fila que se envuelve en móvil. Reusa las medidas de abajo, así
+   que son los mismos tamaños que en empresas. En blanco y negro hasta
+   que el ratón pasa encima: ahí cada uno recupera su color. */
 .marcas-claras-fila {
   display: flex;
   flex-wrap: wrap;
@@ -21,6 +25,17 @@
   gap: clamp(28px, 4vw, 64px);
   max-width: 1280px;
   margin: 0 auto;
+}
+
+.marcas-claras-fila .empresa-marcas-logo {
+  /* Oscuro pero sin empastar: el brillo a la mitad baja todo sin
+     aplastar los trazos finos como hacía el negro puro. */
+  filter: grayscale(1) brightness(0.5);
+  transition: filter 0.35s var(--ease-out-cubic);
+}
+
+.marcas-claras-fila .empresa-marcas-logo:hover {
+  filter: none;
 }
 
 /* En la portada los logos van más grandes que en empresas. */

@@ -37,6 +37,7 @@
 }
 
 @media (min-width: 900px) {
+
   /* En la cabecera partida ocupa la fila entera, la que antes era del
      rótulo solo. */
   .seccion-cabecera--partida .cabecera-fila {
@@ -135,7 +136,7 @@
   align-items: start;
 }
 
-.dos-caras > .cara {
+.dos-caras>.cara {
   grid-area: 1 / 1;
 }
 
@@ -176,12 +177,29 @@
   esto las nueve piezas cambiarían a la vez y el relevo sería un
   parpadeo.
 */
-.escenario-estado { --turno: 0ms; }
-#problema .seccion-titulo { --turno: 80ms; }
-#problema .seccion-lead { --turno: 140ms; }
-.ficha:nth-child(1) { --turno: 200ms; }
-.ficha:nth-child(2) { --turno: 260ms; }
-.ficha:nth-child(3) { --turno: 320ms; }
+.escenario-estado {
+  --turno: 0ms;
+}
+
+#problema .seccion-titulo {
+  --turno: 80ms;
+}
+
+#problema .seccion-lead {
+  --turno: 140ms;
+}
+
+.ficha:nth-child(1) {
+  --turno: 200ms;
+}
+
+.ficha:nth-child(2) {
+  --turno: 260ms;
+}
+
+.ficha:nth-child(3) {
+  --turno: 320ms;
+}
 
 /* ── El escenario ──────────────────────────────────────────────────────
 
@@ -198,6 +216,7 @@
 .escenario {
   --hueco: clamp(16px, 2vw, 28px);
   --hilo: #9CCDBA;
+  --hilo-alerta: var(--coral-accessible);
   --chispazo: #C0D1C6;
   position: relative;
   display: flex;
@@ -221,11 +240,17 @@
   display: none;
 }
 
-.chispas,
-.ruidos {
+.chispas {
   position: absolute;
   inset: 0;
   z-index: 1;
+  pointer-events: none;
+}
+
+.ruidos {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
   pointer-events: none;
 }
 
@@ -325,7 +350,12 @@
   align-items: center;
   justify-content: center;
   margin: 0;
-  padding: 9px 17px;
+  /* El ancho lo mide `problema.ts` y lo deja en `--ancho-estado`.
+     Con `min-width: max-content` garantizamos que el texto nunca quede recortado
+     ni comprimido en reposo. */
+  min-width: max-content;
+  width: var(--ancho-estado, max-content);
+  padding: 9px 24px;
   border-radius: 999px;
   background: var(--coral-accessible);
   box-shadow:
@@ -339,6 +369,8 @@
     background-color 0.65s var(--ease-out-cubic),
     box-shadow 0.65s var(--ease-out-cubic),
     transform 0.6s var(--ease-fluida),
+    width 0.52s var(--ease-fluida),
+    padding 0.52s var(--ease-fluida),
     /* El viaje entre caras: en una el aire va debajo de las fichas y
        en la otra encima del estado, y con el margen animado la píldora
        planea esos 144 en vez de teletransportarse como las tarjetas. */
@@ -375,6 +407,158 @@
   height: 19px;
 }
 
+/* ── El núcleo ─────────────────────────────────────────────────────────
+
+   La ceremonia de `problema.ts`. Pasar de una cara a la otra no es un
+   cambio de estado, es una escena: la alerta roja se encoge hasta ser el
+   logo, se lleva por delante todo lo que hay suelto en el escenario,
+   late, y se vuelve a abrir en verde diciendo «Ya Viene». De ahí baja el
+   árbol. Lo que se cuenta es que el desorden no se desvanece solo: se lo
+   lleva alguien, y ese alguien tiene nombre.
+
+   El reparto: los viajes de cada pieza hasta el centro los calcula el
+   TypeScript, porque dependen de dónde esté cada una; el encogido, el
+   latido y los anillos son de aquí y cuelgan de `data-fase`.
+   ────────────────────────────────────────────────────────────────────── */
+
+.estado-nucleo {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: scale(0.35);
+  pointer-events: none;
+  transition:
+    opacity 0.26s var(--ease-out-cubic),
+    transform 0.44s var(--ease-spring);
+}
+
+.estado-nucleo svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* El remolino. Un anillo de trazos girando alrededor del logo mientras
+   aspira: es lo que dice que lo que se lleva las voces es una corriente
+   y no un interruptor. Se para en cuanto empieza a cargar. */
+.estado-nucleo::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border: 1.5px dashed rgba(4, 116, 84, 0.5);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.24s var(--ease-out-cubic);
+}
+
+[data-fase='aspira'] .estado-nucleo::before {
+  opacity: 1;
+  animation: nucleo-remolino 1s linear infinite;
+}
+
+@keyframes nucleo-remolino {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* El texto se va antes de que la píldora empiece a cerrarse, para que no
+   se lea nunca a medio recortar. */
+.escenario-estado .dos-caras {
+  transition: opacity 0.2s var(--ease-out-cubic);
+}
+
+[data-fase='aspira'] .escenario-estado,
+[data-fase='carga'] .escenario-estado {
+  min-width: 0;
+  width: 46px;
+  padding-inline: 0;
+  /* Y de paso se endereza: la alerta estaba torcida porque nadie la
+     sostenía; en cuanto hay quien responda, deja de estarlo. */
+  transform: none;
+}
+
+[data-fase='aspira'] .escenario-estado .dos-caras,
+[data-fase='carga'] .escenario-estado .dos-caras {
+  opacity: 0;
+}
+
+/* Mientras dura el viaje, el logo va por encima de todo lo que se está
+   llevando: las piezas —incluidas las fichas, que comparten capa con
+   él— entran por detrás y ahí se acaban. Pasando por delante se las
+   vería encogerse encima del logo, que es justo lo contrario de que se
+   las trague. */
+[data-fase='aspira'] .escenario-estado,
+[data-fase='carga'] .escenario-estado {
+  z-index: 12;
+}
+
+[data-fase='aspira'] .estado-nucleo,
+[data-fase='carga'] .estado-nucleo {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* La carga: el color cruza de la alerta a la marca y el logo da un
+   latido. Corto a propósito —un latido largo se vuelve espera—. */
+[data-fase='carga'] .escenario-estado {
+  background: var(--acento);
+  box-shadow:
+    0 0 0 6px rgba(4, 116, 84, 0.09),
+    0 10px 24px rgba(4, 116, 84, 0.16);
+}
+
+[data-fase='carga'] .estado-nucleo {
+  animation: nucleo-late 0.52s var(--ease-spring);
+}
+
+@keyframes nucleo-late {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  38% {
+    transform: scale(1.16);
+  }
+}
+
+/* Los dos anillos que salen del núcleo al cargarse. Van en los
+   pseudoelementos de la píldora porque tienen que salir de su borde
+   exacto, sea cual sea el tamaño al que haya quedado. */
+.escenario-estado::before,
+.escenario-estado::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--acento);
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-fase='carga'] .escenario-estado::before {
+  animation: nucleo-anillo 0.62s var(--ease-out-cubic);
+}
+
+[data-fase='carga'] .escenario-estado::after {
+  animation: nucleo-anillo 0.62s var(--ease-out-cubic) 0.18s;
+}
+
+@keyframes nucleo-anillo {
+  from {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(2.9);
+  }
+}
+
 [data-cara='claro'] .escenario-estado {
   background: var(--acento);
   box-shadow:
@@ -398,6 +582,7 @@
    que dice que el orden viene de un sitio.
    ────────────────────────────────────────────────────────────────────── */
 
+.escenario-circuito,
 .escenario-arbol {
   display: none;
 }
@@ -436,17 +621,17 @@
     transform 0.4s var(--ease-spring);
 }
 
-  /*
+/*
     El punto flota sobre el filo de la ficha en vez de tocarlo: cuelga
     del final de la rama y entre los dos queda aire. Es posición
     absoluta —no mueve el alto de nada— y sólo existe en esta cara.
   */
-  [data-cara='claro'] .arbol-rama::after {
-    bottom: -2px;
-    opacity: 1;
-    transform: scale(1);
-    transition-delay: 0.8s;
-  }
+[data-cara='claro'] .arbol-rama::after {
+  bottom: -2px;
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 0.8s;
+}
 
 .arbol-viga {
   display: block;
@@ -503,7 +688,9 @@
   /* Pareja del viaje del estado: las fichas suben lo mismo que la
      píldora baja, con el mismo tiempo y la misma curva, así que el
      alto total no se mueve en ningún cuadro del relevo. */
-  transition: margin-top 0.7s var(--ease-fluida);
+  transition:
+    margin-top 0.7s var(--ease-fluida),
+    transform 0.62s var(--ease-fluida);
 }
 
 .ficha {
@@ -594,6 +781,52 @@
     margin: -32px;
   }
 
+  .escenario-circuito {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 1;
+    transition: opacity 0.45s var(--ease-out-cubic);
+  }
+
+  .circuito-cable {
+    stroke: var(--hilo-alerta);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  [data-cara='claro'] .escenario-circuito {
+    opacity: 0;
+  }
+
+  /* El enredo entero cede al remolino: gira un grado y medio y se cierra
+     un 3% mientras se recoge. Es poco a propósito —el viaje de verdad lo
+     hacen los cables con su trazo— pero es lo que hace que el fondo
+     acompañe en vez de quedarse quieto viendo cómo se lo llevan. */
+  .escenario-circuito {
+    transform-origin: center;
+    transition:
+      opacity 0.34s var(--ease-out-cubic),
+      transform 0.7s var(--ease-out-cubic);
+  }
+
+  /* El circuito es lo más fino que hay en el escenario, así que es lo
+     primero que se va: se apaga mientras se cierra sobre sí mismo, y
+     para cuando salen las voces ya no queda ni una línea. Sin esto el
+     enredo se quedaba entero de fondo mientras se llevaban todo lo
+     demás, que es justo lo contrario de vaciar el escenario. */
+  [data-fase='aspira'] .escenario-circuito,
+  [data-fase='carga'] .escenario-circuito {
+    opacity: 0;
+    transform: rotate(1.6deg) scale(0.97);
+  }
+
   .escenario-arbol {
     display: flex;
     flex: 1;
@@ -642,21 +875,77 @@
   /* Dónde cae cada cosa del enredo. Los números están escogidos a ojo
      sobre la caja de 1160×468: lo que importa es que nada quede alineado
      con nada. */
-  .chispa:nth-child(1) { left: 16%; top: 22%; transition-delay: 0ms; }
-  .chispa:nth-child(2) { left: 32%; top: 6%; transition-delay: 90ms; }
-  .chispa:nth-child(3) { left: 79%; top: 19%; transition-delay: 50ms; }
-  .chispa:nth-child(4) { left: 89%; top: 9%; transform: rotate(12deg); transition-delay: 130ms; }
-  .chispa:nth-child(5) { left: 27%; top: 31%; transition-delay: 30ms; }
+  .chispa:nth-child(1) {
+    left: 16%;
+    top: 22%;
+    transition-delay: 0ms;
+  }
 
-  .ruido:nth-child(1) { left: 0%; top: 9%; --giro: -3.2deg; transition-delay: 20ms; }
-  .ruido:nth-child(2) { left: 69%; top: 3%; --giro: 2.6deg; transition-delay: 100ms; }
-  .ruido:nth-child(3) { left: 2%; top: 25%; --giro: -1.6deg; transition-delay: 0ms; }
-  .ruido:nth-child(4) { left: 52%; top: 16%; --giro: 3.4deg; transition-delay: 140ms; }
-  .ruido:nth-child(5) { left: 79%; top: 35%; --giro: -2.2deg; transition-delay: 70ms; }
+  .chispa:nth-child(2) {
+    left: 32%;
+    top: 6%;
+    transition-delay: 90ms;
+  }
+
+  .chispa:nth-child(3) {
+    left: 79%;
+    top: 19%;
+    transition-delay: 50ms;
+  }
+
+  .chispa:nth-child(4) {
+    left: 89%;
+    top: 9%;
+    transform: rotate(12deg);
+    transition-delay: 130ms;
+  }
+
+  .chispa:nth-child(5) {
+    left: 27%;
+    top: 31%;
+    transition-delay: 30ms;
+  }
+
+  .ruido:nth-child(1) {
+    left: 0%;
+    top: 9%;
+    --giro: -3.2deg;
+    transition-delay: 20ms;
+  }
+
+  .ruido:nth-child(2) {
+    left: 69%;
+    top: 3%;
+    --giro: 2.6deg;
+    transition-delay: 100ms;
+  }
+
+  .ruido:nth-child(3) {
+    left: 2%;
+    top: 25%;
+    --giro: -1.6deg;
+    transition-delay: 0ms;
+  }
+
+  .ruido:nth-child(4) {
+    left: 52%;
+    top: 16%;
+    --giro: 3.4deg;
+    transition-delay: 140ms;
+  }
+
+  .ruido:nth-child(5) {
+    left: 79%;
+    top: 35%;
+    --giro: -2.2deg;
+    transition-delay: 70ms;
+  }
 
   /* La inclinación vive en la variable para que el relevo no la
      enderece a la fuerza: cada voz se va torcida como estaba. */
-  [data-cara='ciego'] .ruido { transform: rotate(var(--giro, 0deg)); }
+  [data-cara='ciego'] .ruido {
+    transform: rotate(var(--giro, 0deg));
+  }
 
   /* Al ordenarse, el ruido no se desvanece en el sitio: se encoge y se
      va hacia el estado, que es de donde sale la respuesta. */
@@ -672,6 +961,14 @@
 
   [data-cara='ciego'] .escenario-estado {
     transform: rotate(-0.8deg);
+  }
+
+  /* Mientras se las lleva, las voces y los chispazos pasan por encima de
+     las fichas. Por debajo el viaje se pierde detrás de las tarjetas y
+     lo que se ve es que desaparecen, que es justo lo contrario. */
+  [data-fase='aspira'] .chispas,
+  [data-fase='aspira'] .ruidos {
+    z-index: 11;
   }
 
   /* Los 48 de la otra cara, aquí arriba: el estado baja y el árbol
@@ -717,12 +1014,54 @@
   }
 }
 
+/* ── El despliegue ─────────────────────────────────────────────────────
+
+   El último tramo de la ceremonia. Aquí ya no se está deshaciendo nada:
+   se está montando, y tiene que notarse. El árbol baja más rápido que en
+   un cambio normal y con curva de muelle, y las fichas caen en su sitio
+   con un punto de rebote en vez de posarse. Es la diferencia entre que
+   la respuesta aparezca y que la respuesta se plante.
+   ────────────────────────────────────────────────────────────────────── */
+
+[data-fase='brota'] .arbol-tronco,
+[data-fase='brota'] .arbol-viga,
+[data-fase='brota'] .arbol-rama {
+  transition:
+    transform 0.5s var(--ease-spring),
+    opacity 0.34s var(--ease-out-cubic);
+}
+
+[data-fase='brota'] .arbol-tronco {
+  transition-delay: 0.06s;
+}
+
+[data-fase='brota'] .arbol-viga {
+  transition-delay: 0.26s;
+}
+
+[data-fase='brota'] .arbol-rama {
+  transition-delay: 0.42s;
+}
+
+[data-fase='brota'] .arbol-rama::after {
+  transition-delay: 0.68s;
+}
+
+[data-fase='brota'] .ficha {
+  transition:
+    transform 0.72s var(--ease-spring),
+    border-color 0.5s var(--ease-out-cubic),
+    box-shadow 0.6s var(--ease-out-cubic);
+}
+
 /* El suelo de `animations.css` deja las transiciones en 0.01ms, pero no
    toca los retardos: sin esto el árbol seguiría apareciendo medio
    segundo tarde para quien pidió que nada se mueva. */
 @media (prefers-reduced-motion: reduce) {
+
   .escenario *,
   .interruptor * {
     transition-delay: 0s !important;
+    animation: none !important;
   }
 }
