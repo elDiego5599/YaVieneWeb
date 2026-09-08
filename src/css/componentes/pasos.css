@@ -972,7 +972,23 @@
 /* ── La rejilla ──
    Visor ancho a la izquierda, pasos a la derecha, como el bloque de
    producto de Vercel: la imagen manda y el texto la acompaña. */
+/*
+  El viaje. Todo lo que cambia al pasar de un paso al siguiente —la
+  corrida de la fila, el tamaño y el enfoque de cada teléfono, la luz que
+  baja por la lista— dura lo mismo y usa la misma curva, y los dos
+  números viven aquí porque esto es lo que tienen en común el visor y la
+  lista de al lado.
+
+  La curva es simétrica a propósito, y no una de las de `variables.css`,
+  que salen disparadas y frenan al final. Eso está bien para algo que
+  aparece —el ojo quiere verlo ya— y está mal para algo que viaja: un
+  teléfono que arranca de golpe y llega frenando se lee como un tirón por
+  mucho que la llegada sea suave. Aquí sale despacio, coge sitio en medio
+  y llega despacio, que es como se mueve algo que pesa.
+*/
 .pasos-rejilla {
+  --paso-viaje: 0.82s;
+  --paso-curva: cubic-bezier(0.62, 0.02, 0.28, 1);
   display: grid;
   /* El visor se lleva ocho de cada doce. Con la proporción de antes los
      teléfonos de los lados salían cortados por el filo del cuadro; el
@@ -1015,17 +1031,15 @@
    el ancho— y se topa contra el ancho del visor para que en una ventana
    baja y ancha no se salga. */
 /*
-  La corrida no va por pasos enteros sino por el número con decimales que
-  reparte `paso-foco.ts`: `--corrida-pasos` es cuántas columnas le faltan
-  al paso de turno para quedar en el eje, y aquí sólo se multiplica por lo
-  que mide una columna con su hueco. Con tres columnas eso vale 1, 0 y −1,
-  que es exactamente donde estaba antes cada paso; la diferencia es que
-  ahora pasa por todo lo que hay en medio.
+  `--corrida-pasos` es cuántas columnas le faltan al paso de turno para
+  quedar en el eje —1, 0 y −1 con tres columnas—, y aquí sólo se
+  multiplica por lo que mide una columna con su hueco.
 
-  La transición es corta y lineal a propósito: la curva bonita ya la trae
-  el número —el retén y el suavizado están en el JS—, y una transición
-  larga por encima sólo haría que la fila llegara tarde al dedo. Estos
-  0,14 s no dibujan el gesto, sólo redondean lo escalonado del scroll.
+  El número lo pone `paso-foco.ts` de golpe, en el momento en que se
+  cambia de paso, y el viaje entero lo dibuja esta transición. Antes venía
+  con decimales y la fila iba pegada al dedo: bajando despacio se
+  arrastraba y bajando de un tirón cruzaba los tres teléfonos de una vez.
+  Quien decide cuánto dura el gesto tiene que ser el gesto, no la rueda.
 */
 .pasos-pase {
   --col-paso: min(clamp(180px, 26.5vh, 340px), 30vw);
@@ -1040,7 +1054,7 @@
   transform: translateX(
     calc(var(--corrida-pasos) * (var(--col-paso) + var(--hueco-paso)))
   );
-  transition: transform 0.14s linear;
+  transition: transform var(--paso-viaje) var(--paso-curva);
 }
 
 /*
@@ -1048,36 +1062,38 @@
   El desenfoque es lo que deja el paso encendido solo en la escena sin
   tener que esconder los otros dos.
 
-  Todo eso cuelga de `--cerca` —0 el que está más lejos de mandar, 1 el
-  que manda—, así que el teléfono no aparece de golpe al cruzar un tercio
-  del scroll: crece, se aclara y se enfoca durante todo el viaje. El velo
-  llega ya redondeado a medio píxel desde el JS, para no rehacer el mapa
-  del teléfono en cada cuadro.
+  Dos estados y nada en medio. Antes esto colgaba de un `--cerca` que el
+  scroll movía fotograma a fotograma, y los tres teléfonos estaban
+  siempre a medio crecer y a medio enfocar: ninguno acababa de ser el que
+  manda. Ahora el cambio lo lleva la clase y el camino lo pone la
+  transición, siempre el mismo y siempre igual de largo.
+
+  El enfocado acaba en `filter: none` y no en `blur(0px)`: un desenfoque
+  de cero sigue costando una capa aparte y ablanda el texto de la
+  pantalla. Se puede transitar entre los dos porque `none` cuenta como la
+  lista de identidad de la otra —`blur(0) saturate(1)`—.
 */
 .paso-columna {
-  --cerca: 0;
-  --velo: 4px;
   flex: 0 0 var(--col-paso);
   width: var(--col-paso);
   min-width: 0;
   display: grid;
   justify-items: center;
-  opacity: calc(0.45 + 0.55 * var(--cerca));
-  filter: blur(var(--velo)) saturate(calc(0.68 + 0.32 * var(--cerca)));
-  transform: scale(calc(0.7 + 0.3 * var(--cerca)));
+  opacity: 0.45;
+  filter: blur(4px) saturate(0.68);
+  transform: scale(0.7);
   transform-origin: center center;
   pointer-events: none;
-  transition: opacity 0.14s linear, filter 0.14s linear,
-    transform 0.14s linear;
-}
-
-/* Al que ya está enfocado se le quita el filtro entero: un `blur(0px)`
-   sigue costando una capa aparte y ablanda el texto de la pantalla. */
-.paso-columna.is-nitida {
-  filter: none;
+  transition:
+    opacity var(--paso-viaje) var(--paso-curva),
+    filter var(--paso-viaje) var(--paso-curva),
+    transform var(--paso-viaje) var(--paso-curva);
 }
 
 .paso-columna.is-activa {
+  opacity: 1;
+  filter: none;
+  transform: scale(1);
   pointer-events: auto;
 }
 
@@ -1100,8 +1116,12 @@
 .pasos-pase .paso-toma::before {
   inset: -6% -24%;
   background: radial-gradient(closest-side, rgba(0, 168, 89, 0.16), transparent 70%);
-  opacity: var(--cerca, 0);
-  transition: opacity 0.14s linear;
+  opacity: 0;
+  transition: opacity var(--paso-viaje) var(--paso-curva);
+}
+
+.paso-columna.is-activa .paso-toma::before {
+  opacity: 1;
 }
 
 /* ── El lado: entrada, rótulo y pasos clicables ──
@@ -1142,29 +1162,8 @@
   position: relative;
 }
 
-/*
-  La línea que dice por dónde vas: un solo trazo verde sobre el riel
-  gris de los botones, que baja de 0 a 1 con el recorrido de la pista
-  (lo pone `main.ts` desde el avance crudo de `PasoFoco`). Va en `scale`
-  y no en `height` para que lo mueva el compositor sin rehacer el layout
-  en cada cuadro; el pasito de transición redondea lo escalonado del
-  scroll sin que se note que va por detrás.
-*/
-.pasos-lista::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 2px;
-  background: var(--green);
-  transform: scaleY(var(--avance-lista, 0));
-  transform-origin: 50% 0;
-  transition: transform 0.12s linear;
-  pointer-events: none;
-}
-
 .paso-boton {
+  position: relative;
   display: grid;
   gap: 5px;
   width: 100%;
@@ -1177,8 +1176,37 @@
   text-align: left;
   cursor: pointer;
   opacity: 0.5;
-  transition: opacity 0.35s var(--ease-out-cubic),
-    border-color 0.35s var(--ease-out-cubic);
+  transition: opacity var(--paso-viaje) var(--paso-curva);
+}
+
+/*
+  La luz que baja por la lista: sólo se ilumina el paso en el que se
+  está. Es un trazo por paso y no uno solo que crece con el scroll —el de
+  turno se llena de arriba abajo y el que deja de mandar se vacía por
+  arriba, con lo que lo que se ve es la luz pasando de un paso al
+  siguiente—. Antes la línea era una sola y la estiraba el recorrido
+  crudo: iba tan rápido como la rueda y nunca coincidía con el paso que
+  estaba encendido, porque el paso cambia por tercios y ella no.
+
+  Va encima del riel gris, en el sitio exacto del borde izquierdo, y se
+  mueve en `scaleY`: no toca el layout ni obliga a medir nada.
+*/
+.paso-boton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -2px;
+  width: 2px;
+  background: var(--green);
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+  transition: transform var(--paso-viaje) var(--paso-curva);
+  pointer-events: none;
+}
+
+.paso-boton.is-activa::before {
+  transform: scaleY(1);
 }
 
 .paso-boton:hover {
@@ -1191,7 +1219,6 @@
 }
 
 .paso-boton.is-activa {
-  border-left-color: var(--green);
   opacity: 1;
 }
 
@@ -1210,7 +1237,8 @@
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  transition: grid-template-rows 0.52s var(--ease-fluida),
+  transition:
+    grid-template-rows var(--paso-viaje) var(--paso-curva),
     opacity 0.26s var(--ease-out-cubic);
 }
 
@@ -1223,8 +1251,9 @@
 .paso-boton.is-activa .paso-boton-texto {
   grid-template-rows: 1fr;
   opacity: 1;
-  transition: grid-template-rows 0.52s var(--ease-fluida),
-    opacity 0.36s var(--ease-out-cubic) 0.16s;
+  transition:
+    grid-template-rows var(--paso-viaje) var(--paso-curva),
+    opacity 0.42s var(--ease-out-cubic) 0.24s;
 }
 
 .columna-indice {
@@ -1236,7 +1265,7 @@
   letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
   color: var(--tinta-tenue);
-  transition: color 0.45s var(--ease-out-cubic);
+  transition: color var(--paso-viaje) var(--paso-curva);
 }
 
 .paso-boton.is-activa .columna-indice {
@@ -1375,6 +1404,12 @@
   .paso-boton,
   .paso-boton.is-activa {
     opacity: 1;
+  }
+
+  .paso-boton::before,
+  .paso-boton.is-activa::before {
+    transform: scaleY(1);
+    transition: none;
   }
 
   .paso-boton-texto,

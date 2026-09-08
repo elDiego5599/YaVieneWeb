@@ -175,10 +175,6 @@ const arrancar = (): void => {
     });
 
     if (pista && columnas.length > 0) {
-      // La lista lateral: el paso que manda se agranda y enseña su
-      // texto (CSS, con `is-activa`), y la línea verde la mueve el
-      // recorrido crudo, que no va a golpes como el paso discreto.
-      const lista = document.querySelector<HTMLElement>('[data-pasos-lista]');
       new PasoFoco({
         pista,
         pase: columnasPasos,
@@ -186,10 +182,12 @@ const arrancar = (): void => {
         marcas,
         alCambiar: (indice) => {
           demos.forEach((demo, i) => demo.activar(i === indice));
+
+          // Con la sección fuera de vista sólo se paran los bucles. La
+          // lista se queda con su paso encendido: apagarla cerraría de
+          // golpe la explicación abierta, y eso se ve al volver.
+          if (indice < 0) return;
           botones.forEach((boton, i) => boton.classList.toggle('is-activa', i === indice));
-        },
-        alAvanzar: (avance) => {
-          lista?.style.setProperty('--avance-lista', String(avance));
         },
       });
     }
