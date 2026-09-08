@@ -990,11 +990,12 @@
   --paso-viaje: 0.82s;
   --paso-curva: cubic-bezier(0.62, 0.02, 0.28, 1);
   display: grid;
-  /* El visor se lleva ocho de cada doce. Con la proporción de antes los
-     teléfonos de los lados salían cortados por el filo del cuadro; el
-     carril de la derecha, en cambio, lleva tres títulos y un párrafo y
-     le sobraba sitio. */
-  grid-template-columns: minmax(0, 8.4fr) minmax(0, 3.6fr);
+  /* Siete de cada doce para el visor. La proporción venía de cuando había
+     tres teléfonos en fila y el cuadro tenía que darles sitio a los tres;
+     con uno solo le sobraba aire por los lados, y lo que le sobraba al
+     visor le hacía falta al carril de la derecha, que es donde está lo
+     que se lee. */
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   gap: clamp(24px, 3.4vw, 64px);
   align-items: stretch;
   width: 100%;
@@ -1122,8 +1123,8 @@
 
 .pasos-lado-lead {
   margin: 0;
-  max-width: 34ch;
-  font-size: clamp(15px, 1.05vw, 18px);
+  max-width: 38ch;
+  font-size: clamp(16px, 1.2vw, 20px);
   line-height: 1.55;
   color: var(--tinta-media);
 }
@@ -1259,7 +1260,7 @@
 .columna-titulo {
   display: block;
   font-family: var(--font-display);
-  font-size: clamp(19px, 2.1vh, 26px);
+  font-size: clamp(21px, 2.4vh, 30px);
   font-weight: 600;
   letter-spacing: -0.015em;
   color: var(--tinta);
@@ -1268,8 +1269,8 @@
 .columna-texto {
   display: block;
   padding-top: 6px;
-  max-width: 36ch;
-  font-size: clamp(13.5px, 0.95vw, 15.5px);
+  max-width: 40ch;
+  font-size: clamp(15px, 1.1vw, 17.5px);
   line-height: 1.55;
   color: var(--tinta-media);
 }
