@@ -13,13 +13,41 @@
  * pista llegue arriba manda el primero, y pasado el final manda el
  * último, de modo que la sección nunca se ve sin ninguno encendido.
  *
- * Lo que hace con el número: enciende la columna que toca, mueve la fila
- * para dejarla en el centro —`data-activo` en la fila, que es de donde
- * cuelga el desplazamiento en el CSS— y avisa fuera para que sólo corra
- * el bucle de ese teléfono. Con la sección fuera de pantalla no manda
- * ninguno, que es lo que apaga los tres bucles a la vez; la fila se queda
- * donde estaba para que al volver no dé un salto.
+ * Del recorrido salen dos números, no uno. El continuo —`0` a `total - 1`
+ * con decimales— es el que manda en lo que se ve moverse: la corrida de
+ * la fila y, columna por columna, lo cerca que está cada una de tener el
+ * turno. Va pegado al dedo, sin transición larga que lo persiga, así que
+ * la fila no se queda quieta un tercio del scroll para luego pegar un
+ * viaje de golpe. Entre paso y paso hay un retén: la primera parte del
+ * tramo la fila casi no se mueve —el paso se deja leer— y el resto es el
+ * viaje, con una curva suave a la entrada y a la salida.
+ *
+ * El discreto sale de redondear el continuo, y es el que enciende clases
+ * y avisa fuera para que sólo corra el bucle de ese teléfono: cambia
+ * justo cuando los dos teléfonos se cruzan por la mitad del viaje. Con la
+ * sección fuera de pantalla no manda ninguno, que es lo que apaga los
+ * tres bucles a la vez; la fila se queda donde estaba para que al volver
+ * no dé un salto.
  */
+/**
+ * Cuánto del tramo de un paso se va en dejarlo quieto antes de empezar
+ * el viaje al siguiente. Sin retén la fila no para nunca y no se llega a
+ * leer ningún paso; con demasiado vuelve el salto de antes.
+ */
+const RETEN = 0.42;
+
+/** El desenfoque del que está más lejos de mandar, en píxeles. */
+const VELO_MAX = 4;
+
+/** Suavizado de toda la vida: sale y entra sin esquinas. */
+function suave(t: number): number {
+  return t * t * (3 - 2 * t);
+}
+
+function topar(v: number, min: number, max: number): number {
+  return v < min ? min : v > max ? max : v;
+}
+
 export interface PasoFocoPiezas {
   /** El bloque alto que se recorre mientras la escena está pegada. */
   pista: HTMLElement;
@@ -41,6 +69,7 @@ export class PasoFoco {
   private readonly piezas: PasoFocoPiezas;
 
   private actual = -1;
+  private continuo = -1;
   private pedido = 0;
   private dentro = false;
 
@@ -83,13 +112,58 @@ export class PasoFoco {
     const recorrido = caja.height - innerHeight;
     if (recorrido <= 0) {
       this.piezas.alAvanzar?.(0);
+      this.fluir(0);
       this.aplicar(0);
       return;
     }
 
-    const avance = Math.min(1, Math.max(0, -caja.top / recorrido));
+    const avance = topar(-caja.top / recorrido, 0, 1);
     this.piezas.alAvanzar?.(avance);
-    this.aplicar(Math.min(total - 1, Math.floor(avance * total)));
+
+    // El tramo de cada paso: la primera parte quieto y la segunda de
+    // viaje, suavizada por los dos extremos.
+    const bruto = avance * total;
+    const paso = Math.min(total - 1, Math.floor(bruto));
+    const dentro = bruto - paso;
+    const rampa = suave(topar((dentro - RETEN) / (1 - RETEN), 0, 1));
+
+    this.fluir(Math.min(total - 1, paso + rampa));
+    this.aplicar(Math.min(total - 1, Math.round(this.continuo)));
+  }
+
+  /**
+   * El número con decimales, repartido al CSS. La fila se corre lo que
+   * le falta al paso de turno para quedar en el eje, y cada columna
+   * recibe lo cerca que está de mandar (`--cerca`, de 0 a 1) para que el
+   * tamaño, el velo y el halo salgan de ahí y no de una clase que se
+   * enciende de golpe.
+   *
+   * El desenfoque va en pasos de medio píxel: es lo único de aquí que
+   * obliga a rehacer el mapa del teléfono, y con el valor redondeado
+   * sólo lo rehace cuando de verdad cambia. Al que ya manda se le quita
+   * el filtro entero —`is-nitida`—, que un `blur(0px)` sigue costando
+   * una capa y ablanda el texto de la pantalla.
+   */
+  private fluir(continuo: number): void {
+    if (continuo === this.continuo) return;
+    this.continuo = continuo;
+
+    const centro = (this.piezas.columnas.length - 1) / 2;
+    this.piezas.pase.style.setProperty(
+      '--corrida-pasos',
+      (centro - continuo).toFixed(4)
+    );
+
+    this.piezas.columnas.forEach((columna, i) => {
+      const cerca = suave(topar(1 - Math.abs(i - continuo), 0, 1));
+      const nitida = cerca > 0.985;
+      columna.style.setProperty('--cerca', cerca.toFixed(4));
+      columna.style.setProperty(
+        '--velo',
+        `${(Math.round((1 - cerca) * VELO_MAX * 2) / 2).toFixed(1)}px`
+      );
+      columna.classList.toggle('is-nitida', nitida);
+    });
   }
 
   private aplicar(indice: number): void {
@@ -103,8 +177,6 @@ export class PasoFoco {
     this.piezas.marcas.forEach((marca, i) => {
       marca.classList.toggle('is-activa', i === indice);
     });
-
-    if (indice >= 0) this.piezas.pase.dataset.activo = String(indice);
 
     this.piezas.alCambiar(indice);
   }
