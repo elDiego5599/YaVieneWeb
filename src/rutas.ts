@@ -70,7 +70,20 @@ export const fichaDeRuta = (ruta: RutaLanding): HTMLButtonElement => {
   tramo.append(trozo('ruta-ficha-terminal', ruta.terminalA), flecha,
     trozo('ruta-ficha-terminal', ruta.terminalB));
 
-  ficha.append(trozo('ruta-ficha-nombre', ruta.nombre), tramo);
+  /*
+    El kilometraje va en la ficha, no sólo en la suma de la cabecera. Es
+    el dato que distingue una ruta de otra cuando las dos terminales no
+    dicen nada a quien no conoce la ciudad, y estaba en `rutas.json`
+    desde el principio sin aparecer en ninguna parte de la página.
+  */
+  const cabeza = document.createElement('span');
+  cabeza.className = 'ruta-ficha-cabeza';
+  cabeza.append(
+    trozo('ruta-ficha-nombre', ruta.nombre),
+    trozo('ruta-ficha-km', `${ruta.km.toFixed(1)} km`),
+  );
+
+  ficha.append(cabeza, tramo);
   return ficha;
 };
 

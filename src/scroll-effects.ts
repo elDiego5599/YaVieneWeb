@@ -1,7 +1,7 @@
 /**
  * ScrollEffects — aparición de las secciones al entrar en pantalla.
  *
- * La demo del teléfono no vive aquí: se reproduce sola en bucle desde
+ * La escena fija del teléfono no vive aquí: se coloca una sola vez desde
  * PhoneSimulator, sin depender del scroll ni del cursor.
  */
 

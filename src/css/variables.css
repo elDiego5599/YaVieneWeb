@@ -3,7 +3,6 @@
   --ink: #0B1628;
   --ink-deep: #060D1F;
   --navy: #14274E;
-  --navy-light: #1E3A6D;
   --green: #00A859;
   --green-accessible: #047454;
   --green-tint: #E6F7F0;
@@ -12,7 +11,6 @@
   --coral: #E86A5E;
   --coral-accessible: #CE2D1D;
   --coral-light: #FBE7E4;
-  --amber: #FFC107;
   --amber-accessible: #8A6700;
   --amber-tint: #FFF8E1;
 
@@ -39,49 +37,109 @@
   --surface-nada: rgba(255, 255, 255, 0);
 
   /* Tokens que el mockup necesita para pintar la app tal cual: son los
-     mismos AppColors de ya_viene_core/lib/core/theme/app_theme.dart. */
+     mismos AppColors de ya_viene_core/lib/core/theme/app_theme.dart.
+
+     Sólo están los que alguna pantalla del teléfono pinta hoy. El juego
+     de la app es más largo —error, aviso, acierto, sus versiones claras—,
+     pero una variable declarada que nadie usa no documenta nada: se paga
+     en cada carga y engaña al que la lee creyendo que algo la consume. Si
+     una pantalla nueva necesita uno de esos, se copia entonces de
+     `app_theme.dart`. */
   --surface-muted: #F1F5F9;
   --divider: #E5E7EB;
-  --error: #DC2626;
-  --error-light: #FEE2E2;
-  --warn-light: #FEF3C7;
   --app-text-primary: #0F172A;
   --app-text-secondary: #5E6B82;
   --app-text-disabled: #94A3B8;
-  /* El resto del juego que la app usa hoy y el mockup no tenía. Sin estos,
-     las pantallas del teléfono se pintaban con aproximaciones: el crema
-     alto de las tarjetas, la línea de pelo de los bordes, el verde de los
-     rótulos accesibles y el ámbar de las pistas. */
-  --app-arena-alta: #FFFDF8;
   --app-hairline: rgba(20, 39, 78, 0.078);
-  --app-text-body: #475569;
   --app-primary-accessible: #047857;
   --app-coral-accessible: #C0392B;
   --app-warn-accessible: #A85206;
-  --app-success: #059669;
-  --app-success-light: #D1FAE5;
   --app-green-deep: #065F46;
 
   /* Colores que el mapa toma prestados de la app (ya_viene_core/app_theme.dart):
-     el azul eléctrico es la ruta activa y el rojo es el bus reportando. */
+     el azul eléctrico es la ruta activa y el gris es el bus que lleva rato
+     sin reportar. */
   --electric-blue: #2563EB;
-  --bus-red: #E86A5E;
   --bus-ghost: #94A3B8;
 
-  /* Text Colors */
-  --text-primary: #0B1628;
-  --text-secondary: rgba(11, 22, 40, 0.65);
-  --text-muted: rgba(11, 22, 40, 0.45);
+  /* ── Sistema día ──────────────────────────────────────────────────────
+
+     El juego con el que se compone la página desde el rediseño v3. Fondo
+     claro, color contenido, borde de un píxel y sombra casi ninguna: lo
+     que hacen las herramientas que se usan a diario.
+
+     Sólo hay dos fondos, y alternan. El papel es blanco puro y la banda
+     es un gris con un punto de azul —no un gris neutro, que sobre blanco
+     se lee sucio—, lo justo para que se note el cambio de sección sin
+     dibujar una caja. Todo lo que separa es una línea de un píxel; todo
+     lo que agrupa es aire.
+     ─────────────────────────────────────────────────────────────────── */
+  --papel: #FFFFFF;
+  --banda: #F3F7F4;
+  --linea: #E2E8E4;
+  /* El verde de marca, pero sólo donde manda: rótulos de sección, el botón
+     de la barra y el velo del encabezado. Un acento repetido en tres sitios
+     ordena la página; el mismo acento en diez la ensucia. */
+  --acento: #047454;
+  --linea-fuerte: #D5DBE3;
+
+  /* Tres pesos de tinta y nada más. Los dos de abajo son el mismo azul
+     casi negro con menos alfa, así que sobre cualquiera de nuestros
+     fondos claros —papel, banda o crema— siguen leyéndose como gris.
+
+     Las cifras salen de medir, no de mirar. Al 0.42 el tenue daba 2.73:1
+     sobre la banda: por debajo del 4.5:1 que pide la norma AA para letra
+     pequeña, y ahí viven los rótulos del pie, las unidades del mapa y los
+     pies de tarjeta. Subirlo a 0.60 lo deja en 4.79:1. Pero el medio
+     estaba en 0.62 y a dos centésimas del tenue los dos niveles eran el
+     mismo gris, así que el medio sube a 0.78 (9.02:1) para que la
+     jerarquía se siga viendo: título en tinta plena, texto en medio,
+     letra chica en tenue. */
+  --tinta: #0B1220;
+  --tinta-media: rgba(11, 18, 32, 0.78);
+  --tinta-tenue: rgba(11, 18, 32, 0.60);
+
+  /* La monoespaciada no se carga: se pide la del sistema. Es la letra de
+     los rótulos pequeños —cuatro palabras por página— y bajar un fichero
+     de fuente para eso cuesta más de lo que vale. */
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --rotulo-track: 0.12em;
+
+  --radio-tarjeta: 12px;
+  --radio-marco: 16px;
+
+  /* Dos sombras en toda la página: una que apenas despega la tarjeta del
+     papel, y una grande que va sólo debajo del marco del producto. */
+  --sombra-tarjeta: 0 1px 2px rgba(11, 18, 32, 0.05);
+  --sombra-producto: 0 40px 80px -34px rgba(11, 18, 32, 0.26),
+    0 8px 24px -14px rgba(11, 18, 32, 0.10);
+
+  /* La rejilla: un contenedor centrado y el mismo aire vertical en todas
+     las secciones. Se acabaron los paneles flotantes con radio y las
+     bandas a sangre. */
+  --contenedor: 1160px;
+  /* Las bandas que enseñan producto —el visor de los tres pasos y el mapa
+     panorámico— van por una pista más ancha que el texto. Estaba en 1320 y
+     en un monitor grande las dos parecían islas en medio del papel.
+
+     1440 es lo que aguantan las dos: el visor de los pasos cabe con los
+     tres teléfonos y su carril, y el tablero del mapa se llena —la lista
+     de rutas, sus cifras y la lectura a un lado; el mosaico al otro— sin
+     que sobre sitio dentro del marco. Más ancho sólo lo llenaba una de
+     las dos, y la otra se quedaba con un agujero. */
+  --contenedor-ancho: 1440px;
+  --calle: clamp(20px, 4vw, 32px);
+  --aire-seccion: clamp(72px, 9vh, 128px);
+
+  /* Text Colors. Son los mismos tres pesos de tinta con el nombre en
+     inglés que usa la mitad vieja de la hoja; se mueven juntos. */
+  --text-primary: #0B1220;
+  --text-secondary: rgba(11, 18, 32, 0.78);
+  --text-muted: rgba(11, 18, 32, 0.60);
   --text-white: #FFFFFF;
   --text-white-dim: rgba(255, 255, 255, 0.7);
   --text-white-sub: rgba(255, 255, 255, 0.45);
 
-  /* Borders & Shadows */
-  --border-subtle: rgba(20, 39, 78, 0.08);
-  --border-glass: rgba(255, 255, 255, 0.12);
-  --shadow-sm: 0 4px 12px -2px rgba(11, 22, 40, 0.06);
-  --shadow-md: 0 12px 28px -6px rgba(11, 22, 40, 0.1);
-  --shadow-lg: 0 24px 48px -12px rgba(11, 22, 40, 0.16);
   /* La sombra del aparato: ancha, baja y difusa, como la de una foto de
      producto. La de antes iba al 55 % y a este tamaño manchaba el crema
      de alrededor: el teléfono no flotaba, chorreaba. */
@@ -97,14 +155,8 @@
   /* Lo que mide la píldora de la cabecera. Va pegada arriba toda la
      página, así que la franja que ocupa —hueco más píldora— no es sitio
      libre para nadie: las escenas se la descuentan antes de centrar. */
-  --nav-alto: 56px;
-  --panel-radius: 28px;
-  --panel-gap: 14px;
+  --nav-alto: 72px;
   --content-max: 1480px;
-  /* Las bandas que enseñan producto respiran más: la escena de la solución
-     y el mapa panorámico se quedaban encajonados a 1360 en una pantalla
-     grande. */
-  --content-wide: 1680px;
   --measure: 62ch;
 
   /* Typography */
@@ -113,7 +165,6 @@
 
   /* Escala fluida: los titulares crecen con el viewport en vez de quedarse
      clavados en un tamaño pensado para 1200px. */
-  --step-display: clamp(2.75rem, 1.2rem + 6.2vw, 6.5rem);
   --step-h2: clamp(2rem, 1.1rem + 3.2vw, 3.75rem);
   --step-h3: clamp(1.15rem, 0.95rem + 0.7vw, 1.5rem);
   --step-lead: clamp(1.05rem, 0.95rem + 0.5vw, 1.375rem);
@@ -138,7 +189,5 @@
 @media (min-width: 900px) {
   :root {
     --gutter: 20px;
-    --panel-radius: 40px;
-    --panel-gap: 20px;
   }
 }

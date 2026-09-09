@@ -87,12 +87,22 @@ async function quienSeDesborda(page: Page) {
       const cs = getComputedStyle(el);
       // Lo que ya está escondido a propósito no cuenta.
       if (cs.visibility === 'hidden' || cs.display === 'none' || cs.opacity === '0') continue;
-      // Ni lo que vive dentro de un contenedor que sí puede desplazarse.
+      // Ni lo que vive dentro de un contenedor que lo recorta o que sí
+      // puede desplazarse. `clip` cuenta igual que `hidden`: recorta lo
+      // que se sale y no crea barra. Lo usa el visor de los tres pasos,
+      // que es una carrusel —el teléfono de turno va en el centro y los
+      // otros dos se corren fuera del marco— y `hidden` ahí rompería el
+      // pegado de la escena (ver layout.css).
       let padre = el.parentElement;
       let dentroDeScroll = false;
       while (padre && padre !== document.body) {
         const pcs = getComputedStyle(padre);
-        if (pcs.overflowX === 'auto' || pcs.overflowX === 'scroll' || pcs.overflowX === 'hidden') {
+        if (
+          pcs.overflowX === 'auto' ||
+          pcs.overflowX === 'scroll' ||
+          pcs.overflowX === 'hidden' ||
+          pcs.overflowX === 'clip'
+        ) {
           dentroDeScroll = true;
           break;
         }
@@ -211,6 +221,13 @@ for (const { ruta, nombre } of PAGINAS) {
       const destino = await salto.getAttribute('href');
       await expect(page.locator(destino!)).toHaveCount(1);
 
+      // Y nace fuera de cuadro: si el escondite no llega en el primer
+      // pintado se ve un parpadeo en cada recarga, que es justo lo que
+      // arregla tener `critico.css` enlazada desde el <head>.
+      const caja = await salto.boundingBox();
+      expect(caja, 'el enlace de salto no tiene caja').not.toBeNull();
+      expect(caja!.y + caja!.height, 'el enlace de salto asoma en pantalla').toBeLessThan(0);
+
       // Toda imagen lleva alt (aunque sea vacío si es decorativa).
       const sinAlt = await page.evaluate(
         () => Array.from(document.images).filter((i) => !i.hasAttribute('alt')).map((i) => i.src)
@@ -220,53 +237,6 @@ for (const { ruta, nombre } of PAGINAS) {
   });
 }
 
-/*
-  Lo que todavía no se ha asomado no se toca. Los golpes de texto del
-  problema entran con el reloj, y mientras esperan están transparentes;
-  transparente no es escondido, así que «sol» y «lluvia» —que son
-  botones— se dejaban pulsar, y cambiaban el degradado de toda la
-  sección, sin haber aparecido nunca en pantalla.
-*/
-test.describe('el guion del problema', () => {
-  test('los golpes que aún no entran no se dejan tocar', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'load' });
-    await page.evaluate(() => document.fonts.ready);
-
-    // Justo a la entrada de la pista: la escena ya está pegada y en
-    // pantalla, pero el reloj no ha llegado a ningún golpe todavía. Ahí
-    // es donde los botones invisibles quedaban al alcance del dedo.
-    await page.evaluate(() => {
-      const pista = document.querySelector('#problema') as HTMLElement;
-      const top = pista.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({ top: top + 60, behavior: 'instant' });
-    });
-    await page.waitForTimeout(600);
-
-    const escondidos = await page.evaluate(() =>
-      Array.from(document.querySelectorAll('.problema-beat:not(.is-visible)')).map((beat) => {
-        const boton = beat.querySelector('[data-clima-choice]');
-        const caja = (boton ?? beat).getBoundingClientRect();
-        const centro = document.elementFromPoint(caja.left + caja.width / 2, caja.top + caja.height / 2);
-        return {
-          golpe: (beat as HTMLElement).dataset.beat,
-          alcanzable: !!centro && (boton ?? beat).contains(centro),
-        };
-      })
-    );
-
-    // Que haya alguno escondido es parte de la prueba: si el guion no
-    // arrancó, esto no estaría comprobando nada.
-    expect(escondidos.length, 'ningún golpe esperando su turno').toBeGreaterThan(0);
-    expect(
-      escondidos.filter((b) => b.alcanzable).map((b) => b.golpe),
-      'golpes invisibles que responden al dedo'
-    ).toEqual([]);
-  });
-});
-
-/*
-  La banda de empresas. Es prueba social: si un logo no carga, no se lee o
-  sale en gris, la banda deja de probar nada y encima señala a la empresa
 /*
   La banda de empresas en /empresas.html. Es prueba social: si un logo no
   carga, no se lee o sale en gris, la banda deja de probar nada. Se

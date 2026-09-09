@@ -33,59 +33,70 @@
   gap: clamp(28px, 3.4vw, 48px);
 }
 
-/* La cabecera ocupa el ancho entero: el titular a la izquierda y las tres
-   cifras de las rutas a su derecha, apoyadas en la misma línea de base.
-   Ahí había una entradilla que contaba lo que la propia demo enseña —que
-   son seis rutas y que al entrar el bus salta el aviso—, así que decía en
-   prosa lo que se ve tocando. Las cifras, en cambio, no se ven en ningún
-   otro sitio de la página. */
-.mapa-cabecera {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  /* La línea que la separa del tablero, a todo el ancho del panel. */
-  padding-bottom: clamp(20px, 2.2vw, 30px);
-  border-bottom: 1px solid rgba(20, 39, 78, 0.14);
+/*
+  La cabecera la pone ahora `layout.css` con el molde de sección
+  —rótulo, titular a la izquierda y la entradilla a su derecha—, que es
+  el mismo de todas las secciones de la página. Aquí sólo queda el aire
+  que la separa del tablero, que es más corto que el de una sección
+  normal porque lo que sigue es la pieza y no otro bloque de texto.
+*/
+.mapa-inner > .seccion-cabecera {
+  margin-bottom: clamp(28px, 3.4vw, 44px);
 }
 
-/* Este titular no tenía tamaño propio: caía en el `h2` de `base.css`, que
-   son los 2em que trae el navegador y encima con la letra de cuerpo. Al
-   lado del mapa —que ocupa media pantalla— se leía como un pie de foto.
+/*
+  El tablero va enmarcado. Es el recurso de Vercel y de Linear para
+  enseñar producto dentro de una página: un filo de un punto, papel
+  debajo y una sola sombra grande y muy difusa que lo despega de la
+  banda. No lleva degradado ni brillo; lo que tiene que destacar es el
+  mapa, no el marco.
+*/
+.mapa-tablero {
+  padding: clamp(14px, 1.6vw, 22px);
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-marco);
+  box-shadow: var(--sombra-producto);
+}
 
-   Ahora es lo que es: la invitación a tocar la única parte de la página
-   que se toca. Va en la de display, medio escalón por encima del titular
-   del problema (4,5rem de techo) y por debajo del de los pasos (9rem),
-   que es el más grande de la página y así sigue siendo. */
-.mapa-cabecera .section-title {
+/*
+  Las cifras cierran la sección: una fila bajo el marco, separada por un
+  filo. Los tres números iban en tres colores distintos —verde, coral y
+  marino—, que es lo que hace que un dato parezca un adorno. Ahora los
+  tres van en tinta y lo que los distingue es el rótulo.
+*/
+/*
+  Las tres cifras dejaron de ser una banda debajo del marco y son ahora el
+  pie de la lista de rutas, dentro del mando. Como pie van en pequeño: el
+  número grande de esta sección es el de la lectura —la distancia al bus—,
+  y tres cifras de tamaño de titular al lado le quitaban el sitio.
+*/
+.mapa-mando > .rutas-cifras {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.4vw, 24px);
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2.7rem, 1.1rem + 5.4vw, 5.75rem);
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.045em;
+  padding-top: clamp(14px, 1.4vw, 20px);
+  border-top: 1px solid var(--linea);
 }
 
-@media (min-width: 900px) {
-  .mapa-cabecera {
-    display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-    column-gap: clamp(32px, 4vw, 80px);
-    align-items: end;
-  }
+.mapa-mando .rutas-dato-numero,
+.mapa-mando .rutas-dato:nth-child(2) .rutas-dato-numero,
+.mapa-mando .rutas-dato:nth-child(3) .rutas-dato-numero {
+  font-size: clamp(1.15rem, 0.9rem + 0.7vw, 1.55rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--tinta);
+}
 
-  .mapa-cabecera .tracked-eyebrow,
-  .mapa-cabecera .section-title {
-    grid-column: 1;
-  }
-
-  /* Las cifras caen en la segunda columna, apoyadas en la misma línea de
-     base que el titular: son el dato que lo sostiene, no un pie. */
-  .mapa-cabecera .rutas-cifras {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    align-self: end;
-    margin: 0;
-  }
+.mapa-mando .rutas-dato-rotulo {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--tinta-tenue);
 }
 
 .mapa-tablero {
@@ -111,7 +122,7 @@
        mide el nombre de ruta más largo con su tramo debajo— y ni un
        píxel más. Con él puesto los dos van parejos y el grupo se
        centra, que es lo que ya hacía `justify-content`. */
-    grid-template-columns: minmax(0, 820px) auto;
+    grid-template-columns: minmax(0, 960px) auto;
     align-items: stretch;
   }
 
@@ -160,7 +171,7 @@
    veía como un hueco. */
 .mapa-mando {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto auto;
   gap: clamp(16px, 1.6vw, 22px);
   min-width: 0;
 }
@@ -170,9 +181,20 @@
    lectura en vez de dejarlo suelto entre las dos. La proporción da unas
    fichas holgadas —son botones, se tocan— y una lectura del tamaño del
    número que enseña. */
+/*
+  Las dos piezas del mando piden su alto y ya: repartirse el del mapa las
+  estiraba, y una casilla estirada es una casilla con un agujero dentro
+  —el texto en el medio y aire arriba y abajo—. Lo que sobra se queda al
+  final de la columna, donde no molesta.
+*/
 @media (min-width: 1060px) {
   .mapa-mando {
-    grid-template-rows: minmax(0, 2.2fr) minmax(0, 1fr);
+    /* Tres piezas: la lista, sus cifras y la lectura. */
+    grid-template-rows: auto auto auto;
+    /* La lista arriba y la lectura abajo, apoyada en el filo inferior del
+       mapa: las dos columnas cierran a la misma altura y lo que sobra
+       queda en medio, que es donde no se lee como un descuido. */
+    align-content: space-between;
   }
 }
 
@@ -185,11 +207,12 @@
 }
 
 .mapa-rotulo {
+  font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: var(--tinta-tenue);
 }
 
 /* El rótulo de las rutas ocupa la misma banda que la tira de al lado, así
@@ -211,14 +234,19 @@
   position: relative;
   /* La proporción del mosaico, para que quepa la ciudad entera. */
   aspect-ratio: 1284 / 1982;
-  height: clamp(440px, 82vh, 780px);
-  border-radius: 22px;
+  /* Más bajo que antes. A 780 px el mosaico sacaba media pantalla de alto
+     y la columna de al lado —seis fichas y la lectura— se quedaba con un
+     agujero debajo del tamaño de la propia lista. El techo volvió a subir
+     con la pista ancha, ahora que la columna de al lado tiene con qué
+     llenarlo: la lista, sus cifras y la lectura. */
+  height: clamp(380px, 50vh, 540px);
+  border-radius: var(--radio-tarjeta);
   overflow: hidden;
   background: #EDE7DE;
-  border: 1px solid rgba(20, 39, 78, 0.12);
-  /* Sobre crema la sombra vuelve a hacer falta: es lo único que separa
-     el mosaico —que también es claro— del papel de la página. */
-  box-shadow: 0 26px 60px -34px rgba(20, 39, 78, 0.55);
+  border: 1px solid var(--linea);
+  /* Sin sombra propia: el marco del tablero ya la lleva, y dos sombras
+     una dentro de otra es lo que hace que una pieza parezca pegada. */
+  box-shadow: none;
 }
 
 .mapa-svg {
@@ -286,16 +314,26 @@
    tenía sentido; sobre la crema del documento no hay nada que desenfocar
    y es de lo más caro que se le puede pedir a un navegador. */
 .mapa-toque {
-  justify-self: center;
+  /*
+    La pista dejó de ser una pastilla negra. Flotando sobre el papel del
+    marco parecía un globo de ayuda de otra página; es una instrucción de
+    una línea y ahora se lee como tal: alineada a la izquierda con el
+    resto de la columna y en la misma letra de rótulo que «Elige una
+    ruta», que es lo que tiene al lado.
+  */
+  justify-self: start;
+  align-self: end;
   margin: 0;
-  padding: 9px 18px;
-  border-radius: 999px;
-  background: rgba(11, 22, 40, 0.92);
-  color: #FFFFFF;
-  box-shadow: 0 10px 24px -12px rgba(11, 22, 40, 0.72);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--tinta-tenue);
+  box-shadow: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
   white-space: nowrap;
   pointer-events: none;
   transition:
@@ -322,13 +360,17 @@
   margin: 0;
   padding: 3px 9px;
   border-radius: 999px;
-  background: rgba(237, 231, 222, 0.86);
+  background: rgba(255, 255, 255, 0.88);
   font-size: 10.5px;
   line-height: 1.4;
-  color: var(--text-secondary);
+  color: var(--tinta-media);
   pointer-events: none;
 }
 
+.mapa-credito a {
+  color: inherit;
+  pointer-events: auto;
+}
 /* ── Las rutas ── */
 .mv-rutas {
   display: flex;
@@ -346,11 +388,11 @@
    la lista termina donde empieza la lectura. */
 @media (min-width: 1060px) {
   .mv-rutas {
-    flex: 1;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: minmax(0, 1fr);
-    gap: 10px;
+    grid-auto-rows: auto;
+    align-content: start;
+    gap: 8px;
     min-height: 0;
   }
 }
@@ -371,10 +413,18 @@
   flex-direction: column;
   justify-content: center;
   gap: 3px;
-  padding: 20px 22px;
-  border: 1px solid rgba(37, 99, 235, 0.16);
-  border-radius: 20px;
-  background: var(--surface-muted);
+  padding: 16px 18px;
+  /*
+    La lectura era una caja azul pálida con veinte píxeles de aire por
+    dentro y el texto flotando en el medio. Es un dato, no un cartel:
+    ahora es una casilla del mismo material que las fichas de ruta, con
+    el filo fino de la página, y lo único que cambia de color son los
+    dos estados que sí son aviso —verde cuando el bus entra al
+    kilómetro, ámbar cuando la ruta no pasa cerca—.
+  */
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-tarjeta);
+  background: var(--banda);
   transition: border-color var(--transition-normal), background var(--transition-normal);
 }
 
@@ -432,25 +482,25 @@
 
   .mapa-lectura-metros {
     grid-area: 1 / 2 / 4 / 3;
-    font-size: clamp(52px, 5.6vw, 92px);
+    font-size: clamp(44px, 4.2vw, 64px);
   }
 }
 
 .mapa-lectura-bus {
   font-size: 13px;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-weight: 600;
+  color: var(--tinta);
 }
 
 /* Del mismo corte que el número grande de la app. */
 .mapa-lectura-metros {
   font-family: var(--font-display);
-  font-size: clamp(38px, 3.6vw, 54px);
-  font-weight: 300;
+  font-size: clamp(34px, 3vw, 46px);
+  font-weight: 500;
   line-height: 1.05;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
-  color: var(--navy);
+  color: var(--tinta);
   transition: color var(--transition-normal);
 }
 
@@ -462,7 +512,7 @@
 
 .mapa-lectura-pie {
   font-size: 11.5px;
-  color: var(--text-secondary);
+  color: var(--tinta-media);
 }
 
 /* ── El aviso ──

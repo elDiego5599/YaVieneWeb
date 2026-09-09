@@ -65,12 +65,36 @@ const KB = 1024;
  *  96 colores: son logos, no fotos, y una paleta les sienta cuatro veces
  *  mejor que WebP con pérdida (33 KB contra 70 KB medidos con los mismos
  *  píxeles). Los topes quedan otra vez en lo que pesa la build de hoy más
- *  un margen, que es para lo que están. */
+ *  un margen, que es para lo que están.
+ *
+ *  Y los cuatro se vuelven a medir el 09/09/2026, con el rediseño v3 ya
+ *  puesto. Tres de los cuatro topes estaban rotos en `main` —769/760 de
+ *  dist, 90.9/87 de CSS y 611.3/610 de primera visita— porque se dejaron
+ *  clavados mientras la página cambiaba entera debajo. Comparado con
+ *  aquello, el rediseño adelgaza casi todo: dist pasa de 768.9 a 699.6,
+ *  la primera visita de 611.3 a 543.3 y el JavaScript de 63.6 a 59.3,
+ *  que es lo que se ganó al morir el motor de scrollytelling y las
+ *  secciones que ya no están.
+ *
+ *  El CSS es el que sube: de 90.9 a 98.1. Lo paga el rediseño, que trae
+ *  tres secciones nuevas —«el problema» con sus dos caras, el visor de
+ *  los tres pasos y el mapa panorámico— y `critico.css`, que es la hoja
+ *  de 2 KB que impide el parpadeo del enlace de salto. Se buscó de dónde
+ *  sacarlo antes de subir el tope: se fueron el CSS de las secciones
+ *  muertas, catorce variables sin usar, dos `@keyframes` huérfanos y las
+ *  clases que nadie ponía, y eso devolvió 9 KB (107.1 -> 98.1). Lo que
+ *  queda no se puede tocar: `phone-simulator.css` son 66 KB y es el
+ *  espejo de las pantallas de la app en Dart —cada número suyo justifica
+ *  uno de allá—, así que recortarlo es desincronizar el mockup.
+ *
+ *  Los cuatro topes quedan otra vez en la build de hoy más un 3 %. Los
+ *  tres que bajan bajan de verdad: dejarlos anchos habría dejado pasar
+ *  sin avisar toda la grasa que se acaba de quitar. */
 const TOPES = {
-  'todo dist': 760,
-  'JavaScript': 65,
-  'CSS': 87,
-  'primera visita': 610,
+  'todo dist': 720,
+  'JavaScript': 62,
+  'CSS': 101,
+  'primera visita': 560,
 };
 
 /** Lo que el navegador se baja de verdad al abrir la portada por primera

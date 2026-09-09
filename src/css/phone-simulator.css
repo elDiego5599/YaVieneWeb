@@ -213,28 +213,11 @@
   color: var(--app-text-primary);
 }
 
-/*
-  Cierre del ciclo. La demo se repite sola, y volver del último cuadro al
-  primero de un tirón se sentía un corte de tijera: la ruta, el pin y la
-  hoja cambiaban todos a la vez sin que nadie los tocara.
-
-  Lo que se recoge es la sesión, no el teléfono: el mosaico y la barra de
-  Android se quedan donde están —el mapa nunca se va en la app— y lo que se
-  despide es la píldora y la hoja. El trazado, el pin y los buses se apagan
-  por su cuenta, con las transiciones que ya tienen. Así el ciclo se cierra
-  como si el pasajero soltara la búsqueda, y no como un corte de montaje.
-*/
+/* El grupo de arriba —píldora y barra de Android— se va y vuelve con la
+   pausa larga: es el marco de la sesión, no un paso de la app. */
 .phone-topbar {
   transition: opacity 0.6s var(--ease-out-cubic),
     transform 0.6s var(--ease-out-cubic);
-}
-
-.phone-screen.is-cerrando .phone-topbar {
-  opacity: 0;
-  transform: translateY(calc(-10 * var(--u)));
-  /* La despedida del ciclo sí es lenta: es una sesión que se suelta, no
-     un paso de la app. */
-  transition-duration: 0.6s;
 }
 
 /*
@@ -254,13 +237,6 @@
 .phone-topbar.esta-apartada {
   opacity: 0;
   transform: translateY(-40%);
-}
-
-/* La hoja no se limita a apagarse: se va por abajo, que es como se cierra
-   una hoja de verdad. */
-.phone-screen.is-cerrando .phone-sheet {
-  opacity: 0;
-  transform: translateY(46%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -775,6 +751,45 @@
 }
 
 .app-chip-sub[hidden] {
+  display: none;
+}
+
+/*
+  Escena fija del hero: la píldora y el chip enseñan una sola línea cada
+  uno —sin "Ruta activa • Toca para cambiar" ni "Arrástralo para
+  moverlo"— y los textos que quedan van centrados.
+*/
+.es-fija [data-el="pill-sub"],
+.es-fija [data-el="chip-sub"] {
+  display: none;
+}
+
+.es-fija .app-chip-textos {
+  align-items: center;
+  text-align: center;
+}
+
+/*
+  Pasos 1 y 2, igual que la escena fija del hero: una sola línea por
+  tarjeta —sin "Toca para buscar tu ruta" ni "Arrástralo para moverlo"
+  en el 1º, sin "Dos pasos…" ni los subtítulos de las fichas en el 2º—.
+  En el 1º los textos que quedan van centrados; en el 2º los títulos se
+  quedan a la izquierda, donde estaban. Solo CSS: el guion sigue
+  escribiendo los subtítulos y la foto sin JS los trae, pero no se
+  enseñan, como hace `.es-fija` con los del hero.
+*/
+[data-demo="1"] .app-pill-sub,
+[data-demo="1"] [data-el="chip-sub"] {
+  display: none;
+}
+
+[data-demo="1"] .app-chip-textos {
+  align-items: center;
+  text-align: center;
+}
+
+[data-demo="2"] .sheet-head-sub,
+[data-demo="2"] .app-select-sub {
   display: none;
 }
 
@@ -1372,6 +1387,16 @@
   border-radius: calc(32 * var(--u)) calc(32 * var(--u)) 0 0;
   /* elevation: 16 con shadowColor 0x6614274E. */
   box-shadow: 0 calc(-6 * var(--u)) calc(30 * var(--u)) rgba(20, 39, 78, 0.22);
+}
+
+/*
+  La hoja quieta que guarda vistas no pone relleno lateral: lo pone cada
+  vista, que ya lleva sus 24. Con los dos, el selector se metía 48 por
+  lado y las listas salían más angostas que la tarjeta que las mide.
+*/
+.phone-sheet--fija.tiene-vistas {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 /*
@@ -2150,7 +2175,12 @@
 /* El hundido del dedo: lo que hace un InkWell al recibir el toque. La
    píldora y las fichas del selector entran en la lista porque el guion del
    hero también las toca: sin el hundido, la vista cambiaba sola y el
-   mockup parecía pasar diapositivas en vez de responder a un dedo. */
+   mockup parecía pasar diapositivas en vez de responder a un dedo.
+
+   El filo va en esta misma lista y no en la regla de más arriba: esta
+   viene después y con la misma fuerza, así que se llevaba por delante la
+   transición que la ficha declaraba allí y el borde de la ficha elegida
+   aparecía de golpe, un cuadro después del toque. */
 .app-pill,
 .app-tile,
 .app-select,
@@ -2160,6 +2190,8 @@
     transform 0.18s var(--ease-out-cubic),
     filter 0.18s var(--ease-out-cubic),
     background-color 0.25s var(--ease-out-cubic),
+    border-color 0.24s var(--ease-out-cubic),
+    border-width 0.24s var(--ease-out-cubic),
     box-shadow 0.25s var(--ease-out-cubic);
 }
 

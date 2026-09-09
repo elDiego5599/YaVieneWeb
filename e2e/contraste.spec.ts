@@ -42,48 +42,152 @@ function contraste(a: [number, number, number], b: [number, number, number]): nu
   return (alto + 0.05) / (bajo + 0.05);
 }
 
-function aRgb(css: string): [number, number, number] {
+/** `rgb(...)` o `rgba(...)` tal como lo devuelve el navegador. */
+function aRgb(css: string): [number, number, number, number] {
   const n = css.match(/\d+(\.\d+)?/g)!.map(Number);
-  return [n[0], n[1], n[2]];
+  return [n[0], n[1], n[2], n[3] === undefined ? 1 : n[3]];
 }
 
-const PAGINAS = ['/', '/empresas.html'];
+/**
+ * Media tinta sobre un fondo. Casi todos los grises de la página son el
+ * mismo azul con alfa, así que su color de verdad no existe hasta que se
+ * sabe qué hay detrás: comparar el `rgba` a pelo contra el fondo daría
+ * siempre el contraste del negro y no fallaría nunca.
+ */
+function sobre(
+  [r, g, b, a]: [number, number, number, number],
+  fondo: [number, number, number]
+): [number, number, number] {
+  return [
+    r * a + fondo[0] * (1 - a),
+    g * a + fondo[1] * (1 - a),
+    b * a + fondo[2] * (1 - a),
+  ];
+}
 
-test.describe('contraste de las cejillas', () => {
-  for (const ruta of PAGINAS) {
-    test(`las cejillas de ${ruta} llegan a AA`, async ({ page }) => {
+/* Lo que se mide en cada página. No es la lista de todo lo que lleva
+   letra: son los sitios donde el color del texto no es la tinta plena
+   —cejillas, rótulos del pie, cifras de colores, la palabra en verde del
+   titular— que es donde el contraste se cae sin que nadie lo note. */
+const MUESTRAS: Record<string, string[]> = {
+  '/': [
+    '.tracked-eyebrow',
+    '.hero-title .highlight',
+    '.nav-island-cta',
+    '.btn-green',
+    '.hero-description',
+    '.hero-subtext-lead',
+    '.apagado',
+    '.rutas-dato-numero',
+    '.rutas-dato-rotulo',
+    '.footer-cta-note',
+    '.footer-nav-group > span',
+    '.footer-status > span',
+    '.footer-nav a',
+    '.footer-legal-links a',
+  ],
+  '/empresas.html': [
+    '.tracked-eyebrow',
+    '.nav-island-cta',
+    '.btn-green',
+    '.form-submit-btn',
+    '.consola-visible',
+    '.footer-nav-group > span',
+    '.footer-legal-links a',
+  ],
+};
+
+/**
+ * Lo que la norma pide para este texto: 3:1 si es grande —24 px, o 18.66
+ * en negrita— y 4.5:1 si no (WCAG 1.4.3, nivel AA).
+ */
+function pedido(px: number, peso: number): number {
+  const grande = px >= 24 || (px >= 18.66 && peso >= 700);
+  return grande ? 3 : 4.5;
+}
+
+test.describe('contraste del texto que no va en tinta plena', () => {
+  for (const [ruta, selectores] of Object.entries(MUESTRAS)) {
+    test(`el texto de ${ruta} llega a AA`, async ({ page }) => {
       await page.goto(ruta, { waitUntil: 'load' });
       await page.evaluate(() => document.fonts.ready);
 
-      const cuantas = await page.locator('.tracked-eyebrow').count();
-      expect(cuantas, 'no hay cejillas que medir').toBeGreaterThan(0);
+      const flojos: string[] = [];
+      let medidos = 0;
 
-      const flojas: string[] = [];
-      for (let i = 0; i < cuantas; i += 1) {
-        const sitio = await page.evaluate((n) => {
-          const el = document.querySelectorAll('.tracked-eyebrow')[n] as HTMLElement;
-          el.scrollIntoView({ block: 'center', behavior: 'instant' });
-          const c = el.getBoundingClientRect();
-          return {
-            texto: (el.textContent || '').trim(),
-            color: getComputedStyle(el).color,
-            // Justo a la izquierda de la letra: mismo fondo, sin letra
-            // encima que ensucie la medida.
-            x: Math.max(0, Math.round(c.left) - 6),
-            y: Math.round(c.top + c.height / 2),
-          };
-        }, i);
-        await page.waitForTimeout(200);
+      for (const sel of selectores) {
+        const cuantos = await page.locator(sel).count();
+        expect(cuantos, `«${sel}» no existe en ${ruta}`).toBeGreaterThan(0);
 
-        const fondo = await pixel(page, sitio.x, sitio.y);
-        const razon = contraste(aRgb(sitio.color), fondo);
-        // Once píxeles en mayúsculas es texto pequeño para la norma: 4.5:1.
-        if (razon < 4.5) {
-          flojas.push(`«${sitio.texto}» ${sitio.color} sobre rgb(${fondo}) → ${razon.toFixed(2)}:1`);
+        for (let i = 0; i < cuantos; i += 1) {
+          // Se apaga la letra antes de mirar el píxel: así lo que se mide
+          // es el fondo de verdad —panel, gradiente, puntitos y lo que
+          // haya debajo— y no una mezcla a medias con la propia letra.
+          const sitio = await page.evaluate(
+            ([s, n]: [string, number]) => {
+              const el = document.querySelectorAll(s)[n] as HTMLElement;
+              el.scrollIntoView({ block: 'center', behavior: 'instant' });
+              const cs = getComputedStyle(el);
+              const c = el.getBoundingClientRect();
+              const x = Math.round(c.left + Math.min(c.width / 2, 8));
+              const y = Math.round(c.top + c.height / 2);
+              // Lo que está guardado detrás del menú cerrado, apagado o
+              // fuera de la ventana no se mide: ahí el píxel no es el
+              // fondo de nadie. `checkVisibility` mira también a los
+              // padres, que es donde suele estar el escondite.
+              const visible =
+                c.width > 0 &&
+                c.height > 0 &&
+                el.checkVisibility({ opacityProperty: true, visibilityProperty: true }) &&
+                x >= 0 &&
+                y >= 0 &&
+                x < window.innerWidth &&
+                y < window.innerHeight;
+              const color = cs.color;
+              if (visible) {
+                el.dataset.contrasteColor = el.style.color;
+                el.style.color = 'transparent';
+              }
+              return {
+                texto: (el.textContent || '').trim().slice(0, 40),
+                color,
+                px: parseFloat(cs.fontSize),
+                peso: Number(cs.fontWeight) || 400,
+                visible,
+                x,
+                y,
+              };
+            },
+            [sel, i] as [string, number]
+          );
+
+          if (!sitio.visible) continue;
+          await page.waitForTimeout(120);
+          const fondo = await pixel(page, sitio.x, sitio.y);
+
+          await page.evaluate(
+            ([s, n]: [string, number]) => {
+              const el = document.querySelectorAll(s)[n] as HTMLElement;
+              el.style.color = el.dataset.contrasteColor || '';
+              delete el.dataset.contrasteColor;
+            },
+            [sel, i] as [string, number]
+          );
+
+          medidos += 1;
+          const razon = contraste(sobre(aRgb(sitio.color), fondo), fondo);
+          const minimo = pedido(sitio.px, sitio.peso);
+          if (razon < minimo) {
+            flojos.push(
+              `${sel} «${sitio.texto}» ${sitio.color} sobre rgb(${fondo}) → ` +
+                `${razon.toFixed(2)}:1, hace falta ${minimo}:1`
+            );
+          }
         }
       }
 
-      expect(flojas, 'cejillas por debajo de 4.5:1').toEqual([]);
+      expect(medidos, 'no se midió nada').toBeGreaterThan(0);
+      expect(flojos, 'texto por debajo del contraste que pide la norma').toEqual([]);
     });
   }
 });

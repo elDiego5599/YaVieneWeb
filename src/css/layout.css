@@ -1,230 +1,195 @@
-/* ============ SISTEMA DE PANELES ============
-   La página es una pila de paneles anchos, cada uno con su propio fondo,
-   en vez de secciones sueltas sobre un mismo beige dentro de un container
-   de 1200px. Así el color trabaja por bloques y la página deja de sentirse
-   encajonada en una banda central. */
+/* ============ SISTEMA DE SECCIONES ============
+   La página era una pila de paneles flotantes: cada sección con su margen,
+   su radio de 40 y su fondo propio, seis tarjetas gigantes apiladas. Eso
+   hacía que todo pareciera del mismo peso y que el ojo tuviera que
+   reconocer seis veces la misma forma antes de llegar al contenido.
+
+   Ahora son bandas planas de ancho completo con el contenido dentro de un
+   contenedor centrado de 1160. Sólo alternan dos fondos —papel y banda—, y
+   lo que marca el cambio de sección es una línea de un píxel y el aire, no
+   un borde redondeado.
+   ================================================================== */
 
 .panel {
-  /*
-    Dónde para un salto de anclaje. Justo el hueco entre paneles: el panel
-    de destino arranca pegado al borde de arriba y encima sólo queda la
-    franja de fondo, no el final del panel anterior. Con la isla flotando
-    —que no tapa el ancho entero— esa tira del panel de arriba se veía como
-    media sección de sobra, y la de destino empezaba ya cortada.
-
-    Que la isla quede por encima del arranque del panel no estorba: lo que
-    hay ahí es el relleno de `.panel-inner`, más alto que la isla, así que
-    el título entra siempre por debajo.
-  */
-  scroll-margin-top: var(--panel-gap);
   position: relative;
-  margin: 0 var(--gutter) var(--panel-gap);
-  border-radius: var(--panel-radius);
-  /* Recorta igual que `hidden` —respeta el radio— pero sin volverse
-     contenedor de scroll, que dejaría muertas las escenas pegadas. */
+  scroll-margin-top: 0;
+  background: var(--papel);
+  /* Recorta igual que `hidden` pero sin volverse contenedor de scroll, que
+     dejaría muertas las escenas pegadas. */
   overflow: clip;
-  /* Cada panel es su propio contexto de apilado: los glows y patrones
-     decorativos de uno nunca se cuelan sobre el de al lado. */
+  /* Cada banda es su propio contexto de apilado. */
   isolation: isolate;
+}
+
+/* La banda alterna. La línea de arriba y la de abajo son lo único que la
+   delimita: sin ellas, sobre el papel blanco el cambio de tono se lee
+   como una mancha y no como una sección. */
+.panel--banda {
+  background: var(--banda);
+  border-block: 1px solid var(--linea);
+}
+
+/* Una banda seguida de otra compartiría dos líneas pegadas. */
+.panel--banda + .panel--banda {
+  border-top: 0;
 }
 
 .panel-inner {
   position: relative;
   z-index: 1;
-  max-width: var(--content-max);
+  max-width: var(--contenedor);
   margin: 0 auto;
-  padding: clamp(52px, 7vw, 116px) clamp(22px, 4vw, 64px);
+  padding: var(--aire-seccion) var(--calle);
 }
 
-/*
-  Banda a sangre. Un panel flotante siempre se lee como una tarjeta grande:
-  por ancho que sea, el ojo ve dónde termina. Estas dejan el margen y el
-  radio y toman la ventana entera, así la página alterna tarjeta y banda en
-  vez de apilar seis veces la misma forma. Sólo lo llevan las secciones que
-  cargan color o producto —la franja de datos, la solución y empresas—; el
-  hero y el problema siguen flotando, que es lo que hace el contraste.
-*/
-.panel--sangre {
-  margin-left: 0;
-  margin-right: 0;
-  margin-bottom: 0;
-  border-radius: 0;
-}
-
-/* El pie va pegado a la banda de empresas: el hueco de siempre dejaría
-   una raya crema entre dos fondos oscuros. */
-.panel--sangre + .site-footer {
-  margin-top: 0;
-}
-
-/* Tras una banda, el panel que vuelve a flotar necesita su aire de arriba:
-   el hueco entre paneles lo daba el margen inferior, y la banda no lo tiene. */
-.panel--sangre + .panel {
-  margin-top: var(--panel-gap);
-}
-
+/* Las bandas que enseñan producto necesitan más ancho: el marco del mapa
+   con su lista de rutas al lado no cabe en 1160 sin encoger el mapa. */
 .panel-inner--ancho {
-  max-width: var(--content-wide);
+  max-width: var(--contenedor-ancho);
 }
 
-/* ── Fondos de panel ───────────────────────────────────────────────── */
+/* ── Cabecera de sección ───────────────────────────────────────────────
 
-.panel--arena {
-  background: var(--surface);
-}
+   Tres piezas siempre en el mismo orden: el rótulo que dice de qué va la
+   banda, el titular y la frase de apoyo. En pantalla ancha el titular y
+   la frase se ponen uno al lado del otro en vez de uno encima del otro:
+   la cabecera ocupa la mitad de alto y el contenido de la sección entra
+   antes en pantalla, que es de donde sale la sensación de que la página
+   avanza rápido.
+   ────────────────────────────────────────────────────────────────────── */
 
-/*
-  El fondo del hero. Era un #F8FAFC plano —blanco azulado de laboratorio,
-  de una sola pieza— y con la trama encima acababa pareciendo la sala de
-  espera de una consulta. Ahora es luz en vez de pintura: blanco limpio
-  arriba, que es donde caen la isla de navegación y el titular y donde el
-  texto necesita el contraste entero, y hacia abajo se va calentando hasta
-  la crema de la app —`--arena`, la misma superficie que llevan las hojas
-  del teléfono—, con un halo verde detrás del grupo de aparatos y dos
-  respiros de azul marino en las esquinas altas para que el blanco no se
-  lea liso.
-
-  El halo va abajo y no en el centro a propósito: es lo que despega los
-  teléfonos del fondo ahora que el fondo también tira a cálido, y de paso
-  ata el hero al verde de la marca sin teñir el titular.
-
-  El resto de paneles claros —`papel`, `mint`— van hacia el verde frío;
-  éste es el único que va hacia el cálido, y por eso la apertura no se
-  confunde con ninguna de las secciones que vienen después.
-*/
-.panel--sun {
-  background-color: #F0E8DA;
-  background-image:
-    /* La luz sobre el titular. Va la primera —encima de todo lo demás—
-       porque su trabajo es despejar el centro: el texto necesita el
-       blanco entero debajo y el resto de la capa puede ser cálido. */
-    radial-gradient(1180px 720px at 50% 18%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0) 68%),
-    /* El halo verde detrás del grupo de teléfonos. */
-    radial-gradient(1200px 760px at 50% 96%, rgba(0, 168, 89, 0.22), rgba(0, 168, 89, 0) 62%),
-    /* Dos respiros en las esquinas altas, los dos de la paleta: el azul
-       marino de la marca a la derecha y el coral a la izquierda. A esta
-       saturación no se leen como color, sólo como que la esquina no es
-       igual que el centro. */
-    radial-gradient(900px 520px at 97% -8%, rgba(20, 39, 78, 0.12), rgba(20, 39, 78, 0) 66%),
-    radial-gradient(820px 480px at 2% 0%, rgba(232, 106, 94, 0.11), rgba(232, 106, 94, 0) 66%),
-    linear-gradient(180deg, #FBF4E9 0%, #F6EEE1 46%, #EFE5D5 100%);
-}
-
-.panel--mint {
-  background: linear-gradient(180deg, var(--green-tint) 0%, #F2FBF6 100%);
-}
-
-/*
-  Trama de puntos: la misma rejilla que dibuja MapPatternPainter en la app,
-  copiada número por número. Paso de 34, primer punto en (18, 28), radio 1,6
-  y las filas impares corridas 12 a la derecha. Como la rejilla se repite
-  cada dos filas hacen falta dos capas: una lleva las filas corridas y la
-  otra las derechas, y la posición de cada una es lo que le falta al centro
-  de la baldosa —(17, 34)— para caer donde el painter pone el punto.
-
-  El color es `currentColor`, así que la trama sale blanca sobre los paneles
-  de tinta y azul marino sobre los claros, sin repetir la regla.
-*/
-.panel-dots {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    radial-gradient(circle at 50% 50%, currentColor 0 1.6px, transparent 1.9px),
-    radial-gradient(circle at 50% 50%, currentColor 0 1.6px, transparent 1.9px);
-  background-size: 34px 68px;
-  background-position: 13px -6px, 1px 28px;
-  opacity: 0.07;
-  /* La trama se apaga hacia los bordes del panel: si llega hasta la esquina
-     se lee como un fondo de plantilla y no como textura. */
-  mask-image: radial-gradient(ellipse 85% 75% at 50% 42%, #000 40%,
-    rgba(0, 0, 0, 0.45) 76%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 42%, #000 40%,
-    rgba(0, 0, 0, 0.45) 76%, transparent 100%);
-}
-
-/* Sobre el hero la trama baja un punto: el fondo ya tiene degradado y
-   halo, y a 0,07 los puntos volvían a leerse como rejilla de plantilla. */
-.panel--sun .panel-dots {
-  opacity: 0.05;
-}
-
-/* ── Encabezado de sección ─────────────────────────────────────────── */
-
-.section-head {
+.seccion-cabecera {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: clamp(32px, 4vw, 56px);
+  gap: 16px;
+  margin-bottom: clamp(36px, 5vh, 64px);
 }
 
-.section-head .section-title {
-  font-family: var(--font-display);
-  font-size: var(--step-h2);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
-  font-weight: 700;
+.seccion-rotulo {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--acento);
+}
+
+.seccion-titulo {
   margin: 0;
+  max-width: 20ch;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 1.05rem + 2.6vw, 3.1rem);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  color: var(--tinta);
 }
 
-.section-head .section-lead {
-  font-size: var(--step-lead);
-  line-height: 1.45;
-  color: var(--text-secondary);
-  max-width: var(--measure);
+.seccion-lead {
+  margin: 0;
+  max-width: 56ch;
+  font-size: clamp(15.5px, 0.95rem + 0.2vw, 17.5px);
+  line-height: 1.6;
+  color: var(--tinta-media);
 }
 
+@media (min-width: 900px) {
+  .seccion-cabecera--partida {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    column-gap: clamp(40px, 6vw, 104px);
+    row-gap: 20px;
+  }
+
+  .seccion-cabecera--partida .seccion-rotulo {
+    grid-column: 1 / -1;
+  }
+
+  .seccion-cabecera--partida .seccion-lead {
+    padding-top: 6px;
+  }
+}
+
+/*
+  La segunda mitad de una frase, a media tinta. Es el recurso con el que
+  estas interfaces marcan lo importante sin recurrir a la negrita ni al
+  color: la afirmación va en tinta plena y lo que la matiza se apaga, en
+  el mismo tamaño y el mismo peso. Se lee primero lo uno y después lo otro.
+*/
+/*
+  Lo que va dentro de una columna: un titular corto y un párrafo. No hay
+  icono ni número: tres iconos genéricos encima de tres párrafos es el
+  adorno que más veces se ha puesto en una página sin que aporte nada, y
+  numerarlas diría que hay un orden que no hay.
+*/
+.columna-titulo {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 0.95rem + 0.35vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--tinta);
+}
+
+.columna-texto {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--tinta-media);
+}
+
+.apagado {
+  color: var(--tinta-tenue);
+}
+
+/* ── Columnas con línea medianera ──────────────────────────────────────
+
+   Para los grupos de tres: en vez de tres tarjetas con su borde y su
+   sombra, tres columnas separadas por una línea de un píxel que las
+   cruza de arriba abajo. Menos dibujo y más orden.
+   ────────────────────────────────────────────────────────────────────── */
+
+.columnas {
+  display: grid;
+  gap: clamp(28px, 4vw, 56px);
+}
 
 /* ── Pista y escena: el andamio del scrollytelling ────────────────────
    Una pista es un bloque de varias pantallas de alto con una escena
    pegada dentro. Mientras la pista cruza la ventana la escena se queda
-   quieta y lo que cambia es lo que hay dentro: el reloj corre, la cinta
-   de momentos pasa de uno a otro. `--tramos` dice cuántos momentos tiene
-   y `--paso` cuánto scroll cuesta cada uno.
+   quieta y lo que cambia es lo que hay dentro. Queda una sola en la
+   página —el visor de los tres pasos, que va cambiando de pantalla en el
+   teléfono—, y quien lee el recorrido y decide qué paso manda es
+   `paso-foco.ts`.
+
+   `--tramos` dice cuántos momentos tiene y `--paso` cuánto scroll cuesta
+   cada uno. 68 vh por paso: con un teléfono quieto por columna el relevo
+   se lee en menos recorrido que cuando la fila entera tenía que cruzar
+   la ventana.
 
    Cuidado con `overflow` en cualquier antepasado: `hidden` convierte al
    padre en contenedor de scroll y el pegado deja de funcionar. Por eso el
    panel y el body recortan con `clip`. */
 .pista {
   --tramos: 3;
-  --paso: 82vh;
+  --paso: 68vh;
   position: relative;
   height: calc(var(--tramos) * var(--paso) + 100vh);
 }
 
-/* El reloj no necesita las tres pantallas y media que pedía antes: la
-   sección tardaba tanto en soltar su contenido que bajando a ritmo normal
-   se veían transiciones sin tiempo de leerlas, y el que llegaba al final
-   había recorrido más de tres mil píxeles para una idea sola. Con dos
-   tramos cortos el recorrido baja un tercio y la esfera sigue dando la
-   vuelta entera; lo que se lee de la sección ya no depende de haber
-   bajado hasta el fondo, porque el titular y la frase están puestos
-   desde el primer píxel. */
-.pista--reloj {
-  --tramos: 2;
-  --paso: 70vh;
-}
-
-/* Los tramos los pone `pasos.ts`, uno por momento. El paso es más corto
-   que el de antes porque la cinta ya no tiene que cruzar dos bloques
-   desvaneciéndose: el texto se desplaza de un tirón y el teléfono no se
-   mueve, así que el mismo relevo se lee en menos recorrido. */
-.pista--pasos {
-  --paso: 68vh;
-}
-
 /* La escena se pega a la ventana entera, pero la ventana entera no está
-   libre: la píldora de la cabecera flota sobre los primeros setenta
-   píxeles toda la página. Sin descontarlos, el contenido se centra en un
+   libre: la barra de la cabecera flota sobre los primeros píxeles de
+   toda la página. Sin descontarlos, el contenido se centra en un
    hueco que no existe y en un teléfono —donde no sobra ni un píxel— el
-   titular acaba debajo de la píldora. Con `border-box` el relleno se
+   titular acaba debajo de la barra. Con `border-box` el relleno se
    come el alto, así que la escena sigue midiendo una pantalla justa y el
    pegado sigue funcionando igual.
 
    Y abajo pasa lo mismo con la barra de direcciones. En el móvil `100vh`
    es la ventana SIN barras, pero la barra está puesta y tapa los últimos
-   ochenta píxeles: una escena pegada mete ahí el final del reloj y de una
+   ochenta píxeles: una escena pegada mete ahí su final, y de una
    escena pegada no se saca nada bajando, porque no se mueve. */
 .escena {
   position: sticky;
@@ -281,7 +246,7 @@
   }
 
   .escena .panel-inner {
-    padding-top: clamp(52px, 7vw, 116px);
-    padding-bottom: clamp(52px, 7vw, 116px);
+    padding-top: var(--aire-seccion);
+    padding-bottom: var(--aire-seccion);
   }
 }

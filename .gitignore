@@ -20,3 +20,6 @@ __pycache__/
 
 # Documentos de la propuesta: no son parte de la web.
 *.docx
+
+# Capturas sueltas de verificación, no son del sitio.
+shot-*.png

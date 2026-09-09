@@ -55,8 +55,11 @@
 }
 
 /* Tres colores que ya reparte la página: el verde de «la solución», el
-   coral de «el problema» y la tinta marina de la marca. */
-.rutas-dato:nth-child(2) .rutas-dato-numero { color: var(--coral); }
+   coral de «el problema» y la tinta marina de la marca. Los dos primeros
+   en su versión accesible, que es la que aguanta el texto sobre la banda
+   —el coral de marca se quedaba en 2.92:1, por debajo del 3:1 de la
+   norma incluso a este tamaño. */
+.rutas-dato:nth-child(2) .rutas-dato-numero { color: var(--coral-accessible); }
 .rutas-dato:nth-child(3) .rutas-dato-numero { color: var(--navy); }
 
 .rutas-dato-rotulo {
@@ -88,78 +91,85 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   margin: 0;
-  padding: 14px 20px;
+  padding: 13px 14px;
   font: inherit;
   text-align: left;
   cursor: pointer;
-  /* El mismo material que la tarjeta de «El bus está cerca»: blanco casi
-     entero, filo de luz en vez de línea de tinta y la separación puesta
-     por la sombra. Con el blanco al 72% y un borde oscuro las fichas eran
-     papel translúcido al lado de una notificación opaca, y las dos cosas
-     están en el mismo tablero. La sombra va más floja que la del aviso:
-     una notificación es una y las fichas son seis. */
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.97);
-  box-shadow:
-    0 2px 6px -2px rgba(11, 22, 40, 0.05),
-    0 10px 24px -14px rgba(11, 22, 40, 0.16);
+  /*
+    La ficha dejó de ser una tarjeta flotante. Seis tarjetas blancas con
+    sombra dentro de un marco blanco es papel encima de papel: los filos
+    no se leían y el conjunto parecía un solo bloque con manchas. Ahora
+    son seis casillas de filo fino sobre el papel del marco —el mismo
+    material que la tabla de rutas— y lo único que las separa es la
+    línea. Sin sombra y sin salto: la que está puesta se distingue por
+    el tinte verde, que es información, no por levantarse del plano.
+  */
+  border: 1px solid var(--linea);
+  border-radius: var(--radio-tarjeta);
+  background: var(--papel);
+  box-shadow: none;
   color: inherit;
-  /* `translate` y no `transform`: son las dos propiedades que el
-     compositor resuelve solo, sin repintar. */
-  /* Las cuatro al mismo tiempo. Iban a dos velocidades —el borde y el
-     fondo en 0.15s, la sombra y el saltito en 0.3s— y se veía: la ficha
-     cambiaba de color y sólo después se levantaba. */
   transition:
     border-color var(--transition-hover),
-    background var(--transition-hover),
-    box-shadow var(--transition-hover),
-    translate var(--transition-hover);
+    background var(--transition-hover);
 }
 
 /* El foco fuera del guarda, el puntero dentro. Ver botones.css. */
 .ruta-ficha:focus-visible {
-  border-color: rgba(0, 168, 89, 0.5);
-  background: #FFFFFF;
-  box-shadow: 0 16px 30px -26px rgba(20, 39, 78, 0.6);
-  translate: 0 -2px;
+  outline: 2px solid var(--green-accessible);
+  outline-offset: 2px;
+  border-color: var(--linea-fuerte);
 }
 
 @media (hover: hover) {
   .ruta-ficha:hover {
-    border-color: rgba(0, 168, 89, 0.5);
-    background: #FFFFFF;
-    box-shadow: 0 16px 30px -26px rgba(20, 39, 78, 0.6);
-    translate: 0 -2px;
+    border-color: var(--linea-fuerte);
+    background: var(--banda);
   }
 }
 
 /* El acuse del dedo, que en el móvil es el único que hay. Ver botones.css. */
 .ruta-ficha:active {
-  translate: 0 0;
+  background: var(--banda);
   transition-duration: 0.09s;
 }
 
 /* La elegida: la que el mapa está dibujando ahora mismo. Tiene que
    ganarle al `:hover` de cualquier otra, por eso va después. */
 .ruta-ficha[aria-pressed='true'] {
-  border-color: rgba(0, 168, 89, 0.55);
+  border-color: rgba(0, 168, 89, 0.5);
   background: var(--green-tint);
-  translate: none;
 }
 
-/* Sin la chapa ni el número al lado, el nombre es lo único grande de la
-   ficha y puede permitírselo: sube de 0,95rem a algo que se lee a la
-   distancia a la que se mira el mapa. */
+/* El nombre y el kilometraje comparten renglón: el nombre manda a la
+   izquierda y la cifra se apoya en el filo derecho, alineada con la de
+   las demás fichas. */
+.ruta-ficha-cabeza {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 .ruta-ficha-nombre {
   font-family: var(--font-display);
-  font-size: clamp(0.95rem, 0.85rem + 0.35vw, 1.2rem);
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
-  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--tinta);
+}
+
+.ruta-ficha-km {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--tinta-tenue);
 }
 
 .ruta-ficha-tramo {
@@ -169,10 +179,10 @@
   gap: 5px;
   font-size: 12.5px;
   line-height: 1.3;
-  color: var(--text-secondary);
+  color: var(--tinta-media);
 }
 
 .ruta-ficha-flecha {
-  font-weight: 700;
-  color: var(--green);
+  font-weight: 500;
+  color: var(--tinta-tenue);
 }

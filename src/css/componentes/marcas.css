@@ -1,0 +1,248 @@
+/* ── MARCAS: cinta de empresas ────────────────────────────────────
+
+   Los mismos siete logos en la portada (una fila quieta sobre blanco) y
+   en `/empresas.html` (un carrusel al pie de la ficha). Una sola fuente:
+   este fichero lo cargan las dos páginas desde el paquete común.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── La banda de la portada ────────────────────────────────────────────
+
+   Siete logos que no se parecen en nada: un sello cuadrado, una firma
+   seis veces más ancha que alta, tres palabras y un dibujo. Puestos en
+   fila y a su aire, cada uno tira del ojo hacia un lado y la banda se
+   lee como siete recortes pegados. Puestos cada uno en una casilla del
+   mismo tamaño, con el logo plantado en el centro a su altura óptica,
+   se lee como una fila: lo que se repite es la casilla, y lo que cambia
+   dentro de ella es la marca, que es justo lo que hay que mirar.
+
+   El número de columnas está escrito y no lo decide el envoltorio: con
+   siete piezas, cualquier reparto automático deja una suelta al final
+   de la última línea. Dos, tres y siete son los tres repartos en los
+   que eso no pasa —y en los dos primeros la séptima ocupa la línea
+   entera, centrada, en vez de quedarse arrinconada a un lado.
+   ────────────────────────────────────────────────────────────────── */
+.marcas-claras {
+  background: var(--papel);
+  padding: clamp(36px, 4vw, 60px) var(--calle) 48px;
+}
+
+/* El rótulo estaba sólo en el `aria-label` de la sección: se oía y no se
+   leía. Siete logos sin nada que los presente no dicen qué son —¿clientes,
+   alianzas, medios?—, y ésa es justo la frase que hace que valgan. */
+.marcas-claras-rotulo {
+  margin: 0 0 clamp(26px, 3vw, 40px);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--tinta-tenue);
+}
+
+.marcas-claras-fila {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 32px) clamp(14px, 2vw, 26px);
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* La séptima, sola en su línea, se pone a lo ancho para quedar centrada
+   bajo las demás en vez de descolgada a la izquierda. */
+.marcas-claras-fila .marca-casilla:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.marca-casilla {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  height: clamp(46px, 5vw, 58px);
+}
+
+@media (min-width: 640px) {
+  .marcas-claras-fila {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .marcas-claras-fila .marca-casilla:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+
+  .marcas-claras-fila .marca-casilla:last-child:nth-child(3n + 1) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1100px) {
+  .marcas-claras-fila {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .marcas-claras-fila .marca-casilla:last-child:nth-child(3n + 1) {
+    grid-column: auto;
+  }
+}
+
+/*
+  Los siete van a todo color y sin filtro, aquí y en la banda de
+  /empresas.html. Se probó apagarlos —gris, y luego gris con una
+  corrección por logo, porque los ficheros no vienen igual de oscuros:
+  Sobusa y Transmetro son casi negros y Transmecar un gris claro, así
+  que el mismo tratamiento dejaba la fila a dos tintas— y en ninguna de
+  las dos versiones la fila se leía como conjunto. Los logos son prueba
+  social: uno apagado no prueba nada.
+
+  Eso lo pone el color base de `.empresa-marcas-logo` más abajo, y lo
+  vigila la prueba de la banda en `e2e/paginas.spec.ts`, que falla si
+  alguno vuelve con filtro o a media tinta.
+*/
+
+/* En la portada los logos van más grandes que en empresas. El alto de
+   cada uno no es el mismo número: un sello cuadrado necesita más alto
+   que una firma alargada para pesar lo mismo en la fila. El ancho lo
+   pone la casilla, y quien se pase se ajusta a ella. */
+.marcas-claras .empresa-marcas-logo {
+  max-height: 38px;
+  max-width: 100%;
+}
+
+.marcas-claras .empresa-marcas-logo--sobusa     { max-height: 34px; }
+.marcas-claras .empresa-marcas-logo--sodis      { max-height: 37px; }
+.marcas-claras .empresa-marcas-logo--coolitoral { max-height: 30px; }
+.marcas-claras .empresa-marcas-logo--transmetro { max-height: 46px; }
+.marcas-claras .empresa-marcas-logo--coochofal  { max-height: 27px; }
+.marcas-claras .empresa-marcas-logo--transmecar { max-height: 34px; }
+.marcas-claras .empresa-marcas-logo--trasalfa   { max-height: 52px; }
+
+/* ── Marcas: carrusel continuo al pie de la ficha ─────────────────── */
+
+.empresa-marcas {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
+  gap: 14px;
+  margin-top: 6px;
+  padding-top: clamp(22px, 2.4vw, 30px);
+  padding-bottom: 4px;
+  border-top: 1px solid var(--divider);
+  overflow: hidden;
+}
+
+.empresa-marcas-titulo {
+  display: block;
+  color: var(--ink);
+}
+
+.empresa-marcas-carrusel {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/*
+  El apagón de los bordes iba con `mask-image`. El problema es que una
+  máscara sobre contenido que se anima obliga a bastantes móviles —sobre
+  todo gama media de Android— a recomponerla en cada cuadro en vez de
+  dejar la animación correr sola en el compositor, y ahí es donde el
+  carrusel se ponía lentísimo: no cambiaba la duración, cambiaban los
+  cuadros por segundo. Dos franjas quietas del mismo `--surface` del
+  fondo, superpuestas al filo, hacen el mismo apagón sin tocar el
+  elemento que se mueve.
+*/
+.empresa-marcas-carrusel::before,
+.empresa-marcas-carrusel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(28px, 8vw, 56px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/*
+  El desvanecido termina en `--surface-nada`, que es el mismo fondo con
+  alfa 0, y no en `transparent`. `transparent` es negro transparente: un
+  degradado de blanco hacia ahí pasa por grises translúcidos y deja una
+  sombra sucia justo en el filo, encima de los logos que entran y salen.
+*/
+.empresa-marcas-carrusel::before {
+  left: 0;
+  background: linear-gradient(to right, var(--surface), var(--surface-nada));
+}
+
+.empresa-marcas-carrusel::after {
+  right: 0;
+  background: linear-gradient(to left, var(--surface), var(--surface-nada));
+}
+
+.empresa-marcas-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: carrusel-marcas 26s linear infinite;
+}
+
+.empresa-marcas-grupo {
+  display: flex;
+  align-items: center;
+  gap: clamp(26px, 3.2vw, 42px);
+  padding-right: clamp(26px, 3.2vw, 42px);
+  flex-shrink: 0;
+}
+
+.empresa-marcas-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 44px;
+}
+
+.empresa-marcas-logo {
+  display: block;
+  width: auto;
+  height: auto;
+  max-height: 28px;
+  max-width: 180px;
+  object-fit: contain;
+  /* Color original completo */
+  filter: none;
+  opacity: 1;
+}
+
+/* Alturas ópticas individuales para balance visual */
+.empresa-marcas-logo--sobusa     { max-height: 25px; }
+.empresa-marcas-logo--sodis      { max-height: 27px; }
+.empresa-marcas-logo--coolitoral { max-height: 22px; }
+.empresa-marcas-logo--transmetro { max-height: 30px; }
+.empresa-marcas-logo--coochofal  { max-height: 20px; }
+.empresa-marcas-logo--transmecar { max-height: 24px; }
+.empresa-marcas-logo--trasalfa   { max-height: 30px; }
+
+@keyframes carrusel-marcas {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .empresa-marcas-track {
+    animation: none;
+  }
+  .empresa-marcas-carrusel {
+    overflow-x: auto;
+  }
+  .empresa-marcas-carrusel::before,
+  .empresa-marcas-carrusel::after {
+    display: none;
+  }
+}

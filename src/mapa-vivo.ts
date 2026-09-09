@@ -490,7 +490,7 @@ export class MapaVivo {
         exacta no se repite en la tarjeta porque ya está a su lado, en el
         número grande de la lectura y en el círculo del mapa.
       */
-      this.avisoTitulo.textContent = `El bus ${cerca.placa} está cerca de ti`;
+      this.avisoTitulo.textContent = 'Tu bus está cerca de ti';
       this.aviso.classList.add('is-on');
       // La banda de arriba es una sola: mientras hay aviso, la pista de
       // toque se retira. Nunca se ven las dos, así que no reserva hueco.

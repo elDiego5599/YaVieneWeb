@@ -10,17 +10,6 @@
    especificidad. Es el fallo que más veces ha pasado en esta base.
    ────────────────────────────────────────────────────────────────── */
 
-/* ── Experimento `prueba`: geometría y color del Caribe ──────────────
-   La primera escena queda intacta. Estas capas llevan a las secciones
-   siguientes la energía de Barranquilla —bloques de color, cielo, mango y
-   formas de ventana— sin convertir la landing en una postal turística. */
-#solucion {
-  background:
-    radial-gradient(560px circle at 8% 14%, rgba(17, 169, 199, 0.18), transparent 68%),
-    radial-gradient(520px circle at 94% 86%, rgba(232, 106, 94, 0.2), transparent 68%),
-    linear-gradient(125deg, #E6F7F0 0%, #FFF8E1 50%, #FBE7E4 100%);
-}
-
 /* La sección que pide algo va sobre papel, no sobre tinta. Justo encima
    está el mapa, que toma la ventana entera en oscuro: dos fondos de tinta
    seguidos hacen que el formulario parezca un trozo más del mapa. En claro
@@ -39,12 +28,6 @@
   /* El ámbar de la marca no se sostiene sobre papel: mismo sitio y mismo
      peso, pero en el verde que sí pasa contraste. */
   color: var(--green-accessible);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #solucion {
-    animation: none !important;
-  }
 }
 
 @media (min-width: 760px) {

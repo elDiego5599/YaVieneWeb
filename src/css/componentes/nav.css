@@ -248,11 +248,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 11px 20px;
+  padding: 13px 24px;
   border-radius: 999px;
   background: var(--green);
   color: var(--text-white);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.2px;
   white-space: nowrap;
@@ -488,5 +488,220 @@
 
   .nav-island-toggle::after {
     inset: -3px;
+  }
+}
+
+/* ── La barra del rediseño v3 ──────────────────────────────────────────
+
+   La isla flotante se retira. Era una píldora azul marino con degradado,
+   borde de luz y una sombra de dieciséis píxeles suspendida sobre la
+   página: la primera cosa que se veía del sitio y la que más lo delataba
+   como plantilla. Ninguna herramienta seria navega así.
+
+   En su sitio queda una barra de sesenta píxeles pegada arriba, del mismo
+   papel que la página, con una línea de un píxel abajo y el contenido
+   dentro del mismo contenedor de 1160 que todo lo demás. La marca a la
+   izquierda, los enlaces a la derecha y un solo botón.
+
+   El armazón de plegado en móvil se conserva entero —el mismo botón, el
+   mismo `aria-expanded`, el mismo JavaScript—; lo que cambia es que el
+   panel que se despliega es blanco con borde de pelo en vez de un bloque
+   de azul marino.
+   ────────────────────────────────────────────────────────────────────── */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  display: block;
+  pointer-events: auto;
+  /* Arriba del todo la barra es el mismo lienzo: sin velo ni línea, el
+     hero la continúa sin separación. Al bajar aparecen los dos, con una
+     transición larga para que el cambio se sienta y no se note. El
+     desenfoque va siempre puesto: `backdrop-filter` no se anima entre
+     navegadores, así que sólo viajan el color y la línea. */
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  backdrop-filter: saturate(1.6) blur(12px);
+  -webkit-backdrop-filter: saturate(1.6) blur(12px);
+  transition:
+    background-color 0.8s var(--ease-fluida),
+    border-color 0.8s var(--ease-fluida);
+}
+
+.site-header:not(.is-arriba) {
+  background: rgba(255, 255, 255, 0.82);
+  border-bottom-color: var(--linea);
+}
+
+.nav-island {
+  width: 100%;
+  max-width: var(--contenedor);
+  height: var(--nav-alto);
+  margin: 0 auto;
+  padding: 0 var(--calle);
+  gap: 20px;
+  justify-content: space-between;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  transition: none;
+}
+
+.nav-island.is-open {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.nav-island-brand {
+  color: var(--tinta);
+}
+
+.nav-island-logo {
+  box-shadow: none;
+}
+
+/* El nombre de la marca deja el espaciado de cartel: a 0.22em una palabra
+   de ocho letras ocupa lo que un enlace y medio del menú. */
+.site-header .wordmark {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* ── El pliegue, en papel ──────────────────────────────────────────── */
+
+.nav-island-reveal {
+  top: calc(100% + 9px);
+  left: var(--calle);
+  right: var(--calle);
+  padding: 8px;
+  border-radius: var(--radio-tarjeta);
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  box-shadow: 0 18px 40px -20px rgba(11, 18, 32, 0.24);
+}
+
+.nav-island-inner .nav-link {
+  color: var(--tinta);
+}
+
+/* ── Los enlaces ───────────────────────────────────────────────────── */
+
+.nav-link {
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--tinta-media);
+  transition: color var(--transition-hover);
+}
+
+/* El halo de píldora que se encendía detrás del enlace al pasar por
+   encima se retira: en una barra clara basta con que el texto pase de
+   tinta media a tinta plena. */
+.nav-link::before {
+  content: none;
+}
+
+@media (hover: hover) {
+  .nav-link:hover {
+    color: var(--tinta);
+  }
+}
+
+.nav-link:focus-visible {
+  outline: 2px solid var(--green-accessible);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.nav-island .nav-island-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 15px;
+  border: 1px solid var(--green-accessible);
+  border-radius: 9999px;
+  background: var(--green-accessible);
+  color: var(--text-white);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  box-shadow: none;
+  transition: background-color var(--transition-hover), border-color var(--transition-hover);
+}
+
+@media (hover: hover) {
+  .nav-island .nav-island-cta:hover {
+    border-color: #036145;
+    background: #036145;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.nav-island-toggle {
+  color: var(--tinta);
+  background: none;
+  border: 1px solid var(--linea);
+  border-radius: 9999px;
+}
+
+.nav-island-grip,
+.nav-island-grip::before {
+  background: var(--tinta);
+}
+
+@media (min-width: 880px) {
+  .nav-island-reveal {
+    position: static;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  /* La isla vieja nacía cerrada y se abría al pasar el ratón: el pliegue
+     era una columna de rejilla de 0fr y sus piezas empezaban en opacidad
+     cero y desplazadas. Una barra fija no se abre, así que la columna se
+     queda a 1fr y las piezas puestas. El botón de hamburguesa, que en la
+     isla vivía también en escritorio como pista del pliegue, sobra. */
+  .nav-island-reveal,
+  .nav-island.is-open > .nav-island-reveal {
+    grid-template-columns: 1fr;
+    transition: none;
+  }
+
+  .nav-island-toggle {
+    display: none;
+  }
+
+  .nav-island-inner .nav-link,
+  .nav-island-inner .nav-island-cta,
+  .nav-island.is-open .nav-link,
+  .nav-island.is-open .nav-island-cta {
+    opacity: 1;
+    transform: none;
+  }
+
+  .nav-island-inner {
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(18px, 2.2vw, 32px);
+    overflow: visible;
+  }
+
+  .nav-island-links {
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(18px, 2.2vw, 32px);
   }
 }

@@ -13,10 +13,7 @@
   transform: translateY(0);
 }
 
-/* Aceleración de hardware y renderizado vectorial nítido HD para buses y elementos flotantes */
-.scene-bus,
-.scene-bus-img,
-.animate-float-slow,
+/* Aceleración de hardware para los elementos flotantes que quedan */
 .animate-float-delayed {
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -26,16 +23,7 @@
   will-change: transform;
 }
 
-/* Levitación de los buses vectoriales y tarjetas del hero */
-@keyframes floatSlow {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
+/* Levitación de las tarjetas flotantes que quedan */
 @keyframes floatDelayed {
   0%, 100% {
     transform: translateY(0px);
@@ -45,24 +33,8 @@
   }
 }
 
-.animate-float-slow {
-  animation: floatSlow 6s ease-in-out infinite;
-}
-
 .animate-float-delayed {
   animation: floatDelayed 7s ease-in-out infinite 1.5s;
-}
-
-/* Latido bajo el pin del mapa, el mismo faro de ubicación de la app. */
-@keyframes pinRadarPing {
-  0% {
-    transform: scale(0.7);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(4.2);
-    opacity: 0;
-  }
 }
 
 /* Reduced motion accessibility query */
@@ -108,7 +80,6 @@
     transition: none !important;
     translate: none !important;
   }
-  .animate-float-slow,
   .animate-float-delayed {
     animation: none !important;
     transform: none !important;

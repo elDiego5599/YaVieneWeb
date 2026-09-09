@@ -31,6 +31,19 @@
   color: var(--text-primary);
 }
 
+/* Los tres degradados del fondo crecen y se encogen a la vez; lo que se
+   ve es que la luz de abajo se acerca y se aleja. El tercero, el lineal,
+   se queda quieto: es el color base y moverlo despegaría el pie del
+   borde. */
+@keyframes footer-gradient-respiro {
+  0% {
+    background-size: 135% 135%, 115% 115%, 100% 100%;
+  }
+  100% {
+    background-size: 155% 155%, 132% 132%, 100% 100%;
+  }
+}
+
 .site-footer::before {
   content: '';
   position: absolute;
@@ -271,4 +284,154 @@
   .footer-legal-links a {
     padding-block: 13px;
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   EL CIERRE Y EL PIE, EN PAPEL
+
+   El pie era un degradado de ámbar y coral que además respiraba: diez
+   segundos de ida y vuelta, con una trama de puntos encima. Bajo la luz
+   del día que usa el resto de la página se leía como otra web pegada al
+   final de ésta.
+
+   Queda el mismo contenido —el cierre grande, las tres columnas de
+   enlaces y la línea legal— sobre el papel de siempre, con el velo verde
+   del encabezado repetido abajo para que la página abra y cierre igual.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.site-footer {
+  padding: 0;
+  border-top: 1px solid var(--linea);
+  background: none;
+  animation: none;
+  color: var(--tinta);
+}
+
+.site-footer::before {
+  content: none;
+}
+
+.footer-cta,
+.footer-grid,
+.footer-bottom {
+  max-width: calc(var(--contenedor) + var(--calle) * 2);
+  padding-right: var(--calle);
+  padding-left: var(--calle);
+}
+
+.footer-cta {
+  gap: 0;
+  padding-top: clamp(76px, 9vh, 124px);
+  padding-bottom: clamp(68px, 8vh, 108px);
+}
+
+/* El velo va en la sección, no en el bloque centrado: tiene que cruzar la
+   ventana entera como el del encabezado. */
+.site-footer {
+  background:
+    radial-gradient(120% 68% at 50% 122%, rgba(0, 168, 89, 0.085), var(--surface-nada) 72%);
+}
+
+.footer-cta .tracked-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--acento);
+}
+
+.footer-cta h2 {
+  margin: 16px 0 0;
+  max-width: 16ch;
+  font-family: var(--font-display);
+  font-size: clamp(34px, 1.9rem + 1.9vw, 54px);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  color: var(--tinta);
+  text-wrap: balance;
+}
+
+.footer-cta > p:not(.footer-cta-note) {
+  margin: 18px 0 0;
+  max-width: 50ch;
+  font-size: clamp(16px, 1rem + 0.2vw, 17.5px);
+  line-height: 1.6;
+  color: var(--tinta-media);
+}
+
+.footer-actions {
+  margin-top: 30px;
+  gap: 12px;
+}
+
+.footer-actions .btn-outline {
+  background: var(--papel);
+  border: 1px solid var(--linea-fuerte);
+  color: var(--tinta);
+}
+
+.footer-cta-note {
+  margin: 24px 0 0;
+  font-size: 12.5px;
+  color: var(--tinta-tenue);
+}
+
+.footer-grid {
+  margin-top: 0;
+  padding-top: clamp(36px, 4vw, 52px);
+  border-top: 1px solid var(--linea);
+}
+
+.footer-brand span {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--tinta);
+}
+
+.footer-intro p,
+.footer-status p {
+  color: var(--tinta-media);
+}
+
+.footer-nav-group > span,
+.footer-status > span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--tinta-tenue);
+}
+
+.footer-nav a,
+.footer-legal-links a {
+  color: var(--tinta-media);
+}
+
+@media (hover: hover) {
+  .footer-nav a:hover,
+  .footer-legal-links a:hover {
+    color: var(--tinta);
+  }
+}
+
+.footer-status {
+  border-left: 1px solid var(--linea);
+}
+
+.footer-status strong {
+  color: var(--tinta);
+  font-weight: 600;
+}
+
+.footer-bottom {
+  margin-top: clamp(38px, 4vw, 54px);
+  padding-top: 18px;
+  padding-bottom: 22px;
+  border-top: 1px solid var(--linea);
+  color: var(--tinta-tenue);
 }

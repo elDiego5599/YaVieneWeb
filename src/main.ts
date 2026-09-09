@@ -24,14 +24,12 @@ import { encajarEscena } from './encaje';
 import { MapaVivo } from './mapa-vivo';
 import { NavIsland } from './nav-island';
 import { PasoDemo } from './paso-demo';
-import { Pasos } from './pasos';
+import { PasoFoco } from './paso-foco';
 import { PhoneMap } from './phone-map';
 import { PhoneSimulator } from './phone-simulator';
-import { ProblemWeather } from './problem-weather';
-import { Reloj } from './reloj';
+import { Problema } from './problema';
 import { pintarCifras } from './rutas';
 import { dormirLoQueNoSeVe } from './reposo';
-import { saltosDeMenu } from './salto';
 import { encenderScrollSuave } from './scroll-suave';
 import { entrarEscena, ScrollEffects } from './scroll-effects';
 import { sinMovimiento } from './scrolly';
@@ -63,10 +61,6 @@ const arrancar = (): void => {
   // ninguna otra pieza haya montado lo suyo. Ver reposo.ts.
   dormirLoQueNoSeVe();
 
-  // Los enlaces internos cruzan por encima de las dos pistas; sin esto la
-  // travesía reproduce sus historias a toda velocidad. Ver salto.ts.
-  saltosDeMenu();
-
   const isla = document.querySelector<HTMLElement>('.nav-island');
   const botonIsla = isla?.querySelector<HTMLButtonElement>('.nav-island-toggle');
   if (isla && botonIsla) new NavIsland(isla, botonIsla);
@@ -96,11 +90,16 @@ const arrancar = (): void => {
     mapaLado.showPin(true);
   }
 
+  /*
+    Qué resuelve: la sección de dos caras. Va aquí y no antes porque el
+    HTML ya trae puesta la cara del problema —lo que se ve sin
+    JavaScript—, así que nada de lo de arriba depende de ella.
+  */
+  const problema = document.querySelector<HTMLElement>('[data-problema]');
+  if (problema) new Problema(problema);
+
   const form = document.querySelector<HTMLFormElement>('#contact-form');
   if (form) new ContactForm(form);
-
-  const problema = document.querySelector<HTMLElement>('#problema');
-  if (problema) new ProblemWeather(problema);
 
   /*
     Las dos secciones que se recorren en vez de leerse de un golpe. Cada
@@ -117,36 +116,100 @@ const arrancar = (): void => {
     }
   }
 
-  const pistaReloj = document.querySelector<HTMLElement>('[data-reloj-pista]');
-  if (pistaReloj) new Reloj(pistaReloj);
-
   /*
-    La solución: los tres textos van en una cinta y los tres teléfonos
-    están apilados en el mismo sitio, uno por momento. Los mapas son el
-    mismo mosaico y las mismas seis polilíneas del hero, uno por teléfono,
-    porque cada guion mueve su bus a su ritmo.
+    Cómo funciona: tres columnas, cada una con su teléfono, y el scroll
+    decidiendo cuál de las tres se está contando. Los mapas son el mismo
+    mosaico y las mismas seis polilíneas del hero, uno por aparato, porque
+    cada guion mueve su bus a su ritmo.
 
-    `Pasos` avisa qué teléfono está a la vista y sólo ése se anima: así la
-    sección nunca tiene más de un bucle corriendo, y la demo se ve entera
-    antes de dar paso a la siguiente. Con -1 se apagan todos, que es lo
-    que pasa cuando la sección se sale de pantalla.
+    El paso en primer plano crece y corre su bucle; los otros dos esperan
+    a tamaño normal y quietos. Así nunca hay más de un `requestAnimationFrame`
+    de mapa vivo, y la sección se lee como lo que cuenta: un paso, luego el
+    siguiente, luego el último.
   */
-  const pistaPasos = document.querySelector<HTMLElement>('[data-pasos-pista]');
-  if (pistaPasos) {
-    const demos = new Map<number, PasoDemo>();
+  const columnasPasos = document.querySelector<HTMLElement>('[data-pasos-columnas]');
+  if (columnasPasos) {
+    const demos: PasoDemo[] = [];
+    const columnas: HTMLElement[] = [];
 
-    for (const toma of pistaPasos.querySelectorAll<HTMLElement>('[data-toma]')) {
-      const numero = Number(toma.dataset.demo);
-      const capa = toma.querySelector<SVGSVGElement>('.routes-svg-layer');
-      const lienzo = toma.querySelector<HTMLElement>('.phone-map');
-      if (!capa || !lienzo || !Number.isFinite(numero)) continue;
+    for (const columna of columnasPasos.querySelectorAll<HTMLElement>('[data-paso-columna]')) {
+      const toma = columna.querySelector<HTMLElement>('[data-toma]');
+      const capa = columna.querySelector<SVGSVGElement>('.routes-svg-layer');
+      const lienzo = columna.querySelector<HTMLElement>('.phone-map');
+      const numero = Number(toma?.dataset.demo);
+      if (!toma || !capa || !lienzo || !Number.isFinite(numero)) continue;
 
-      demos.set(numero - 1, new PasoDemo(toma, new PhoneMap(capa, lienzo), numero));
+      columnas.push(columna);
+      demos.push(new PasoDemo(toma, new PhoneMap(capa, lienzo), numero));
     }
 
-    new Pasos(pistaPasos, (indice) => {
-      for (const [i, demo] of demos) demo.activar(i === indice);
+    const pista = columnasPasos.closest<HTMLElement>('.pista');
+    const marcas = [
+      ...document.querySelectorAll<HTMLElement>('[data-paso-marca]'),
+    ];
+    const botones = [
+      ...document.querySelectorAll<HTMLButtonElement>('[data-paso-boton]'),
+    ];
+
+    /*
+      Los botones llevan al mismo sitio que el scroll: bajan la pista
+      hasta el tramo del paso y el PasoFoco hace el resto, así que el
+      resaltado del botón y el del teléfono salen del mismo número.
+    */
+    const irAPaso = (indice: number): void => {
+      if (!pista) return;
+      const caja = pista.getBoundingClientRect();
+      const recorrido = Math.max(0, caja.height - window.innerHeight);
+      const y =
+        caja.top + window.scrollY +
+        (recorrido <= 0 ? 0 : (recorrido * (indice + 0.5)) / columnas.length);
+      window.scrollTo({ top: y, behavior: sinMovimiento() ? 'auto' : 'smooth' });
+    };
+    botones.forEach((boton, i) => {
+      boton.addEventListener('click', () => irAPaso(i));
     });
+
+    /*
+      Lo que dura el relevo de una toma a la siguiente, en milisegundos.
+      Es el mismo `--paso-viaje` de pasos.css: allí lo gasta el fundido y
+      aquí hay que esperarlo, porque la toma que sale sigue a la vista
+      todo ese rato. Un pelo de más para no apagarla justo en el límite.
+    */
+    const RELEVO = 880;
+    let apagado = 0;
+
+    if (pista && columnas.length > 0) {
+      new PasoFoco({
+        pista,
+        columnas,
+        marcas,
+        alCambiar: (indice) => {
+          clearTimeout(apagado);
+
+          // Con la sección fuera de vista sólo se paran los bucles. La
+          // lista se queda con su paso encendido: apagarla cerraría de
+          // golpe la explicación abierta, y eso se ve al volver.
+          if (indice < 0) {
+            demos.forEach((demo) => demo.activar(false));
+            return;
+          }
+
+          botones.forEach((boton, i) => boton.classList.toggle('is-activa', i === indice));
+
+          /*
+            El bucle del paso de turno arranca ya, con su toma todavía
+            aclarándose; los otros dos siguen corriendo hasta que el
+            fundido los ha tapado. Pararlos en el acto devuelve su
+            pantalla a la foto de partida, y ese salto se vería por
+            debajo del que entra.
+          */
+          demos[indice]?.activar(true);
+          apagado = window.setTimeout(() => {
+            demos.forEach((demo, i) => demo.activar(i === indice));
+          }, RELEVO);
+        },
+      });
+    }
   }
 };
 
