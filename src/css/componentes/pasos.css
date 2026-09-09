@@ -175,18 +175,7 @@
   }
 }
 
-@keyframes footer-gradient-respiro {
-  0% {
-    background-size: 135% 135%, 115% 115%, 100% 100%;
-  }
-  100% {
-    background-size: 155% 155%, 132% 132%, 100% 100%;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  #problema .escena::before,
-  #problema .escena::after,
   #problema,
   .site-footer {
     animation: none !important;
@@ -389,8 +378,8 @@
   --ancho: var(--col-paso);
 }
 
-/* El halo azulado de la cinta no pega con el papel claro: aquí el
-   aparato se despega con un velo verde muy flojo. Va siempre encendido y
+/* Sobre el papel claro un halo azulado ensucia, así que el aparato se
+   despega con un velo verde muy flojo. Va siempre encendido y
    no sólo en la toma de turno: como las tres se apilan en el mismo sitio,
    el velo cae siempre donde mismo y durante el relevo no hay dos velos
    que sumar, sino uno solo pasando de una toma a otra. */

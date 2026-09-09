@@ -31,6 +31,19 @@
   color: var(--text-primary);
 }
 
+/* Los tres degradados del fondo crecen y se encogen a la vez; lo que se
+   ve es que la luz de abajo se acerca y se aleja. El tercero, el lineal,
+   se queda quieto: es el color base y moverlo despegaría el pie del
+   borde. */
+@keyframes footer-gradient-respiro {
+  0% {
+    background-size: 135% 135%, 115% 115%, 100% 100%;
+  }
+  100% {
+    background-size: 155% 155%, 132% 132%, 100% 100%;
+  }
+}
+
 .site-footer::before {
   content: '';
   position: absolute;
