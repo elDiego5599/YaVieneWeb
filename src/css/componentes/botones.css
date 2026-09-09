@@ -66,17 +66,23 @@
 }
 
 /* El verde de la marca. Se gasta aquí y en dos sitios más de la página
-   —el punto de «en vivo» y la ruta activa del mapa—, y en ningún otro. */
+   —el punto de «en vivo» y la ruta activa del mapa—, y en ningún otro.
+
+   En su versión accesible, que es la misma que ya lleva el botón de la
+   barra: blanco sobre el verde de marca da 3.11:1 y esta letra son 14.5
+   px en semibold, así que la norma pide 4.5:1. Sobre el accesible da
+   5.78:1. El de marca sigue en su sitio donde es relleno y no fondo de
+   texto —el punto de «en vivo», el icono del aviso, la ruta del mapa. */
 .btn-green {
-  border-color: var(--green);
-  background: var(--green);
+  border-color: var(--green-accessible);
+  background: var(--green-accessible);
   color: var(--text-white);
 }
 
 @media (hover: hover) {
   .btn-green:hover {
-    border-color: var(--green-accessible);
-    background: var(--green-accessible);
+    border-color: #036145;
+    background: #036145;
   }
 }
 

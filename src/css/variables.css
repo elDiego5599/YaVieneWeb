@@ -87,9 +87,21 @@
   --acento: #047454;
   --linea-fuerte: #D5DBE3;
 
+  /* Tres pesos de tinta y nada más. Los dos de abajo son el mismo azul
+     casi negro con menos alfa, así que sobre cualquiera de nuestros
+     fondos claros —papel, banda o crema— siguen leyéndose como gris.
+
+     Las cifras salen de medir, no de mirar. Al 0.42 el tenue daba 2.73:1
+     sobre la banda: por debajo del 4.5:1 que pide la norma AA para letra
+     pequeña, y ahí viven los rótulos del pie, las unidades del mapa y los
+     pies de tarjeta. Subirlo a 0.60 lo deja en 4.79:1. Pero el medio
+     estaba en 0.62 y a dos centésimas del tenue los dos niveles eran el
+     mismo gris, así que el medio sube a 0.78 (9.02:1) para que la
+     jerarquía se siga viendo: título en tinta plena, texto en medio,
+     letra chica en tenue. */
   --tinta: #0B1220;
-  --tinta-media: rgba(11, 18, 32, 0.62);
-  --tinta-tenue: rgba(11, 18, 32, 0.42);
+  --tinta-media: rgba(11, 18, 32, 0.78);
+  --tinta-tenue: rgba(11, 18, 32, 0.60);
 
   /* La monoespaciada no se carga: se pide la del sistema. Es la letra de
      los rótulos pequeños —cuatro palabras por página— y bajar un fichero
@@ -123,10 +135,11 @@
   --calle: clamp(20px, 4vw, 32px);
   --aire-seccion: clamp(72px, 9vh, 128px);
 
-  /* Text Colors */
+  /* Text Colors. Son los mismos tres pesos de tinta con el nombre en
+     inglés que usa la mitad vieja de la hoja; se mueven juntos. */
   --text-primary: #0B1220;
-  --text-secondary: rgba(11, 18, 32, 0.62);
-  --text-muted: rgba(11, 18, 32, 0.42);
+  --text-secondary: rgba(11, 18, 32, 0.78);
+  --text-muted: rgba(11, 18, 32, 0.60);
   --text-white: #FFFFFF;
   --text-white-dim: rgba(255, 255, 255, 0.7);
   --text-white-sub: rgba(255, 255, 255, 0.45);

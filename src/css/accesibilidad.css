@@ -123,11 +123,4 @@
     --text-secondary: rgba(11, 22, 40, 0.85);
     --divider: rgba(11, 22, 40, 0.35);
   }
-
-  /* El verde de marca da 3,11:1 sobre blanco: vale para titulares
-     grandes, no para quien pide más contraste. Se cambia por el verde
-     accesible de la paleta, que da 5,48:1. */
-  .hero-title .highlight {
-    color: var(--green-accessible);
-  }
 }

@@ -82,13 +82,18 @@
 }
 
 /*
-  El corte va en el verde de la marca, como la referencia: primera línea
-  en oscuro, segunda en verde. Con más contraste pedido se usa el verde
-  accesible (ver accesibilidad.css).
+  El corte va en verde, como la referencia: primera línea en oscuro,
+  segunda en verde.
+
+  Pero en el verde accesible, no en el de marca. El de marca da 2.89:1
+  sobre el crema del hero: no llega ni al 3:1 que la norma AA pide para
+  letra grande, y esta es la primera frase de la página. El accesible es
+  el mismo tono y la misma saturación dos puntos más abajo —5.37:1— y a
+  84 px la diferencia no se ve; lo que se ve es que ya no está lavado.
 */
 .hero-title .highlight {
   display: inline;
-  color: var(--green);
+  color: var(--green-accessible);
 }
 
 .hero-description {

@@ -233,8 +233,11 @@
   color: var(--green-accessible);
 }
 
+/* En coral accesible y no en el de marca: son nueve píxeles, la letra
+   más pequeña de la página, y el coral de marca da 2.92:1 contra el
+   4.5:1 que toca. El accesible da 4.83:1. */
 .consola-visible--oculto {
-  color: var(--coral);
+  color: var(--coral-accessible);
 }
 
 /* La fila abierta en la ficha del operador. Mismo azul que la pestaña. */
@@ -313,11 +316,16 @@
   box-shadow: 0 0 0 3px rgba(0, 168, 89, 0.16);
 }
 
+/* Verde accesible y no el de marca, por lo mismo que `.btn-green`: es
+   letra blanca de 15 px en negrita y sobre el de marca se quedaba en
+   3.11:1. Y el puntero ahora oscurece en vez de aclarar —iba a #00C267,
+   que subía el fondo y bajaba el contraste justo cuando el dedo ya está
+   encima. */
 .form-submit-btn {
   margin-top: 2px;
   padding: 16px;
   border-radius: 999px;
-  background: var(--green);
+  background: var(--green-accessible);
   color: #fff;
   font-size: 15px;
   font-weight: 700;
@@ -327,7 +335,7 @@
 
 @media (hover: hover) {
   .form-submit-btn:hover {
-    background: #00C267;
+    background: #036145;
     transform: translateY(-2px);
   }
 }

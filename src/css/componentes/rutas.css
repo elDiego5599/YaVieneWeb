@@ -55,8 +55,11 @@
 }
 
 /* Tres colores que ya reparte la página: el verde de «la solución», el
-   coral de «el problema» y la tinta marina de la marca. */
-.rutas-dato:nth-child(2) .rutas-dato-numero { color: var(--coral); }
+   coral de «el problema» y la tinta marina de la marca. Los dos primeros
+   en su versión accesible, que es la que aguanta el texto sobre la banda
+   —el coral de marca se quedaba en 2.92:1, por debajo del 3:1 de la
+   norma incluso a este tamaño. */
+.rutas-dato:nth-child(2) .rutas-dato-numero { color: var(--coral-accessible); }
 .rutas-dato:nth-child(3) .rutas-dato-numero { color: var(--navy); }
 
 .rutas-dato-rotulo {
