@@ -743,8 +743,27 @@
   color: var(--acento);
 }
 
+/* La letra de la ficha no crece con la ventana. La estaba midiendo la
+   hoja de los pasos, que declara `.columna-titulo` a 2.4vh y
+   `.columna-texto` a 1.1vw sin acotarlas a su sección, y aquí eso no
+   vale: la ficha mide siempre un tercio del escenario —1096 partidos en
+   tres—, así que agrandar la letra no le da holgura, le añade líneas.
+
+   Y el alto de la ficha no es asunto suyo: el escenario mide 548 fijos y
+   la fila va pegada abajo, así que cada línea de más sube la fila entera
+   y se come el sitio donde viven las voces. Medido: a 1600 de ancho la
+   ficha crecía cuarenta píxeles y su borde de arriba subía hasta tapar
+   «me iré en taxi». Con la letra quieta, el alto de la fila deja de
+   depender del tamaño de la ventana. */
 .ficha .columna-titulo {
   margin-bottom: 8px;
+  font-size: 21px;
+}
+
+.ficha .columna-texto {
+  padding-top: 6px;
+  font-size: 15px;
+  line-height: 1.55;
 }
 
 /* ── El escenario ancho ────────────────────────────────────────────────
@@ -963,9 +982,16 @@
     transition-delay: 140ms;
   }
 
+  /* Ésta se coloca contra dos cosas, no a ojo. Por debajo, el borde de
+     arriba de la tercera ficha, que está en 241 de 548: en 35% la voz
+     acababa en 224 y se leía pegada a la tarjeta —y con una ficha más
+     alta, tapada por ella—. Por la izquierda, la bajada del cable 3, que
+     pasa por 933 de 1160: la voz arranca pasado ese punto para que el
+     cable llegue a la ficha por delante y no se meta por detrás del
+     papel. */
   .ruido:nth-child(5) {
-    left: 79%;
-    top: 35%;
+    left: 83.5%;
+    top: 30%;
     --giro: -2.2deg;
     transition-delay: 70ms;
   }
