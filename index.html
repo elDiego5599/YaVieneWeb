@@ -1549,15 +1549,22 @@
             creciendo con el hueco que sobra, que es lo que hace que el
             escenario mida lo mismo en las dos caras y la página no dé un
             salto al cambiar de lado.
+
+            Las bajadas van de borde a borde del lienzo —de 0 a 200 y no de
+            8 a 192— porque el lienzo empieza justo debajo de la píldora y
+            acaba justo encima de las fichas: dejar margen dentro del
+            trazado abría un hueco de seis píxeles arriba y otro abajo, y
+            las líneas no llegaban a tocar nada. El remate redondo se mete
+            un píxel por debajo de la tarjeta, que pasa por encima.
           -->
           <div class="escenario-arbol" aria-hidden="true">
             <svg class="escenario-red" viewBox="0 0 1000 200" fill="none" preserveAspectRatio="none" aria-hidden="true" focusable="false">
               <!-- Bajada al centro: recta, sin esquina que doblar. -->
-              <path class="red-cable red-cable--centro" pathLength="1" d="M 500 8 V 192" />
+              <path class="red-cable red-cable--centro" pathLength="1" d="M 500 0 V 200" />
               <!-- Bajada a la izquierda, con las dos esquinas del circuito. -->
-              <path class="red-cable red-cable--izquierda" pathLength="1" d="M 430 8 V 60 Q 430 76 414 76 H 174 Q 158 76 158 92 V 192" />
+              <path class="red-cable red-cable--izquierda" pathLength="1" d="M 430 0 V 60 Q 430 76 414 76 H 174 Q 158 76 158 92 V 200" />
               <!-- Bajada a la derecha, espejo de la anterior. -->
-              <path class="red-cable red-cable--derecha" pathLength="1" d="M 570 8 V 60 Q 570 76 586 76 H 826 Q 842 76 842 92 V 192" />
+              <path class="red-cable red-cable--derecha" pathLength="1" d="M 570 0 V 60 Q 570 76 586 76 H 826 Q 842 76 842 92 V 200" />
             </svg>
           </div>
 
