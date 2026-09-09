@@ -159,25 +159,24 @@
 /* ── Pista y escena: el andamio del scrollytelling ────────────────────
    Una pista es un bloque de varias pantallas de alto con una escena
    pegada dentro. Mientras la pista cruza la ventana la escena se queda
-   quieta y lo que cambia es lo que hay dentro: el reloj corre, la cinta
-   de momentos pasa de uno a otro. `--tramos` dice cuántos momentos tiene
-   y `--paso` cuánto scroll cuesta cada uno.
+   quieta y lo que cambia es lo que hay dentro. Queda una sola en la
+   página —el visor de los tres pasos, que va cambiando de pantalla en el
+   teléfono—, y quien lee el recorrido y decide qué paso manda es
+   `paso-foco.ts`.
+
+   `--tramos` dice cuántos momentos tiene y `--paso` cuánto scroll cuesta
+   cada uno. 68 vh por paso: con un teléfono quieto por columna el relevo
+   se lee en menos recorrido que cuando la fila entera tenía que cruzar
+   la ventana.
 
    Cuidado con `overflow` en cualquier antepasado: `hidden` convierte al
    padre en contenedor de scroll y el pegado deja de funcionar. Por eso el
    panel y el body recortan con `clip`. */
 .pista {
   --tramos: 3;
-  --paso: 82vh;
+  --paso: 68vh;
   position: relative;
   height: calc(var(--tramos) * var(--paso) + 100vh);
-}
-
-/* Cada paso cuesta 68 vh de scroll: con un teléfono quieto por columna
-   el relevo se lee en menos recorrido que cuando la fila tenía que
-   cruzar la ventana. */
-.pista--pasos {
-  --paso: 68vh;
 }
 
 /* La escena se pega a la ventana entera, pero la ventana entera no está
