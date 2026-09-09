@@ -1,0 +1,51 @@
+/* ============================================================
+   CRÍTICO
+   ============================================================
+
+   Lo poco que tiene que estar pintado antes que nada. Esta hoja va
+   enlazada con <link> desde el <head> de cada página, no importada
+   desde el módulo de JavaScript como todas las demás: esas llegan
+   después del primer pintado, y hasta que llegaban el enlace de salto
+   se dibujaba un instante como un enlace normal arriba del todo y
+   luego se recogía —el parpadeo que se veía en cada recarga. Enlazada
+   aquí nace ya fuera de cuadro.
+
+   Nada de <style> suelto dentro del HTML: la política de contenido que
+   publica `vercel.json` es `style-src 'self'`, así que un bloque en
+   línea quedaría bloqueado en producción y el parpadeo volvería justo
+   donde más importa.
+
+   Las variables (`--ink`, `--font-family`) viven en `variables.css` y
+   llegan con el resto. No pasa nada: mientras no están, el enlace ya
+   está fuera de la pantalla y nadie ve de qué color es.
+   ============================================================ */
+
+/* El primer tabulador de la página: manda directo al contenido y se
+   salta la navegación. Sin esto, quien navegue con teclado o lector de
+   pantalla tiene que recorrer la isla de navegación entera en cada
+   carga antes de llegar al texto (WCAG 2.4.1). Vive fuera de la
+   pantalla y sólo baja cuando recibe el foco, así que con el ratón no
+   se ve nunca. */
+.saltar-al-contenido {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  z-index: 999;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 12px 28px -10px rgba(11, 22, 40, 0.55);
+  /* `translate` y no `transform`: en esta base `transform` ya tiene
+     dueños en varios sitios y no conviene pisarlos. */
+  translate: -50% -180%;
+  transition: translate 0.22s var(--ease-out-cubic);
+}
+
+.saltar-al-contenido:focus {
+  translate: -50% 0;
+}

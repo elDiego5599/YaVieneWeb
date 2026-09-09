@@ -221,6 +221,13 @@ for (const { ruta, nombre } of PAGINAS) {
       const destino = await salto.getAttribute('href');
       await expect(page.locator(destino!)).toHaveCount(1);
 
+      // Y nace fuera de cuadro: si el escondite no llega en el primer
+      // pintado se ve un parpadeo en cada recarga, que es justo lo que
+      // arregla tener `critico.css` enlazada desde el <head>.
+      const caja = await salto.boundingBox();
+      expect(caja, 'el enlace de salto no tiene caja').not.toBeNull();
+      expect(caja!.y + caja!.height, 'el enlace de salto asoma en pantalla').toBeLessThan(0);
+
       // Toda imagen lleva alt (aunque sea vacío si es decorativa).
       const sinAlt = await page.evaluate(
         () => Array.from(document.images).filter((i) => !i.hasAttribute('alt')).map((i) => i.src)

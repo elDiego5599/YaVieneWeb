@@ -8,40 +8,13 @@
    mover nada, y dos consultas de medios que sólo se activan si el
    usuario lo ha pedido en su sistema. No cambia ni un píxel de lo que
    ya se ve.
+
+   El enlace de salto no está aquí: vive en `critico.css`, que sí va
+   enlazada desde el <head>. Tiene que estar escondido en el primer
+   pintado o parpadea, y esta hoja llega más tarde.
    ============================================================ */
 
-/* ---------- 1. Saltar al contenido ----------
-
-   El primer tabulador de la página. Sin esto, quien navegue con teclado
-   o lector de pantalla tiene que recorrer la isla de navegación entera
-   en cada carga antes de llegar al texto. Vive fuera de la pantalla y
-   sólo baja cuando recibe el foco, así que nadie más lo ve. */
-
-.saltar-al-contenido {
-  position: fixed;
-  top: 12px;
-  left: 50%;
-  z-index: 999;
-  padding: 12px 22px;
-  border-radius: 999px;
-  background: var(--ink);
-  color: #fff;
-  font-family: var(--font-family);
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 12px 28px -10px rgba(11, 22, 40, 0.55);
-  /* Arriba del todo y fuera de cuadro: `translate` y no `transform`,
-     que en esta base `transform` ya tiene dueños en varios sitios. */
-  translate: -50% -180%;
-  transition: translate 0.22s var(--ease-out-cubic);
-}
-
-.saltar-al-contenido:focus {
-  translate: -50% 0;
-}
-
-/* ---------- 2. Un único anillo de foco ----------
+/* ---------- 1. Un único anillo de foco ----------
 
    Varios controles ya traen su propio foco (la isla, las palabras del
    clima, las filas del panel de error) y esos no se tocan. Los de aquí
@@ -57,7 +30,6 @@
 .btn-primary:focus-visible,
 .btn-outline:focus-visible,
 .form-submit-btn:focus-visible,
-.pasos-tab:focus-visible,
 .interruptor-opcion:focus-visible,
 .login-link:focus-visible,
 .ruta-ficha:focus-visible,
@@ -83,16 +55,14 @@
   box-shadow: 0 0 0 4px rgba(0, 168, 89, 0.28);
 }
 
-/* ---------- 3. Zonas de toque ----------
+/* ---------- 2. Zonas de toque ----------
 
    La norma que aplica es WCAG 2.5.8 (nivel AA): 24 por 24 píxeles
-   mínimo. Lo medido en la página: las pestañas de los pasos van a
-   210x37, las fichas de ruta a 432x85 en escritorio y 230x123 en el
-   carrusel del móvil, las palabras del clima a 33x35 — todas pasan de
-   sobra. Las dos que no llegaban son las de
-   abajo, y se arreglan con un pseudo-elemento transparente: el área
-   sensible crece, la caja del elemento no se mueve y el diseño queda
-   exactamente igual.
+   mínimo. Lo medido en la página: las fichas de ruta van a 432x85 en
+   escritorio y 230x123 en el carrusel del móvil, y pasan de sobra. Las
+   dos que no llegaban son el botón del menú y los enlaces del pie, y se
+   arreglan con un pseudo-elemento transparente: el área sensible crece,
+   la caja del elemento no se mueve y el diseño queda exactamente igual.
 
    No se fuerzan los 44 px de WCAG 2.5.5 (nivel AAA) en los enlaces del
    pie: la separación entre uno y otro es de 11 px, así que estirarlos
@@ -124,7 +94,7 @@
   inset: -5px -4px;
 }
 
-/* ---------- 4. Menos transparencia ----------
+/* ---------- 3. Menos transparencia ----------
 
    Las píldoras del hero llevan un desenfoque de fondo. Para quien tiene
    activado «reducir transparencia» en el sistema —normalmente por
@@ -142,7 +112,7 @@
   }
 }
 
-/* ---------- 5. Más contraste ----------
+/* ---------- 4. Más contraste ----------
 
    Con «aumentar contraste» activado, el texto secundario y los bordes
    finos pasan a los tonos plenos que ya están en la paleta. No se

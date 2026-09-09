@@ -54,6 +54,14 @@
        mucho más corto que el de la portada, y su CSS viaja con ella en vez
        de ir en el paquete común. Ver src/empresas.ts. -->
   <script type="module" src="/src/empresas.ts"></script>
+
+  <!--
+    El enlace de salto tiene que estar escondido desde el primer pintado
+    o se ve un parpadeo en cada recarga. Por eso su regla va en su propia
+    hoja enlazada aquí y no dentro del módulo de JavaScript, que es por
+    donde entra todo el resto del CSS —o sea, después de pintar.
+  -->
+  <link rel="stylesheet" href="/src/css/critico.css" />
 </head>
 
 <body>
