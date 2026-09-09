@@ -331,7 +331,30 @@
 
 /* Cada glifo de iOS tiene su propia proporción: las barras son casi
    cuadradas, el wifi un poco más ancho que alto y la pila bastante más
-   ancha. Se miden por el viewBox de cada uno, no todos por el mismo. */
+   ancha. Se miden por el viewBox de cada uno, no todos por el mismo.
+
+   Los tres se dibujan en el HTML —seis copias, una por teléfono— y su
+   geometría está pensada para este tamaño y no para verlos grandes: aquí
+   miden diez píxeles de alto, así que lo que a tamaño de icono se lee
+   como un detalle fino, a tamaño de barra de estado se lee como un
+   borrón. De ahí tres decisiones que sólo se entienden midiendo:
+
+   · Las cuatro barras de cobertura van del mismo color. iOS apaga las
+     que faltan y en estos teléfonos la señal está llena, así que no
+     falta ninguna; con la primera al 35 % no se leía como una barra
+     floja, se leía como una mota suelta al lado de las otras tres.
+
+   · Los tres arcos del wifi son circunferencias con el mismo centro —el
+     punto, en (8, 11)— y radios 3.1, 6 y 9, abiertas 48 grados a cada
+     lado de la vertical. Antes cada arco llevaba su propio radio grande
+     (11.2, 8 y 4.4) sin centro común: salían casi planos, amontonados
+     arriba y con el punto colgando aparte. El trazo bajó de 1.7 a 1.5
+     para que el aire entre arcos siga viéndose a este tamaño.
+
+   · El contorno de la pila adelgazó de 1.1 a 1 y la carga se le acercó
+     —1.9 de margen en vez de 2.2, y con menos radio—: el trazo gordo con
+     el hueco ancho detrás se leía como dos pastillas, una dentro de la
+     otra, y no como una pila. */
 .phone-status .glifo-cobertura {
   width: calc(17 * var(--u));
 }
