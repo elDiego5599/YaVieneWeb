@@ -239,6 +239,13 @@
               </span>
             </span>
           </p>
+
+          <!-- La atribución del mosaico va dentro de la copia, no suelta al
+               final del lienzo: sigue anclada a la esquina de abajo por CSS
+               —el bloque que la contiene tiene el mismo filo que el panel—,
+               y en un teléfono, donde esa esquina la tapa el aparato, cae
+               en el flujo justo encima de él. -->
+          <p class="hero-credit">Mapa base © <a href="https://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> · © <a href="https://carto.com" target="_blank" rel="noopener">CARTO</a></p>
         </div>
 
         <!--
@@ -875,7 +882,6 @@
         cercano y el aviso armado.
       </p>
     </div>
-    <p class="hero-credit">Mapa base © <a href="https://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> · © <a href="https://carto.com" target="_blank" rel="noopener">CARTO</a></p>
   </section>
 
     <!-- ============ MARCAS ============

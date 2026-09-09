@@ -398,11 +398,28 @@
   .hero-phone-side--der .phone-shell::before {
     opacity: 1;
   }
+
+  /* La calcomanía de la esquina no sirve en un teléfono: ahí el aparato
+     ocupa el ancho entero del lienzo y sangra 107 px por debajo del filo,
+     así que la esquina de abajo a la izquierda cae encima de su tarjeta
+     crema —no a ratos, sino en cualquier punto del recorrido—. Aquí la
+     atribución vuelve al flujo, centrada como el resto de la copia, en el
+     hueco que ya había entre la línea de las tiendas y el aparato. */
+  .hero-credit {
+    position: static;
+    margin-top: 12px;
+  }
 }
 
 /* La atribución del mosaico vive en la esquina de abajo a la izquierda
    del lienzo, como calcomanía y no como franja: así no hay tira blanca
-   entre el filo redondeado y la sección que sigue. */
+   entre el filo redondeado y la sección que sigue.
+
+   El párrafo va escrito dentro de `.hero-copy`, pero el bloque que lo
+   contiene es `.hero-grid`, que es quien está posicionado: su caja mide
+   exactamente lo mismo que el panel —mismo borde izquierdo y mismo borde
+   de abajo en todos los anchos—, así que la esquina sale en el mismo
+   sitio que cuando el párrafo colgaba suelto al final de la sección. */
 .hero-credit {
   position: absolute;
   left: calc(var(--calle) + 6px);
