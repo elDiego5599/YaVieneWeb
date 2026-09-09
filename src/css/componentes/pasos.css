@@ -640,7 +640,7 @@
      ya dice que son tres pasos—, el número se mete en la misma línea del
      título y sólo el paso de turno gasta las dos líneas de explicación. */
   .pasos-lado {
-    gap: 12px;
+    gap: 9px;
   }
 
   .pasos-lado-rotulo {
@@ -649,7 +649,7 @@
 
   .paso-boton {
     display: block;
-    padding: 9px 0 9px 14px;
+    padding: 6px 0 6px 14px;
   }
 
   .paso-boton .columna-indice {
@@ -669,8 +669,21 @@
     font-size: 14px;
   }
 
+  /* El aparato se lleva más alto del que había, y no es capricho: la
+     escena va pegada y `encaje` la encoge con `zoom` hasta que quepa en
+     la ventana, así que lo que se ve en pantalla no es esta medida sino
+     esta medida por el factor. En un iPhone el factor cae a 0.75 —hay
+     628 px libres para 807 de escena— y un aparato de 24vh acababa en
+     135 px de ancho: un teléfono de juguete perdido en medio del cuadro,
+     con la letra de su pantalla ya ilegible.
+
+     La cuenta importa: en pantalla mide `col x 628 / (resto + 2.09 col)`,
+     que crece con `col` aunque el factor baje. Subir a 32vh y ensanchar
+     el tope a 72vw lo deja en 172 px —un 27 % más grande— y el factor en
+     0.71, que sobre los 17 px del título de cada paso son 12.1 px: los
+     mismos que se leían antes. Se gana teléfono sin perder letra. */
   .pasos-pase {
-    --col-paso: min(clamp(160px, 24vh, 270px), 62vw);
+    --col-paso: min(clamp(190px, 32vh, 300px), 72vw);
   }
 
   .pasos-lado-lead {
@@ -682,12 +695,20 @@
   }
 
   .pasos-rejilla {
-    gap: 16px;
+    gap: 12px;
   }
 
+  /* Los tres recortes de aire —el hueco de la rejilla, el respiro del
+     panel y el relleno del cuadro— son 38 px que dejan de contar en el
+     alto de la escena, y cada píxel que se le quita al aire sube el
+     factor de `encaje`, que es lo que decide el tamaño de todo. */
   #solucion .panel-inner {
-    padding-top: 10px;
-    padding-bottom: 12px;
+    padding-top: 6px;
+    padding-bottom: 8px;
+  }
+
+  .pasos-cuadro {
+    padding: clamp(10px, 1.2vh, 20px) clamp(8px, 1vw, 14px);
   }
 }
 
