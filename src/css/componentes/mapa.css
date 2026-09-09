@@ -191,12 +191,22 @@
 */
 @media (min-width: 1060px) {
   .mapa-mando {
-    /* Tres piezas: la lista, sus cifras y la lectura. */
-    grid-template-rows: auto auto auto;
-    /* La lista arriba y la lectura abajo, apoyada en el filo inferior del
-       mapa: las dos columnas cierran a la misma altura y lo que sobra
-       queda en medio, que es donde no se lee como un descuido. */
-    align-content: space-between;
+    /* Tres piezas: la lista, sus cifras y la lectura. Lo que sobra va
+       entero a la tercera fila, no repartido entre las tres.
+
+       Con `space-between` el sobrante se partía en dos huecos iguales, y
+       eso se lee bien mientras el sobrante es poco. Al crecer el mapa
+       pasó a ser un cuarto de la columna y los dos huecos dejaban las
+       cifras flotando en medio de la nada, sin la lista a la que
+       resumen. Ahora la lista y sus cifras van juntas arriba —que es lo
+       que son, una pieza y su pie— y la lectura baja a apoyarse en el
+       filo de abajo del mapa, así que las dos columnas siguen cerrando a
+       la misma altura. */
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
+  .mapa-mando > .mapa-lectura {
+    align-self: end;
   }
 }
 
@@ -240,13 +250,15 @@
      ancho lo saca la proporción. Con el techo en 540 el mapa medía 350
      de ancho al lado de un mando de 960, y a esa escala no se leía como
      el centro de la sección sino como su ilustración. Sube a 680, que es
-     lo que cabe por los dos lados: 466 de ancho más el mando y el hueco
-     siguen dentro de los 1440 de la pista ancha, y en un portátil de 900
-     de alto el 72vh deja el mapa en 648 sin sacar la sección de la
-     pantalla. La columna de al lado tiene con qué llenar el alto —la
-     lista, sus cifras y la lectura—, que es lo que faltaba cuando este
-     techo se bajó. */
-  height: clamp(440px, 72vh, 720px);
+     lo que se puede sin dejar hueco al lado: el mando pide 494 de alto
+     con sus tres piezas, y lo que el mapa saque por encima de eso es
+     aire muerto en la otra columna. A 72vh el mapa llegaba a 648 y
+     sobraban 222 —un cuarto de la columna en blanco, que es lo que hacía
+     que el tablero se viera roto—. A 56vh se queda en 504 sobre un
+     portátil de 900: el sobrante baja a menos de 80, que ya se lee como
+     aire y no como avería, y el techo se queda en 540 porque en un
+     monitor alto el 56vh volvía a dispararse y con él el sobrante. */
+  height: clamp(420px, 56vh, 540px);
   border-radius: var(--radio-tarjeta);
   overflow: hidden;
   background: #EDE7DE;
@@ -608,7 +620,7 @@
      saca la altura. */
   .mapa-lienzo {
     justify-self: center;
-    width: min(100%, calc(min(76vh, 720px) * 1284 / 1982));
+    width: min(100%, calc(min(76vh, 540px) * 1284 / 1982));
     height: auto;
     margin-inline: auto;
   }
@@ -617,7 +629,7 @@
      de él se lee como su cabecera; a lo ancho del panel parecía un aviso
      suelto de la página. */
   .mapa-tira {
-    width: min(100%, calc(min(76vh, 720px) * 1284 / 1982));
+    width: min(100%, calc(min(76vh, 540px) * 1284 / 1982));
     margin-inline: auto;
   }
 
