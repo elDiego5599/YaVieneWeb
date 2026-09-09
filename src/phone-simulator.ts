@@ -385,20 +385,20 @@ export class PhoneSimulator {
    * aparecería de verdad: con el aviso armado y el bus ya dentro del
    * kilómetro.
    *
-   * Una sola línea y una sola idea: «Bus <placa> está cerca de ti». La
-   * ruta no hace falta —es la que el pasajero acaba de elegir, y su
-   * nombre entero partía la tarjeta en dos renglones—; el metraje
+   * Una sola línea y una sola idea: «Tu bus está cerca de ti». Sin
+   * placa: el pasajero ya sabe cuál espera —acaba de elegirlo—, y el
+   * nombre entero partía la tarjeta en dos renglones; el metraje
    * tampoco, que la hoja del teléfono lo está dando justo debajo en
    * grande. Es la misma tarjeta del paso 3 y de la sección del mapa, y
    * las tres dicen exactamente esto.
    */
-  private notificacion(placa: string, metros: number): void {
+  private notificacion(metros: number): void {
     const dentro = this.avisoActivo && metros <= this.radioAvisoM;
     const tarjeta = this.escena?.querySelector('[data-escena="notif"]');
     if (dentro) {
       this.escenaTexto(
         'notif-title',
-        `Bus ${placa} está cerca de ti`
+        'Tu bus está cerca de ti'
       );
     }
     tarjeta?.classList.toggle('is-on', dentro);
@@ -478,7 +478,7 @@ export class PhoneSimulator {
 
     this.texto('eta-value', valor);
     this.texto('eta-unit', unidad);
-    this.notificacion(bus.placa, metros);
+    this.notificacion(metros);
     // La franja y el número llevan el mismo color: en la app los dos
     // salen de `stripColor`, no solo la franja.
     const urgencia = this.colorUrgencia(metros);

@@ -624,7 +624,7 @@ export class PasoDemo {
     this.setMetros(metros);
 
     // La tarjeta no cambia de texto: dice el título de la notificación de
-    // la app, «Bus B-042 está cerca de ti», y el metraje vive en la hoja
+    // la app, «Tu bus está cerca de ti», y el metraje vive en la hoja
     // del teléfono, debajo.
     this.prender('notif', this.avisoPuesto && metros <= RADIO_AVISO_M);
   }
