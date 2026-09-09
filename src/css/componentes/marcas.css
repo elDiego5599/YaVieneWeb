@@ -86,43 +86,18 @@
 }
 
 /*
-  Apagados, no ennegrecidos, y apagados los siete al mismo tono.
+  Los siete van a todo color y sin filtro, aquí y en la banda de
+  /empresas.html. Se probó apagarlos —gris, y luego gris con una
+  corrección por logo, porque los ficheros no vienen igual de oscuros:
+  Sobusa y Transmetro son casi negros y Transmecar un gris claro, así
+  que el mismo tratamiento dejaba la fila a dos tintas— y en ninguna de
+  las dos versiones la fila se leía como conjunto. Los logos son prueba
+  social: uno apagado no prueba nada.
 
-  Quitarles el color a todos por igual no los iguala: los ficheros no
-  vienen igual de oscuros. Sobusa y Transmetro son casi negros y
-  Transmecar es un gris claro, así que el mismo tratamiento dejaba una
-  fila a dos tintas —tres manchas y cuatro fantasmas—, que es lo que
-  hacía que no se leyera como un conjunto.
-
-  Cada logo lleva por eso su corrección. `--tono` aclara u oscurece, y
-  `--vela` es cuánto se levanta del papel. Hacen falta las dos: el brillo
-  no aclara el negro puro —multiplicar cero por lo que sea sigue dando
-  cero, y la marca de Transmetro es negra maciza—.
-
-  De momento los siete van a todo color: la fila apagada no se leía
-  como conjunto. Quedan `--tono` y `--vela` con sus valores por si
-  hay que volver.
+  Eso lo pone el color base de `.empresa-marcas-logo` más abajo, y lo
+  vigila la prueba de la banda en `e2e/paginas.spec.ts`, que falla si
+  alguno vuelve con filtro o a media tinta.
 */
-.marcas-claras-fila .empresa-marcas-logo {
-  filter: none;
-  opacity: 1;
-  transition:
-    filter 0.35s var(--ease-out-cubic),
-    opacity 0.35s var(--ease-out-cubic);
-}
-
-.marcas-claras .empresa-marcas-logo--sobusa     { --tono: 1.15; --vela: 0.6; }
-.marcas-claras .empresa-marcas-logo--sodis      { --tono: 1.05; --vela: 0.7; }
-.marcas-claras .empresa-marcas-logo--coolitoral { --tono: 1.1;  --vela: 0.65; }
-.marcas-claras .empresa-marcas-logo--transmetro { --tono: 1.2;  --vela: 0.52; }
-.marcas-claras .empresa-marcas-logo--coochofal  { --tono: 1.15; --vela: 0.6; }
-.marcas-claras .empresa-marcas-logo--transmecar { --tono: 0.66; --vela: 0.95; }
-.marcas-claras .empresa-marcas-logo--trasalfa   { --tono: 0.78; --vela: 0.9; }
-
-.marca-casilla:hover .empresa-marcas-logo {
-  filter: none;
-  opacity: 1;
-}
 
 /* En la portada los logos van más grandes que en empresas. El alto de
    cada uno no es el mismo número: un sello cuadrado necesita más alto

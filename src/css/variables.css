@@ -37,33 +37,29 @@
   --surface-nada: rgba(255, 255, 255, 0);
 
   /* Tokens que el mockup necesita para pintar la app tal cual: son los
-     mismos AppColors de ya_viene_core/lib/core/theme/app_theme.dart. */
+     mismos AppColors de ya_viene_core/lib/core/theme/app_theme.dart.
+
+     Sólo están los que alguna pantalla del teléfono pinta hoy. El juego
+     de la app es más largo —error, aviso, acierto, sus versiones claras—,
+     pero una variable declarada que nadie usa no documenta nada: se paga
+     en cada carga y engaña al que la lee creyendo que algo la consume. Si
+     una pantalla nueva necesita uno de esos, se copia entonces de
+     `app_theme.dart`. */
   --surface-muted: #F1F5F9;
   --divider: #E5E7EB;
-  --error: #DC2626;
-  --error-light: #FEE2E2;
-  --warn-light: #FEF3C7;
   --app-text-primary: #0F172A;
   --app-text-secondary: #5E6B82;
   --app-text-disabled: #94A3B8;
-  /* El resto del juego que la app usa hoy y el mockup no tenía. Sin estos,
-     las pantallas del teléfono se pintaban con aproximaciones: el crema
-     alto de las tarjetas, la línea de pelo de los bordes, el verde de los
-     rótulos accesibles y el ámbar de las pistas. */
-  --app-arena-alta: #FFFDF8;
   --app-hairline: rgba(20, 39, 78, 0.078);
-  --app-text-body: #475569;
   --app-primary-accessible: #047857;
   --app-coral-accessible: #C0392B;
   --app-warn-accessible: #A85206;
-  --app-success: #059669;
-  --app-success-light: #D1FAE5;
   --app-green-deep: #065F46;
 
   /* Colores que el mapa toma prestados de la app (ya_viene_core/app_theme.dart):
-     el azul eléctrico es la ruta activa y el rojo es el bus reportando. */
+     el azul eléctrico es la ruta activa y el gris es el bus que lleva rato
+     sin reportar. */
   --electric-blue: #2563EB;
-  --bus-red: #E86A5E;
   --bus-ghost: #94A3B8;
 
   /* ── Sistema día ──────────────────────────────────────────────────────

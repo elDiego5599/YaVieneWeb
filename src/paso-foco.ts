@@ -32,7 +32,7 @@ function topar(v: number, min: number, max: number): number {
   return v < min ? min : v > max ? max : v;
 }
 
-export interface PasoFocoPiezas {
+interface PasoFocoPiezas {
   /** El bloque alto que se recorre mientras la escena está pegada. */
   pista: HTMLElement;
   /** Las tres tomas apiladas en el visor, una por paso. */
