@@ -794,6 +794,30 @@
 }
 
 /*
+  Pasos 1 y 2, igual que la escena fija del hero: una sola línea por
+  tarjeta —sin "Toca para buscar tu ruta" ni "Arrástralo para moverlo"
+  en el 1º, sin "Dos pasos…" ni los subtítulos de las fichas en el 2º—.
+  En el 1º los textos que quedan van centrados; en el 2º los títulos se
+  quedan a la izquierda, donde estaban. Solo CSS: el guion sigue
+  escribiendo los subtítulos y la foto sin JS los trae, pero no se
+  enseñan, como hace `.es-fija` con los del hero.
+*/
+[data-demo="1"] .app-pill-sub,
+[data-demo="1"] [data-el="chip-sub"] {
+  display: none;
+}
+
+[data-demo="1"] .app-chip-textos {
+  align-items: center;
+  text-align: center;
+}
+
+[data-demo="2"] .sheet-head-sub,
+[data-demo="2"] .app-select-sub {
+  display: none;
+}
+
+/*
   La acción del chip. Verde cuando propone algo —"Fijar" clava el pin en
   la posición del GPS—; gris cuando solo deshace.
 
