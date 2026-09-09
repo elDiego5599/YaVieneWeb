@@ -118,11 +118,13 @@
        El mando lleva techo. Sin él se queda con todo lo que sobra en una
        pantalla ancha y el mapa acaba pareciendo la ilustración de al
        lado en vez del centro. El techo es el ancho que piden dos
-       columnas de fichas —unos cuatrocientos por columna, que es lo que
-       mide el nombre de ruta más largo con su tramo debajo— y ni un
-       píxel más. Con él puesto los dos van parejos y el grupo se
-       centra, que es lo que ya hacía `justify-content`. */
-    grid-template-columns: minmax(0, 960px) auto;
+       columnas de fichas y ni un píxel más: 410 por columna, que es lo
+       que mide el nombre de ruta más largo con su tramo debajo. Estaba
+       en 960 —dos columnas holgadas— y esos 140 de más eran justo los
+       que hacían que el mapa se leyera chico al lado. Con él puesto los
+       dos van parejos y el grupo se centra, que es lo que ya hacía
+       `justify-content`. */
+    grid-template-columns: minmax(0, 820px) auto;
     align-items: stretch;
   }
 
@@ -234,12 +236,17 @@
   position: relative;
   /* La proporción del mosaico, para que quepa la ciudad entera. */
   aspect-ratio: 1284 / 1982;
-  /* Más bajo que antes. A 780 px el mosaico sacaba media pantalla de alto
-     y la columna de al lado —seis fichas y la lectura— se quedaba con un
-     agujero debajo del tamaño de la propia lista. El techo volvió a subir
-     con la pista ancha, ahora que la columna de al lado tiene con qué
-     llenarlo: la lista, sus cifras y la lectura. */
-  height: clamp(380px, 50vh, 540px);
+  /* El mosaico es vertical, así que de él sólo se pide la altura: el
+     ancho lo saca la proporción. Con el techo en 540 el mapa medía 350
+     de ancho al lado de un mando de 960, y a esa escala no se leía como
+     el centro de la sección sino como su ilustración. Sube a 680, que es
+     lo que cabe por los dos lados: 466 de ancho más el mando y el hueco
+     siguen dentro de los 1440 de la pista ancha, y en un portátil de 900
+     de alto el 72vh deja el mapa en 648 sin sacar la sección de la
+     pantalla. La columna de al lado tiene con qué llenar el alto —la
+     lista, sus cifras y la lectura—, que es lo que faltaba cuando este
+     techo se bajó. */
+  height: clamp(440px, 72vh, 720px);
   border-radius: var(--radio-tarjeta);
   overflow: hidden;
   background: #EDE7DE;
@@ -601,7 +608,7 @@
      saca la altura. */
   .mapa-lienzo {
     justify-self: center;
-    width: min(100%, calc(min(76vh, 600px) * 1284 / 1982));
+    width: min(100%, calc(min(76vh, 720px) * 1284 / 1982));
     height: auto;
     margin-inline: auto;
   }
@@ -610,7 +617,7 @@
      de él se lee como su cabecera; a lo ancho del panel parecía un aviso
      suelto de la página. */
   .mapa-tira {
-    width: min(100%, calc(min(76vh, 600px) * 1284 / 1982));
+    width: min(100%, calc(min(76vh, 720px) * 1284 / 1982));
     margin-inline: auto;
   }
 
