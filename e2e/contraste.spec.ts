@@ -79,6 +79,10 @@ const MUESTRAS: Record<string, string[]> = {
     '.hero-description',
     '.hero-subtext-lead',
     '.apagado',
+    // La banda cálida de «Qué resuelve»: fondo propio, así que su rótulo
+    // en coral y su letra chica se miden aparte de los de papel blanco.
+    '#problema .seccion-rotulo',
+    '#problema .columna-texto',
     '.rutas-dato-numero',
     '.rutas-dato-rotulo',
     '.footer-cta-note',

@@ -77,6 +77,15 @@
   --papel: #FFFFFF;
   --banda: #F3F7F4;
   --linea: #E2E8E4;
+  /* Y un tercero, cálido, para la sección que enseña el problema. Es la
+     crema del mockup —`--arena`, la superficie de las hojas de la app—
+     tirada hacia el coral, que es el color con el que esa sección habla
+     mientras está en la cara «a ciegas». Sirve para lo mismo que la
+     banda: decir que la sección es otra sin dibujar una caja. Medido,
+     la tinta tenue encima da 4.76:1, así que la letra chica sigue
+     pasando AA. */
+  --crema: #FCF2ED;
+  --linea-crema: #F0DFD7;
   /* El verde de marca, pero sólo donde manda: rótulos de sección, el botón
      de la barra y el velo del encabezado. Un acento repetido en tres sitios
      ordena la página; el mismo acento en diez la ensucia. */
