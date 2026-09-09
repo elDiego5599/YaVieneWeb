@@ -13,7 +13,7 @@ import type { RutaLanding } from './types';
  * y cada frase sale de la app (`location_status_chip`,
  * `route_selector_sheet`, `eta_bottom_sheet`, `bus_notification_service`).
  *
- * Sólo corre el que se está viendo. `pasos.ts` avisa cuál es el momento
+ * Sólo corre el que se está viendo. `paso-foco.ts` avisa cuál es el paso
  * activo y aquí se enciende ése y se apagan los demás, así la sección no
  * mantiene tres bucles y tres `requestAnimationFrame` a la vez.
  */

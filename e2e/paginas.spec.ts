@@ -238,9 +238,6 @@ for (const { ruta, nombre } of PAGINAS) {
 }
 
 /*
-  La banda de empresas. Es prueba social: si un logo no carga, no se lee o
-  sale en gris, la banda deja de probar nada y encima señala a la empresa
-/*
   La banda de empresas en /empresas.html. Es prueba social: si un logo no
   carga, no se lee o sale en gris, la banda deja de probar nada. Se
   comprueba que los siete logos estén en color real y cargados.

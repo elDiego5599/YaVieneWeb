@@ -270,7 +270,7 @@ export class PhoneMap {
     return g;
   }
 
-  /** Gota verde de assets/icons/pin.svg, anclada en la punta. */
+  /** Gota verde del punto de espera, anclada en la punta. */
   /**
    * Gota verde: los mismos trazos que createPinMarker(), en el mismo
    * orden. El brillo largo de arriba, el disco blanco, el ojo con su

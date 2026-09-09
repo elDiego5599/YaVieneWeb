@@ -30,7 +30,6 @@ import { PhoneSimulator } from './phone-simulator';
 import { Problema } from './problema';
 import { pintarCifras } from './rutas';
 import { dormirLoQueNoSeVe } from './reposo';
-import { saltosDeMenu } from './salto';
 import { encenderScrollSuave } from './scroll-suave';
 import { entrarEscena, ScrollEffects } from './scroll-effects';
 import { sinMovimiento } from './scrolly';
@@ -61,10 +60,6 @@ const arrancar = (): void => {
   // primero que se enciende porque sólo mira secciones, no depende de que
   // ninguna otra pieza haya montado lo suyo. Ver reposo.ts.
   dormirLoQueNoSeVe();
-
-  // Los enlaces internos cruzan por encima de las dos pistas; sin esto la
-  // travesía reproduce sus historias a toda velocidad. Ver salto.ts.
-  saltosDeMenu();
 
   const isla = document.querySelector<HTMLElement>('.nav-island');
   const botonIsla = isla?.querySelector<HTMLButtonElement>('.nav-island-toggle');

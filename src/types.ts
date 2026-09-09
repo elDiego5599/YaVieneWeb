@@ -43,11 +43,3 @@ export interface Punto {
   x: number;
   y: number;
 }
-
-/** Un rectángulo en el espacio de usuario del SVG. */
-export interface Caja {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}

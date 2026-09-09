@@ -54,7 +54,7 @@ const PALETA_EMPRESA = [
  * app, en los goldens y aquí. Sobusa (EMP-01) da ámbar; Coolitoral
  * (EMP-02), navy.
  */
-export function colorEmpresa(id: string): string {
+function colorEmpresa(id: string): string {
   let suma = 0;
   for (const c of id) suma += c.charCodeAt(0);
   return PALETA_EMPRESA[suma % PALETA_EMPRESA.length];
@@ -72,7 +72,7 @@ export function colorEmpresa(id: string): string {
  * la app las iniciales van siempre en blanco sobre el color que le toca a
  * la empresa, y ni una sola es azul si su id no cae en esa casilla.
  */
-export const EMPRESAS = [
+const EMPRESAS = [
   { id: 'EMP-02', nombre: 'Coolitoral' },
   { id: 'EMP-01', nombre: 'Sobusa' },
   { id: 'EMP-03', nombre: 'Sodis' },
@@ -85,7 +85,7 @@ const CONECTORES = new Set(['de', 'del', 'la', 'el', 'los', 'las', 'y']);
  * _companyInitials(): la primera palabra y la siguiente que no sea un
  * conector; si sólo hay una, sus dos primeras letras.
  */
-export function inicialesEmpresa(nombre: string): string {
+function inicialesEmpresa(nombre: string): string {
   const palabras = nombre.trim().split(/\s+/).filter(p => p.length > 0);
   if (palabras.length === 0) return '?';
   const claves = palabras.filter(p => !CONECTORES.has(p.toLowerCase()));
