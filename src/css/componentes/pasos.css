@@ -307,7 +307,13 @@
   padding: clamp(18px, 2.4vh, 40px) clamp(8px, 1vw, 18px);
   border: 1px solid var(--linea);
   border-radius: clamp(20px, 2.4vw, 34px);
-  background: radial-gradient(128% 96% at 50% 0%, var(--papel) 0%, var(--arena) 58%, var(--banda) 100%);
+  /* Verde y azul como el hero: el verde abajo a la izquierda y el azul
+     al costado, en los mismos sitios y fuerzas del hero, sobre la caída
+     a navy. El azul va más flojo que en el hero para no tapar el verde. */
+  background:
+    radial-gradient(circle at 12% 88%, rgba(0, 168, 89, 0.2) 0%, transparent 55%),
+    radial-gradient(circle at 85% 68%, rgba(43, 92, 184, 0.16) 0%, transparent 48%),
+    radial-gradient(128% 96% at 50% 0%, var(--papel) 0%, var(--arena) 58%, rgba(20, 39, 78, 0.1) 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8),
     0 34px 74px -38px rgba(11, 22, 40, 0.24);
   overflow: clip;
@@ -391,8 +397,9 @@
   --ancho: var(--col-paso);
 }
 
-/* Sobre el papel claro un halo azulado ensucia, así que el aparato se
-   despega con un velo verde muy flojo. Va siempre encendido y
+/* El aparato conserva su halo verde, como los teléfonos del hero y con
+   su misma fuerza: el verde del fondo ya lo pone el cuadro. Va siempre
+   encendido y
    no sólo en la toma de turno: como las tres se apilan en el mismo sitio,
    el velo cae siempre donde mismo y durante el relevo no hay dos velos
    que sumar, sino uno solo pasando de una toma a otra. */
@@ -408,6 +415,10 @@
    discrepan. Ver main.ts `irAPaso`. */
 .pasos-lado {
   display: grid;
+  /* La lista se lleva lo que sobra: la entrada arriba y los tres pasos
+     repartidos hasta abajo, cerrando a la altura del cuadro en vez de
+     quedarse cortos a mitad de camino. */
+  grid-template-rows: auto auto 1fr;
   align-content: start;
   gap: clamp(14px, 2vh, 26px);
   padding-top: clamp(2px, 1vh, 14px);
@@ -436,18 +447,37 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   position: relative;
+  /* Una sola línea: el riel vive en la lista y va de arriba abajo sin
+     cortes, en vez de un tramo por botón. Llena su fila y el paso de
+     turno se lleva lo que sobra, así que el último siempre remata al
+     fondo, a la par del cuadro. Sin sobrante no crece nada, así que en
+     móvil queda igual que antes. */
+  height: 100%;
+  border-left: 2px solid var(--linea);
+}
+
+.pasos-lista > li {
+  display: grid;
+  flex: 0 0 auto;
+  min-height: 0;
+  transition: flex-grow var(--paso-viaje) var(--paso-curva);
+}
+
+.pasos-lista > li:has(> .paso-boton.is-activa) {
+  flex: 1 0 auto;
 }
 
 .paso-boton {
   position: relative;
   display: grid;
+  align-content: start;
   gap: 5px;
   width: 100%;
   padding: clamp(11px, 1.5vh, 18px) 6px clamp(11px, 1.5vh, 18px) 18px;
   border: 0;
-  border-left: 2px solid var(--linea);
   border-radius: 0;
   background: transparent;
   font: inherit;
@@ -498,6 +528,13 @@
 
 .paso-boton.is-activa {
   opacity: 1;
+  /* El paso de turno crece para llenar la lista, así que su contenido
+     se centra en vertical y el titular va más grande: es el que manda. */
+  align-content: center;
+}
+
+.paso-boton.is-activa .columna-titulo {
+  font-size: clamp(21px, 1.8vw, 28px);
 }
 
 .paso-boton .columna-indice {
@@ -677,6 +714,15 @@
   .paso-boton,
   .paso-boton.is-activa {
     opacity: 1;
+  }
+
+  /* Y el paso de turno deja de estirarse: con las tres tomas desapiladas
+     no hay cuadro al lado con cuya altura cuadrar, así que crecer sólo
+     sería movimiento por movimiento. */
+  .pasos-lista > li,
+  .pasos-lista > li:has(> .paso-boton.is-activa) {
+    flex: 0 0 auto;
+    transition: none;
   }
 
   .paso-boton::before,
