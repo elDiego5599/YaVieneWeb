@@ -290,7 +290,16 @@ export class Problema {
   // ── El cambio de cara ──────────────────────────────────────────────
 
   private poner(cara: string): void {
-    if (this.seccion.dataset.cara === cara && !this.tramos.length) return;
+    // Adónde va la sección ahora mismo. Con una ceremonia en marcha va a
+    // «claro» aunque el atributo todavía diga otra cosa: la cara sólo se
+    // cambia a mitad de la escena. Pedir esa misma cara no es un cambio y
+    // no se rehace nada. Sin esto, volver a pulsar el botón ya pulsado
+    // mientras el árbol acababa de brotar relanzaba la ceremonia con
+    // `data-cara` ya en «claro», y el tramo del enredo —los cables rojos,
+    // las voces, las fichas desparramadas— se representaba con los textos
+    // y las fichas de «Con Ya Viene».
+    const destino = this.tramos.length ? 'claro' : this.seccion.dataset.cara;
+    if (destino === cara) return;
 
     this.cortarCeremonia();
 
