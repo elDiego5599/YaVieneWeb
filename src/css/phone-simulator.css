@@ -213,28 +213,11 @@
   color: var(--app-text-primary);
 }
 
-/*
-  Cierre del ciclo. La demo se repite sola, y volver del último cuadro al
-  primero de un tirón se sentía un corte de tijera: la ruta, el pin y la
-  hoja cambiaban todos a la vez sin que nadie los tocara.
-
-  Lo que se recoge es la sesión, no el teléfono: el mosaico y la barra de
-  Android se quedan donde están —el mapa nunca se va en la app— y lo que se
-  despide es la píldora y la hoja. El trazado, el pin y los buses se apagan
-  por su cuenta, con las transiciones que ya tienen. Así el ciclo se cierra
-  como si el pasajero soltara la búsqueda, y no como un corte de montaje.
-*/
+/* El grupo de arriba —píldora y barra de Android— se va y vuelve con la
+   pausa larga: es el marco de la sesión, no un paso de la app. */
 .phone-topbar {
   transition: opacity 0.6s var(--ease-out-cubic),
     transform 0.6s var(--ease-out-cubic);
-}
-
-.phone-screen.is-cerrando .phone-topbar {
-  opacity: 0;
-  transform: translateY(calc(-10 * var(--u)));
-  /* La despedida del ciclo sí es lenta: es una sesión que se suelta, no
-     un paso de la app. */
-  transition-duration: 0.6s;
 }
 
 /*
@@ -254,13 +237,6 @@
 .phone-topbar.esta-apartada {
   opacity: 0;
   transform: translateY(-40%);
-}
-
-/* La hoja no se limita a apagarse: se va por abajo, que es como se cierra
-   una hoja de verdad. */
-.phone-screen.is-cerrando .phone-sheet {
-  opacity: 0;
-  transform: translateY(46%);
 }
 
 @media (prefers-reduced-motion: reduce) {

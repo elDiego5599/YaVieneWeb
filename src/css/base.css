@@ -95,7 +95,6 @@ p {
    pequeño y pide 4.5:1, así que las variantes de color van al tono
    accesible de su familia y no al de marca. El rótulo por defecto es
    tinta tenue, que sobre papel da 5.6:1. */
-.eyebrow--coral { color: var(--coral-accessible); }
 .eyebrow--verde { color: var(--green-accessible); }
 .eyebrow--ambar { color: var(--amber-accessible); }
 

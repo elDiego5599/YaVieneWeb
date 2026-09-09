@@ -3,7 +3,6 @@
   --ink: #0B1628;
   --ink-deep: #060D1F;
   --navy: #14274E;
-  --navy-light: #1E3A6D;
   --green: #00A859;
   --green-accessible: #047454;
   --green-tint: #E6F7F0;
@@ -12,7 +11,6 @@
   --coral: #E86A5E;
   --coral-accessible: #CE2D1D;
   --coral-light: #FBE7E4;
-  --amber: #FFC107;
   --amber-accessible: #8A6700;
   --amber-tint: #FFF8E1;
 
@@ -87,7 +85,6 @@
      de la barra y el velo del encabezado. Un acento repetido en tres sitios
      ordena la página; el mismo acento en diez la ensucia. */
   --acento: #047454;
-  --acento-velo: rgba(0, 168, 89, 0.055);
   --linea-fuerte: #D5DBE3;
 
   --tinta: #0B1220;
@@ -134,12 +131,6 @@
   --text-white-dim: rgba(255, 255, 255, 0.7);
   --text-white-sub: rgba(255, 255, 255, 0.45);
 
-  /* Borders & Shadows */
-  --border-subtle: #E5E9EE;
-  --border-glass: rgba(255, 255, 255, 0.12);
-  --shadow-sm: 0 1px 2px rgba(11, 18, 32, 0.05);
-  --shadow-md: 0 2px 6px -1px rgba(11, 18, 32, 0.07);
-  --shadow-lg: 0 40px 80px -34px rgba(11, 18, 32, 0.26), 0 8px 24px -14px rgba(11, 18, 32, 0.10);
   /* La sombra del aparato: ancha, baja y difusa, como la de una foto de
      producto. La de antes iba al 55 % y a este tamaño manchaba el crema
      de alrededor: el teléfono no flotaba, chorreaba. */
@@ -156,13 +147,7 @@
      página, así que la franja que ocupa —hueco más píldora— no es sitio
      libre para nadie: las escenas se la descuentan antes de centrar. */
   --nav-alto: 72px;
-  --panel-radius: 28px;
-  --panel-gap: 14px;
   --content-max: 1480px;
-  /* Las bandas que enseñan producto respiran más: la escena de la solución
-     y el mapa panorámico se quedaban encajonados a 1360 en una pantalla
-     grande. */
-  --content-wide: 1680px;
   --measure: 62ch;
 
   /* Typography */
@@ -171,7 +156,6 @@
 
   /* Escala fluida: los titulares crecen con el viewport en vez de quedarse
      clavados en un tamaño pensado para 1200px. */
-  --step-display: clamp(2.75rem, 1.2rem + 6.2vw, 6.5rem);
   --step-h2: clamp(2rem, 1.1rem + 3.2vw, 3.75rem);
   --step-h3: clamp(1.15rem, 0.95rem + 0.7vw, 1.5rem);
   --step-lead: clamp(1.05rem, 0.95rem + 0.5vw, 1.375rem);
@@ -196,7 +180,5 @@
 @media (min-width: 900px) {
   :root {
     --gutter: 20px;
-    --panel-radius: 40px;
-    --panel-gap: 20px;
   }
 }

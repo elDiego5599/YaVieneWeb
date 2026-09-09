@@ -48,24 +48,6 @@
   max-width: var(--contenedor-ancho);
 }
 
-/*
-  Restos del sistema anterior. `panel--sangre` marcaba las secciones que
-  soltaban el margen para ocupar la ventana entera; ahora la ocupan todas,
-  así que no hace nada. Los tres fondos viejos —crema, verde pálido y el
-  degradado cálido del hero— apuntan a los dos fondos nuevos mientras las
-  secciones se van pasando al sistema día una por una.
-*/
-.panel--sangre { /* sin efecto: todas las bandas van a sangre */ }
-.panel--arena { background: var(--papel); }
-.panel--sun { background: var(--papel); }
-.panel--mint { background: var(--banda); border-block: 1px solid var(--linea); }
-
-/* La trama de puntos se retira: era textura de fondo, y en una página de
-   fondo claro y borde de pelo no hay nada que texturizar. */
-.panel-dots {
-  display: none;
-}
-
 /* ── Cabecera de sección ───────────────────────────────────────────────
 
    Tres piezas siempre en el mismo orden: el rótulo que dice de qué va la
@@ -174,27 +156,6 @@
   gap: clamp(28px, 4vw, 56px);
 }
 
-@media (min-width: 860px) {
-  .columnas--tres {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0;
-  }
-
-  .columnas--tres > * {
-    padding-inline: clamp(24px, 3vw, 44px);
-    border-left: 1px solid var(--linea);
-  }
-
-  .columnas--tres > *:first-child {
-    padding-left: 0;
-    border-left: 0;
-  }
-
-  .columnas--tres > *:last-child {
-    padding-right: 0;
-  }
-}
-
 /* ── Pista y escena: el andamio del scrollytelling ────────────────────
    Una pista es un bloque de varias pantallas de alto con una escena
    pegada dentro. Mientras la pista cruza la ventana la escena se queda
@@ -212,38 +173,24 @@
   height: calc(var(--tramos) * var(--paso) + 100vh);
 }
 
-/* El reloj no necesita las tres pantallas y media que pedía antes: la
-   sección tardaba tanto en soltar su contenido que bajando a ritmo normal
-   se veían transiciones sin tiempo de leerlas, y el que llegaba al final
-   había recorrido más de tres mil píxeles para una idea sola. Con dos
-   tramos cortos el recorrido baja un tercio y la esfera sigue dando la
-   vuelta entera; lo que se lee de la sección ya no depende de haber
-   bajado hasta el fondo, porque el titular y la frase están puestos
-   desde el primer píxel. */
-.pista--reloj {
-  --tramos: 2;
-  --paso: 70vh;
-}
-
-/* Los tramos los pone `pasos.ts`, uno por momento. El paso es más corto
-   que el de antes porque la cinta ya no tiene que cruzar dos bloques
-   desvaneciéndose: el texto se desplaza de un tirón y el teléfono no se
-   mueve, así que el mismo relevo se lee en menos recorrido. */
+/* Cada paso cuesta 68 vh de scroll: con un teléfono quieto por columna
+   el relevo se lee en menos recorrido que cuando la fila tenía que
+   cruzar la ventana. */
 .pista--pasos {
   --paso: 68vh;
 }
 
 /* La escena se pega a la ventana entera, pero la ventana entera no está
-   libre: la píldora de la cabecera flota sobre los primeros setenta
-   píxeles toda la página. Sin descontarlos, el contenido se centra en un
+   libre: la barra de la cabecera flota sobre los primeros píxeles de
+   toda la página. Sin descontarlos, el contenido se centra en un
    hueco que no existe y en un teléfono —donde no sobra ni un píxel— el
-   titular acaba debajo de la píldora. Con `border-box` el relleno se
+   titular acaba debajo de la barra. Con `border-box` el relleno se
    come el alto, así que la escena sigue midiendo una pantalla justa y el
    pegado sigue funcionando igual.
 
    Y abajo pasa lo mismo con la barra de direcciones. En el móvil `100vh`
    es la ventana SIN barras, pero la barra está puesta y tapa los últimos
-   ochenta píxeles: una escena pegada mete ahí el final del reloj y de una
+   ochenta píxeles: una escena pegada mete ahí su final, y de una
    escena pegada no se saca nada bajando, porque no se mueve. */
 .escena {
   position: sticky;

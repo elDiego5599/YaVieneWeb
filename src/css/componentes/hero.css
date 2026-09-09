@@ -215,8 +215,6 @@
      los tres se lean como un solo objeto y no como tres estampas. */
   --lado: calc(var(--tel) * 0.93);
   --solape: calc(var(--lado) * 0.3);
-  /* El trío se muestra siempre: el escenario es central + laterales. */
-  --escenario: calc(var(--tel) + 2 * (var(--lado) - var(--solape)));
   /* Alto del aparato central: el marco es un Pixel 9, 152,8 × 72 mm. */
   --alto-tel: calc(var(--tel) * 152.8 / 72);
   /* Lo que se hunde el trío tras el filo de abajo del lienzo: esconde el
@@ -357,12 +355,10 @@
   demo que corre dentro del teléfono derecho.
 */
 .hero-phone-side--izq {
-  --respiro: 5px;
   margin-right: calc(var(--solape) * -1);
 }
 
 .hero-phone-side--der {
-  --respiro: 4px;
   margin-left: calc(var(--solape) * -1);
 }
 
