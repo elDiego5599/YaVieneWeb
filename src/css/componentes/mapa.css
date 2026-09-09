@@ -30,18 +30,29 @@
 .mapa-inner {
   display: flex;
   flex-direction: column;
-  gap: clamp(28px, 3.4vw, 48px);
+  /* El mismo aire que en «Cómo funciona»: el titular y el tablero van
+     igual de pegados que el titular y el visor. */
+  gap: clamp(18px, 2.8vh, 40px);
 }
 
 /*
   La cabecera la pone ahora `layout.css` con el molde de sección
   —rótulo, titular a la izquierda y la entradilla a su derecha—, que es
-  el mismo de todas las secciones de la página. Aquí sólo queda el aire
-  que la separa del tablero, que es más corto que el de una sección
-  normal porque lo que sigue es la pieza y no otro bloque de texto.
+  el mismo de todas las secciones de la página. El aire con el tablero
+  lo pone el `gap` de arriba, así que aquí no queda margen: había margen
+  Y hueco a la vez y el titular flotaba lejos de la pieza.
 */
 .mapa-inner > .seccion-cabecera {
-  margin-bottom: clamp(28px, 3.4vw, 44px);
+  margin-bottom: 0;
+}
+
+/* El titular va a la misma talla que el de «Cómo funciona»: la misma
+   promesa en dos secciones no puede ir en dos tamaños. */
+.mapa-inner > .seccion-cabecera .seccion-titulo {
+  font-size: clamp(34px, 4.3vw, 64px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.018em;
 }
 
 /*
@@ -647,5 +658,13 @@
   .ruta-ficha {
     flex: 0 0 auto;
     width: 230px;
+  }
+}
+
+/* Pantalla estrecha: el titular sigue la misma cuenta que el de
+   «Cómo funciona», que a lo ancho ya no se mide en `vw` de escritorio. */
+@media (max-width: 859px) {
+  .mapa-inner > .seccion-cabecera .seccion-titulo {
+    font-size: clamp(29px, 7.6vw, 44px);
   }
 }
