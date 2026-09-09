@@ -29,16 +29,9 @@
   border-block: 1px solid var(--linea);
 }
 
-/* La banda cálida. Misma idea, otro tono: la usa «Qué resuelve», que es
-   la sección donde el problema se cuenta en coral. */
-.panel--crema {
-  background: var(--crema);
-  border-block: 1px solid var(--linea-crema);
-}
 
 /* Una banda seguida de otra compartiría dos líneas pegadas. */
-.panel--banda + .panel--banda,
-.panel--crema + .panel--crema {
+.panel--banda + .panel--banda {
   border-top: 0;
 }
 
