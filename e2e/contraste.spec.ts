@@ -73,6 +73,7 @@ const MUESTRAS: Record<string, string[]> = {
   '/': [
     '.tracked-eyebrow',
     '.hero-title .highlight',
+    '.acentuado',
     '.nav-island-cta',
     '.btn-green',
     '.hero-description',

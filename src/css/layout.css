@@ -112,12 +112,6 @@
 }
 
 /*
-  La segunda mitad de una frase, a media tinta. Es el recurso con el que
-  estas interfaces marcan lo importante sin recurrir a la negrita ni al
-  color: la afirmación va en tinta plena y lo que la matiza se apaga, en
-  el mismo tamaño y el mismo peso. Se lee primero lo uno y después lo otro.
-*/
-/*
   Lo que va dentro de una columna: un titular corto y un párrafo. No hay
   icono ni número: tres iconos genéricos encima de tres párrafos es el
   adorno que más veces se ha puesto en una página sin que aporte nada, y
@@ -140,8 +134,27 @@
   color: var(--tinta-media);
 }
 
+/*
+  La segunda mitad de una frase, a media tinta. Es el recurso con el que
+  estas interfaces marcan lo importante sin recurrir a la negrita ni al
+  color: la afirmación va en tinta plena y lo que la matiza se apaga, en
+  el mismo tamaño y el mismo peso. Se lee primero lo uno y después lo otro.
+*/
 .apagado {
   color: var(--tinta-tenue);
+}
+
+/*
+  Y su contrario: la segunda mitad en verde, para cuando la frase no
+  matiza sino que remata. Uno por página como mucho —el titular del hero
+  ya usa el suyo—, porque el recurso funciona por ser raro.
+
+  Va en `--acento`, que es el verde bajado para letra, no el de marca: el
+  de marca se queda en 2.89:1 sobre nuestros fondos claros y este titular
+  es texto, no un relleno.
+*/
+.acentuado {
+  color: var(--acento);
 }
 
 /* ── Columnas con línea medianera ──────────────────────────────────────
