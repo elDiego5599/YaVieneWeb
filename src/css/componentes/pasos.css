@@ -208,6 +208,10 @@
   justify-items: stretch;
   align-content: center;
   gap: clamp(18px, 2.8vh, 40px);
+  /* El hueco entre el visor y la lista, declarado aquí arriba y no en la
+     rejilla: el titular vive fuera de la rejilla y necesita esta misma
+     cifra para saber dónde acaba el visor que tiene debajo. */
+  --pasos-hueco: clamp(24px, 3.4vw, 64px);
   /* La fila se sale por los lados a propósito; el visor la recorta. */
   overflow: visible;
 }
@@ -239,14 +243,18 @@
   gap: 10px;
 }
 
-/* El titular de esta sección va más suelto que el resto: 26ch en vez de
-   18 y la letra menos apretada —-0.018em contra -0.035—, que es lo que
-   hace que ocupe el ancho del visor que tiene debajo en lugar de quedarse
-   en una columna estrecha con la mitad del renglón vacío. `text-wrap:
-   balance` reparte lo que quede en dos líneas parejas. */
+/* El titular de esta sección va más suelto que el resto: la letra menos
+   apretada —-0.018em contra -0.035— y el ancho no medido en caracteres
+   sino copiado del visor. Un tope en `ch` no sabe dónde acaba el cuadro
+   del teléfono: con la letra a 64 px el renglón se pasaba de largo y la
+   frase se metía en la columna de los pasos. La cuenta es la de la
+   rejilla de abajo —siete de cada doce, descontando el hueco—, así que
+   el titular termina justo en el borde del visor pase lo que pase con el
+   ancho de la ventana. `text-wrap: balance` reparte lo que quede en dos
+   líneas parejas. */
 .pasos-cabecera .seccion-titulo {
   margin: 0;
-  max-width: 26ch;
+  max-width: calc((100% - var(--pasos-hueco)) * 7 / 12);
   font-size: clamp(34px, 4.3vw, 64px);
   font-weight: 700;
   line-height: 1.02;
@@ -281,7 +289,7 @@
      visor le hacía falta al carril de la derecha, que es donde está lo
      que se lee. */
   grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  gap: clamp(24px, 3.4vw, 64px);
+  gap: var(--pasos-hueco);
   align-items: stretch;
   width: 100%;
 }
@@ -565,6 +573,13 @@
   .pasos-rejilla {
     grid-template-columns: minmax(0, 1fr);
     gap: clamp(18px, 3vh, 32px);
+  }
+
+  /* Aquí el visor ya ocupa todo el ancho, así que la cuenta de los siete
+     doceavos dejaría el titular corto sin motivo. Vuelve a medirse en
+     caracteres, que es lo que manda cuando no hay dos columnas. */
+  .pasos-cabecera .seccion-titulo {
+    max-width: 26ch;
   }
 
   .pasos-pase {
