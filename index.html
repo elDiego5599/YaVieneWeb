@@ -1705,7 +1705,16 @@
               </div>
             </div>
             <div class="mapa-lienzo" data-mapa-lienzo>
-              <svg class="mapa-svg" data-mapa-svg role="img" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses"></svg>
+              <!--
+                El mapa se puede tocar, así que también se tiene que poder
+                usar con el teclado: `tabindex` lo mete en el recorrido de
+                tabulación y las flechas mueven el punto de espera por el
+                recorrido (src/mapa-vivo.ts). El rótulo lo dice, porque es lo
+                único que se oye al llegar aquí; lo que pasa después lo
+                cuenta el `role="status"` de abajo.
+              -->
+              <svg class="mapa-svg" data-mapa-svg role="img" tabindex="0" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses. Con las flechas mueves tu punto de espera por la ruta"></svg>
+              <p class="solo-lectores" data-mapa-voz role="status" aria-live="polite"></p>
               <p class="mapa-credito">Mapa base © <a href="https://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> · © <a href="https://carto.com" target="_blank" rel="noopener">CARTO</a></p>
             </div>
           </div>

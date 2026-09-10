@@ -35,9 +35,18 @@
 .ruta-ficha:focus-visible,
 .nav-island-brand:focus-visible,
 .nav-island-cta:focus-visible,
-.footer-brand:focus-visible {
+.footer-brand:focus-visible,
+/* El mapa entra en la lista desde que se puede mover el punto con las
+   flechas: sin anillo, quien tabula no sabe que el foco está ahí y las
+   flechas se le van en desplazar la página. Va sin separación porque el
+   lienzo llega al borde del marco y el anillo se saldría del recorte. */
+.mapa-svg:focus-visible {
   outline: 3px solid var(--green);
   outline-offset: 3px;
+}
+
+.mapa-svg:focus-visible {
+  outline-offset: -3px;
 }
 
 /* Sobre fondo oscuro el verde de marca se apaga; ahí el anillo va en

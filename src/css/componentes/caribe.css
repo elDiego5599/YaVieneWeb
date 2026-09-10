@@ -10,25 +10,10 @@
    especificidad. Es el fallo que más veces ha pasado en esta base.
    ────────────────────────────────────────────────────────────────── */
 
-/* La sección que pide algo va sobre papel, no sobre tinta. Justo encima
-   está el mapa, que toma la ventana entera en oscuro: dos fondos de tinta
-   seguidos hacen que el formulario parezca un trozo más del mapa. En claro
-   la ficha se lee como lo que es —algo que se rellena— y el pie recoge el
-   calor de la marca al final. El papel tira a verde frío para no repetir
-   el arena del problema ni la crema del pie. */
-#empresas {
-  margin-bottom: 0;
-  border: 1px solid rgba(11, 22, 40, 0.07);
-  box-shadow: none;
-}
-
-#empresas .tracked-eyebrow {
-  font-size: clamp(14px, 1.15vw, 18px);
-  letter-spacing: 0.2em;
-  /* El ámbar de la marca no se sostiene sobre papel: mismo sitio y mismo
-     peso, pero en el verde que sí pasa contraste. */
-  color: var(--green-accessible);
-}
+/* Aquí vivían las reglas de `#empresas`: la sección del formulario cuando
+   estaba dentro de la portada. Se mudó a `empresas.html`, que es un
+   documento aparte y no lleva ese identificador en ninguna parte, así que
+   las reglas ya no seleccionaban nada —sólo pesaban en la hoja. */
 
 @media (min-width: 760px) {
   .footer-grid {

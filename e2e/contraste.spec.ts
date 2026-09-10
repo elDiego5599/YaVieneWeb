@@ -112,6 +112,14 @@ function pedido(px: number, peso: number): number {
 }
 
 test.describe('contraste del texto que no va en tinta plena', () => {
+  // Cada muestra son tres viajes al navegador y una captura de pantalla, con
+  // su espera para que el color esté compuesto: veinte y pico muestras por
+  // página se van a medio minuto largo, y con la máquina ocupada corriendo el
+  // resto de la suite en paralelo se pasaba de los 30 s por defecto y fallaba
+  // por tiempo sin haber medido nada. El tope es sólo tiempo: lo que se
+  // comprueba y lo que se da por bueno no cambia.
+  test.describe.configure({ timeout: 150_000 });
+
   for (const [ruta, selectores] of Object.entries(MUESTRAS)) {
     test(`el texto de ${ruta} llega a AA`, async ({ page }) => {
       await page.goto(ruta, { waitUntil: 'load' });

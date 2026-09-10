@@ -86,6 +86,8 @@ export class MapaVivo {
   private readonly lecturaBus: HTMLElement;
   private readonly lecturaMetros: HTMLElement;
   private readonly lecturaPie: HTMLElement;
+  /** Lo que se le dice a un lector de pantalla cuando el punto se mueve. */
+  private readonly voz: HTMLElement;
 
   private readonly casing: SVGPathElement;
   private readonly activa: SVGPathElement;
@@ -120,6 +122,7 @@ export class MapaVivo {
     this.lecturaBus = req<HTMLElement>(raiz, '[data-mapa-bus]');
     this.lecturaMetros = req<HTMLElement>(raiz, '[data-mapa-metros]');
     this.lecturaPie = req<HTMLElement>(raiz, '[data-mapa-lectura-pie]');
+    this.voz = req<HTMLElement>(raiz, '[data-mapa-voz]');
 
     // La C16 Calle 72 Uninorte es la que abre el resto de la página.
     this.ruta = YV_RUTAS.rutas.find(r => r.id === 'R-106') ?? YV_RUTAS.rutas[0];
@@ -187,6 +190,7 @@ export class MapaVivo {
     this.medir();
 
     this.svg.addEventListener('pointerdown', e => this.alTocar(e));
+    this.svg.addEventListener('keydown', e => this.alTeclado(e));
     window.addEventListener('resize', this.alRedimensionar, { passive: true });
 
     // Sin animaciones el mapa se queda como una foto: ruta, punto y buses
@@ -333,6 +337,44 @@ export class MapaVivo {
     const p = new DOMPoint(evento.clientX, evento.clientY).matrixTransform(ctm.inverse());
     this.ponerPin({ x: p.x, y: p.y });
     this.raiz.classList.add('es-tocado');
+    this.anunciarPunto();
+  }
+
+  /**
+   * El mapa con el teclado. Sin esto la única forma de mover el punto de
+   * espera era tocarlo o pincharlo: quien navega con teclado —o con un
+   * lector de pantalla, que no apunta a coordenadas— se quedaba con el punto
+   * donde naciera y la sección entera se volvía una imagen.
+   *
+   * Las flechas lo mueven a lo largo del recorrido, que es lo que se puede
+   * decir sin coordenadas: cada paso es un 2 % del trazado, así que la vuelta
+   * completa son cincuenta pulsaciones y se recorre una ruta de punta a punta
+   * sin cansarse. El recorrido cierra, así que pasado el final se sigue por
+   * el principio. Puesto sobre el trazado el punto queda a cero de la ruta,
+   * que es justo el caso en el que el aviso puede saltar.
+   */
+  private alTeclado(evento: KeyboardEvent): void {
+    const PASO = 0.02;
+    let t: number;
+    if (evento.key === 'ArrowRight' || evento.key === 'ArrowUp') t = this.pinT + PASO;
+    else if (evento.key === 'ArrowLeft' || evento.key === 'ArrowDown') t = this.pinT - PASO;
+    else return;
+    evento.preventDefault();
+    this.ponerPin(this.punto((t + 1) % 1));
+    this.raiz.classList.add('es-tocado');
+    this.anunciarPunto();
+  }
+
+  /**
+   * La lectura de al lado, dicha en voz alta. Es un `role="status"`, así que
+   * sólo se escribe cuando el punto lo mueve una persona: los buses cambian
+   * la distancia sesenta veces por segundo y ponerla ahí sería un lector de
+   * pantalla hablando sin parar.
+   */
+  private anunciarPunto(): void {
+    this.voz.textContent =
+      `Punto de espera movido. ${this.lecturaBus.textContent} `
+      + `a ${this.lecturaMetros.textContent}, ${this.lecturaPie.textContent}.`;
   }
 
   private ponerPin(destino: Punto): void {

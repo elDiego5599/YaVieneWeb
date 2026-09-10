@@ -261,20 +261,31 @@
             te llamamos.</p>
 
           <form id="contact-form" class="contact-form-card">
+            <!--
+              `autocomplete` para que el teléfono ofrezca lo que ya tiene
+              guardado —tres campos que casi todo el mundo tiene rellenos en
+              su navegador—, `inputmode` para que el teclado del móvil salga
+              en números en el único campo que lo es, y `maxlength` para que
+              lo que se envía tenga un tamaño con sentido: sin él, el formulario
+              acepta cualquier cosa que quepa en la memoria del navegador y
+              eso viaja tal cual al endpoint o al mensaje de WhatsApp.
+            -->
             <div class="form-group">
               <label class="form-label" for="nombre">Nombre</label>
-              <input required type="text" id="nombre" name="nombre" class="form-input" placeholder="Tu nombre" />
+              <input required type="text" id="nombre" name="nombre" class="form-input" placeholder="Tu nombre"
+                autocomplete="name" maxlength="60" />
             </div>
 
             <div class="form-group">
               <label class="form-label" for="empresa">Empresa de transporte</label>
               <input required type="text" id="empresa" name="empresa" class="form-input"
-                placeholder="Nombre de la empresa" />
+                placeholder="Nombre de la empresa" autocomplete="organization" maxlength="80" />
             </div>
 
             <div class="form-group">
               <label class="form-label" for="telefono">Teléfono / WhatsApp</label>
-              <input required type="tel" id="telefono" name="telefono" class="form-input" placeholder="300 000 0000" />
+              <input required type="tel" id="telefono" name="telefono" class="form-input" placeholder="300 000 0000"
+                autocomplete="tel" inputmode="tel" maxlength="20" />
             </div>
 
             <p id="form-error" class="form-error" role="alert" hidden></p>
@@ -282,7 +293,15 @@
             <button type="submit" class="form-submit-btn">Quiero conectar mi flota</button>
           </form>
 
-          <div id="form-success" class="form-success-message" hidden>
+          <!--
+            El panel de éxito sale donde estaba el formulario, así que quien
+            no lo ve no se entera de nada: `role="status"` lo canta y
+            `tabindex="-1"` deja que el guion le mande el foco
+            (src/contact-form.ts), que es lo que de verdad funciona en todos
+            los lectores cuando el texto ya estaba escrito y sólo se destapa.
+          -->
+          <div id="form-success" class="form-success-message" hidden
+            role="status" aria-live="polite" tabindex="-1">
             <div class="form-success-icon">✓</div>
             <h3 data-exito-titulo>¡Solicitud recibida!</h3>
             <p data-exito-texto>Te contactaremos pronto para contarte cómo conectar tus buses a la red YaViene.</p>

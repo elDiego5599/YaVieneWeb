@@ -271,3 +271,35 @@ test.describe('la banda de empresas', () => {
     expect(logos.filter((p) => p.alto < 18).map((p) => p.empresa), 'logos demasiado pequeños para leerse').toEqual([]);
   });
 });
+
+test.describe('el mapa en vivo con el teclado', () => {
+  /*
+    El punto de espera sólo se movía tocando o pinchando el mapa, así que
+    con teclado la sección entera era una imagen. Esto comprueba las tres
+    piezas del arreglo: que el mapa recibe el foco, que las flechas mueven
+    el punto, y que lo que pasa se cuenta en el `role="status"` —el número
+    de al lado no lo lee nadie si no se dice.
+  */
+  test('las flechas mueven el punto de espera y lo cuentan', async ({ page }) => {
+    await page.goto('/');
+    const mapa = page.locator('[data-mapa-svg]');
+    await mapa.scrollIntoViewIfNeeded();
+    await mapa.focus();
+    expect(
+      await page.evaluate(() => document.activeElement?.hasAttribute('data-mapa-svg') ?? false),
+      'el mapa no recibe el foco'
+    ).toBe(true);
+
+    const voz = page.locator('[data-mapa-voz]');
+    await expect(voz).toHaveText('');
+    await page.keyboard.press('ArrowRight');
+    await expect(voz).toContainText('Punto de espera movido');
+    await expect(voz).toContainText('en línea recta hasta tu punto');
+
+    // La flecha no puede además desplazar la página: si lo hiciera, mover
+    // el punto sacaría el mapa de la pantalla a cada pulsación.
+    const alto = await page.evaluate(() => window.scrollY);
+    await page.keyboard.press('ArrowDown');
+    expect(await page.evaluate(() => window.scrollY)).toBe(alto);
+  });
+});

@@ -56,6 +56,16 @@ export class ContactForm {
     this.boton.textContent = 'Enviando…';
 
     try {
+      // Hoy no hay `VITE_CONTACT_ENDPOINT` puesto en Vercel, así que el
+      // camino que se usa de verdad es el segundo: el formulario abre
+      // WhatsApp con los datos escritos y no queda registro de la solicitud
+      // en ningún sitio. Es a propósito y no un pendiente a medias —no hay
+      // servidor de la web ni buzón que atender, y la conversación con la
+      // empresa acaba en WhatsApp igualmente—, pero tiene una consecuencia
+      // que conviene tener escrita: quien rellena y no le da a enviar en
+      // WhatsApp se pierde, y nadie se entera. El día que haya dónde
+      // guardarlas, basta con declarar la variable: este camino ya está
+      // hecho y `mostrarExito` ya cuenta cada final por separado.
       const endpoint = import.meta.env.VITE_CONTACT_ENDPOINT;
       if (endpoint) await ContactForm.publicar(endpoint, this.datos);
       else this.abrirWhatsApp();
@@ -132,6 +142,10 @@ export class ContactForm {
     }
     this.exito.hidden = false;
     this.exito.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Llevar la vista hasta el panel sólo sirve a quien mira. El foco es lo
+    // que hace que un lector de pantalla lo lea entero y que el siguiente
+    // tabulador salga de aquí y no del formulario que acaba de desaparecer.
+    this.exito.focus({ preventScroll: true });
   }
 
   private mostrarError(mensaje: string): void {
