@@ -175,6 +175,15 @@
         <span class="wordmark">YA VIENE</span>
       </a>
 
+      <!-- El nombre de la sección en la que estás. Debajo de 880 los enlaces
+           se pliegan detrás del botón, y con ellos la marca de sección que
+           llevan puesta: en el teléfono la barra no decía en qué parte de la
+           página estabas. Esto lo dice. Nace vacío porque lo escribe
+           `nav-island.ts` desde el enlace de turno, y va oculto a los
+           lectores de pantalla: para ellos ya está el `aria-current` del
+           enlace, y repetirlo sólo estorba. -->
+      <span class="nav-lugar" data-nav-lugar aria-hidden="true"></span>
+
       <div class="nav-island-reveal" id="nav-island-menu">
         <div class="nav-island-inner">
           <nav class="nav-island-links" aria-label="Navegación principal">
@@ -182,7 +191,10 @@
             <a href="#problema" class="nav-link">El problema</a>
             <a href="/empresas.html" class="nav-link">Para empresas</a>
           </nav>
-          <a href="#mapa" class="nav-island-cta">Probar el mapa</a>
+          <!-- `data-lugar` es cómo se llama la sección, que no es lo que
+               dice el botón: arriba tiene que leerse «el mapa», no «probar
+               el mapa», que ahí ya no se está invitando a nada. -->
+          <a href="#mapa" class="nav-island-cta" data-lugar="El mapa">Probar el mapa</a>
         </div>
       </div>
 

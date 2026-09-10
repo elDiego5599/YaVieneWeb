@@ -16,6 +16,12 @@
  * El cierre por puntero lleva un respiro de `margenMs`. Sin él, el hueco
  * de 10 px entre la píldora y el panel desplegado en móvil, o un temblor
  * de la mano en el borde, cerraban el menú a mitad de camino.
+ *
+ * Lo otro que hace, y que no tiene que ver con abrir y cerrar, es marcar
+ * en qué sección está el que lee. Vive aquí porque es lo mismo que ya
+ * hacía el velo de la cabecera —mirar el desplazamiento y tocar la
+ * barra—, y en el mismo cuadro: son dos lecturas de medidas seguidas y
+ * no dos oyentes de scroll compitiendo.
  */
 
 const MARGEN_MS = 120;
@@ -90,12 +96,87 @@ export class NavIsland {
 
     // Fundido con el hero: arriba la cabecera es el mismo papel, sin velo
     // ni línea; al bajar aparecen los dos. Ver nav.css `.is-arriba`.
-    const cabecera = isla.closest('.site-header');
+    const cabecera = isla.closest<HTMLElement>('.site-header');
     const marcarArriba = (): void => {
       cabecera?.classList.toggle('is-arriba', window.scrollY <= 4);
     };
+
+    /*
+      Dónde estás.
+
+      La barra llevaba los tres enlaces del mismo color de principio a
+      fin: se podía recorrer la página entera sin que dijera en ningún
+      momento qué sección se estaba leyendo. Aquí se marca la que manda
+      con `aria-current`, que es lo que anuncia el lector de pantalla, y
+      nav.css le pone el trazo verde debajo.
+
+      Sólo entran los enlaces que apuntan a una sección de esta misma
+      página. En `empresas.html` los del menú van a `/#solucion` y no
+      empiezan por `#`, así que no hay ninguno y esto no hace nada: allí
+      el enlace de la propia página ya viene marcado a mano en el HTML y
+      nadie se lo toca. El botón del mapa entra como uno más, porque es
+      el único enlace que hay a esa sección.
+    */
+    const dianas: [HTMLElement, HTMLElement][] = [];
+    for (const enlace of isla.querySelectorAll<HTMLAnchorElement>(
+      '.nav-link[href^="#"], .nav-island-cta[href^="#"]'
+    )) {
+      const destino = document.getElementById(enlace.hash.slice(1));
+      if (destino) dianas.push([destino, enlace]);
+    }
+
+    let marcado: HTMLElement | null = null;
+    // El rótulo de la barra plegada. Debajo de 880 los enlaces no están a
+    // la vista, así que la marca que se les pone no la ve nadie: el
+    // nombre de la sección se escribe también aquí. Lo que se copia es
+    // `data-lugar` si el enlace lo trae —el botón del mapa dice «Probar
+    // el mapa», que arriba no pega— y si no, su propio texto.
+    const lugar = isla.querySelector<HTMLElement>('[data-nav-lugar]');
+
+    /*
+      Manda la última sección cuyo filo de arriba ya pasó por debajo de la
+      barra y que todavía no ha salido por ahí. La línea de corte es la
+      barra misma: lo que está tapado por ella no se está leyendo.
+
+      Con esa regla, en el hero y en el pie no manda ninguna —ninguna de
+      las dos tiene enlace— y la barra se queda sin marca, que es lo
+      honesto: no hay a qué apuntar.
+    */
+    const mirar = (): void => {
+      const linea = (cabecera?.offsetHeight ?? 0) + 8;
+      let manda: HTMLElement | null = null;
+      for (const [seccion, enlace] of dianas) {
+        const caja = seccion.getBoundingClientRect();
+        if (caja.top <= linea && caja.bottom > linea) manda = enlace;
+      }
+      if (manda === marcado) return;
+      marcado?.removeAttribute('aria-current');
+      // `location` y no `page`: la sección está dentro de esta página, y
+      // `page` es lo que gasta el enlace de una página en la que ya se
+      // está. Los dos se ven igual, y eso lo decide la hoja.
+      manda?.setAttribute('aria-current', 'location');
+      marcado = manda;
+      if (lugar) {
+        lugar.textContent = manda ? manda.dataset.lugar || manda.textContent : '';
+      }
+    };
+
+    // Las dos leen medidas, así que van juntas y una sola vez por cuadro:
+    // el desplazamiento dispara muchos más avisos que pinturas.
+    let repaso = 0;
+    const repasar = (): void => {
+      if (repaso) return;
+      repaso = requestAnimationFrame(() => {
+        repaso = 0;
+        marcarArriba();
+        mirar();
+      });
+    };
+
     marcarArriba();
-    window.addEventListener('scroll', marcarArriba, { passive: true });
+    mirar();
+    addEventListener('scroll', repasar, { passive: true });
+    addEventListener('resize', repasar, { passive: true });
   }
 
   private abrir(): void {

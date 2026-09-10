@@ -559,10 +559,58 @@
 
 .nav-island-brand {
   color: var(--tinta);
+  transition: opacity var(--transition-hover);
+}
+
+/* La marca es un enlace al principio de la página y no decía nada al
+   pasar por encima. No se le cambia el color —es el logo— sino que se
+   apaga un punto, que es lo que hace cualquier cabecera. */
+@media (hover: hover) {
+  .nav-island-brand:hover {
+    opacity: 0.7;
+  }
 }
 
 .nav-island-logo {
   box-shadow: none;
+}
+
+/* ── Dónde estás, cuando el menú está plegado ──────────────────────── */
+
+/* La sección de turno se marca en su enlace, y debajo de 880 los enlaces
+   viven detrás del botón: en el teléfono la barra se quedaba muda. Aquí
+   va el nombre de la sección, pegado a la marca como una migaja, con el
+   mismo rótulo de máquina que usan las cejillas de las secciones para
+   que se lea como una etiqueta y no como un segundo título.
+
+   Vacío no ocupa nada y no se ve; el paso de una sección a otra es un
+   fundido corto, que el nombre cambia solo mientras se baja y un corte
+   seco delata que hay una máquina detrás. A partir de 880 sobra: ahí los
+   enlaces están a la vista y ya lo dicen ellos. */
+.nav-lugar {
+  margin-right: auto;
+  max-width: 40vw;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--tinta-tenue);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity var(--transition-hover);
+}
+
+.nav-lugar:not(:empty) {
+  opacity: 1;
+}
+
+@media (min-width: 880px) {
+  .nav-lugar {
+    display: none;
+  }
 }
 
 /* El nombre de la marca deja el espaciado de cartel: a 0.22em una palabra
@@ -587,10 +635,6 @@
   box-shadow: 0 18px 40px -20px rgba(11, 18, 32, 0.24);
 }
 
-.nav-island-inner .nav-link {
-  color: var(--tinta);
-}
-
 /* ── Los enlaces ───────────────────────────────────────────────────── */
 
 .nav-link {
@@ -604,7 +648,14 @@
 
 /* El halo de píldora que se encendía detrás del enlace al pasar por
    encima se retira: en una barra clara basta con que el texto pase de
-   tinta media a tinta plena. */
+   tinta media a tinta plena.
+
+   Y tinta media es lo que tienen que tener. Había una regla aquí mismo
+   —`.nav-island-inner .nav-link`— que los dejaba a los tres en tinta
+   plena: venía de la isla azul, donde el pliegue era navy y la letra
+   blanca, y en la barra clara dejaba la barra sin nada que decir. Con
+   los tres ya en el color del hover, ni el puntero ni la sección de
+   turno tenían adónde ir. */
 .nav-link::before {
   content: none;
 }
@@ -613,6 +664,51 @@
   .nav-link:hover {
     color: var(--tinta);
   }
+}
+
+/*
+  Dónde estás, y qué se puede pulsar. Es un solo trazo de dos píxeles
+  debajo de la palabra, con dos estados: en tinta tenue mientras el
+  puntero está encima, y en verde de acento —puesto, sin que nadie lo
+  toque— en la sección que se está leyendo. Quien la marca es
+  `nav-island.ts`, con `aria-current`, que además es lo que anuncia el
+  lector de pantalla.
+
+  Crece desde el centro con `scaleX`, que no toca el layout ni obliga a
+  medir. Los dieciséis píxeles de los lados son el relleno del propio
+  enlace, así que el trazo mide justo lo que la palabra.
+*/
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--tinta-tenue);
+  transform: scaleX(0);
+  transition:
+    transform 0.26s var(--ease-out-cubic),
+    background-color var(--transition-hover);
+}
+
+@media (hover: hover) {
+  .nav-link:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+/* `location` es una sección de esta misma página; `page`, la página en la
+   que ya se está —el enlace de empresas, marcado a mano en su HTML—. Las
+   dos son lo mismo para quien mira, así que se ven igual. */
+.nav-link[aria-current] {
+  color: var(--tinta);
+}
+
+.nav-link[aria-current]::after {
+  background: var(--acento);
+  transform: scaleX(1);
 }
 
 .nav-link:focus-visible {
@@ -635,7 +731,10 @@
   font-weight: 600;
   letter-spacing: -0.01em;
   box-shadow: none;
-  transition: background-color var(--transition-hover), border-color var(--transition-hover);
+  transition:
+    background-color var(--transition-hover),
+    border-color var(--transition-hover),
+    box-shadow var(--transition-hover);
 }
 
 @media (hover: hover) {
@@ -643,8 +742,17 @@
     border-color: #036145;
     background: #036145;
     transform: none;
-    box-shadow: none;
   }
+}
+
+/* El botón es también el enlace del mapa: el único que hay. Cuando el
+   mapa es lo que se está leyendo lleva la misma marca que los demás,
+   pero no un trazo debajo —es un bloque lleno, no una palabra—, sino un
+   halo de su propio verde, que es como se enseña un control activo.
+   Va después del hover a propósito: con el puntero encima de la sección
+   en la que ya estás, el halo se queda y lo que cambia es el relleno. */
+.nav-island .nav-island-cta[aria-current] {
+  box-shadow: 0 0 0 3px rgba(4, 116, 84, 0.18);
 }
 
 .nav-island-toggle {
