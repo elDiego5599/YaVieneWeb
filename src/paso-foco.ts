@@ -13,14 +13,21 @@
  * pista llegue arriba manda el primero, y pasado el final manda el
  * último, de modo que la sección nunca se ve sin ninguno encendido.
  *
- * De aquí sale un número entero y nada más. Antes salía también un
- * continuo con decimales, y de él colgaba todo lo que se veía: la fila
- * corría pegada al dedo y cada teléfono crecía, se aclaraba y se enfocaba
- * fotograma a fotograma, con una línea verde que bajaba por la lista al
- * mismo ritmo. Eso hacía que el gesto durase lo que durase el gesto de
- * quien lee: con la rueda a fondo, tres teléfonos cruzando la escena de
- * un tirón. Ahora el scroll sólo dice cuándo se cambia de paso; cuánto
- * tarda el cambio y con qué curva lo decide el CSS, siempre igual.
+ * De aquí salen dos cosas: qué paso manda —un entero— y cuánto se lleva
+ * recorrido de ese paso —de 0 a 1—. El entero decide todo lo que se ve:
+ * qué toma está encima, qué botón está encendido, qué bucle corre. El
+ * continuo no decide nada de eso; sólo llena el riel de la lista.
+ *
+ * La distinción importa, porque el continuo ya estuvo aquí y se quitó
+ * por bueno motivo: de él colgaba la escena entera —la fila corría
+ * pegada al dedo y cada teléfono crecía, se aclaraba y se enfocaba
+ * fotograma a fotograma—, así que un tirón de rueda pasaba los tres
+ * teléfonos de un golpe. Eso no vuelve: cuánto tarda el relevo y con qué
+ * curva lo sigue decidiendo el CSS, siempre igual. Vuelve sólo para la
+ * barra, que es la única pieza a la que el recorrido crudo le sienta
+ * bien: la pista está pegada tres pantallas y, sin algo que se mueva con
+ * el dedo, la sección no dice por ninguna parte que bajando se cambia de
+ * paso.
  *
  * Con la sección fuera de pantalla no manda ninguno, que es lo que apaga
  * los tres bucles a la vez. Lo que se ve, en cambio, se queda como
@@ -38,6 +45,8 @@ interface PasoFocoPiezas {
   /** Las tres tomas apiladas en el visor, una por paso. */
   columnas: HTMLElement[];
   marcas: HTMLElement[];
+  /** La lista de al lado: recibe cuánto lleva lleno el tramo de turno. */
+  riel: HTMLElement | null;
   /** El paso que pasa a mandar, o `-1` con la sección fuera de vista. */
   alCambiar: (indice: number) => void;
 }
@@ -46,11 +55,17 @@ export class PasoFoco {
   private readonly piezas: PasoFocoPiezas;
 
   private actual = -1;
+  private llenado = -1;
   private pedido = 0;
   private dentro = false;
 
   constructor(piezas: PasoFocoPiezas) {
     this.piezas = piezas;
+
+    // El riel arranca vacío: hasta que la pista no empieza a correr no
+    // hay nada recorrido. El valor por omisión que trae la hoja es el
+    // tramo lleno, y ése es para cuando este módulo no llega a cargar.
+    this.llenar(0);
 
     // Un margen generoso para que el primer paso ya esté encendido cuando
     // la sección asoma, y no arranque el bucle a mitad de gesto.
@@ -88,7 +103,31 @@ export class PasoFoco {
     const recorrido = caja.height - innerHeight;
     const avance = recorrido <= 0 ? 0 : topar(-caja.top / recorrido, 0, 1);
 
-    this.aplicar(Math.min(total - 1, Math.floor(avance * total)));
+    // El tramo de cada paso es una parte igual del recorrido: la parte
+    // entera dice cuál manda y lo que sobra, cuánto se lleva de él. En el
+    // final justo la cuenta da `total`, que no es un paso; se topa en el
+    // último y entonces lo que sobra vale uno, con el riel hasta abajo.
+    const bruto = avance * total;
+    const indice = Math.min(total - 1, Math.floor(bruto));
+
+    this.llenar(topar(bruto - indice, 0, 1));
+    this.aplicar(indice);
+  }
+
+  /**
+   * Cuánto lleva lleno el tramo del paso de turno, de 0 a 1. Sale a una
+   * variable de CSS y la gasta el riel con `scaleY`, que no toca el
+   * layout: esto se escribe en cada cuadro del desplazamiento.
+   *
+   * Se redondea a la milésima antes de comparar, y así la mitad de los
+   * cuadros no escriben nada: en un tramo de 200 px una milésima es un
+   * quinto de píxel, o sea que el riel se mueve exactamente igual.
+   */
+  private llenar(parte: number): void {
+    const redondo = Math.round(parte * 1000) / 1000;
+    if (redondo === this.llenado) return;
+    this.llenado = redondo;
+    this.piezas.riel?.style.setProperty('--paso-llenado', String(redondo));
   }
 
   /**

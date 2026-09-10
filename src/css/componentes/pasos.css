@@ -489,12 +489,19 @@
 
 /*
   La luz que baja por la lista: sólo se ilumina el paso en el que se
-  está. Es un trazo por paso y no uno solo que crece con el scroll —el de
-  turno se llena de arriba abajo y el que deja de mandar se vacía por
-  arriba, con lo que lo que se ve es la luz pasando de un paso al
-  siguiente—. Antes la línea era una sola y la estiraba el recorrido
-  crudo: iba tan rápido como la rueda y nunca coincidía con el paso que
-  estaba encendido, porque el paso cambia por tercios y ella no.
+  está, y dentro de él se llena al ritmo del dedo. Es un trazo por paso y
+  no una barra única cruzando la lista entera —el de turno se llena de
+  arriba abajo según lo que se lleve recorrido de su tramo, y el que deja
+  de mandar se vacía por arriba—, así que lo que se ve es dónde estás
+  dentro del paso, no cuánto queda de la sección.
+
+  Antes hubo una sola línea estirada por el recorrido crudo de la sección
+  entera: iba a la carrera y nunca coincidía con el paso encendido,
+  porque el paso cambia por tercios y ella no. Partirla por tramos
+  arregla eso —cada trazo empieza donde empieza su paso y remata justo
+  cuando el paso cambia— y recupera lo que se perdió al quitarla: la
+  pista está pegada tres pantallas, y sin nada que se mueva con el dedo
+  la sección no dice por ninguna parte que bajando se cambia de paso.
 
   Va encima del riel gris, en el sitio exacto del borde izquierdo, y se
   mueve en `scaleY`: no toca el layout ni obliga a medir nada.
@@ -513,8 +520,17 @@
   pointer-events: none;
 }
 
+/* `--paso-llenado` es cuánto se ha bajado del tramo de este paso, de 0 a
+   1, y lo escribe `paso-foco.ts` en cada cuadro del desplazamiento. Por
+   eso aquí la transición se apaga: el valor ya viene del dedo, y una
+   curva encima sólo lo dejaría atrás.
+
+   Al vaciarse vuelve a mandar la de arriba, que es la del resto del
+   relevo. Y sin la variable —el módulo no cargó— el tramo sale lleno,
+   igual que antes. */
 .paso-boton.is-activa::before {
-  transform: scaleY(1);
+  transform: scaleY(var(--paso-llenado, 1));
+  transition: none;
 }
 
 .paso-boton:hover {

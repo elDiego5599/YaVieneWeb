@@ -150,6 +150,10 @@ const arrancar = (): void => {
     const botones = [
       ...document.querySelectorAll<HTMLButtonElement>('[data-paso-boton]'),
     ];
+    // La lista es quien lleva el riel, así que es ahí donde se escribe
+    // cuánto lleva lleno el tramo: la variable baja sola hasta el botón
+    // de turno, que es el único que la pinta.
+    const riel = document.querySelector<HTMLElement>('[data-pasos-riel]');
 
     /*
       Los botones llevan al mismo sitio que el scroll: bajan la pista
@@ -183,6 +187,7 @@ const arrancar = (): void => {
         pista,
         columnas,
         marcas,
+        riel,
         alCambiar: (indice) => {
           clearTimeout(apagado);
 
