@@ -401,6 +401,20 @@
   color: inherit;
   pointer-events: auto;
 }
+
+/* La pastilla no deja pasar el puntero salvo en los dos nombres, que sí
+   son enlaces. Lo dicen al pasar por encima, igual que los del hero. */
+.mapa-credito a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .mapa-credito a:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
 /* ── Las rutas ── */
 .mv-rutas {
   display: flex;

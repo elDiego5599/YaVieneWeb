@@ -104,6 +104,16 @@
   color: var(--papel);
 }
 
+/* La mitad apagada es la que se puede pulsar y no lo decía: las dos
+   estaban en tinta media pasara lo que pasara. Sube a tinta plena bajo
+   el puntero. La encendida no se toca —ya está en el sitio— y por eso
+   se la deja fuera. */
+@media (hover: hover) {
+  .interruptor-opcion:not([aria-pressed='true']):hover {
+    color: var(--tinta);
+  }
+}
+
 [data-cara='claro'] .interruptor-marca {
   transform: translateX(100%);
   background: var(--acento);

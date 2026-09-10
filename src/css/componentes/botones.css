@@ -58,10 +58,19 @@
   acompañarlo se saca fuera cuando lo hay, que el teclado sí existe en
   pantallas táctiles y ahí el foco tiene que verse igual.
 */
+/*
+  Lo que cambia al pasar el puntero es el fondo, y ahora también una
+  sombra corta que aparece debajo. No es el salto de dos píxeles que el
+  rediseño quitó —el botón no se mueve de su hueco, que era el problema—:
+  es la misma pieza encendiéndose. Un cambio de color solo, a este
+  tamaño, se pierde; con la sombra el botón se despega del papel sin
+  moverse.
+*/
 @media (hover: hover) {
   .btn-primary:hover {
     border-color: #24304A;
     background: #24304A;
+    box-shadow: 0 6px 16px -8px rgba(11, 18, 32, 0.5);
   }
 }
 
@@ -83,6 +92,7 @@
   .btn-green:hover {
     border-color: #036145;
     background: #036145;
+    box-shadow: 0 6px 16px -8px rgba(4, 116, 84, 0.55);
   }
 }
 
@@ -99,6 +109,7 @@
   .btn-outline:hover {
     border-color: var(--tinta-tenue);
     background: var(--banda);
+    box-shadow: var(--sombra-tarjeta);
   }
 }
 

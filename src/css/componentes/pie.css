@@ -141,6 +141,20 @@
   letter-spacing: -0.04em;
 }
 
+/* El nombre del pie es el enlace de vuelta arriba y no lo decía de
+   ninguna manera. Se apaga un punto bajo el puntero, igual que el de la
+   barra. Aquí no se puede usar `::after`: en pantalla táctil ese
+   pseudo-elemento ya está agrandando el área que se puede tocar. */
+.footer-brand {
+  transition: opacity var(--transition-hover);
+}
+
+@media (hover: hover) {
+  .footer-brand:hover {
+    opacity: 0.7;
+  }
+}
+
 .footer-brand img {
   border-radius: 50%;
   box-shadow: 0 8px 18px -7px var(--green-glow);

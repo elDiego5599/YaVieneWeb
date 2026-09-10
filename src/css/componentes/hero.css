@@ -133,6 +133,31 @@
 }
 
 /*
+  Los dos hovers hay que repetirlos aquí, y no es de más: los de
+  `botones.css` pesan lo mismo —una clase y una pseudo-clase— que estas
+  dos reglas de arriba, que van en un fichero posterior. Empatados en
+  peso gana el último, así que el fondo y el borde del hero se comían el
+  estado del puntero entero: el secundario del hero no acusaba nada al
+  pasar por encima, y el borde del verde tampoco.
+
+  De paso el gesto es el del sitio: el secundario no tiene borde que
+  encender, así que sube el velo gris; y el verde, que aquí sí lleva
+  sombra de fábrica, la abre en vez de estrenarla.
+*/
+@media (hover: hover) {
+  .hero-actions .btn-outline:hover {
+    border-color: transparent;
+    background: rgba(11, 22, 32, 0.11);
+    box-shadow: var(--sombra-tarjeta);
+  }
+
+  .hero-actions .btn-green:hover {
+    border-color: transparent;
+    box-shadow: 0 12px 26px -10px rgba(4, 116, 84, 0.5);
+  }
+}
+
+/*
   La línea de debajo: dónde se consigue la app. Es una sola frase con dos
   fichas dentro, no una lista, así que va en un `<p>` con las fichas en
   línea; si el ancho no da, el `wrap` las baja juntas y la frase se sigue
@@ -429,6 +454,22 @@
   font-size: 10.5px;
   color: var(--text-muted);
   line-height: 1.4;
+}
+
+/* Los dos nombres de dentro son enlaces y no lo decían por ninguna
+   parte: sin subrayado, sin cambio de color y del mismo tono que la
+   frase. El subrayado sale al pasar por encima, y también al llegar con
+   el teclado, que ahí no hay puntero que valga. */
+.hero-credit a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .hero-credit a:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
 }
 
 .hero-credit a {
