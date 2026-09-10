@@ -36,7 +36,15 @@ function seoDeRaiz(): Plugin {
     */
     transformIndexHtml: {
       order: 'pre',
-      handler(html, ctx) {
+      handler(original, ctx) {
+        /*
+          `%VITE_SITE_URL%` se sustituye aquí, antes que Vite, con el valor
+          ya sin barra final. Vite lo pone tal cual: con `https://sitio.co/`
+          el og:image y el JSON-LD salían con la barra doblada, y si la
+          variable no existe —una construcción sin `.env`— dejaba el texto
+          `%VITE_SITE_URL%` literal en las etiquetas publicadas.
+        */
+        const html = original.replaceAll('%VITE_SITE_URL%', sitio);
         const ruta = ctx.path === '/index.html' ? '/' : ctx.path;
         const etiqueta = /[^\S\n]*<link rel="canonical"[^>]*>\n?/;
         if (!etiqueta.test(html)) return html;
