@@ -469,8 +469,9 @@ export class PhoneSimulator {
     const metros = crudo < 100 ? Math.max(10, Math.round(crudo)) : Math.round(crudo / 10) * 10;
     const [valor, unidad] = this.partesMetrica(metros);
 
-    // bus_labels.dart: routePlateLabel() arma "ruta - placa".
-    this.texto('eta-route', `${this.rutaActual.nombre} - ${bus.placa}`);
+    // eta_bottom_sheet.dart (busTitulo): encima de la distancia va "Bus" y
+    // la placa; la ruta ya la nombra la píldora de arriba.
+    this.texto('eta-route', `Bus ${bus.placa}`);
 
     // Con distancia en pantalla y sin aviso puesto, la app no muestra
     // detalle: el número ya lo dice todo.
