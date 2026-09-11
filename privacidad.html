@@ -51,7 +51,7 @@
   </header>
 
   <main id="contenido" class="legal-hoja">
-    <p class="legal-fecha">Actualizado el 28 de agosto de 2026</p>
+    <p class="legal-fecha">Actualizado el 11 de septiembre de 2026</p>
     <h1>Privacidad</h1>
     <p class="legal-entrada">Ya Viene es una aplicación para saber por dónde va tu bus. Para
       eso necesita muy poco, y lo poco que necesita casi todo se queda dentro de tu
@@ -78,11 +78,36 @@
 
     <h2>Sin analítica, sin rastreo, sin publicidad</h2>
     <p>La aplicación no incluye herramientas de analítica, de perfiles de uso ni de
-      publicidad, y no vende ni cede datos a terceros. Tampoco guarda un historial de tus
-      viajes: ni la ruta ni la empresa que elegiste sobreviven al cierre de la app, se
-      preguntan otra vez cada vez que la abres. Lo único que se queda guardado en el
-      teléfono es el punto de espera que hayas marcado a mano, para no tener que volver a
-      marcarlo.</p>
+      publicidad, y no vende ni cede datos a terceros.</p>
+
+    <!-- Esta sección decía que lo único guardado era el punto de espera, y no
+         era cierto: el historial de avisos (alert_history_provider.dart) guarda
+         bus, ruta, fechas y el punto al que quedó fijado cada aviso. Aquí va la
+         lista completa de lo que la app escribe en SharedPreferences, con los
+         mismos topes que el código: 50 entradas, 30 días, los activos nunca se
+         purgan. La copia de Android la excluyen backup_rules.xml y
+         data_extraction_rules.xml; iOS no tiene esa exclusión, por eso se dice
+         aparte. -->
+    <h2>Lo que se queda guardado en tu teléfono</h2>
+    <p>Algunas cosas sí se guardan, pero solo dentro del teléfono, en el espacio privado
+      de la app. Ninguna se manda a un servidor:</p>
+    <ul class="legal-lista">
+      <li><strong>El punto de espera</strong> que hayas marcado a mano, para no tener que
+        volver a marcarlo. Se borra al cerrar sesión.</li>
+      <li><strong>Tus avisos.</strong> Por cada bus al que le activaste uno: el bus, la
+        ruta, cuándo lo activaste, cuándo sonó y, si lo activaste sobre un punto marcado a
+        mano, ese punto. Es lo que deja que un aviso siga vivo aunque cierres la app. Se
+        guardan los 50 más recientes de los últimos 30 días; los que todavía no han sonado
+        se quedan hasta que suenen o los quites. Los borras todos desde Notificaciones.</li>
+      <li><strong>Lo que ya aprendiste</strong>: si ya viste la bienvenida y la guía del
+        mapa, y si ya se te pidió el permiso de ubicación.</li>
+    </ul>
+    <p>La ruta y la empresa que tienes abiertas en el mapa no se guardan: se eligen otra
+      vez cada vez que abres la app. Tu posición del GPS tampoco se guarda, ni siquiera en
+      el teléfono.</p>
+    <p>En Android nada de esto entra en la copia de seguridad de tu cuenta de Google. En
+      iPhone forma parte de la copia del propio teléfono, si la tienes activada, como los
+      datos de cualquier otra app. Desinstalar la app lo borra todo.</p>
 
     <h2>Lo que sí viaja: la posición del bus</h2>
     <p>El que manda datos es el GPS del bus, no una persona. Es un equipo que va instalado
@@ -101,7 +126,9 @@
 
     <h2>Borrar tu cuenta</h2>
     <p>Escríbenos por WhatsApp al 300 443 8626 y la eliminamos junto con el correo y el
-      nombre asociados. Como no guardamos nada más tuyo, con eso no queda nada.</p>
+      nombre asociados. En nuestros servidores no hay nada más tuyo, así que allá no queda
+      nada. Lo que la app guardó en tu teléfono lo borras tú: desinstalándola, o desde la
+      app, cerrando sesión y borrando tus avisos.</p>
 
     <h2>Cambios</h2>
     <p>Si algo de esto cambia, cambia también esta página y su fecha. Ya Viene está en
