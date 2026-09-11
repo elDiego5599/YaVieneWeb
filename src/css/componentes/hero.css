@@ -423,17 +423,6 @@
   .hero-phone-side--der .phone-shell::before {
     opacity: 1;
   }
-
-  /* La calcomanía de la esquina no sirve en un teléfono: ahí el aparato
-     ocupa el ancho entero del lienzo y sangra 107 px por debajo del filo,
-     así que la esquina de abajo a la izquierda cae encima de su tarjeta
-     crema —no a ratos, sino en cualquier punto del recorrido—. Aquí la
-     atribución vuelve al flujo, centrada como el resto de la copia, en el
-     hueco que ya había entre la línea de las tiendas y el aparato. */
-  .hero-credit {
-    position: static;
-    margin-top: 12px;
-  }
 }
 
 /* La atribución del mosaico vive en la esquina de abajo a la izquierda
@@ -454,6 +443,25 @@
   font-size: 10.5px;
   color: var(--text-muted);
   line-height: 1.4;
+}
+
+/* La calcomanía de la esquina no sirve en un teléfono: ahí el aparato
+   ocupa el ancho entero del lienzo y sangra 107 px por debajo del filo,
+   así que la esquina de abajo a la izquierda cae encima de su tarjeta
+   crema —no a ratos, sino en cualquier punto del recorrido—. Aquí la
+   atribución vuelve al flujo, centrada como el resto de la copia, en el
+   hueco que ya había entre la línea de las tiendas y el aparato.
+
+   Este bloque tiene que ir después de la regla general, no dentro del de
+   719 px de más arriba: las dos pesan lo mismo —una sola clase—, así que
+   manda la que se escribe última. Metido allá arriba, el `position:
+   absolute` de la general lo tapaba y el crédito volvía a pintarse
+   encima del «Puedes cambiar de aplicación» de la tarjeta crema. */
+@media (max-width: 719px) {
+  .hero-credit {
+    position: static;
+    margin-top: 12px;
+  }
 }
 
 /* Los dos nombres de dentro son enlaces y no lo decían por ninguna
