@@ -6,6 +6,7 @@
 // `npm run mapa`.
 
 import mapaUrl from '../assets/map/barranquilla.webp';
+import ciudadUrl from '../assets/map/barranquilla-ciudad.webp';
 import type { DatosLanding } from '../types';
 
 export const YV_RUTAS: DatosLanding = {
@@ -17,6 +18,16 @@ export const YV_RUTAS: DatosLanding = {
     ancho: 804,
     alto: 1750,
     atribucion: "© OpenStreetMap · © CARTO"
+  },
+  // La ciudad entera para el mapa en vivo, en las mismas unidades.
+  ciudad: {
+    viewBox: [-825.4,-79.6,1869.8,2884.7],
+    mapa: {
+      src: ciudadUrl,
+      ancho: 1286,
+      alto: 1984,
+      atribucion: "© OpenStreetMap · © CARTO"
+    }
   },
   rutas: [
     {

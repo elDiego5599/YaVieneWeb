@@ -127,11 +127,13 @@ export class MapaVivo {
     // La C16 Calle 72 Uninorte es la que abre el resto de la página.
     this.ruta = YV_RUTAS.rutas.find(r => r.id === 'R-106') ?? YV_RUTAS.rutas[0];
 
-    const [vx, vy, w, h] = YV_RUTAS.viewBox;
+    // La ciudad entera y sin recortar: las seis rutas van de Granabastos al
+    // norte, y cualquier recorte se come una terminal. Por eso el lienzo es
+    // `YV_RUTAS.ciudad` y no el mosaico de los teléfonos, que es la
+    // pantalla del pin y dejaba fuera buses, pin y media ruta.
+    const [vx, vy, w, h] = YV_RUTAS.ciudad.viewBox;
     this.svg.replaceChildren();
     this.svg.setAttribute('viewBox', `${vx} ${vy} ${w} ${h}`);
-    // La ciudad entera y sin recortar: las seis rutas van de Granabastos al
-    // norte, y cualquier recorte se come una terminal.
     this.svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
     const defs = nuevo('defs');
@@ -150,8 +152,8 @@ export class MapaVivo {
     this.svg.appendChild(defs);
 
     const img = nuevo('image');
-    img.setAttribute('href', YV_RUTAS.mapa.src);
-    img.setAttributeNS(XLINK, 'xlink:href', YV_RUTAS.mapa.src);
+    img.setAttribute('href', YV_RUTAS.ciudad.mapa.src);
+    img.setAttributeNS(XLINK, 'xlink:href', YV_RUTAS.ciudad.mapa.src);
     img.setAttribute('x', String(vx));
     img.setAttribute('y', String(vy));
     img.setAttribute('width', String(w));
@@ -266,7 +268,7 @@ export class MapaVivo {
 
   private medir(): void {
     const caja = this.lienzo.getBoundingClientRect();
-    const [, , w, h] = YV_RUTAS.viewBox;
+    const [, , w, h] = YV_RUTAS.ciudad.viewBox;
     if (caja.width > 0 && caja.height > 0) {
       // Con `meet` manda el lado que menos aumento admite.
       this.unidadesPorPx = Math.max(w / caja.width, h / caja.height);
@@ -405,7 +407,7 @@ export class MapaVivo {
    * tarjeta y no se entiende que se puede mover.
    */
   private tCentral(): number {
-    const [vx, vy, w, h] = YV_RUTAS.viewBox;
+    const [vx, vy, w, h] = YV_RUTAS.ciudad.viewBox;
     return this.tMasCercano({ x: vx + w / 2, y: vy + h / 2 });
   }
 

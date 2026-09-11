@@ -45,6 +45,17 @@ export interface DatosLanding {
    */
   metrosPorUnidad: number;
   mapa: MapaBase;
+  /**
+   * La ciudad entera, para el mapa en vivo. El mosaico de arriba es la
+   * pantalla del pin y deja fuera medio recorrido de cada ruta; éste cubre
+   * la caja de toda la red. Su viewBox va en las mismas unidades que las
+   * rutas —puede empezar en negativo—, así que `d`, `extremos` y
+   * `metrosPorUnidad` valen igual en los dos.
+   */
+  ciudad: {
+    viewBox: [number, number, number, number];
+    mapa: MapaBase;
+  };
   rutas: RutaLanding[];
 }
 

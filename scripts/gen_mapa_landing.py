@@ -2,8 +2,9 @@
 que ve la app, más las seis rutas de Sobusa proyectadas encima.
 
 Salidas (dentro de este repo):
-  src/assets/map/barranquilla.webp   fondo real (CARTO Voyager)
-  src/data/rutas-landing.ts          rutas en píxeles de ese mosaico
+  src/assets/map/barranquilla.webp          fondo real (CARTO Voyager)
+  src/assets/map/barranquilla-ciudad.webp   la ciudad entera, para el mapa en vivo
+  src/data/rutas-landing.ts                 rutas en píxeles de ese mosaico
 
 Entrada: rutas.json vive en el repo de la app, que ya no es este. Se busca
 en ../YaViene por defecto; con otra ubicación, se le pasa por entorno:
@@ -47,6 +48,7 @@ YAVIENE = Path(os.environ.get("YAVIENE_REPO", RAIZ.parent / "YaViene"))
 SRC = YAVIENE / "app_pasajero" / "assets" / "data" / "rutas.json"
 OUT_TS = RAIZ / "src" / "data" / "rutas-landing.ts"
 OUT_IMG = RAIZ / "src" / "assets" / "map" / "barranquilla.webp"
+OUT_IMG_CIUDAD = RAIZ / "src" / "assets" / "map" / "barranquilla-ciudad.webp"
 
 # Dónde cae el pin de espera, y en qué punto de la pantalla. El punto es
 # un tramo norte de la C16, la ruta que el paso 1 deja elegida, a mitad de
@@ -85,6 +87,23 @@ EPS_DENTRO = 0.8
 EPS_FUERA = 16
 MARGEN = 40
 WEBP_QUALITY = 78
+
+# El mapa en vivo no es un teléfono: enseña la ciudad entera y deja elegir
+# cualquiera de las seis rutas, así que el recorte de la pantalla del pin le
+# deja fuera medio recorrido —la R-105 tiene la terminal a 700 unidades a la
+# izquierda del borde— y buses y pin se le salían del dibujo. Lleva su
+# propio fondo, pintado sobre la caja de toda la red y en las MISMAS
+# unidades del lienzo del teléfono: las polilíneas, las terminales y
+# `metrosPorUnidad` sirven tal cual para los dos, sólo cambia el viewBox.
+#
+# Zoom 12 de MapLibre es el z13 de las teselas raster @2x que llevaba el
+# mosaico de la ciudad antes del render vectorial (512 píxeles por tesela
+# de 256): la ciudad sale del mismo tamaño que entonces, unos 1250 x 1900
+# píxeles, que es lo que pide el lienzo del mapa en vivo a 2x. AIRE_CIUDAD
+# es el 5 % de cada lado que dejaba aquel mosaico, para que ninguna
+# terminal quede pegada al borde de la tarjeta.
+ZOOM_CIUDAD_GL = 12
+AIRE_CIUDAD = 0.05
 
 
 # ── Web Mercator en píxeles globales ────────────────────────────────────
@@ -167,6 +186,7 @@ def emitir_ts(body, generado, out_w, out_h):
         "// `npm run mapa`.",
         "",
         "import mapaUrl from '../assets/map/barranquilla.webp';",
+        "import ciudadUrl from '../assets/map/barranquilla-ciudad.webp';",
         "import type { DatosLanding } from '../types';",
         "",
         "export const YV_RUTAS: DatosLanding = {",
@@ -178,6 +198,16 @@ def emitir_ts(body, generado, out_w, out_h):
         "    ancho: %d," % body["mapa"]["ancho"],
         "    alto: %d," % body["mapa"]["alto"],
         "    atribucion: %s" % json.dumps(body["mapa"]["atribucion"], ensure_ascii=False),
+        "  },",
+        "  // La ciudad entera para el mapa en vivo, en las mismas unidades.",
+        "  ciudad: {",
+        "    viewBox: [%s]," % ",".join(str(v) for v in body["ciudad"]["viewBox"]),
+        "    mapa: {",
+        "      src: ciudadUrl,",
+        "      ancho: %d," % body["ciudad"]["mapa"]["ancho"],
+        "      alto: %d," % body["ciudad"]["mapa"]["alto"],
+        "      atribucion: %s" % json.dumps(body["ciudad"]["mapa"]["atribucion"], ensure_ascii=False),
+        "    }",
         "  },",
         "  rutas: [",
     ]
@@ -201,6 +231,25 @@ def emitir_ts(body, generado, out_w, out_h):
 
     OUT_TS.parent.mkdir(parents=True, exist_ok=True)
     OUT_TS.write_text("\n".join(lineas), encoding="utf-8")
+
+
+def pintar(centro, zoom_gl, ancho, alto, destino):
+    """Pinta con render_mapa.mjs y guarda en WebP; devuelve su tamaño."""
+    with tempfile.TemporaryDirectory() as tmp:
+        png = Path(tmp) / "mapa.png"
+        subprocess.run(
+            [
+                "node", str(RAIZ / "scripts" / "render_mapa.mjs"),
+                "%.6f" % centro[0], "%.6f" % centro[1], str(zoom_gl),
+                str(ancho), str(alto), str(DPR), str(png),
+            ],
+            check=True,
+            cwd=RAIZ,
+        )
+        img = Image.open(png).convert("RGB")
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    img.save(destino, "WEBP", quality=WEBP_QUALITY, method=6)
+    return img.size
 
 
 def main():
@@ -235,22 +284,7 @@ def main():
     )
 
     print(f"encuadre: {ancho} x {alto} pt a zoom {ZOOM_GL}, x{DPR}")
-    with tempfile.TemporaryDirectory() as tmp:
-        png = Path(tmp) / "mapa.png"
-        subprocess.run(
-            [
-                "node", str(RAIZ / "scripts" / "render_mapa.mjs"),
-                "%.6f" % centro[0], "%.6f" % centro[1], str(ZOOM_GL),
-                str(ancho), str(alto), str(DPR), str(png),
-            ],
-            check=True,
-            cwd=RAIZ,
-        )
-        img = Image.open(png).convert("RGB")
-    out_w, out_h = img.size
-
-    OUT_IMG.parent.mkdir(parents=True, exist_ok=True)
-    img.save(OUT_IMG, "WEBP", quality=WEBP_QUALITY, method=6)
+    out_w, out_h = pintar(centro, ZOOM_GL, ancho, alto, OUT_IMG)
 
     # El lienzo del SVG es la captura en sus propios píxeles, así la
     # polilínea y el fondo comparten sistema de coordenadas. Se simplifica
@@ -292,8 +326,39 @@ def main():
             }
         )
 
+    # La caja de la ciudad sale de los waypoints crudos y no de los
+    # simplificados: Douglas-Peucker sólo conserva puntos originales, así que
+    # todo lo que se dibuja cae dentro de ella, redondeo incluido.
+    todos = [project(p["lon"], p["lat"]) for r in rutas for p in r["waypoints"]]
+    x0, x1 = min(p[0] for p in todos), max(p[0] for p in todos)
+    y0, y1 = min(p[1] for p in todos), max(p[1] for p in todos)
+    # Puntos del render de la ciudad por unidad del lienzo del teléfono: la
+    # razón de los dos zooms, sobre los DPR de cada punto del teléfono.
+    escala = 2 ** (ZOOM_CIUDAD_GL - ZOOM_GL) / DPR
+    c_ancho = math.ceil((x1 - x0) * (1 + 2 * AIRE_CIUDAD) * escala)
+    c_alto = math.ceil((y1 - y0) * (1 + 2 * AIRE_CIUDAD) * escala)
+    # El viewBox se deduce del tamaño entero de la captura, y no al revés,
+    # para que imagen y viewBox tengan exactamente la misma proporción y el
+    # fondo no se estire ni una décima.
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    vw, vh = c_ancho / escala, c_alto / escala
+    centro_c = (px_to_lon(left + cx / DPR, zoom), px_to_lat(top + cy / DPR, zoom))
+    print(f"ciudad: {c_ancho} x {c_alto} pt a zoom {ZOOM_CIUDAD_GL}, x{DPR}")
+    ciudad_w, ciudad_h = pintar(centro_c, ZOOM_CIUDAD_GL, c_ancho, c_alto, OUT_IMG_CIUDAD)
+
     body = {
         "viewBox": [0, 0, out_w, out_h],
+        "ciudad": {
+            "viewBox": [
+                round(cx - vw / 2, 1), round(cy - vh / 2, 1), round(vw, 1), round(vh, 1)
+            ],
+            "mapa": {
+                "src": "src/assets/map/barranquilla-ciudad.webp",
+                "ancho": ciudad_w,
+                "alto": ciudad_h,
+                "atribucion": "© OpenStreetMap · © CARTO",
+            },
+        },
         "metrosPorUnidad": round(metros_por_unidad, 4),
         "mapa": {
             # La ruta real la resuelve el import del módulo generado.
@@ -307,6 +372,7 @@ def main():
     emitir_ts(body, data.get("generado", "sin fecha"), out_w, out_h)
 
     print(f"mosaico {out_w} x {out_h} -> {OUT_IMG.stat().st_size / 1024:.0f} KB")
+    print(f"ciudad {ciudad_w} x {ciudad_h} -> {OUT_IMG_CIUDAD.stat().st_size / 1024:.0f} KB")
     for r in out_rutas:
         print(f"  {r['id']} {r['nombre']}: {r['puntos']} -> {r['simples']} pts")
     print("datos:", OUT_TS.stat().st_size, "bytes")
