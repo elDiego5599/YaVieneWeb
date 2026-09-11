@@ -519,7 +519,7 @@ export class MapaVivo {
 
   private actualizarLectura(): void {
     const cerca = this.buses.reduce((a, b) => (b.metros < a.metros ? b : a));
-    this.lecturaBus.textContent = `${this.ruta.nombre} - ${cerca.placa}`;
+    this.lecturaBus.textContent = `Bus ${cerca.placa}`;
     this.lecturaMetros.textContent = legible(cerca.metros);
     const dentro = cerca.metros <= RADIO_AVISO_M;
     this.lectura.classList.toggle('es-cerca', dentro);
