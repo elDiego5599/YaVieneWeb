@@ -79,8 +79,8 @@
 }
 
 .nav-island-logo {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   box-shadow: 0 4px 12px -3px var(--green-glow);
 }
@@ -616,10 +616,10 @@
 /* El nombre de la marca deja el espaciado de cartel: a 0.22em una palabra
    de ocho letras ocupa lo que un enlace y medio del menú. */
 .site-header .wordmark {
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-family: var(--font-family);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
 /* ── El pliegue, en papel ──────────────────────────────────────────── */
@@ -639,10 +639,10 @@
 
 .nav-link {
   font-family: var(--font-family);
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 17px;
+  font-weight: 600;
   letter-spacing: -0.01em;
-  color: var(--tinta-media);
+  color: var(--tinta);
   transition: color var(--transition-hover);
 }
 
@@ -721,14 +721,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 36px;
-  padding: 0 15px;
+  height: 44px;
+  padding: 0 26px;
   border: 1px solid var(--green-accessible);
   border-radius: 9999px;
   background: var(--green-accessible);
   color: var(--text-white);
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   letter-spacing: -0.01em;
   box-shadow: none;
   transition:

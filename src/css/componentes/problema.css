@@ -41,7 +41,10 @@
 }
 
 #problema[data-cara='ciego'] .seccion-rotulo {
-  color: var(--coral-accessible);
+  /* El coral accesible no llega a 4.5:1 sobre el rosa de esta cara con
+     letra fina: se oscurece solo aquí, sin tocar la variable que usan
+     los números grandes y las alertas. */
+  color: #871A0E;
 }
 
 #problema[data-cara='claro'] .seccion-rotulo {

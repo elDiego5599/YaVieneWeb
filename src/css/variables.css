@@ -99,10 +99,10 @@
   --tinta-media: rgba(11, 18, 32, 0.78);
   --tinta-tenue: rgba(11, 18, 32, 0.60);
 
-  /* La monoespaciada no se carga: se pide la del sistema. Es la letra de
-     los rótulos pequeños —cuatro palabras por página— y bajar un fichero
-     de fuente para eso cuesta más de lo que vale. */
-  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  /* Prueba: los rótulos pequeños dejan la mono del sistema y usan la
+     misma Jakarta del cuerpo, como la ceja del hero. Revertir es volver a
+     la pila de abajo. */
+  --font-mono: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --rotulo-track: 0.12em;
 
   --radio-tarjeta: 12px;

@@ -65,6 +65,40 @@
   margin-left: auto;
 }
 
+/* Los 4 buses de las esquinas, como en el hero original. Viven en una
+   capa propia detrás del contenido (el pie ya recorta lo que se salga);
+   en el teléfono se apagan para no pelear con el texto. */
+.pie-buses {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.footer-cta,
+.footer-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.pie-bus {
+  position: absolute;
+  width: clamp(110px, 11vw, 190px);
+  height: auto;
+  opacity: 0.95;
+}
+
+.pie-bus--arriba-izq { top: 0; left: 13%; }
+.pie-bus--arriba-der { top: 0; right: 13%; }
+.pie-bus--abajo-izq { bottom: 9%; left: 7%; }
+.pie-bus--abajo-der { bottom: 9%; right: 7%; }
+
+@media (max-width: 899px) {
+  .pie-buses {
+    display: none;
+  }
+}
+
 .footer-cta {
   display: flex;
   flex-direction: column;
@@ -135,7 +169,7 @@
   align-self: flex-start;
   gap: 11px;
   color: var(--text-primary);
-  font-family: var(--font-display);
+  font-family: var(--font-family);
   font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -301,7 +335,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   EL CIERRE Y EL PIE, EN PAPEL
+   El cierre y el pie, en papel con luz desde abajo
 
    El pie era un degradado de ámbar y coral que además respiraba: diez
    segundos de ida y vuelta, con una trama de puntos encima. Bajo la luz
@@ -309,14 +343,15 @@
    final de ésta.
 
    Queda el mismo contenido —el cierre grande, las tres columnas de
-   enlaces y la línea legal— sobre el papel de siempre, con el velo verde
-   del encabezado repetido abajo para que la página abra y cierre igual.
+   enlaces y la línea legal— sobre el papel de siempre, pero con luz
+   desde abajo: verde marca a la izquierda y navy a la derecha, fijos y
+   sin respirar, para que el cierre se sienta parte de la página y no un
+   pegote.
    ══════════════════════════════════════════════════════════════════════ */
 
 .site-footer {
   padding: 0;
   border-top: 1px solid var(--linea);
-  background: none;
   animation: none;
   color: var(--tinta);
 }
@@ -340,10 +375,13 @@
 }
 
 /* El velo va en la sección, no en el bloque centrado: tiene que cruzar la
-   ventana entera como el del encabezado. */
+   ventana entera como el del encabezado. Luz desde abajo —verde marca a
+   la izquierda, navy a la derecha— sobre el papel, fija y sin respirar. */
 .site-footer {
   background:
-    radial-gradient(120% 68% at 50% 122%, rgba(0, 168, 89, 0.085), var(--surface-nada) 72%);
+    radial-gradient(1200px 520px at 8% 106%, rgba(0, 168, 89, 0.34), transparent 70%),
+    radial-gradient(1200px 520px at 92% 106%, rgba(19, 43, 87, 0.36), transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 55%, rgba(19, 43, 87, 0.07) 100%);
 }
 
 .footer-cta .tracked-eyebrow {
@@ -399,7 +437,7 @@
 }
 
 .footer-brand span {
-  font-family: var(--font-display);
+  font-family: var(--font-family);
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.02em;

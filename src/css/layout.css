@@ -120,7 +120,7 @@
 */
 .columna-titulo {
   margin: 0 0 10px;
-  font-family: var(--font-display);
+  font-family: var(--font-family);
   font-size: clamp(1.05rem, 0.95rem + 0.35vw, 1.25rem);
   font-weight: 600;
   line-height: 1.25;
