@@ -1,5 +1,5 @@
-"""Genera el mapa del mockup de la landing: el mosaico real de Barranquilla
-más las seis rutas de Sobusa proyectadas encima.
+"""Genera el mapa del mockup de la landing: la pantalla real de Barranquilla
+que ve la app, más las seis rutas de Sobusa proyectadas encima.
 
 Salidas (dentro de este repo):
   src/assets/map/barranquilla.webp   fondo real (CARTO Voyager)
@@ -10,23 +10,31 @@ en ../YaViene por defecto; con otra ubicación, se le pasa por entorno:
 
   YAVIENE_REPO=/ruta/al/repo npm run mapa
 
-Nada de esto es decorativo. El fondo son las teselas del mismo estilo que
-carga app_pasajero (basemaps.cartocdn.com/gl/voyager-gl-style/style.json,
-ver map_widget.dart) y las rutas son los waypoints reales de rutas.json.
-Al salir ambos del mismo encuadre Web Mercator, la polilínea cae sobre las
-calles que le tocan.
+Nada de esto es decorativo. El fondo lo dibuja MapLibre con el mismo estilo
+vectorial que carga app_pasajero (basemaps.cartocdn.com/gl/voyager-gl-style/
+style.json, ver map_widget.dart), al zoom de la vista del pin y del tamaño
+de la pantalla del iPhone; lo pinta scripts/render_mapa.mjs en un Chromium
+sin ventana. Las rutas son los waypoints reales de rutas.json. Al salir
+ambos del mismo encuadre Web Mercator, la polilínea cae sobre las calles
+que le tocan.
+
+Antes el fondo se armaba bajando teselas raster de CARTO, pero ya no se
+sirven sin clave: cada una trae «API KEY REQUIRED» impreso encima.
+
+Hace falta Node con las dependencias del repo (npm install) y el Chromium
+de Playwright (npx playwright install chromium).
 
 Uso:  npm run mapa      (o python3 scripts/gen_mapa_landing.py)
 
 Atribución obligatoria en cualquier página que muestre el mosaico:
   © OpenStreetMap contributors · © CARTO
 """
-import io
 import json
 import math
 import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 from PIL import Image
@@ -40,14 +48,43 @@ SRC = YAVIENE / "app_pasajero" / "assets" / "data" / "rutas.json"
 OUT_TS = RAIZ / "src" / "data" / "rutas-landing.ts"
 OUT_IMG = RAIZ / "src" / "assets" / "map" / "barranquilla.webp"
 
-TILE_URL = "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png"
-TILE_PX = 512          # las teselas @2x miden 512, aunque cubran lo mismo que una de 256
-ZOOM = 13
-PAD_FRAC = 0.05        # aire alrededor de la red para que no quede pegada al borde
-TARGET_PTS = 110
+# Dónde cae el pin de espera, y en qué punto de la pantalla. El punto es
+# un tramo norte de la C16, la ruta que el paso 1 deja elegida, a mitad de
+# camino entre dos waypoints de rutas.json (172 y 174): por ahí la ruta
+# baja en diagonal, así que los buses que llegan por detrás vienen desde
+# arriba a la izquierda y no se meten bajo la hoja de distancia. MIRA es
+# MIRA_X/MIRA_Y de paso-demo.ts: el centro de la franja que dejan libre la
+# píldora de arriba y la hoja de abajo.
+#
+# Antes el centro estaba en el tronco del sur por el que suben las seis
+# rutas. A este zoom esa zona es un gris de manzanas apretadas que se come
+# la línea azul; en el norte el Voyager es el de las capturas de la app,
+# calles blancas sobre crema, y ahí la ruta se lee sola.
+PIN_ESPERA = (-74.80598, 10.99770)  # lon, lat
+MIRA = (0.5, 0.44)
+# Zoom de MapLibre de la vista del pin en la app, medido y no supuesto: en
+# el simulador (iPhone de 402 pt de ancho) el radio de 2 km del punto de
+# espera ocupa 155 pt, o sea 12,9 m por punto, y eso en la latitud de
+# Barranquilla es el zoom 12,54. Con él el círculo entra entero a lo ancho
+# de la pantalla, como allá; a 13, como iba antes, se salía por los lados.
+ZOOM_GL = 12.54
+# La pantalla del iPhone que reproduce el mockup, en puntos: 402 de ancho,
+# y el alto que le da el aspecto de .phone-screen (0,4594).
+PANTALLA_PT = (402, 875)
+# A 2x, como la pantalla retina: en el teléfono del hero cae uno a uno.
+DPR = 2
+# Tolerancia de la simplificación, en unidades del lienzo (medio punto a
+# 2x). Dentro de la pantalla va casi a cero —0,8 unidades, menos de medio
+# punto— para que la línea pase por los mismos waypoints que la de la app
+# y no corte las esquinas en diagonal; fuera no se ve y se puede ser
+# grueso, que es de donde sale el peso del JS. MARGEN es cuánto se
+# extiende «dentro» más allá del borde: tiene que ser mayor que EPS_FUERA,
+# porque la simplificación se aparta hasta eps de la línea real, y así un
+# tramo de fuera nunca entra a la pantalla por un atajo.
+EPS_DENTRO = 0.8
+EPS_FUERA = 16
+MARGEN = 40
 WEBP_QUALITY = 78
-
-UA = "YaViene-landing-build/1.0 (+https://github.com/elDiego5599/YaViene)"
 
 
 # ── Web Mercator en píxeles globales ────────────────────────────────────
@@ -66,6 +103,15 @@ def lat_to_px(lat, zoom):
     return (1.0 - y / math.pi) / 2.0 * world_px(zoom)
 
 
+def px_to_lon(x, zoom):
+    return x / world_px(zoom) * 360.0 - 180.0
+
+
+def px_to_lat(y, zoom):
+    n = math.pi * (1.0 - 2.0 * y / world_px(zoom))
+    return math.degrees(math.atan(math.sinh(n)))
+
+
 # ── Simplificación de polilíneas ────────────────────────────────────────
 
 def perpendicular_distance(p, a, b):
@@ -78,7 +124,16 @@ def perpendicular_distance(p, a, b):
     return math.hypot(px - (ax + t * dx), py - (ay + t * dy))
 
 
-def douglas_peucker(pts, eps):
+def douglas_peucker(pts, eps_de):
+    """Douglas-Peucker con la tolerancia que pida cada tramo.
+
+    `eps_de(tramo)` la decide mirando los puntos del tramo: uno que toca la
+    pantalla se sigue partiendo con la fina hasta que sus pedazos quedan
+    todos fuera, y sólo esos se simplifican grueso. Antes había una sola
+    tolerancia para toda la ruta, buscada para dejar 110 puntos, y en
+    pantalla la línea cortaba las esquinas en diagonales que la app no
+    tiene.
+    """
     if len(pts) < 3:
         return list(pts)
     a, b = pts[0], pts[-1]
@@ -87,71 +142,11 @@ def douglas_peucker(pts, eps):
         d = perpendicular_distance(pts[i], a, b)
         if d > dmax:
             idx, dmax = i, d
-    if dmax <= eps:
+    if dmax <= eps_de(pts):
         return [a, b]
-    left = douglas_peucker(pts[: idx + 1], eps)
-    right = douglas_peucker(pts[idx:], eps)
+    left = douglas_peucker(pts[: idx + 1], eps_de)
+    right = douglas_peucker(pts[idx:], eps_de)
     return left[:-1] + right
-
-
-def simplify_to(pts, target):
-    """Busca por bisección el epsilon que deja ~target puntos."""
-    if len(pts) <= target:
-        return list(pts)
-    lo, hi = 0.0, 100.0
-    best = list(pts)
-    for _ in range(40):
-        mid = (lo + hi) / 2
-        out = douglas_peucker(pts, mid)
-        if len(out) > target:
-            lo = mid
-        else:
-            best = out
-            hi = mid
-    return best
-
-
-# ── Mosaico ─────────────────────────────────────────────────────────────
-
-def fetch_tile(z, x, y):
-    # Vía curl y no urllib: el Python de este Mac no tiene el almacén de
-    # certificados configurado y la descarga falla en el handshake TLS.
-    url = TILE_URL.format(z=z, x=x, y=y)
-    res = subprocess.run(
-        ["curl", "-sS", "--fail", "-A", UA, url],
-        capture_output=True,
-        timeout=60,
-    )
-    if res.returncode != 0:
-        raise RuntimeError(f"no se pudo bajar {url}: {res.stderr.decode().strip()}")
-    return Image.open(io.BytesIO(res.stdout)).convert("RGB")
-
-
-def build_mosaic(left, top, right, bottom, zoom):
-    """Descarga y recorta el mosaico que cubre el rectángulo dado, en
-    píxeles globales de Web Mercator. Devuelve (imagen, ancho, alto)."""
-    scale = TILE_PX / 256.0  # cuántos píxeles de imagen por píxel global
-
-    tx0, tx1 = int(left // 256), int(right // 256)
-    ty0, ty1 = int(top // 256), int(bottom // 256)
-    cols, rows = tx1 - tx0 + 1, ty1 - ty0 + 1
-
-    sheet = Image.new("RGB", (cols * TILE_PX, rows * TILE_PX))
-    for i, tx in enumerate(range(tx0, tx1 + 1)):
-        for j, ty in enumerate(range(ty0, ty1 + 1)):
-            sheet.paste(fetch_tile(zoom, tx, ty), (i * TILE_PX, j * TILE_PX))
-            print(f"  tesela {zoom}/{tx}/{ty}")
-
-    # Recorte fino: del origen del mosaico al rectángulo pedido.
-    ox, oy = tx0 * 256.0, ty0 * 256.0
-    box = (
-        int(round((left - ox) * scale)),
-        int(round((top - oy) * scale)),
-        int(round((right - ox) * scale)),
-        int(round((bottom - oy) * scale)),
-    )
-    crop = sheet.crop(box)
-    return crop, crop.width, crop.height
 
 
 def emitir_ts(body, generado, out_w, out_h):
@@ -167,8 +162,8 @@ def emitir_ts(body, generado, out_w, out_h):
         "// GENERADO — no editar a mano.",
         "// Fuente: app_pasajero/assets/data/rutas.json del repo YaViene (%s)." % generado,
         "// Las seis rutas reales de Sobusa proyectadas sobre el mosaico",
-        "// src/assets/map/barranquilla.webp (%d x %d, CARTO" % (out_w, out_h),
-        "// Voyager z%d), el mismo mapa base que carga la app. Se regenera con" % ZOOM,
+        "// src/assets/map/barranquilla.webp (%d x %d, CARTO Voyager" % (out_w, out_h),
+        "// vectorial a zoom %s, la vista del pin en la app). Se regenera con" % ZOOM_GL,
         "// `npm run mapa`.",
         "",
         "import mapaUrl from '../assets/map/barranquilla.webp';",
@@ -176,6 +171,7 @@ def emitir_ts(body, generado, out_w, out_h):
         "",
         "export const YV_RUTAS: DatosLanding = {",
         "  viewBox: [%s]," % ",".join(str(v) for v in body["viewBox"]),
+        "  metrosPorUnidad: %s," % body["metrosPorUnidad"],
         "  mapa: {",
         "    // El empaquetador resuelve y versiona la URL del mosaico.",
         "    src: mapaUrl,",
@@ -218,38 +214,69 @@ def main():
     data = json.loads(SRC.read_text(encoding="utf-8"))
     rutas = data["rutas"]
 
-    lons = [p["lon"] for r in rutas for p in r["waypoints"]]
-    lats = [p["lat"] for r in rutas for p in r["waypoints"]]
+    # MapLibre mide el mundo en teselas de 512, así que su zoom z es el
+    # z + 1 de estas cuentas, que van en teselas de 256: un punto de la
+    # captura es un píxel global a ese zoom.
+    zoom = ZOOM_GL + 1
+    ancho, alto = PANTALLA_PT
+    # La esquina se pone para que el pin caiga en MIRA, y el centro que se
+    # le pasa a MapLibre sale de ella.
+    left = lon_to_px(PIN_ESPERA[0], zoom) - MIRA[0] * ancho
+    top = lat_to_px(PIN_ESPERA[1], zoom) - MIRA[1] * alto
+    centro = (px_to_lon(left + ancho / 2, zoom), px_to_lat(top + alto / 2, zoom))
 
-    # Rectángulo de la red en píxeles globales, más un margen.
-    left = lon_to_px(min(lons), ZOOM)
-    right = lon_to_px(max(lons), ZOOM)
-    top = lat_to_px(max(lats), ZOOM)
-    bottom = lat_to_px(min(lats), ZOOM)
-    pad_x = (right - left) * PAD_FRAC
-    pad_y = (bottom - top) * PAD_FRAC
-    left, right = left - pad_x, right + pad_x
-    top, bottom = top - pad_y, bottom + pad_y
+    # Metros por unidad del lienzo: la circunferencia del ecuador por el
+    # coseno de la latitud, repartida en los píxeles del mundo a este zoom
+    # y en los DPR de cada punto. Web Mercator es conforme, así que vale
+    # igual a lo ancho que a lo alto, y en los 11 km de alto de la pantalla
+    # la latitud la mueve menos de un 0,1 %.
+    metros_por_unidad = (
+        40075016.686 * math.cos(math.radians(PIN_ESPERA[1])) / world_px(zoom) / DPR
+    )
 
-    print(f"encuadre z{ZOOM}: {right - left:.0f} x {bottom - top:.0f} px globales")
-    img, out_w, out_h = build_mosaic(left, top, right, bottom, ZOOM)
+    print(f"encuadre: {ancho} x {alto} pt a zoom {ZOOM_GL}, x{DPR}")
+    with tempfile.TemporaryDirectory() as tmp:
+        png = Path(tmp) / "mapa.png"
+        subprocess.run(
+            [
+                "node", str(RAIZ / "scripts" / "render_mapa.mjs"),
+                "%.6f" % centro[0], "%.6f" % centro[1], str(ZOOM_GL),
+                str(ancho), str(alto), str(DPR), str(png),
+            ],
+            check=True,
+            cwd=RAIZ,
+        )
+        img = Image.open(png).convert("RGB")
+    out_w, out_h = img.size
 
     OUT_IMG.parent.mkdir(parents=True, exist_ok=True)
     img.save(OUT_IMG, "WEBP", quality=WEBP_QUALITY, method=6)
 
-    # El lienzo del SVG es el mosaico en sus propios píxeles, así la
-    # polilínea y el fondo comparten sistema de coordenadas.
-    scale = out_w / (right - left)
-
+    # El lienzo del SVG es la captura en sus propios píxeles, así la
+    # polilínea y el fondo comparten sistema de coordenadas. Se simplifica
+    # con decimales y se redondea al escribir: a 2x una unidad es medio
+    # punto, así que el decimal no se ve y quitarlo ahorra dos caracteres
+    # por coordenada del JS.
     def project(lon, lat):
-        x = (lon_to_px(lon, ZOOM) - left) * scale
-        y = (lat_to_px(lat, ZOOM) - top) * scale
-        return (round(x, 1), round(y, 1))
+        x = (lon_to_px(lon, zoom) - left) * DPR
+        y = (lat_to_px(lat, zoom) - top) * DPR
+        return (x, y)
+
+    def dentro(p):
+        return (-MARGEN <= p[0] <= out_w + MARGEN
+                and -MARGEN <= p[1] <= out_h + MARGEN)
+
+    def eps_de(tramo):
+        return EPS_DENTRO if any(dentro(p) for p in tramo) else EPS_FUERA
 
     out_rutas = []
     for r in rutas:
         pts = [project(p["lon"], p["lat"]) for p in r["waypoints"]]
-        simple = simplify_to(pts, TARGET_PTS)
+        simple = []
+        for x, y in douglas_peucker(pts, eps_de):
+            q = (round(x), round(y))
+            if not simple or simple[-1] != q:
+                simple.append(q)
         d = "M" + " L".join(f"{x} {y}" for x, y in simple)
         out_rutas.append(
             {
@@ -267,6 +294,7 @@ def main():
 
     body = {
         "viewBox": [0, 0, out_w, out_h],
+        "metrosPorUnidad": round(metros_por_unidad, 4),
         "mapa": {
             # La ruta real la resuelve el import del módulo generado.
             "src": "src/assets/map/barranquilla.webp",

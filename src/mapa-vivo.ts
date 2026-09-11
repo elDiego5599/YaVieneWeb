@@ -277,9 +277,18 @@ export class MapaVivo {
     this.dibujarTerminales();
   }
 
-  /** Metros que mide una unidad del mosaico, deducido del kilometraje real. */
+  /**
+   * Metros que mide una unidad del mosaico. Es la escala del render, que
+   * trae el propio mosaico; deducirla del `km` de la ruta daba un 5 % de
+   * más, porque el kilometraje declarado no es lo que mide la polilínea.
+   */
   private get metrosPorUnidad(): number {
-    return this.largo > 0 ? (this.ruta.km * 1000) / this.largo : 0;
+    return YV_RUTAS.metrosPorUnidad;
+  }
+
+  /** Lo que mide el recorrido dibujado, en metros, con esa misma escala. */
+  private get metrosDeRuta(): number {
+    return this.largo * this.metrosPorUnidad;
   }
 
   private punto(t: number): Punto {
@@ -431,7 +440,7 @@ export class MapaVivo {
 
   /** Los buses vuelven a nacer por detrás del punto, sobre el recorrido. */
   private reponerBuses(): void {
-    const metros = this.ruta.km * 1000;
+    const metros = this.metrosDeRuta;
     this.buses.forEach((bus, i) => {
       const atras = (SALIDA_M[i] ?? 2000) / metros;
       bus.t = (this.pinT - atras + 1) % 1;
@@ -475,7 +484,7 @@ export class MapaVivo {
   }
 
   private avanzar(dt: number): void {
-    const metros = this.ruta.km * 1000;
+    const metros = this.metrosDeRuta;
     if (!metros) return;
     const salto = (RITMO_M_S * dt) / metros;
 

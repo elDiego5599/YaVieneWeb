@@ -38,21 +38,26 @@ export const EMPRESA = { nombre: 'Sobusa', sub: 'Empresa de transporte masivo' }
  * route_selector_sheet.dart. El color de una empresa no se escoge a mano
  * ni al azar; se saca de su id, y por eso hay que copiar la lista entera
  * y en orden —cambiar una posición cambiaría el color de todas.
+ *
+ * Es un escalón de azul noche a verde. La app dejó de tomar prestados los
+ * tokens semánticos porque vestían a una empresa con el naranja de
+ * «cuidado» o el coral de «sin conexión»; aquí seguía la paleta vieja y
+ * Sobusa salía ámbar, un color que en la app ya no lleva ninguna.
  */
 const PALETA_EMPRESA = [
-  'var(--electric-blue)',
-  'var(--coral)',
-  'var(--warn)',
-  'var(--navy)',
-  'var(--green)',
-  'var(--app-primary-accessible)'
+  '#14274E', // noche
+  '#22406F', // marino
+  '#1C5670', // petróleo
+  '#0F6A65', // verde azulado
+  '#1C6B4C', // bosque
+  '#3B6B2E' // oliva
 ] as const;
 
 /**
  * _companyColor(): suma los códigos del id y toma el resto entre seis. Es
  * determinista a propósito: la misma empresa sale del mismo color en la
- * app, en los goldens y aquí. Sobusa (EMP-01) da ámbar; Coolitoral
- * (EMP-02), navy.
+ * app, en los goldens y aquí. Sobusa (EMP-01) da petróleo; Coolitoral
+ * (EMP-02), verde azulado.
  */
 function colorEmpresa(id: string): string {
   let suma = 0;
@@ -95,6 +100,50 @@ function inicialesEmpresa(nombre: string): string {
 }
 
 /**
+ * _codigoDeRuta de route_selector_sheet.dart: la primera palabra es un
+ * código si son hasta dos letras, de una a tres cifras y quizá una letra
+ * más —«B18», «C16»—.
+ */
+const CODIGO_RUTA = /^[A-Z]{0,2}\d{1,3}[A-Z]?$/;
+
+/**
+ * _routeCode(): «B18 Tcherassi» → «B18» y «Tcherassi». El código es lo que
+ * va pintado en el parabrisas, así que el selector lo pone en la insignia
+ * y deja el destino de título. Sin código, o sin nombre detrás, no parte.
+ */
+function codigoDeRuta(nombre: string): { codigo: string; resto: string } | null {
+  const palabras = nombre.trim().split(/\s+/);
+  if (palabras.length < 2 || !CODIGO_RUTA.test(palabras[0])) return null;
+  const resto = palabras.slice(1).join(' ');
+  return resto ? { codigo: palabras[0], resto } : null;
+}
+
+/**
+ * `Icons.alt_route_rounded`, para la ruta que no traiga código. Es el
+ * trazado de Material Icons: relleno, no de línea, como el de la app.
+ */
+const ALT_ROUTE = `
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M9.78 11.16l-1.42 1.42c-.68-.69-1.34-1.58-1.79-2.94l1.94-.49c.3.89.75 1.5 1.27 2.01zM11 6L7 2 3 6h3.02c.02.81.08 1.54.19 2.17l1.94-.49C8.08 7.2 8.03 6.63 8.02 6H11zm10 0l-4-4-4 4h2.99c-.1 3.68-1.28 4.75-2.54 5.88-.5.44-1.01.92-1.45 1.55-.34-.49-.73-.88-1.13-1.24L9.46 13.6c.93.85 1.54 1.54 1.54 3.4v5h2v-5c0-2.02.71-2.66 1.79-3.63 1.38-1.24 3.08-2.78 3.2-7.37H21z" />
+  </svg>`;
+
+/**
+ * El final de cada fila: `chevron_right_rounded` y, si la fila es la ya
+ * elegida, `check_circle_rounded`. Van los dos y el CSS enseña uno; los
+ * trazados son los de Material Icons Round. Antes era un «›» de texto,
+ * más fino y más bajo que el chevron de la app.
+ */
+const COLA = `
+  <span class="app-tile-chevron" aria-hidden="true">
+    <svg class="icono-chevron" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M9.29 6.71a1 1 0 0 0 0 1.41L13.17 12l-3.88 3.88a1 1 0 1 0 1.41 1.41l4.59-4.59a1 1 0 0 0 0-1.41L10.7 6.7a1 1 0 0 0-1.41.01z" />
+    </svg>
+    <svg class="icono-elegida" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2.71 14.29L5.7 12.7a1 1 0 0 1 1.41-1.41L10 14.17l6.88-6.88a1 1 0 0 1 1.41 1.41l-7.59 7.59a1 1 0 0 1-1.41 0z" />
+    </svg>
+  </span>`;
+
+/**
  * El carril donde cuelgan las filas. Lo que se desplaza es él y no la
  * ventana, que es como se mueve una lista de verdad; va posicionado para
  * que el `offsetTop` de cada fila se mida contra el carril.
@@ -121,8 +170,7 @@ export function carrilEmpresas(): HTMLElement {
         <span class="app-tile-icon app-tile-icon--empresa"></span>
         <span class="app-tile-body">
           <span class="app-tile-title"></span>
-        </span>
-        <span class="app-tile-chevron" aria-hidden="true">›</span>`;
+        </span>${COLA}`;
       const insignia = fila.querySelector<HTMLElement>('.app-tile-icon')!;
       insignia.textContent = inicialesEmpresa(empresa.nombre);
       insignia.style.background = colorEmpresa(empresa.id);
@@ -135,30 +183,28 @@ export function carrilEmpresas(): HTMLElement {
 }
 
 /**
- * La lista de rutas se arma con los datos, no a mano en el HTML: nombre y
- * "terminalA ↔ terminalB", igual que _routeSubtitle() del selector.
+ * La lista de rutas se arma con los datos, no a mano en el HTML. Como en
+ * el selector, el código va en la insignia y el título se queda con el
+ * destino: seis filas con el mismo ícono verde solo se distinguían
+ * leyendo, y «B18», «C11», «C16» es justo lo que se busca en el
+ * parabrisas. Debajo, "terminalA ↔ terminalB", igual que _routeSubtitle().
  */
 export function carrilRutas(rutas: readonly RutaLanding[]): HTMLElement {
   return carril(
     rutas.map(ruta => {
       const fila = document.createElement('div');
-      fila.className = 'app-tile';
+      // Dos líneas: el ListTile sube de 56 a 72.
+      fila.className = 'app-tile app-tile--dos-lineas';
       fila.dataset.ruta = ruta.id;
+      const partes = codigoDeRuta(ruta.nombre);
       fila.innerHTML = `
-        <span class="app-tile-icon app-tile-icon--ruta">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 17h4a4 4 0 0 0 4-4V9a4 4 0 0 1 4-4h4" />
-            <path d="M18 2l3 3l-3 3" />
-            <circle cx="5" cy="17" r="2" />
-          </svg>
-        </span>
+        <span class="app-tile-icon app-tile-icon--ruta">${partes ? '' : ALT_ROUTE}</span>
         <span class="app-tile-body">
           <span class="app-tile-title"></span>
           <span class="app-tile-sub"></span>
-        </span>
-        <span class="app-tile-chevron" aria-hidden="true">›</span>`;
-      fila.querySelector('.app-tile-title')!.textContent = ruta.nombre;
+        </span>${COLA}`;
+      if (partes) fila.querySelector('.app-tile-icon')!.textContent = partes.codigo;
+      fila.querySelector('.app-tile-title')!.textContent = partes?.resto ?? ruta.nombre;
       fila.querySelector('.app-tile-sub')!.textContent =
         `${ruta.terminalA} ↔ ${ruta.terminalB}`;
       return fila;

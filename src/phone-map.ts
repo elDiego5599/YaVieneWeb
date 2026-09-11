@@ -35,17 +35,39 @@ const XLINK = 'http://www.w3.org/1999/xlink';
  * salía bien en el teléfono de la solución y pequeño en el del hero, que
  * es más grande; en puntos mide lo mismo que en la app en los dos.
  *
- * Los 30 son los «~28px reales en el mapa» que anota
- * createFlatTransitMarker(); el pin va a 48 porque su gota es más alta
- * que la cápsula y en la app se ve así de grande.
+ * Los dos números son la cuenta que hace MapLibre, no un tanteo. Los
+ * dibujos de map_markers.dart entran al mapa a 3 píxeles por punto —la
+ * escala de la pantalla del iPhone— y el `iconSize` de map_widget.dart los
+ * agranda con el zoom: el pin de 1,0 a zoom 11 a 1,6 a zoom 15, el bus
+ * suelto de 1,1 a 1,5. Al 12,54 del mosaico (ZOOM_GL en gen_mapa_landing.py)
+ * eso da 1,231 y 1,254:
+ *   pin: 76 px de dibujo hasta la punta / 3 × 1,231 = 31,2 puntos;
+ *   bus: 60 px de cápsula / 3 × 1,254 = 25,1 puntos.
+ * En el simulador, con la C16 viva, la cabeza del pin mide 21,3 puntos
+ * —52 px / 3 × 1,231—. Antes iban a 48 y 30, más de vez y media lo de la
+ * app: tapaban las calles y el mockup se veía tosco al lado del teléfono
+ * de verdad. Después el bus fue a 16,3 y a 19,6, lo que daban los
+ * `iconSize` de entonces (0,7 a 1,0 y 0,84 a 1,2); al lado del pin se
+ * perdía y costaba encontrarlo antes de tocarlo, así que la app lo subió y
+ * el mockup lo sigue.
  */
 const ANCHO_PANTALLA_PT = 402;
-const BUS_PT = 30;
-const PIN_PT = 48;
+const BUS_PT = 25.1;
+const PIN_PT = 31.2;
 
 /** Alto del dibujo original de cada marcador, en unidades del SVG. */
 const BUS_ALTO = 60;
 const PIN_ALTO = 76;
+
+/**
+ * Radio del halo del bus elegido: los `circleRadius: 24` de su capa más
+ * los 2,4 de `circleStrokeWidth`, que MapLibre pinta por fuera del radio.
+ * El halo vive dentro del grupo del bus, escalado a BUS_PT, así que se
+ * pasa a unidades de la cápsula: 26,4 × 60 / 25,1 ≈ 63. Antes daba 81: en
+ * la app el halo se quedó en 24 cuando el bus suelto creció, así que medido
+ * contra la cápsula ahora es más chico, aunque en la pantalla mida lo mismo.
+ */
+const HALO_R = ((24 + 2.4) * BUS_ALTO) / BUS_PT;
 
 /**
  * Radio "cerca de ti" que la app pinta alrededor del punto de espera:
@@ -55,27 +77,35 @@ const PIN_ALTO = 76;
 const RADIO_CERCA_M = 2000;
 
 /**
- * Encuadre de la cámara sobre el mosaico, en fracciones del mismo.
+ * Encuadre de la cámara sobre el mapa, en fracciones del mismo.
  *
- * La ventana mide 560 x 1188 y va centrada en (975, 1290), sobre el
- * tronco por el que suben las seis rutas. Va ahí abajo y no más arriba
- * por una razón boba pero visible: el mosaico es z13 y trae el rótulo
- * «BARRANQUILLA» dibujado para ese zoom, así que de cerca cruzaba la
- * pantalla en letras enormes que ningún mapa de calle enseña. Es 1,7 veces más cerca que el
- * encuadre anterior de 934 x 1982: pasa de 36 a 22 metros por píxel, con
- * lo que un bus a 480 m del pin se separa 22 píxeles en vez de 13 y deja
- * de confundirse con él.
+ * Es el mapa entero, porque el mapa ya es la pantalla: la captura mide
+ * 402 x 875 puntos —el iPhone que reproduce el mockup— al zoom de la vista
+ * del pin en la app (ZOOM_GL en gen_mapa_landing.py dice de dónde sale),
+ * y va centrada en un tramo norte de la C16. Son unos 5,2 km de ancho a
+ * ~6,5 m por unidad: el radio de 2 km mide lo mismo que en el teléfono y
+ * entra entero, y el pin y sus buses se separan lo mismo que allá.
  *
- * El tamaño no se eligió a ojo. Más cerca de 560 el mosaico —z13, 9,6 m
- * por unidad— empieza a agrandarse por encima de su resolución y las
- * calles se emborronan; a 560 cae en uno a uno con la pantalla retina.
- * Y de las seis rutas, a la peor le quedan dentro el 47 % de su trazo,
- * suficiente para que `tVisible` siempre tenga recorrido a la vista.
+ * Antes era una ventana de 560 x 1188 dentro de un mosaico z13 raster de
+ * toda la red, y de ahí salían sus dos defectos: de cerca las calles se
+ * emborronaban y el rótulo «BARRANQUILLA», dibujado para ese zoom, cruzaba
+ * la pantalla en letras enormes. El render vectorial pinta rótulos y
+ * edificios al tamaño que les da la app.
  */
-const CAMARA = { x: 695 / 1284, y: 696 / 1982, w: 560 / 1284, h: 1188 / 1982 };
+const CAMARA = { x: 0, y: 0, w: 1, h: 1 };
 
 const nuevo = <K extends keyof SVGElementTagNameMap>(tag: K): SVGElementTagNameMap[K] =>
   document.createElementNS(SVG_NS, tag);
+
+/**
+ * Cada teléfono lleva sus propios degradados, con un sufijo que no se
+ * repite. Con los mismos id en los cinco mapas de la página, `url(#pinGrad)`
+ * resolvía al primero del documento, que es el del teléfono lateral del
+ * hero; en móvil ese teléfono va con `display: none`, y un degradado que
+ * vive dentro de algo oculto no pinta: el pin salía como un disco blanco y
+ * los buses como un contorno vacío.
+ */
+let instancias = 0;
 
 export class PhoneMap {
   readonly rutas: RutaLanding[] = YV_RUTAS.rutas;
@@ -87,13 +117,13 @@ export class PhoneMap {
   private readonly lienzo: { w: number; h: number };
   private readonly camara: { x: number; y: number; w: number; h: number };
 
-  private readonly casingEl: SVGPathElement;
   private readonly activeEl: SVGPathElement;
   private readonly terminalsEl: SVGGElement;
   private readonly radioEl: SVGCircleElement;
   private readonly markersEl: SVGGElement;
   private readonly pinNode: SVGGElement;
   private readonly busNodes: SVGGElement[] = [];
+  private readonly sufijo: string;
 
   private largo = 0;
   private unitsPerPx = 1;
@@ -109,6 +139,7 @@ export class PhoneMap {
   constructor(svg: SVGSVGElement, host: HTMLElement) {
     this.svg = svg;
     this.host = host;
+    this.sufijo = String(++instancias);
 
     const [vx, vy, w, h] = YV_RUTAS.viewBox;
     this.camara = {
@@ -128,20 +159,30 @@ export class PhoneMap {
       `${this.camara.x} ${this.camara.y} ${this.camara.w} ${this.camara.h}`);
     this.svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
 
+    const s = this.sufijo;
     const defs = nuevo('defs');
     defs.innerHTML = `
-      <linearGradient id="busBody" x1="0" y1="0" x2="0" y2="1">
+      <linearGradient id="busBody-${s}" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#EF978E"/>
         <stop offset="100%" stop-color="#E86A5E"/>
       </linearGradient>
-      <clipPath id="busClip">
+      <clipPath id="busClip-${s}">
         <rect x="-16" y="-30" width="32" height="60" rx="16"/>
       </clipPath>
-      <linearGradient id="pinGrad" x1="0" y1="0" x2="0" y2="1">
+      <radialGradient id="busHalo-${s}">
+        <stop offset="0" stop-color="#FFC72C" stop-opacity="0.97"/>
+        <stop offset="0.25" stop-color="#FFCA36" stop-opacity="0.99"/>
+        <stop offset="0.4" stop-color="#FFD660" stop-opacity="1"/>
+        <stop offset="0.55" stop-color="#FFE48F" stop-opacity="0.84"/>
+        <stop offset="0.7" stop-color="#FFEEB1" stop-opacity="0.52"/>
+        <stop offset="0.85" stop-color="#FFF3C3" stop-opacity="0.16"/>
+        <stop offset="1" stop-color="#FFF3C4" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="pinGrad-${s}" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#4ADE80"/>
         <stop offset="100%" stop-color="#059669"/>
       </linearGradient>
-      <linearGradient id="pinOjo" x1="0" y1="0" x2="1" y2="1">
+      <linearGradient id="pinOjo-${s}" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stop-color="#065F46"/>
         <stop offset="100%" stop-color="#00A859"/>
       </linearGradient>`;
@@ -163,12 +204,8 @@ export class PhoneMap {
     this.radioEl.setAttribute('class', 'map-radio');
     this.svg.appendChild(this.radioEl);
 
-    // Ruta activa: orla blanca abajo, azul encima — las dos capas que
-    // apila map_widget.dart sobre MapLibre.
-    this.casingEl = nuevo('path');
-    this.casingEl.setAttribute('class', 'map-route-casing');
-    this.svg.appendChild(this.casingEl);
-
+    // Ruta activa: una sola línea azul, la única capa que map_widget.dart
+    // le pone a la ruta sobre MapLibre.
     this.activeEl = nuevo('path');
     this.activeEl.setAttribute('class', 'map-route-active');
     this.svg.appendChild(this.activeEl);
@@ -181,7 +218,7 @@ export class PhoneMap {
     this.markersEl.setAttribute('class', 'map-markers');
     this.svg.appendChild(this.markersEl);
 
-    this.pinNode = PhoneMap.makePin();
+    this.pinNode = PhoneMap.makePin(this.sufijo);
     this.markersEl.appendChild(this.pinNode);
 
     this.setRoute(this.activeRoute.id);
@@ -246,46 +283,50 @@ export class PhoneMap {
    * capa 'bus-selected-halo-layer' de map_widget.dart, con su dorado y su
    * filo claro.
    *
-   * El 34 no es a ojo. En la app la cápsula se ve a unos 28 px —lo dice
-   * map_markers.dart— y al elegirse crece a 1,25, o sea 35 px de largo;
-   * el halo mide 20 de radio, algo más que su medio largo. Aquí la
-   * cápsula mide 60, medio largo 30, así que el halo va a 34: la misma
-   * relación. Lo que no se copia es el `circleBlur`: un filtro de
-   * desenfoque por bus, repintado cuadro a cuadro, cuesta más de lo que
-   * aporta, así que el borde se suaviza bajando la opacidad.
+   * El halo es un degradado y no un disco con borde porque así lo pinta
+   * MapLibre: con `circleBlur: 0.75` la opacidad cae, en una curva
+   * smoothstep, desde un cuarto del radio hasta el borde, y el color pasa
+   * del dorado del relleno al crema del filo por el camino. Las paradas de
+   * `busHalo` son esa cuenta con los valores en reposo —relleno 0,55, filo
+   * 0,9— llevada a 1 en el punto más opaco, que cae en el 0,4; cuánto se
+   * ve el conjunto lo pone el latido del CSS. El latido de la app también
+   * mueve el desenfoque, de 0,5 a 0,95; aquí se queda en el 0,75 de
+   * reposo. Antes era un círculo liso con un trazo, porque un filtro de
+   * desenfoque por bus cuesta demasiado; un degradado no cuesta nada, y al
+   * tamaño de la app un disco duro de 22 puntos parecía una moneda pegada
+   * al bus.
    */
-  private static makeBus(): SVGGElement {
+  private static makeBus(s: string): SVGGElement {
     const g = nuevo('g');
     g.setAttribute('class', 'map-bus');
     g.innerHTML = `
-      <circle class="map-bus-halo" r="34" fill="#FFC72C" stroke="#FFF3C4"
-              stroke-width="2.6"/>
+      <circle class="map-bus-halo" r="${HALO_R.toFixed(1)}" fill="url(#busHalo-${s})"/>
       <g class="map-bus-art">
-        <rect x="-16" y="-30" width="32" height="60" rx="16" fill="url(#busBody)"/>
+        <rect x="-16" y="-30" width="32" height="60" rx="16" fill="url(#busBody-${s})"/>
         <ellipse cx="0" cy="-15.6" rx="11.5" ry="7.8" fill="#FFFFFF" opacity="0.3"
-                 clip-path="url(#busClip)"/>
+                 clip-path="url(#busClip-${s})"/>
         <rect x="-16" y="-30" width="32" height="60" rx="16" fill="none"
               stroke="#FFFFFF" stroke-width="2.6" stroke-opacity="0.92"/>
       </g>`;
     return g;
   }
 
-  /** Gota verde del punto de espera, anclada en la punta. */
   /**
-   * Gota verde: los mismos trazos que createPinMarker(), en el mismo
-   * orden. El brillo largo de arriba, el disco blanco, el ojo con su
-   * degradado en diagonal y la chispita descentrada no son adorno: sin
-   * ellos el pin se ve como una calcomanía plana y el de la app no lo es.
+   * Gota verde del punto de espera, anclada en la punta: los mismos trazos
+   * que createPinMarker(), en el mismo orden. El brillo largo de arriba, el
+   * disco blanco, el ojo con su degradado en diagonal y la chispita
+   * descentrada no son adorno: sin ellos el pin se ve como una calcomanía
+   * plana y el de la app no lo es.
    */
-  private static makePin(): SVGGElement {
+  private static makePin(s: string): SVGGElement {
     const g = nuevo('g');
     g.setAttribute('class', 'map-pin');
     g.innerHTML = `
       <g class="map-pin-art" transform="translate(-40 -76)">
-        <path d="M40 76 Q10 48 14 30 A26 26 0 1 1 66 30 Q70 48 40 76 Z" fill="url(#pinGrad)"/>
+        <path d="M40 76 Q10 48 14 30 A26 26 0 1 1 66 30 Q70 48 40 76 Z" fill="url(#pinGrad-${s})"/>
         <ellipse cx="40" cy="14" rx="12" ry="4.5" fill="#FFFFFF" opacity="0.2"/>
         <circle cx="40" cy="30" r="12.5" fill="#FFFFFF"/>
-        <circle cx="40" cy="30" r="8.5" fill="url(#pinOjo)"/>
+        <circle cx="40" cy="30" r="8.5" fill="url(#pinOjo-${s})"/>
         <circle cx="37.5" cy="27" r="2.2" fill="#FFFFFF" opacity="0.85"/>
       </g>`;
     return g;
@@ -298,7 +339,6 @@ export class PhoneMap {
     if (!route) return;
     this.activeRoute = route;
 
-    this.casingEl.setAttribute('d', route.d);
     this.activeEl.setAttribute('d', route.d);
     this.largo = this.activeEl.getTotalLength();
 
@@ -321,18 +361,24 @@ export class PhoneMap {
     this.drawBuses();
   }
 
-  /** Longitud del recorrido activo, en metros. */
+  /**
+   * Longitud del recorrido activo, en metros, medida sobre el trazo que
+   * se dibuja. Así el pin, los buses, el radio y la cifra de la hoja usan
+   * la misma regla: 1 km en la hoja es 1 km sobre el mapa.
+   */
   get metrosDeRuta(): number {
-    return this.activeRoute.km * 1000;
+    return this.largo * this.metrosPorUnidad;
   }
 
   /**
-   * Escala del mosaico, deducida de los propios datos: la ruta mide
-   * `km` kilómetros y `largo` unidades de SVG. Salen ~9,6 m por unidad,
-   * que es lo que toca a z13 en la latitud de Barranquilla.
+   * Escala del mosaico: la calcula gen_mapa_landing.py con el zoom y la
+   * latitud del render, no con los datos de la ruta. Antes salía de
+   * dividir `km` entre el largo del trazo, y el `km` declarado no es el
+   * del recorrido —la C16 dice 62,6 y su polilínea mide 59,7—, así que
+   * el radio de 2 km salía un 5 % más chico que el de la app.
    */
   private get metrosPorUnidad(): number {
-    return this.largo > 0 ? this.metrosDeRuta / this.largo : 0;
+    return YV_RUTAS.metrosPorUnidad;
   }
 
   /** Punto en unidades del SVG. t: 0 = terminal A, 1 = terminal B. */
@@ -427,7 +473,7 @@ export class PhoneMap {
   setBuses(ts: number[]): void {
     this.busTs = ts;
     while (this.busNodes.length < ts.length) {
-      const node = PhoneMap.makeBus();
+      const node = PhoneMap.makeBus(this.sufijo);
       // Encima del pin. El pin es del usuario, pero es un punto quieto y
       // el bus es la noticia: debajo, el disco del pin se lo comía justo
       // en el momento en que hay que verlo llegar.
@@ -477,7 +523,6 @@ export class PhoneMap {
   }
 
   showRoute(on: boolean): void {
-    this.casingEl.classList.toggle('is-on', on);
     this.activeEl.classList.toggle('is-on', on);
     this.terminalsEl.classList.toggle('is-on', on);
   }

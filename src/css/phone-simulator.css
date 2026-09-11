@@ -399,7 +399,6 @@
 /* El SVG se escala para caber en la pantalla; sin non-scaling-stroke los
    trazos se adelgazarían hasta desaparecer. Sólo aplica a la ruta: los
    marcadores sí llevan relleno y su propio tamaño. */
-.map-route-casing,
 .map-route-active,
 .map-terminals circle,
 .map-radio {
@@ -416,19 +415,11 @@
   la tercera parte de uno de verdad, la ruta salía como un pelo y no se
   veía sobre el mosaico.
 
-  La orla blanca no está en la app: allí el mapa es vectorial y clarito, y
-  la línea azul se lee sola. Aquí el fondo es un mosaico con calles
-  amarillas del mismo calibre, así que la ruta lleva debajo un filo blanco
-  para despegarse de ellas. Es lo justo para separarla, no un segundo
-  trazo con vida propia.
+  Va sola, sin orla, como en la app: map_widget.dart le pone a la ruta una
+  única capa de línea. La orla blanca que llevaba antes compensaba un
+  fondo del sur lleno de calles amarillas del mismo calibre; con el
+  encuadre del norte el Voyager es clarito y la línea azul se lee sola.
 */
-.map-route-casing {
-  fill: none;
-  stroke: #FFFFFF;
-  stroke-width: calc(7 * var(--u));
-  opacity: 0.9;
-}
-
 .map-route-active {
   fill: none;
   stroke: var(--electric-blue);
@@ -460,14 +451,12 @@
 }
 
 /* La ruta entra y sale con la elección, no de golpe. */
-.map-route-casing,
 .map-route-active,
 .map-terminals {
   opacity: 0;
   transition: opacity 0.45s var(--ease-out-cubic);
 }
 
-.map-route-casing.is-on,
 .map-route-active.is-on,
 .map-terminals.is-on {
   opacity: 1;
@@ -490,8 +479,16 @@
   El halo del bus elegido: la capa dorada de map_widget.dart. Ahí late con
   un temporizador cada 900 ms que sólo pone dos juegos de valores y deja
   que la transición del estilo haga el medio; aquí el vaivén es el mismo
-  —0,8 y 1,35 del radio, opacidades 0,68 y 0,22, filo 1 y 0,3— en una
-  animación de 1,8 s, que es el ciclo entero.
+  en una animación de 1,8 s, que es el ciclo entero.
+
+  El radio va de 19,2 a 32,4, con sus 2,4 de filo por fuera: 21,6 y 34,8
+  sobre los 26,4 del círculo en reposo, de ahí 0,82 y 1,32. Son las
+  mismas fracciones que con 16, 27 y 2, antes de que bus y halo crecieran
+  un 20 % en la app. La opacidad es la del
+  punto más opaco del halo en cada fase —la cuenta de MapLibre con el
+  relleno, el filo y el desenfoque de cada una—: 0,74 recogido, 0,57 en
+  reposo y 0,22 abierto. El filo y el desenfoque ya van dentro del
+  degradado (makeBus en phone-map.ts), así que aquí no hay trazo.
 
   Se escala en vez de cambiar el radio: mover `r` obliga a rehacer la
   geometría en cada cuadro, y encima de un mapa que ya está repintando dos
@@ -511,8 +508,11 @@
 }
 
 /*
-  Elegido, el ícono va a 1,25 y sin elegir a 1: los dos tamaños de la
-  expresión `iconSize` del SymbolLayer.
+  Elegido, el ícono crece lo que dice la expresión `iconSize` del
+  SymbolLayer al zoom del mockup: 1,32 y 1,1 a zoom 11, 1,8 y 1,5 a zoom
+  15, que a 12,54 son 1,505 contra 1,254, 1,2 veces —la misma proporción
+  en todo el recorrido—. Antes eran 1,27: el suelto creció más que el
+  elegido, que ya tiene el halo para destacarse.
 
   La sombra va aquí y no en `.map-bus`, que es quien lleva el transform:
   así sus medidas son las del propio dibujo —el mismo espacio en el que
@@ -528,28 +528,26 @@
 }
 
 .map-bus.is-elegida .map-bus-art {
-  transform: scale(1.25);
+  transform: scale(1.2);
 }
 
 @keyframes bus-halo {
   0%,
   100% {
-    transform: scale(0.8);
-    opacity: 0.68;
-    stroke-opacity: 1;
+    transform: scale(0.82);
+    opacity: 0.74;
   }
 
   50% {
-    transform: scale(1.35);
+    transform: scale(1.32);
     opacity: 0.22;
-    stroke-opacity: 0.3;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .map-bus.is-elegida .map-bus-halo {
     animation: none;
-    opacity: 0.55;
+    opacity: 0.57;
   }
 }
 
@@ -1157,32 +1155,60 @@
   min-height: 0;
 }
 
-/* Fila de lista: _compactTile() del selector. */
+/*
+  Fila de lista: _compactTile() del selector. Es un ListTile blanco
+  —`tileColor: AppColors.surface`— con filo de hairline y radio lg (16),
+  no una ficha gris sin borde: sobre la arena de la hoja, el blanco con su
+  filo es lo que la despega del fondo.
+
+  Padding md (16) a los lados y xs (4) arriba y abajo, y la altura la pone
+  el ListTile de Material 3: 56 con una línea —empresas— y 72 con dos
+  —rutas—. Entre la insignia, el texto y el chevron van los 16 de
+  `horizontalTitleGap`. Debajo, sm (8) hasta la siguiente fila.
+
+  El filo va en 1px y no en u, igual que el de la píldora: en los
+  teléfonos chicos una u queda por debajo del píxel y el borde se borraba.
+*/
 .app-tile {
-  background: #F8FAFC;
+  background: var(--surface);
+  border: 1px solid var(--app-hairline);
   border-radius: calc(16 * var(--u));
-  padding: calc(10 * var(--u)) calc(16 * var(--u));
+  min-height: calc(56 * var(--u));
+  padding: calc(4 * var(--u)) calc(16 * var(--u));
   margin-bottom: calc(8 * var(--u));
   display: flex;
   align-items: center;
   gap: calc(16 * var(--u));
 }
 
-/* La fila ya elegida se marca al volver a la lista. */
-.app-tile.is-activa {
-  box-shadow: inset 0 0 0 1.5px var(--navy);
+.app-tile--dos-lineas {
+  min-height: calc(72 * var(--u));
 }
 
+/* La fila ya elegida se marca al volver a la lista: el filo pasa a
+   `AppColors.primary` en 1,5. El medio punto que falta lo pone la sombra
+   por dentro, para que el cambio de grosor no mueva el contenido. */
+.app-tile.is-activa {
+  border-color: var(--green);
+  box-shadow: inset 0 0 0 0.5px var(--green);
+}
+
+/* La caja de 40 con radio md (12). Lo que lleva dentro, cuando es texto,
+   es la insignia de _compactTile(): AppTextStyles.etiqueta —13, peso 600—
+   con 4 de aire a cada lado. */
 .app-tile-icon {
   width: calc(40 * var(--u));
   height: calc(40 * var(--u));
   border-radius: calc(12 * var(--u));
+  padding: 0 calc(4 * var(--u));
   flex: none;
   display: grid;
   place-items: center;
-  font-size: calc(14 * var(--u));
-  font-weight: 800;
-  letter-spacing: calc(-0.2 * var(--u));
+  font-size: calc(13 * var(--u));
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: calc(-0.1 * var(--u));
+  white-space: nowrap;
 }
 
 .app-tile-icon svg {
@@ -1191,9 +1217,17 @@
   display: block;
 }
 
-/* Ruta: ícono verde sobre el tinte verde, como en el selector. */
+/* Ruta: el código («C16») en `primaryAccessible` sobre `primaryTint`. La
+   empresa lleva tinta sólida y letra blanca; la ruta va en voz más baja,
+   como dice el selector: dos niveles, no dos etiquetas. */
 .app-tile-icon--ruta {
   background: var(--green-tint);
+  color: var(--app-primary-accessible);
+}
+
+/* Si un nombre no trae código, la caja lleva `Icons.alt_route_rounded` en
+   `AppColors.primary`, a 20. */
+.app-tile-icon--ruta svg {
   color: var(--green);
 }
 
@@ -1213,8 +1247,12 @@
 }
 
 .app-tile-title {
-  font-size: calc(16 * var(--u));
-  font-weight: 800;
+  /* AppTextStyles.subtitulo: «encabeza una fila o una tarjeta». El 16 en
+     800 de antes era más gordo que el de la app, donde el 800 se guarda
+     para la marca, los títulos grandes y los botones. */
+  font-size: calc(18 * var(--u));
+  font-weight: 700;
+  line-height: 1.3;
   letter-spacing: calc(-0.3 * var(--u));
   color: var(--app-text-primary);
   white-space: nowrap;
@@ -1223,20 +1261,43 @@
 }
 
 .app-tile-sub {
-  margin-top: calc(2 * var(--u));
+  /* AppTextStyles.pie. ListTile apila título y subtítulo sin hueco. */
   font-size: calc(12 * var(--u));
   font-weight: 500;
+  line-height: 1.3;
   color: var(--app-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* `Icons.chevron_right_rounded` en `textDisabled`, al tamaño por defecto
+   de Icon (24); con la fila elegida se cambia por `check_circle_rounded`
+   en `primary`. */
 .app-tile-chevron {
   flex: none;
-  color: #CBD5E1;
-  font-size: calc(20 * var(--u));
-  line-height: 1;
+  width: calc(24 * var(--u));
+  height: calc(24 * var(--u));
+  color: var(--app-text-disabled);
+}
+
+.app-tile-chevron svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.app-tile-chevron .icono-elegida,
+.app-tile.is-activa .app-tile-chevron .icono-chevron {
+  display: none;
+}
+
+.app-tile.is-activa .app-tile-chevron {
+  color: var(--green);
+}
+
+.app-tile.is-activa .app-tile-chevron .icono-elegida {
+  display: block;
 }
 
 /* ── Hoja de ETA ───────────────────────────────────────────────────── */
@@ -1262,12 +1323,14 @@
 .eta-route {
   margin-top: calc(18 * var(--u));
   text-align: center;
-  /* AppTextStyles.etiqueta. */
-  font-size: calc(13 * var(--u));
-  line-height: 1.2;
-  font-weight: 600;
-  letter-spacing: calc(-0.1 * var(--u));
-  color: var(--app-text-secondary);
+  /* AppTextStyles.subtitulo, como en eta_bottom_sheet.dart: «Bus B-042»
+     encabeza la tarjeta y va en negro y negrita. En la etiqueta gris de 13
+     que llevaba antes se perdía encima del número. */
+  font-size: calc(18 * var(--u));
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: calc(-0.3 * var(--u));
+  color: var(--app-text-primary);
 }
 
 /*
@@ -1286,7 +1349,9 @@
   font-weight: 200;
   line-height: 0.9;
   letter-spacing: calc(-2 * var(--u));
-  font-variant-numeric: tabular-nums;
+  /* Sin cifras tabulares: AppTextStyles.dato no pide `tabularFigures`, así
+     que en la app el 1 es estrecho y el número queda apretado y centrado.
+     Con las tabulares cada cifra ocupaba lo mismo y «1.2» se abría. */
   color: var(--app-primary-accessible);
   transition: color var(--transition-smooth);
 }
@@ -1385,12 +1450,15 @@
 
 /* ── El selector de ruta ───────────────────────────────────────────── */
 
-/* El barrier de showGeneralDialog(): Color(0x66000000). */
+/* El velo no es el barrier de showGeneralDialog(), que en la app va
+   transparente: lo pinta la propia hoja en route_selector_sheet.dart,
+   AppColors.ink (#0B1628) al 40 %. Tinta y no negro: el mapa se oscurece
+   hacia el azul noche de la marca en vez de volverse gris. */
 .phone-scrim {
   position: absolute;
   inset: 0;
   z-index: 31;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(11, 22, 40, 0.4);
 }
 
 /*
@@ -1433,6 +1501,24 @@
 */
 .phone-sheet--fija .sheet-handle {
   margin-bottom: calc(40 * var(--u));
+}
+
+/*
+  La hoja de distancia del tercer momento también es fija, pero no es el
+  selector: lleva el aire de eta_bottom_sheet.dart. Arriba, los 14 del asa;
+  del asa a la franja, sus 18 de abajo más los 6 que la tarjeta pone
+  encima del color, 24; y al pie, los 20 de `fromLTRB(24, 6, 24, 20)` más
+  la zona del gesto. Con los 16, 40 y 24 del selector la franja quedaba
+  flotando a media tarjeta, lejos del asa, y la hoja salía 22 puntos más
+  alta que la de la app.
+*/
+.phone-sheet--eta {
+  padding-top: calc(14 * var(--u));
+  padding-bottom: calc(20 * var(--u) + var(--alto-inferior));
+}
+
+.phone-sheet--eta .sheet-handle {
+  margin-bottom: calc(24 * var(--u));
 }
 
 .sheet-selector .sheet-head {
@@ -2115,29 +2201,43 @@
   }
 }
 
-/* El punto donde cae el dedo. La demo lo coloca sobre lo que va a tocar y
-   lanza la onda; entre toque y toque no está en ninguna parte. */
+/*
+  El punto donde cae el dedo. La demo lo coloca sobre lo que va a tocar y
+  lo apoya; entre toque y toque no está en ninguna parte.
+
+  No es una pieza de la app sino el dedo de la demo, así que no copia
+  ningún InkWell: se dibuja como el círculo con que las grabaciones de
+  pantalla marcan los toques. Blanco a medias, con un filo blanco y una
+  sombra corta en tinta, se lee igual encima del mapa, de la hoja crema y
+  del botón verde. Antes eran dos —una onda blanca sobre el mapa y otra en
+  tinta sobre la hoja— y la de tinta, encima del botón y de la crema, se
+  veía como una mancha.
+
+  Mide 44 puntos, el blanco mínimo de toque que pide Apple: lo que ocupa
+  la yema de un dedo en la pantalla que se reproduce.
+*/
 .phone-toque {
   position: absolute;
   z-index: 60;
-  width: calc(56 * var(--u));
-  height: calc(56 * var(--u));
-  margin: calc(-28 * var(--u)) 0 0 calc(-28 * var(--u));
+  width: calc(44 * var(--u));
+  height: calc(44 * var(--u));
+  margin: calc(-22 * var(--u)) 0 0 calc(-22 * var(--u));
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 0 calc(2 * var(--u)) rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 0 0 calc(1.5 * var(--u)) rgba(255, 255, 255, 0.95),
+    0 calc(3 * var(--u)) calc(12 * var(--u)) rgba(11, 22, 40, 0.24);
   opacity: 0;
   pointer-events: none;
 }
 
-/* Sobre la hoja —blanca o crema— una onda blanca no se ve: era un toque
-   que ocurría y no se notaba. Ahí va en tinta, que además es lo que hace
-   de verdad un InkWell de Material sobre una superficie clara. */
-.phone-toque--tinta {
-  background: rgba(11, 22, 40, 0.14);
-  box-shadow: 0 0 0 calc(2 * var(--u)) rgba(11, 22, 40, 0.18);
-}
-
+/*
+  Apoyar y soltar, no una onda. El dedo baja en 100 ms, de 1,2 a 0,92 —el
+  16 % de los 0,62 s—, se queda apoyado hasta los 240 ms —el 38 %—, que
+  es lo que dura `is-pulsado` y cuando el guion cambia de vista, y al
+  soltar se abre y se desvanece. El orden es el de iOS: un botón actúa
+  cuando se levanta el dedo, no cuando se apoya.
+*/
 .phone-toque.is-on {
   animation: paso-toque 0.62s var(--ease-out-cubic);
 }
@@ -2145,15 +2245,16 @@
 @keyframes paso-toque {
   0% {
     opacity: 0;
-    transform: scale(0.3);
+    transform: scale(1.2);
   }
-  28% {
-    opacity: 0.95;
-    transform: scale(0.72);
+  16%,
+  38% {
+    opacity: 1;
+    transform: scale(0.92);
   }
   100% {
     opacity: 0;
-    transform: scale(1.5);
+    transform: scale(1.3);
   }
 }
 

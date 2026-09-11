@@ -13,7 +13,11 @@ export interface RutaLanding {
   nombre: string;
   terminalA: string;
   terminalB: string;
-  /** Longitud del recorrido en kilómetros, medida sobre los waypoints. */
+  /**
+   * Longitud declarada en rutas.json (`lengthKm`). No sirve de escala: no
+   * coincide con lo que mide la polilínea, así que las distancias se
+   * cuentan con `DatosLanding.metrosPorUnidad`.
+   */
   km: number;
   /** Atributo `d` de la polilínea, en píxeles del mosaico. */
   d: string;
@@ -21,7 +25,7 @@ export interface RutaLanding {
   extremos: Array<[number, number]>;
 }
 
-/** El mosaico de fondo: Barranquilla en CARTO Voyager, z13. */
+/** El mosaico de fondo: Barranquilla en CARTO Voyager, al zoom de la vista del pin. */
 export interface MapaBase {
   /** URL resuelta por el empaquetador. */
   src: string;
@@ -34,6 +38,12 @@ export interface MapaBase {
 export interface DatosLanding {
   /** `[x, y, ancho, alto]` en píxeles del mosaico. */
   viewBox: [number, number, number, number];
+  /**
+   * Metros que mide una unidad del lienzo, sacados del zoom y la latitud
+   * del render. Es la regla con la que se dibuja el radio de 2 km y se
+   * cuentan las distancias de la hoja.
+   */
+  metrosPorUnidad: number;
   mapa: MapaBase;
   rutas: RutaLanding[];
 }
