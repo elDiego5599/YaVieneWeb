@@ -1,15 +1,16 @@
 /* ── EMPRESAS (LA PÁGINA) ──────────────────────────────────
 
-   `/empresas.html` es una sola pantalla: a la izquierda qué es esto y qué
-   se ve desde la oficina, a la derecha los tres datos con los que te
-   llamamos. Nada más. La página anterior contaba el turno del conductor
-   en cinco paneles, y ese producto ya no existe: el GPS va montado en el
-   vehículo, así que no hay turno que contar ni app que abrir.
+   `/empresas.html` son tres secciones, en el orden en que decide una
+   empresa: el panel de control enseñado entero, en un monitor; lo que la
+   empresa gana con él, y cómo se conecta, con el formulario. Antes era
+   sólo la última: una ficha con cuatro placas y el formulario al lado.
+   Contaba bien cómo funciona, pero no por qué pagarlo, y el panel en
+   pequeño parecía un prototipo y no la pantalla de una oficina.
 
    Este fichero no se carga desde `components.css`: lo importa
    `src/empresas.ts`, que es la única entrada que lo usa. Va después del
    índice de componentes, así que en la cascada sigue siendo el último y
-   puede afinar lo que venga de `nav.css`.
+   puede afinar lo que venga de `nav.css` y de `pasos.css`.
    ────────────────────────────────────────────────────────────────── */
 
 /* ── El menú, estando ya en la página ──────────────────────────────── */
@@ -24,7 +25,1294 @@
   gana: por eso conviene que este hueco siga vacío.
 */
 
-/* ── Las dos columnas ──────────────────────────────────────────────── */
+/* ── La cabecera del panel ─────────────────────────────────────────── */
+
+/*
+  El titular de la página a la talla de los de la portada —«Cómo
+  funciona» y el del mapa—: 64 de tope, 62 a 1440. Con la de
+  `.seccion-titulo`, que para en 49,6, quedaba más pequeño que
+  cualquier titular de la portada siendo el `h1` de ésta, y encima de
+  un monitor de 1096 parecía el pie de foto. El 4,3 % del ancho y el
+  suelo de 34 son los mismos que en `mapa.css`: una sola escala de
+  titulares grandes para las dos páginas. Va por el `id` porque
+  `.panel-inner > .seccion-cabecera` también es la cabecera de
+  «Beneficios», y ésa sigue en la talla de siempre.
+*/
+#panel .seccion-titulo {
+  font-size: clamp(34px, 4.3vw, 64px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.018em;
+}
+
+/* La parte en verde siempre en su propia línea. A 1440 ya caía ahí por
+   ancho, pero en un teléfono de 390 el «en» subía a la primera y el
+   corte partía la frase: «Toda tu flota, en / una pantalla.». */
+#panel .seccion-titulo .acentuado {
+  display: block;
+}
+
+/* ── El monitor ────────────────────────────────────────────────────── */
+
+/*
+  Una pantalla de escritorio, con su marco, su cuello y su pie: es lo que
+  una empresa se imagina cuando piensa en controlar la flota desde la
+  oficina, y el panel de verdad corre en Windows y en macOS.
+
+  Ocupa todo el contenedor de la sección, sin un tope propio: 1160 menos
+  las dos calles de 32, 1096 a partir de esa ventana. Llegó a ir en el
+  contenedor ancho, 1376, y la pantalla medía 1346: más alta que lo que
+  cabe de un portátil y con la cabecera de encima en letra de párrafo, el
+  titular parecía el pie de foto del monitor. En el contenedor de siempre
+  los filos del marco siguen cayendo en las mismas líneas que el texto de
+  arriba, que era lo que se buscaba con el ancho completo, y la pantalla
+  queda en 1072, el 67 % de la ventana de 1600 × 900 para la que está
+  medido el panel. Las letras de 10 y 11 bajan a 7, como en cualquier
+  captura de una pantalla entera, pero las placas, los botones y el mapa
+  se siguen leyendo. El margen de arriba no hace falta: ya lo pone el
+  `margin-bottom` de la cabecera.
+
+  El marco va en porcentaje para que adelgace con el monitor: 1,1 % son
+  12 px a 1096, el borde fino de una pantalla de oficina de ahora, y en un
+  teléfono se queda en 4 y no se come la imagen. En el `padding` el
+  porcentaje se mide sobre el ancho también arriba y abajo, así que el
+  marco sale igual por los cuatro lados. El radio acompaña: 16 a tamaño
+  grande, el 1,1 % de la ventana de 1440.
+
+  Tinta de marca y no negro: es el marino de la barra de la app y de la
+  cabecera de la portada, y el negro puro era la única mancha de la
+  página que no salía de la paleta. La sombra es la del teléfono de la
+  portada, que es el otro producto enseñado en un aparato.
+*/
+.despacho-monitor {
+  padding: 1.1%;
+  border-radius: clamp(10px, 1.1vw, 16px);
+  background: var(--ink);
+  box-shadow: var(--sombra-producto);
+}
+
+/*
+  16:9, que es 1600 × 900: la proporción de la ventana que imita el panel
+  de dentro. El radio es el de fuera menos el marco —16 menos 12 a tamaño
+  grande, que el clamp deja en 4—, para que las dos curvas vayan
+  paralelas.
+
+  `container-type` es lo que deja al panel medirse contra esta pantalla:
+  `.flota` saca su unidad de `100cqw`, y `cqw` se resuelve contra el
+  contenedor más cercano, que es éste. Tiene que estar en el padre: un
+  elemento no puede medirse contra sí mismo.
+*/
+.despacho-pantalla {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: clamp(3px, 0.28vw, 4px);
+  container-type: inline-size;
+}
+
+/*
+  El cuello: un trapecio recortado, más estrecho arriba, del gris de las
+  líneas fuertes de la página —el aluminio de un pie de monitor— y un
+  punto más oscuro donde se mete detrás de la pantalla, que es donde le
+  llega la sombra. 15 % del ancho y un alto que sigue a la ventana: a
+  1096 son 164 × 37, las medidas de un pie de monitor de 27 pulgadas a
+  esa escala y la misma proporción que tenía con el monitor grande,
+  206 × 46.
+*/
+.despacho-pie {
+  width: 15%;
+  height: clamp(18px, 2.6vw, 37px);
+  margin: 0 auto;
+  clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+  background: linear-gradient(to bottom, #B9C1CB, var(--linea-fuerte));
+}
+
+/* La base, el doble de ancha que el cuello y apoyada con una sombra corta
+   sobre la mesa: sin ella el monitor parece colgado de la nada. */
+.despacho::after {
+  content: '';
+  display: block;
+  width: 30%;
+  height: clamp(4px, 0.6vw, 8px);
+  margin: 0 auto;
+  border-radius: 999px;
+  background: var(--linea-fuerte);
+  box-shadow: 0 10px 18px -10px rgba(11, 18, 32, 0.35);
+}
+
+/* La atribución del plano, centrada bajo la base del monitor, en la letra
+   chica y el gris tenue del resto de la página, que pasa el 4,5 : 1 que
+   pide un texto de 12. Dentro del mapa, a escala, se quedaba en 7 px. */
+.despacho-credito {
+  margin-top: 12px;
+  text-align: center;
+  color: var(--tinta-tenue);
+  font-size: 12px;
+}
+
+/* ── El panel de control, entero ───────────────────────────────────────
+
+   `DashboardScreen` de `app_control` en una ventana de 1600 × 900. Cada
+   medida sale del Dart y va como `calc(N * var(--u))`, con N el número
+   de allí: `--u` es un píxel de esa ventana medido contra la pantalla del
+   monitor, así que el panel entero encoge y crece sin descomponerse. Los
+   bordes de un píxel se quedan en `1px`, que es lo que son también en la
+   app: a escala se perderían por debajo del medio píxel.
+
+   Las cuatro filas de la columna, de arriba abajo: `_Header` 57,
+   `_TopBar` 72, `_RouteFilters` 54 y el cuerpo con lo que queda,
+   900 − 57 − 72 − 54 = 717, de los que 16 son su margen de abajo.
+   ────────────────────────────────────────────────────────────────────── */
+
+/*
+  Los colores que la página no tiene con el mismo valor salen aquí, con el
+  nombre que llevan en `app_theme.dart`; los que coinciden —superficie,
+  divisor, arena, verde, marino, gris fantasma— usan el token de la web.
+
+  `line-height: 1.26` es el alto natural de Plus Jakarta Sans —ascendente
+  1038 más descendente 222 sobre 1000—, que es el que usa Flutter cuando
+  un `TextStyle` no trae `height`, como todos los del panel.
+
+  `--f-tiempo` es lo que tarda en responder todo lo que se pulsa: 0,2 s,
+  lo que tarda en Flutter el resaltado de un `InkWell` en encenderse y el
+  `Switch` en cruzar. `--f-hover` es el negro al 4 %, el `hoverColor` que
+  Material pone cuando el tema no dice otro, como aquí.
+*/
+.flota {
+  --u: calc(100cqw / 1600);
+  --f-texto: #0F172A;
+  --f-texto-2: #5E6B82;
+  --f-borde-fuerte: #D8DBE0;
+  --f-peligro: #DC2626;
+  --f-tiempo: 0.2s;
+  --f-hover: rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--arena);
+  color: var(--f-texto);
+  font-family: var(--font-family);
+  font-size: calc(14 * var(--u));
+  line-height: 1.26;
+  white-space: nowrap;
+}
+
+/* El almacén de iconos no ocupa sitio. `display: none` no vale: con él
+   hay navegadores que dejan de pintar los `<use>` que lo llaman. */
+.flota-iconos {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Cada icono dice su tamaño en `--i`, el `size:` de su `Icon` en el Dart,
+   y toma el color del texto que lo rodea como hace `IconTheme`. */
+.flota-ico {
+  flex: none;
+  width: calc(var(--i, 20) * var(--u));
+  height: calc(var(--i, 20) * var(--u));
+  fill: currentColor;
+}
+
+/* Los botones del panel, que ahora los hay. `base.css` les quita el borde
+   y el fondo, pero no la letra de 13,33 px, el relleno ni el color que el
+   navegador le pone a un `<button>`, y cada uno salía con los suyos en
+   medio de un panel medido en `--u`. `:where` deja la especificidad en
+   cero: cualquier regla de abajo gana sin pelear. */
+:where(.flota button) {
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+/* El anillo del teclado, en el verde de la página como en
+   `accesibilidad.css`, pero de 2 y pegado: a esta escala el de 3 separado
+   3 se montaba sobre la fila de al lado. */
+.flota button:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 1px;
+}
+
+/* ── _Header ── */
+
+/* Alto 57: 10 de relleno arriba y abajo, 36 del logo y el borde de un
+   píxel. Se fija el alto y se centra, que es lo mismo y no depende de que
+   el botón de salir mida exactamente 36. */
+.flota-cabecera {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: calc(57 * var(--u));
+  padding: 0 calc(16 * var(--u));
+  border-bottom: 1px solid var(--divider);
+  background: var(--surface);
+}
+
+/* Caja de 36 con 6 de relleno y borde: el logo queda en 22, igual que en
+   el Dart, donde el borde de la decoración se suma al relleno. */
+.flota-logo {
+  display: grid;
+  flex: none;
+  width: calc(36 * var(--u));
+  height: calc(36 * var(--u));
+  padding: calc(6 * var(--u));
+  border: 1px solid var(--divider);
+  border-radius: calc(12 * var(--u));
+  background: var(--surface-muted);
+}
+
+.flota-logo img {
+  width: 100%;
+  height: 100%;
+}
+
+.flota-marca {
+  display: flex;
+  flex-direction: column;
+  margin-left: calc(11 * var(--u));
+}
+
+.flota-marca b {
+  font-size: calc(13 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(2.5 * var(--u));
+}
+
+.flota-marca small {
+  font-size: calc(8.5 * var(--u));
+  font-weight: 600;
+  letter-spacing: calc(1.8 * var(--u));
+  color: var(--bus-ghost);
+}
+
+/* La píldora de conexión con el servidor: el verde al 10 % de fondo y el
+   punto de 7 con 7 de aire, como `_ConnectionPill`. */
+.flota-conexion {
+  display: flex;
+  align-items: center;
+  gap: calc(7 * var(--u));
+  margin-left: auto;
+  padding: calc(6 * var(--u)) calc(10 * var(--u));
+  border-radius: 999px;
+  background: rgba(0, 168, 89, 0.1);
+  color: var(--green);
+  font-size: calc(11.5 * var(--u));
+  font-weight: 700;
+}
+
+.flota-conexion i {
+  width: calc(7 * var(--u));
+  height: calc(7 * var(--u));
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* `OutlinedButton.icon`: 8 entre icono y texto es el hueco que Material 3
+   pone en los botones con icono. */
+.flota-salir {
+  --i: 15;
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  margin-left: calc(14 * var(--u));
+  padding: calc(8 * var(--u)) calc(12 * var(--u));
+  border: 1px solid var(--f-borde-fuerte);
+  border-radius: calc(12 * var(--u));
+  color: var(--f-texto-2);
+  font-size: calc(12 * var(--u));
+  font-weight: 700;
+}
+
+/* ── _TopBar ── */
+
+/* 18 + 40 + 14 = 72: el alto de la caja de búsqueda, que es lo más alto
+   de la fila, entre los rellenos de arriba y de abajo. */
+.flota-barra {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: calc(72 * var(--u));
+  padding: calc(18 * var(--u)) calc(24 * var(--u)) calc(14 * var(--u));
+}
+
+.flota-titulo {
+  font-size: calc(26 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(-0.6 * var(--u));
+}
+
+/*
+  El `TextField` de 260: con la densidad compacta del escritorio mide 40
+  de alto. El icono va centrado en su hueco de 40 —el mínimo de 48 menos
+  los 8 de la densidad—, así que 10,5 a cada lado y el texto empieza en
+  el 40. Lo que no cabe se corta con puntos, como la pista en Flutter.
+*/
+.flota-buscar {
+  --i: 19;
+  display: flex;
+  align-items: center;
+  gap: calc(10.5 * var(--u));
+  width: calc(260 * var(--u));
+  height: calc(40 * var(--u));
+  margin-left: auto;
+  padding: 0 calc(12 * var(--u)) 0 calc(10.5 * var(--u));
+  border: 1px solid var(--f-borde-fuerte);
+  border-radius: calc(12 * var(--u));
+  background: var(--surface);
+  color: var(--bus-ghost);
+  font-size: calc(13.5 * var(--u));
+}
+
+.flota-buscar span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Los `IconButton` con fondo blanco y borde: círculos de 40. Los de la
+   barra van a 10 de lo que tienen a la izquierda. */
+.flota-boton-icono {
+  --i: 20;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: calc(40 * var(--u));
+  height: calc(40 * var(--u));
+  border: 1px solid var(--divider);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--f-texto-2);
+}
+
+.flota-boton-icono--barra {
+  margin-left: calc(10 * var(--u));
+}
+
+/* `ClockWidget`: la hora en cifras de ancho fijo, como `AppType.mono`,
+   para que no baile al cambiar el segundo. */
+.flota-reloj {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: calc(14 * var(--u));
+}
+
+.flota-reloj b {
+  font-size: calc(20 * var(--u));
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.flota-reloj small {
+  font-size: calc(12 * var(--u));
+  color: var(--bus-ghost);
+}
+
+/* ── _RouteFilters ── */
+
+/*
+  54 de alto: la fila de 42 más los 12 de abajo. Dentro de esos 42 la
+  lista deja 9 de relleno debajo, así que las píldoras miden 33 y van
+  arriba, no centradas. Cada una lleva 8 a su izquierda: la primera
+  empieza en 24.
+*/
+.flota-filtros {
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  height: calc(54 * var(--u));
+  padding: 0 calc(16 * var(--u)) calc(12 * var(--u));
+  overflow: hidden;
+}
+
+/* El borde va con su `solid` escrito: `base.css` deja los botones con
+   `border: none`, y un `border-color` suelto no lo devolvería. El hover
+   es una sombra por dentro y no otro fondo, porque así se suma a
+   cualquiera —blanco o marino— y, a diferencia de un degradado, se puede
+   fundir en `--f-tiempo`. Sólo con puntero: en un teléfono el hover se
+   queda pegado después del toque. */
+.flota-filtros button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: calc(33 * var(--u));
+  margin-left: calc(8 * var(--u));
+  padding: 0 calc(14 * var(--u));
+  border: 1px solid var(--f-borde-fuerte);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--f-texto-2);
+  font-size: calc(11.5 * var(--u));
+  font-weight: 700;
+  transition:
+    background-color var(--f-tiempo),
+    border-color var(--f-tiempo),
+    color var(--f-tiempo),
+    box-shadow var(--f-tiempo);
+}
+
+.flota-filtros .es-activo {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+@media (hover: hover) {
+  .flota-filtros button:not(.es-activo):hover,
+  .flota-pestanas button:not(.es-activa):hover,
+  .flota-fila:not(.es-elegida):hover {
+    box-shadow: inset 0 0 0 100vmax var(--f-hover);
+  }
+}
+
+/* ── El cuerpo ── */
+
+/*
+  La lista y el mapa a 1 : 3 con 12 entre medias: de los 1568 que dejan
+  los 16 de cada lado salen 389 y 1167. `minmax(0, …)` para que ninguna
+  de las dos crezca con lo que lleva dentro, como no crecen los `flex:`
+  de un `Row`.
+*/
+.flota-cuerpo {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+  gap: calc(12 * var(--u));
+  min-height: 0;
+  padding: 0 calc(16 * var(--u)) calc(16 * var(--u));
+}
+
+/* ── _FleetPanel ── */
+
+.flota-lista {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--divider);
+  border-radius: calc(16 * var(--u));
+  background: var(--surface);
+}
+
+/* La cabeza, con el `Divider` de un píxel debajo. */
+.flota-lista-cabeza {
+  display: flex;
+  align-items: center;
+  padding: calc(12 * var(--u)) calc(12 * var(--u)) calc(10 * var(--u)) calc(16 * var(--u));
+  border-bottom: 1px solid var(--divider);
+}
+
+.flota-rotulo {
+  font-size: calc(11.5 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(2 * var(--u));
+  color: var(--bus-ghost);
+}
+
+/* El número de buses de la ruta, en el marino al 8 %. */
+.flota-cuenta {
+  margin-left: calc(8 * var(--u));
+  padding: calc(2 * var(--u)) calc(8 * var(--u));
+  border-radius: 999px;
+  background: rgba(11, 22, 40, 0.08);
+  color: var(--ink);
+  font-size: calc(11.5 * var(--u));
+  font-weight: 800;
+}
+
+.flota-agregar-ruta {
+  --i: 16;
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  margin-left: auto;
+  padding: calc(9 * var(--u)) calc(12 * var(--u));
+  border: 1px solid var(--f-borde-fuerte);
+  border-radius: calc(12 * var(--u));
+  color: var(--f-texto-2);
+  font-size: calc(12 * var(--u));
+  font-weight: 700;
+}
+
+.flota-agregar-bus {
+  --i: 17;
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  margin-left: calc(8 * var(--u));
+  padding: calc(9 * var(--u)) calc(14 * var(--u));
+  border-radius: calc(12 * var(--u));
+  background: var(--green);
+  color: #fff;
+  font-size: calc(12.5 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(0.8 * var(--u));
+}
+
+/* `_StatusTabs`: la abierta en marino con el texto blanco y la cuenta al
+   70 %; las demás sin fondo. */
+.flota-pestanas {
+  display: flex;
+  gap: calc(6 * var(--u));
+  padding: calc(10 * var(--u)) calc(12 * var(--u)) 0;
+}
+
+.flota-pestanas button {
+  display: flex;
+  align-items: center;
+  gap: calc(5 * var(--u));
+  padding: calc(6 * var(--u)) calc(10 * var(--u));
+  border-radius: calc(8 * var(--u));
+  color: var(--f-texto-2);
+  font-size: calc(11 * var(--u));
+  font-weight: 700;
+  transition:
+    background-color var(--f-tiempo),
+    color var(--f-tiempo),
+    box-shadow var(--f-tiempo);
+}
+
+.flota-pestanas b {
+  color: var(--bus-ghost);
+  font-size: calc(10 * var(--u));
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  transition: color var(--f-tiempo);
+}
+
+.flota-pestanas .es-activa {
+  background: var(--ink);
+  color: #fff;
+}
+
+.flota-pestanas .es-activa b {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* El `Divider` con sangría de 12 por lado y 8 encima, y la lista con sus
+   12 de relleno. Como la raya ya está metida 12, la lista sólo pone los
+   de arriba y abajo: las filas empiezan igual a 12 del borde. */
+.flota-buses {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8 * var(--u));
+  margin: calc(8 * var(--u)) calc(12 * var(--u)) 0;
+  padding: calc(12 * var(--u)) 0;
+  border-top: 1px solid var(--divider);
+  list-style: none;
+}
+
+/* ── FleetListTile ── */
+
+.flota-fila {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: calc(12 * var(--u)) calc(10 * var(--u)) calc(10 * var(--u)) calc(14 * var(--u));
+  border: 1px solid var(--divider);
+  border-radius: calc(16 * var(--u));
+  background: var(--surface);
+  transition:
+    opacity var(--f-tiempo),
+    background-color var(--f-tiempo),
+    border-color var(--f-tiempo),
+    box-shadow var(--f-tiempo);
+}
+
+/* Las de la otra ruta. El `display: flex` de arriba pisaría el `hidden`
+   del navegador, que es sólo un `display: none` de hoja de estilos. */
+.flota-fila[hidden] {
+  display: none;
+}
+
+/* El botón que elige el bus, estirado a la fila entera. Transparente y
+   colocado, así que se pinta encima de la placa y los iconos y el toque
+   le llega en cualquier sitio de la fila; hereda las esquinas para que el
+   anillo del teclado siga la forma de la fila. */
+.flota-fila-elegir {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* La elegida: el azul de selección al 7 % mezclado con blanco —el
+   `alphaBlend` del Dart, que da #F0F4FE— y el borde al 45 %. */
+.flota-fila.es-elegida {
+  border-color: rgba(37, 99, 235, 0.45);
+  background: #F0F4FE;
+}
+
+/* Sin señal la fila entera baja al 70 %, como el `Opacity` que la
+   envuelve cuando `bus.online` es falso. */
+.flota-fila--sin-senal {
+  opacity: 0.7;
+}
+
+/* Al cambiar de ruta o de pestaña las filas que entran se funden desde
+   cero en vez de saltar. Va después de la regla de arriba para ganarle
+   también a la del 70 %: las dos pesan lo mismo y decide el orden. */
+@starting-style {
+  .flota-fila,
+  .flota-vacio {
+    opacity: 0;
+  }
+}
+
+/* El icono en el color del estado al 12 %. Verde para las que
+   transmiten, oculta incluida: ocultar no apaga el GPS. */
+.flota-fila-icono {
+  --i: 20;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: calc(40 * var(--u));
+  height: calc(40 * var(--u));
+  border-radius: calc(12 * var(--u));
+  background: rgba(0, 168, 89, 0.12);
+  color: var(--green);
+}
+
+.flota-fila--sin-senal .flota-fila-icono {
+  background: rgba(148, 163, 184, 0.12);
+  color: var(--bus-ghost);
+}
+
+/* La placa ocupa lo que sobra, como el `Expanded`. Los 3 de abajo son el
+   `SizedBox` que la separa de la línea del conductor, que aquí va vacía:
+   el GPS va en el bus y no hay nadie que inicie sesión. */
+.flota-fila-placa {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  min-width: 0;
+  margin-left: calc(12 * var(--u));
+  padding-bottom: calc(3 * var(--u));
+  font-size: calc(14.5 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(0.4 * var(--u));
+}
+
+.flota-fila-placa i {
+  width: calc(6 * var(--u));
+  height: calc(6 * var(--u));
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.flota-fila--sin-senal .flota-fila-placa i {
+  background: var(--bus-ghost);
+}
+
+.flota-chip {
+  padding: calc(4 * var(--u)) calc(9 * var(--u));
+  border-radius: 999px;
+  background: rgba(11, 22, 40, 0.06);
+  color: var(--ink);
+  font-size: calc(10.5 * var(--u));
+  font-weight: 700;
+  letter-spacing: calc(0.3 * var(--u));
+}
+
+/* `IconButton` compacto: la caja de 40 menos los 8 de la densidad. */
+.flota-fila-editar {
+  --i: 17;
+  display: grid;
+  place-items: center;
+  width: calc(32 * var(--u));
+  height: calc(32 * var(--u));
+  margin-left: calc(6 * var(--u));
+  color: var(--bus-ghost);
+}
+
+/* El interruptor y su rótulo: verde si el pasajero lo ve, gris si no. */
+.flota-permiso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(2 * var(--u));
+  margin-left: calc(2 * var(--u));
+  color: var(--green);
+  font-size: calc(8 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(1.2 * var(--u));
+  transition: color var(--f-tiempo);
+}
+
+.flota-fila--oculta .flota-permiso {
+  color: var(--bus-ghost);
+}
+
+/* El `Switch` de Material 3 recogido a su tamaño, 52 × 32. Encendido:
+   pista verde y botón blanco de 24, a 4 del borde: 52 − 4 − 24 = 24 desde
+   la izquierda. Se mide siempre desde la izquierda, y no desde la derecha
+   encendido y desde la izquierda apagado, porque entre `right` y `left`
+   no hay transición y el botón saltaría en vez de cruzar. Colocado y
+   después del botón de la fila en el HTML, así que queda encima de él y
+   el toque es suyo. */
+.flota-interruptor {
+  position: relative;
+  flex: none;
+  width: calc(52 * var(--u));
+  height: calc(32 * var(--u));
+  border-radius: calc(16 * var(--u));
+  background: var(--green);
+  transition: background-color var(--f-tiempo);
+}
+
+.flota-interruptor::after {
+  content: '';
+  position: absolute;
+  top: calc(4 * var(--u));
+  left: calc(24 * var(--u));
+  width: calc(24 * var(--u));
+  height: calc(24 * var(--u));
+  border-radius: 50%;
+  background: #fff;
+  transition:
+    top var(--f-tiempo),
+    left var(--f-tiempo),
+    width var(--f-tiempo),
+    height var(--f-tiempo),
+    background-color var(--f-tiempo);
+}
+
+/* Apagado: pista del borde fuerte y botón gris de 16, que en Material 3
+   encoge al soltarse y queda a 8 del borde. Sin contorno, porque el tema
+   lo pone transparente. */
+.flota-fila--oculta .flota-interruptor {
+  background: var(--f-borde-fuerte);
+}
+
+.flota-fila--oculta .flota-interruptor::after {
+  top: calc(8 * var(--u));
+  left: calc(8 * var(--u));
+  width: calc(16 * var(--u));
+  height: calc(16 * var(--u));
+  background: var(--bus-ghost);
+}
+
+/* `_emptyMessage`: centrado en lo que queda de la columna, de 13 y en el
+   gris apagado, `textMuted`. Con `hidden` se va por lo mismo que las
+   filas: el `display` de aquí pisaría el del navegador. */
+.flota-vacio {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  color: var(--bus-ghost);
+  font-size: calc(13 * var(--u));
+  transition: opacity var(--f-tiempo);
+}
+
+.flota-vacio[hidden] {
+  display: none;
+}
+
+/* ── ControlMap ── */
+
+/*
+  El mapa va a sangre, sin borde ni esquinas: en el Dart es un
+  `Positioned.fill` sin recorte dentro del `Stack`, así que su borde es el
+  de la ventana.
+
+  El plano es propio de este hueco: CARTO Voyager pintado con
+  `render_mapa.mjs` a 1167 × 701, el ancho de la columna por el alto del
+  cuerpo, y a 2x, así que cada punto del panel tiene dos píxeles suyos y
+  a 1440 sobran —el hueco sale a 982—. Antes era el plano de la ciudad
+  de la portada estirado a este ancho: una imagen hecha para una tarjeta
+  de teléfono ampliada a medio monitor, con el borroso de ampliar y la
+  ciudad demasiado lejos para que se leyera una calle.
+
+  Zoom 13,6 de MapLibre, que mide en teselas de 512: es el 14,6 de
+  flutter_map, que mide en 256, y es justo donde el marcador de abajo
+  llega a su tope de 44. Es lo que hace un despachador que sigue una
+  ruta: se acerca hasta que los buses se ven enteros. A 12, con el que
+  abre el panel, la ciudad cabe en un tercio de la pantalla y los buses
+  se montan unos encima de otros. El centro, -74,801598 / 11,023252, deja
+  la ruta Tcherassi cruzando en diagonal por la Vía 40, con el río a un
+  lado y Riomar al otro, y los cuatro buses lejos de la leyenda y de la
+  ficha.
+
+  Voyager y no las teselas de OpenStreetMap que pinta `control_map.dart`:
+  el propio Dart deja dicho que lo ideal sería el estilo del pasajero
+  también allí, y es el mapa del resto de esta página.
+
+  Para rehacerlo: `node scripts/render_mapa.mjs -74.801598 11.023252 13.6
+  1167 701 2 mapa.png` y a WebP con calidad 78, la de `gen_mapa_landing.py`.
+*/
+.flota-mapa {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.flota-plano {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(1167 * var(--u));
+  max-width: none;
+  height: auto;
+}
+
+/*
+  Los buses de `_FlatBusPainter`. El marcador mide
+  `(26 + (zoom − 11) × 5)` sin pasar de 44: a 14,6 da 44, y ésa es la
+  caja. Dentro, la cápsula: alto h = 44 × 0,75 = 33 y ancho
+  h × 32 / 60 = 17,6, radio la mitad del ancho, centrada —13,2 a los
+  lados, 5,5 arriba y abajo—. El aro es de w × 0,08 = 1,408; en el lienzo
+  va centrado sobre el filo y aquí por dentro, que es medio aro de
+  diferencia y deja la cápsula del mismo tamaño por fuera. Cada caja gira
+  con el rumbo del bus, como el `Transform.rotate` del marcador.
+
+  Se pulsa para elegirlo, como el `onTap` de allá.
+*/
+.flota-bus {
+  position: absolute;
+  width: calc(44 * var(--u));
+  height: calc(44 * var(--u));
+  cursor: pointer;
+  transition:
+    opacity var(--f-tiempo),
+    scale var(--f-tiempo),
+    visibility var(--f-tiempo);
+}
+
+/* Los de la ruta que no se mira. Se funden y encogen al 60 % en vez de
+   desaparecer de golpe: al cambiar de ruta se ve que unos buses se van y
+   otros llegan, y no que el mapa se cambió por otro. `scale` y no
+   `transform`, que ya lleva el rumbo; `visibility` para que el apagado
+   no reciba toques. */
+.flota-bus.es-fuera {
+  opacity: 0;
+  scale: 0.6;
+  visibility: hidden;
+}
+
+.flota-bus::after {
+  content: '';
+  position: absolute;
+  top: calc(5.5 * var(--u));
+  left: calc(13.2 * var(--u));
+  width: calc(17.6 * var(--u));
+  height: calc(33 * var(--u));
+  border: calc(1.408 * var(--u)) solid rgba(255, 255, 255, 0.5);
+  border-radius: calc(8.8 * var(--u));
+  background: var(--bus-ghost);
+}
+
+/*
+  El que transmite y ve el pasajero. El degradado baja del verde mezclado
+  al 30 % con blanco —#4DC28B— al verde de marca, y el parabrisas es un
+  óvalo blanco al 30 % de w × 0,72 por h × 0,26 —radios 6,336 y 4,29— con
+  el centro a h × 0,26 por encima del medio, el 24 % del alto. La sombra
+  sale de la elevación h × 0,12 = 3,96 y del desplazamiento
+  h × 0,05 = 1,65. `border-box` para que el degradado corra también bajo
+  el aro.
+*/
+.flota-bus.es-activo::after {
+  border-color: rgba(255, 255, 255, 0.92);
+  background:
+    radial-gradient(calc(6.336 * var(--u)) calc(4.29 * var(--u)) at 50% 24%,
+      rgba(255, 255, 255, 0.3) 96%, transparent 100%),
+    linear-gradient(#4DC28B, var(--green));
+  background-origin: border-box;
+  box-shadow: 0 calc(1.65 * var(--u)) calc(3.96 * var(--u)) rgba(0, 168, 89, 0.45);
+}
+
+/* El halo del elegido: un círculo de radio h × 0,62 = 20,46 en el azul de
+   selección al 45 %, desenfocado h × 0,16 = 5,28. `blur()` recibe la
+   desviación, igual que el `MaskFilter.blur` del lienzo. Está en todos,
+   apagado, para que al elegir otro bus el halo se funda de uno a otro en
+   vez de saltar. */
+.flota-bus::before {
+  content: '';
+  position: absolute;
+  top: calc(1.54 * var(--u));
+  left: calc(1.54 * var(--u));
+  width: calc(40.92 * var(--u));
+  height: calc(40.92 * var(--u));
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.45);
+  filter: blur(calc(5.28 * var(--u)));
+  opacity: 0;
+  transition: opacity var(--f-tiempo);
+}
+
+.flota-bus.es-elegido::before {
+  opacity: 1;
+}
+
+/*
+  Dónde cae cada uno sobre el plano y hacia dónde mira. Los cuatro van
+  sobre un punto de la ruta Tcherassi proyectado con el mismo Mercator que
+  pintó el plano, y la caja se corre 22, medio marcador, para que el
+  centro caiga en él. El rumbo es el de la ruta en ese punto, medido
+  entre el punto de dos antes y el de dos después para que un quiebro de
+  la calle no lo tuerza.
+
+  Tres suben hacia el norte por la Vía 40 y DMV-238 baja por el otro
+  sentido, que es lo que se ve en un turno. SFA-482, el elegido, queda
+  casi en el medio del mapa y no debajo de la ficha que lo describe;
+  WNP-659, el oculto, se para en 766 de ancho, a más de 70 de la ficha, y
+  DMV-238 va arriba, lejos de la leyenda.
+*/
+.flota-bus--sfa {
+  top: calc(273 * var(--u));
+  left: calc(522.5 * var(--u));
+  transform: rotate(319deg);
+}
+
+.flota-bus--tuh {
+  top: calc(105.7 * var(--u));
+  left: calc(331.3 * var(--u));
+  transform: rotate(305.3deg);
+}
+
+.flota-bus--wnp {
+  top: calc(578.4 * var(--u));
+  left: calc(744.4 * var(--u));
+  transform: rotate(331.9deg);
+}
+
+.flota-bus--dmv {
+  top: calc(47 * var(--u));
+  left: calc(110.2 * var(--u));
+  transform: rotate(72.1deg);
+}
+
+/*
+  Los tres de Vivero Paraíso, sobre su ruta y con la misma cuenta. La
+  ruta baja en diagonal desde el centro del plano hacia el suroeste:
+  KJT-704 y LMR-826 van en ese sentido y BQX-391 sube por el otro, que
+  vuelve a ser lo que se ve en un turno. LMR-826, el que no tiene señal,
+  queda abajo pero a 50 a la derecha de la leyenda, y ninguno se acerca a
+  la ficha, que empieza en 859.
+*/
+.flota-bus--kjt {
+  top: calc(361.8 * var(--u));
+  left: calc(545.2 * var(--u));
+  transform: rotate(233.5deg);
+}
+
+.flota-bus--bqx {
+  top: calc(487.1 * var(--u));
+  left: calc(378 * var(--u));
+  transform: rotate(33.4deg);
+}
+
+.flota-bus--lmr {
+  top: calc(632.3 * var(--u));
+  left: calc(181.6 * var(--u));
+  transform: rotate(199deg);
+}
+
+/*
+  `_Legend`, abajo a la izquierda, con la sombra suave del tema: #0F172A
+  al 5 %, 12 de desenfoque y 4 hacia abajo.
+
+  Tres columnas —punto, nombre, cifra— que comparten las tres filas con
+  `subgrid`, con 8 entre una y otra. Antes cada fila era un flex suelto y
+  la cifra iba pegada detrás de su nombre: «En línea», «Sin señal» y
+  «Ocultos» miden distinto, así que los tres números salían cada uno a
+  una altura. Ahora la columna del medio es tan ancha como el nombre más
+  largo y las cifras caen alineadas a la derecha, unas encima de otras.
+  Es lo que hace el Dart desde el mismo cambio: `IntrinsicWidth` con las
+  filas estiradas y un `Spacer` entre nombre y cifra; el `1fr` es ese
+  `Spacer`, que en una caja que se ajusta al contenido no reparte nada.
+*/
+.flota-leyenda {
+  position: absolute;
+  bottom: calc(18 * var(--u));
+  left: calc(18 * var(--u));
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  column-gap: calc(8 * var(--u));
+  padding: calc(10 * var(--u)) calc(14 * var(--u));
+  border: 1px solid var(--divider);
+  border-radius: calc(14 * var(--u));
+  background: var(--surface);
+  box-shadow: 0 calc(4 * var(--u)) calc(12 * var(--u)) rgba(15, 23, 42, 0.05);
+}
+
+.flota-leyenda-titulo {
+  grid-column: 1 / -1;
+  margin-bottom: calc(6 * var(--u));
+  font-size: calc(10 * var(--u));
+  font-weight: 700;
+  letter-spacing: calc(1.6 * var(--u));
+  color: var(--bus-ghost);
+}
+
+/* Cada fila ocupa las tres columnas y las hereda: el nombre suelto entre
+   el punto y la cifra es texto sin etiqueta, y la rejilla lo envuelve en
+   su propia celda, así que cae en la del medio sin tocar el HTML. */
+.flota-leyenda-fila {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: center;
+  padding: calc(2.5 * var(--u)) 0;
+  color: var(--f-texto-2);
+  font-size: calc(12 * var(--u));
+  font-weight: 500;
+}
+
+/* El punto de 9 con su resplandor del mismo color al 50 %. */
+.flota-leyenda-fila i {
+  width: calc(9 * var(--u));
+  height: calc(9 * var(--u));
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 calc(5 * var(--u)) rgba(0, 168, 89, 0.5);
+}
+
+.flota-leyenda-fila--gris i {
+  background: var(--bus-ghost);
+  box-shadow: 0 0 calc(5 * var(--u)) rgba(148, 163, 184, 0.5);
+}
+
+.flota-leyenda-fila b {
+  text-align: right;
+  color: var(--f-texto);
+  font-weight: 800;
+}
+
+/* ── _SelectedBusCard ── */
+
+/* 292 de ancho a 16 de la esquina, encima del mapa: en el Dart va en el
+   `Stack` del tablero, por fuera de `ControlMap`. */
+.flota-ficha {
+  position: absolute;
+  right: calc(16 * var(--u));
+  bottom: calc(16 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: calc(292 * var(--u));
+  padding: calc(15 * var(--u));
+  border: 1px solid var(--divider);
+  border-radius: calc(16 * var(--u));
+  background: var(--surface);
+  box-shadow: 0 calc(4 * var(--u)) calc(12 * var(--u)) rgba(15, 23, 42, 0.05);
+  transition:
+    opacity var(--f-tiempo),
+    translate var(--f-tiempo),
+    visibility var(--f-tiempo);
+}
+
+/* Cerrada: se funde y baja 8, la mitad de lo que la separa del borde del
+   mapa, en vez de desaparecer de golpe, que es lo que más se nota al
+   soltar un bus. Lo justo para que se lea que se va, sin llegar al
+   borde. `visibility` la saca de los toques al terminar. */
+.flota-ficha.es-cerrada {
+  opacity: 0;
+  translate: 0 calc(8 * var(--u));
+  visibility: hidden;
+}
+
+.flota-ficha-cabeza {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+}
+
+.flota-ficha-icono {
+  --i: 19;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: calc(36 * var(--u));
+  height: calc(36 * var(--u));
+  border-radius: calc(12 * var(--u));
+  background: rgba(0, 168, 89, 0.14);
+  color: var(--green);
+}
+
+/* El bus sin señal lleva el icono en su gris al mismo 14 %: el color del
+   estado, como en la fila. */
+.flota-ficha--sin-senal .flota-ficha-icono {
+  background: rgba(148, 163, 184, 0.14);
+  color: var(--bus-ghost);
+}
+
+.flota-ficha-placa {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin-left: calc(11 * var(--u));
+}
+
+.flota-ficha-placa b {
+  font-size: calc(15.5 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(0.4 * var(--u));
+}
+
+.flota-ficha-placa small {
+  font-size: calc(10.5 * var(--u));
+  font-variant-numeric: tabular-nums;
+  color: var(--bus-ghost);
+}
+
+/* Redonda, como el `IconButton` que es: el hover y el anillo del teclado
+   siguen el círculo. */
+.flota-ficha-cerrar {
+  --i: 18;
+  display: grid;
+  place-items: center;
+  width: calc(32 * var(--u));
+  height: calc(32 * var(--u));
+  border-radius: 50%;
+  color: var(--bus-ghost);
+  transition: background-color var(--f-tiempo);
+}
+
+@media (hover: hover) {
+  .flota-ficha-cerrar:hover {
+    background: var(--f-hover);
+  }
+}
+
+.flota-ficha-ruta {
+  --i: 12;
+  display: flex;
+  align-items: center;
+  gap: calc(5 * var(--u));
+  margin-top: calc(10 * var(--u));
+  padding: calc(4 * var(--u)) calc(9 * var(--u));
+  border-radius: 999px;
+  background: rgba(11, 22, 40, 0.08);
+  color: var(--ink);
+  font-size: calc(10.5 * var(--u));
+  font-weight: 700;
+}
+
+.flota-ficha-acciones {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: calc(8 * var(--u));
+  margin-top: calc(12 * var(--u));
+}
+
+/* «Ocultar» ocupa lo que sobra y mide 40, el mínimo que le da el Dart. */
+.flota-ocultar {
+  --i: 16;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: calc(8 * var(--u));
+  height: calc(40 * var(--u));
+  border-radius: calc(12 * var(--u));
+  background: var(--bus-ghost);
+  color: #fff;
+  font-size: calc(12 * var(--u));
+  font-weight: 800;
+  letter-spacing: calc(1 * var(--u));
+  transition: background-color var(--f-tiempo);
+}
+
+/* Con el bus oculto el botón ofrece lo contrario, «Mostrar», en el verde
+   de `AppColors.online`. */
+.flota-ocultar.es-mostrar {
+  background: var(--green);
+}
+
+.flota-boton-icono--gris {
+  --i: 18;
+  background: var(--surface-muted);
+}
+
+/* Borrar, en el rojo de peligro: fondo al 8 % y borde al 25 %. */
+.flota-boton-icono--peligro {
+  --i: 18;
+  border-color: rgba(220, 38, 38, 0.25);
+  background: rgba(220, 38, 38, 0.08);
+  color: var(--f-peligro);
+}
+
+/* ── Lo que gana la empresa ────────────────────────────────────────── */
+
+/*
+  Las tres columnas con línea medianera que `layout.css` promete y no
+  dibuja: allí `.columnas` es sólo la rejilla. En pantalla ancha van a
+  tres, sin hueco entre ellas, y el aire lo pone el relleno de cada una a
+  los dos lados de la raya —la primera no lo lleva a la izquierda ni la
+  última a la derecha, para que el bloque quede alineado con la
+  cabecera—. Apiladas, la raya pasa arriba.
+*/
+.empresa-razones > * + * {
+  padding-top: clamp(28px, 4vw, 56px);
+  border-top: 1px solid var(--linea);
+}
+
+@media (min-width: 900px) {
+  .empresa-razones {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  /* Cada columna reparte sus tres piezas —titular, frase y pieza del
+     panel— en las filas de la rejilla de fuera con `subgrid`, así que los
+     tres titulares, las tres frases y las tres piezas arrancan a la misma
+     altura aunque una frase ocupe una línea y otra dos. */
+  .empresa-razones > * {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    padding-inline: clamp(24px, 3vw, 44px);
+  }
+
+  .empresa-razones > * + * {
+    padding-top: 0;
+    border-top: 0;
+    border-left: 1px solid var(--linea);
+  }
+
+  .empresa-razones > :first-child {
+    padding-left: 0;
+  }
+
+  .empresa-razones > :last-child {
+    padding-right: 0;
+  }
+}
+
+/* La letra de las columnas se fija aquí por lo mismo que en las fichas
+   del problema: `pasos.css` declara `.columna-titulo` a 2,4vh y
+   `.columna-texto` a 1,1vw sin acotarlas a su sección, y en esta página
+   también se cargan. Con la ventana alta el titular crecía a 30 y las
+   tres columnas dejaban de cuadrar entre sí. */
+.empresa-razones .columna-titulo {
+  margin-bottom: 8px;
+  font-size: 21px;
+}
+
+.empresa-razones .columna-texto {
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/* La pieza del panel que hace posible cada argumento. Versalitas como el
+   rótulo de sección, pero en tinta tenue y no en verde: el verde de la
+   página ya lo gasta el titular de arriba. Sobre la banda da 4,8:1. */
+.empresa-razon-pieza {
+  margin-top: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: var(--rotulo-track);
+  text-transform: uppercase;
+  color: var(--tinta-tenue);
+}
+
+/* ── Cómo se conecta: las dos columnas ─────────────────────────────── */
 
 /*
   Explicación y formulario, uno al lado del otro. El formulario es más
@@ -46,9 +1334,8 @@
 
 /* ── La columna de la izquierda ────────────────────────────────────── */
 
-/* La única pieza con marco de la página, ahora que la sección va a sangre
-   y no hay panel debajo. Blanca sobre la crema del fondo, con el reparto de
-   la propia app: superficie blanca fuera, arena dentro del producto. */
+/* Blanca sobre la crema del fondo, con el reparto de la propia app:
+   superficie blanca fuera, arena dentro del producto. */
 .empresa-ficha {
   display: flex;
   flex-direction: column;
@@ -64,13 +1351,17 @@
     0 30px 70px -50px rgba(11, 22, 40, 0.55);
 }
 
+/* El titular de la sección, «Conecta tu flota», al tamaño de los
+   titulares de sección. Fue un `--step-h3` cuando el titular grande
+   estaba encima del formulario, y la ficha parecía la nota al pie de la
+   otra columna; ahora que es el único, va a su talla. El tope de 22
+   caracteres sobra con tres palabras. */
 .empresa-ficha h2 {
   font-family: var(--font-display);
-  font-size: var(--step-h3);
-  line-height: 1.08;
-  letter-spacing: -0.025em;
+  font-size: var(--step-h2);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
   font-weight: 700;
-  max-width: 22ch;
 }
 
 .empresa-lista {
@@ -110,151 +1401,12 @@
   color: var(--text-primary);
 }
 
-/* ── El panel de control, en pequeño ───────────────────────────────── */
-
-/*
-  Un recorte de la app de escritorio: la barra, las cuatro pestañas con
-  sus cuentas y cuatro buses de la flota de pruebas. Los números cuadran
-  entre sí como cuadran en el panel de verdad —«En línea» cuenta los que
-  transmiten aunque estén ocultos, por eso 3 y no 2— y las placas son las
-  de la base de datos de pruebas, no unas inventadas para la foto.
-
-  Es una imagen, y se anuncia como tal: `role="img"` con su descripción.
-  Un lector de pantalla no tiene por qué leer una tabla de mentira.
-*/
-.consola {
-  border-radius: 16px;
-  background: var(--arena);
-  border: 1px solid var(--divider);
-  box-shadow: 0 18px 40px -30px rgba(11, 22, 40, 0.5);
-  overflow: hidden;
-  font-variant-numeric: tabular-nums;
-}
-
-.consola-barra {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 11px 14px;
-  background: var(--ink);
-  color: var(--text-white);
-}
-
-.consola-barra span:first-child {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-}
-
-.consola-barra span:last-child {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-white-dim);
-}
-
-.consola-pestanas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 12px 14px 0;
-}
-
-.consola-pestanas span {
-  padding: 5px 10px;
-  border-radius: 999px;
-  background: var(--surface-muted);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-secondary);
-}
-
-/* La pestaña abierta, con el azul que en el panel marca lo que el
-   operador tiene seleccionado. */
-.consola-pestanas .es-activa {
-  background: rgba(37, 99, 235, 0.1);
-  color: var(--electric-blue);
-}
-
-.consola-flota {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 12px 14px 14px;
-  list-style: none;
-}
-
-.consola-flota li {
-  display: grid;
-  background: var(--surface);
-  grid-template-columns: 8px minmax(0, auto) minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 11px;
-  border-radius: 12px;
-  border: 1px solid var(--divider);
-}
-
-.consola-flota b {
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  color: var(--text-primary);
-}
-
-.consola-estado {
-  font-size: 11.5px;
-  color: var(--text-secondary);
-}
-
-.consola-punto {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--bus-ghost);
-}
-
-.consola-punto--linea {
-  background: var(--green);
-}
-
-/* «PERMITIDO» / «OCULTO»: el interruptor con el que la empresa decide qué
-   ve el pasajero. Es lo único de la ficha que es una decisión y no un
-   estado, así que es lo único que lleva color de acción. */
-.consola-visible {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  color: var(--green-accessible);
-}
-
-/* En coral accesible y no en el de marca: son nueve píxeles, la letra
-   más pequeña de la página, y el coral de marca da 2.92:1 contra el
-   4.5:1 que toca. El accesible da 4.83:1. */
-.consola-visible--oculto {
-  color: var(--coral-accessible);
-}
-
-/* La fila abierta en la ficha del operador. Mismo azul que la pestaña. */
-.consola-flota .es-elegida {
-  border-color: rgba(37, 99, 235, 0.45);
-  background: rgba(37, 99, 235, 0.05);
-}
-
 /* ── La columna de la derecha: los datos ───────────────────────────── */
 
 .empresa-solicitud {
   display: flex;
   flex-direction: column;
   gap: 18px;
-}
-
-.empresa-solicitud h1 {
-  font-family: var(--font-display);
-  font-size: var(--step-h2);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
-  font-weight: 700;
 }
 
 .empresa-solicitud > p {
@@ -402,22 +1554,6 @@
   color: #fff;
   font-size: 24px;
   font-weight: 700;
-}
-
-/* En un teléfono la fila no da para las cuatro columnas y «Sin señal»
-   partía en dos líneas. Se cae el texto del estado, que es el dato que ya
-   lleva el punto de color al lado; lo que no se cae es la placa ni el
-   permiso, que es lo que la fila viene a contar. */
-@media (max-width: 420px) {
-  .consola-estado {
-    display: none;
-  }
-
-  /* Con una columna menos, la que se estira pasa a ser la de la placa: si
-     no, el permiso se queda pegado a la placa y la fila se lee torcida. */
-  .consola-flota li {
-    grid-template-columns: 8px minmax(0, 1fr) auto;
-  }
 }
 
 /* ── Marcas: la cinta vive en `componentes/marcas.css`, que comparten la

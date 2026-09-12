@@ -94,19 +94,35 @@
         <span class="wordmark">Ya Viene</span>
       </a>
 
-      <!-- Lo mismo que en la portada, pero aquí escrito a mano: esta página
-           no tiene secciones que vigilar —el menú apunta todo a la portada—,
-           así que el sitio es siempre éste y no cambia al bajar. -->
+      <!-- El rótulo de la barra plegada. En la portada lo reescribe
+           `nav-island.ts` con la sección que se está leyendo; aquí no
+           lleva `data-nav-lugar` a propósito, así que el guion no lo toca
+           y dice siempre en qué página se está. Las secciones sí se marcan
+           en los enlaces del menú desplegado, que es donde se ven. -->
       <span class="nav-lugar" aria-hidden="true">Para empresas</span>
 
       <div class="nav-island-reveal" id="nav-island-menu">
         <div class="nav-island-inner">
+          <!--
+            El menú de una empresa no lleva a la página del pasajero. Antes
+            eran «Cómo funciona» y «El problema» de la portada: quien había
+            llegado a pedir que le llamaran tocaba un enlace del menú y
+            acababa leyendo cómo se espera un bus, con el formulario a una
+            página de distancia. Ahora los enlaces son las secciones de
+            aquí y el botón es el formulario.
+
+            La vuelta a la portada sí va, pero una sola y con su nombre:
+            «Inicio», el primero, fuera del orden de las secciones. Con el
+            logo sólo no bastaba, porque no todo el mundo sabe que el logo
+            lleva a casa, y así queda claro que es salir de esta página y no
+            ir a una parte de ella.
+          -->
           <nav class="nav-island-links" aria-label="Navegación principal">
-            <a href="/#solucion" class="nav-link">Cómo funciona</a>
-            <a href="/#problema" class="nav-link">El problema</a>
-            <a href="/empresas.html" class="nav-link" aria-current="page">Para empresas</a>
+            <a href="/" class="nav-link">Inicio</a>
+            <a href="#panel" class="nav-link">Panel de control</a>
+            <a href="#beneficios" class="nav-link">Beneficios</a>
           </nav>
-          <a href="/#mapa" class="nav-island-cta">Probar el mapa</a>
+          <a href="#solicitar" class="nav-island-cta">Conecta tu flota</a>
         </div>
       </div>
 
@@ -120,68 +136,327 @@
   <main id="contenido">
 
     <!--
-      Una sola pantalla. Antes eran cinco paneles que contaban el turno del
-      conductor: elegir bus, transmitir, cerrar turno. Ese producto no
-      existe —el GPS va montado en el vehículo y no hay app de conductor—,
-      así que en vez de reescribir la historia entera se quedó lo que una
-      empresa necesita para decidir: qué es esto, qué ve desde la oficina y
-      dónde deja su teléfono.
+      Tres secciones, en el orden en que decide una empresa: qué es —el
+      panel, enseñado entero—, qué gana con él y cómo se conecta. Antes era
+      una sola pantalla con el formulario y una lista de cómo funciona, y lo
+      que faltaba era justo lo del medio: por qué pagarlo.
+    -->
+
+    <!-- ============ EL PANEL ============ -->
+    <section class="panel" id="panel">
+      <!-- El contenedor de siempre, 1160, y no el ancho de 1440: con éste
+           el monitor pasaba de 1300 y la cabecera se quedaba en letra de
+           párrafo al lado de una pantalla que llenaba la ventana. Así el
+           monitor mide lo que el titular y la frase de encima, y sus filos
+           caen en las mismas líneas. -->
+      <div class="panel-inner">
+        <header class="seccion-cabecera seccion-cabecera--partida reveal">
+          <span class="seccion-rotulo">Para empresas de transporte</span>
+          <h1 class="seccion-titulo">Toda tu flota, <span class="acentuado">en una pantalla.</span></h1>
+          <!-- Sin botones: el de «Conecta tu flota» ya está fijo en el menú
+               y repetirlo aquí era poner dos veces lo mismo en la misma
+               pantalla, encima de un monitor que ya pide la mirada. -->
+          <p class="seccion-lead">Cada bus en el mapa, en vivo, con su placa y su ruta. Desde la oficina
+            ves cuáles están en la calle, cuáles perdieron la señal y cuáles ven tus pasajeros: eso
+            último lo decides tú, bus por bus.</p>
+        </header>
+
+        <!--
+          El panel de control de verdad, en un monitor. Lo que había aquí
+          era una lista de cuatro placas, y quien compra para una empresa
+          no se imagina con eso: se imagina en su oficina, delante de una
+          pantalla con el mapa de la ciudad. Así que se enseña la pantalla
+          entera, la misma que abre el despachador en Windows o en macOS.
+
+          Cada pieza copia un widget de `app_control`
+          (`dashboard_screen.dart`, `fleet_list_tile.dart`,
+          `control_map.dart`) y cada número lo justifica
+          `componentes/empresas-pagina.css`. Las placas son las de la flota
+          de pruebas y las cuentas cuadran entre sí como cuadran allá.
+
+          Y se deja tocar: las píldoras de ruta, las pestañas de estado, cada bus
+          en la lista o en el mapa, su interruptor y la ficha. Lo mueve
+          `src/panel-flota.ts`, que es el `FleetNotifier` del Dart en
+          pequeño. Lo que en la app abre un diálogo o habla con el servidor
+          —buscar, agregar, editar, borrar, salir— se queda quieto: aquí no
+          hay una flota de verdad detrás.
+
+          Para el lector de pantalla es un grupo con nombre y ya no una
+          imagen, porque ahora tiene botones que hacen algo. La cabecera y
+          la barra de arriba no tienen ninguno que funcione y se le
+          esconden.
+        -->
+        <div class="despacho reveal" data-reveal-delay="120">
+          <div class="despacho-monitor">
+            <div class="despacho-pantalla" role="group"
+              aria-label="Panel de control de flota de Ya Viene, de demostración: elige la ruta, filtra por estado, elige un bus y ocúltalo o muéstralo a los pasajeros.">
+              <div class="flota">
+
+                <!-- Los iconos de Material que usa el panel, con sus
+                     trazados de 24×24 tal cual. Van una sola vez y cada
+                     sitio los llama con `<use>`: dibujados en línea, el
+                     del bus salía repetido nueve veces. -->
+                <svg class="flota-iconos" width="0" height="0" aria-hidden="true">
+                  <symbol id="fi-bus" viewBox="0 0 24 24"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z" /></symbol>
+                  <symbol id="fi-buscar" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" /></symbol>
+                  <symbol id="fi-refrescar" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" /></symbol>
+                  <symbol id="fi-ocultar" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" /></symbol>
+                  <symbol id="fi-mostrar" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" /></symbol>
+                  <symbol id="fi-salir" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" /></symbol>
+                  <symbol id="fi-mas" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></symbol>
+                  <symbol id="fi-via" viewBox="0 0 24 24"><path d="M20 18v-3h-2v3h-3v2h3v3h2v-3h3v-2h-3zM18 4h2v9h-2zM4 4h2v16H4zm7 0h2v4h-2zm0 6h2v4h-2zm0 6h2v4h-2z" /></symbol>
+                  <symbol id="fi-editar" viewBox="0 0 24 24"><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" /></symbol>
+                  <symbol id="fi-cerrar" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" /></symbol>
+                  <symbol id="fi-borrar" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4z" /></symbol>
+                  <symbol id="fi-ruta" viewBox="0 0 24 24"><path d="M19 15.18V7c0-2.21-1.79-4-4-4s-4 1.79-4 4v10c0 1.1-.9 2-2 2s-2-.9-2-2V8.82C8.16 8.4 9 7.3 9 6c0-1.66-1.34-3-3-3S3 4.34 3 6c0 1.3.84 2.4 2 2.82V17c0 2.21 1.79 4 4 4s4-1.79 4-4V7c0-1.1.9-2 2-2s2 .9 2 2v8.18c-1.16.41-2 1.51-2 2.82 0 1.66 1.34 3 3 3s3-1.34 3-3c0-1.3-.84-2.4-2-2.82z" /></symbol>
+                </svg>
+
+                <!-- _Header -->
+                <div class="flota-cabecera" aria-hidden="true">
+                  <span class="flota-logo"><img src="/logo.svg" alt="" width="24" height="24" /></span>
+                  <span class="flota-marca"><b>YA VIENE</b><small>CONTROL DE FLOTA</small></span>
+                  <span class="flota-conexion"><i></i>En línea</span>
+                  <span class="flota-salir"><svg class="flota-ico"><use href="#fi-salir" /></svg>Salir</span>
+                </div>
+
+                <!-- _TopBar. El reloj marca una hora de despacho de la
+                     mañana en un lunes: es la hora en que esta pantalla
+                     está abierta en una oficina de verdad. El ojo ofrece
+                     lo contrario de lo que hay, `allBusesVisible`: con
+                     WNP-659 oculto sale abierto, para mostrarlos todos, y
+                     el guion lo cierra si ya se ven los siete. -->
+                <div class="flota-barra" aria-hidden="true">
+                  <span class="flota-titulo">Flota</span>
+                  <span class="flota-buscar"><svg class="flota-ico"><use href="#fi-buscar" /></svg><span>Buscar placa, ruta o conductor…</span></span>
+                  <span class="flota-boton-icono flota-boton-icono--barra"><svg class="flota-ico"><use href="#fi-refrescar" /></svg></span>
+                  <span class="flota-boton-icono flota-boton-icono--barra"><svg class="flota-ico"><use data-todos href="#fi-mostrar" /></svg></span>
+                  <span class="flota-reloj"><b>06:42:32</b><small>lunes, 7 de septiembre de 2026</small></span>
+                </div>
+
+                <!-- _RouteFilters: una píldora por ruta con su número de
+                     buses, `'${route.name} (${route.total})'`. Dos de las
+                     seis rutas de Sobusa que salen en la portada: con dos
+                     ya se ve que el panel reparte la flota por ruta, y
+                     cada una de más son buses que colocar a mano sobre el
+                     plano. -->
+                <div class="flota-filtros">
+                  <button type="button" class="es-activo" data-accion="ruta" data-ruta="tcherassi" aria-pressed="true">Tcherassi (4)</button>
+                  <button type="button" data-accion="ruta" data-ruta="vivero" aria-pressed="false">Vivero Paraíso (3)</button>
+                </div>
+
+                <div class="flota-cuerpo">
+
+                  <!-- _FleetPanel -->
+                  <div class="flota-lista">
+                    <div class="flota-lista-cabeza">
+                      <span class="flota-rotulo">BUSES</span>
+                      <span class="flota-cuenta">4</span>
+                      <span class="flota-agregar-ruta"><svg class="flota-ico"><use href="#fi-via" /></svg>Agregar ruta</span>
+                      <span class="flota-agregar-bus"><svg class="flota-ico"><use href="#fi-mas" /></svg>Agregar bus</span>
+                    </div>
+
+                    <!-- _StatusTabs. «En Línea» cuenta los que transmiten
+                         aunque estén ocultos —`online && !isGhost`—, por
+                         eso 3 y no 2. -->
+                    <div class="flota-pestanas">
+                      <button type="button" class="es-activa" data-accion="estado" data-estado="todos" aria-pressed="true">Todos <b>4</b></button>
+                      <button type="button" data-accion="estado" data-estado="linea" aria-pressed="false">En Línea <b>3</b></button>
+                      <button type="button" data-accion="estado" data-estado="ocultos" aria-pressed="false">Ocultos <b>1</b></button>
+                      <button type="button" data-accion="estado" data-estado="sin-senal" aria-pressed="false">Sin Señal <b>1</b></button>
+                    </div>
+
+                    <!-- FleetListTile, en el orden de la lista: por
+                         identificador de bus, que es como llegan. Están
+                         las siete y cada ruta esconde las de la otra con
+                         `hidden`. La fila entera elige el bus: es el botón
+                         `flota-fila-elegir`, estirado de borde a borde, y
+                         el interruptor va por encima con el suyo, como el
+                         `Switch` dentro del `InkWell` de la fila. -->
+                    <ul class="flota-buses">
+                      <li class="flota-fila es-elegida" data-bus="SFA-482">
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="true" aria-label="Elegir SFA-482"></button>
+                        <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
+                        <span class="flota-fila-placa">SFA-482<i></i></span>
+                        <span class="flota-chip">Tcherassi</span>
+                        <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
+                        <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="true" aria-label="SFA-482 visible para los pasajeros"></button><span class="flota-permiso-texto">PERMITIDO</span></span>
+                      </li>
+                      <li class="flota-fila" data-bus="TUH-513">
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir TUH-513"></button>
+                        <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
+                        <span class="flota-fila-placa">TUH-513<i></i></span>
+                        <span class="flota-chip">Tcherassi</span>
+                        <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
+                        <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="true" aria-label="TUH-513 visible para los pasajeros"></button><span class="flota-permiso-texto">PERMITIDO</span></span>
+                      </li>
+                      <li class="flota-fila flota-fila--sin-senal" data-bus="DMV-238">
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir DMV-238, sin señal"></button>
+                        <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
+                        <span class="flota-fila-placa">DMV-238<i></i></span>
+                        <span class="flota-chip">Tcherassi</span>
+                        <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
+                        <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="true" aria-label="DMV-238 visible para los pasajeros"></button><span class="flota-permiso-texto">PERMITIDO</span></span>
+                      </li>
+                      <li class="flota-fila flota-fila--oculta" data-bus="WNP-659">
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir WNP-659"></button>
+                        <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
+                        <span class="flota-fila-placa">WNP-659<i></i></span>
+                        <span class="flota-chip">Tcherassi</span>
+                        <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
+                        <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="false" aria-label="WNP-659 visible para los pasajeros"></button><span class="flota-permiso-texto">OCULTO</span></span>
+                      </li>
+                      <li class="flota-fila" data-bus="KJT-704" hidden>
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir KJT-704"></button>
+                        <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
+                        <span class="flota-fila-placa">KJT-704<i></i></span>
+                        <span class="flota-chip">Vivero Paraíso</span>
+                        <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
+                        <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="true" aria-label="KJT-704 visible para los pasajeros"></button><span class="flota-permiso-texto">PERMITIDO</span></span>
+                      </li>
+                      <li class="flota-fila" data-bus="BQX-391" hidden>
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir BQX-391"></button>
+                        <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
+                        <span class="flota-fila-placa">BQX-391<i></i></span>
+                        <span class="flota-chip">Vivero Paraíso</span>
+                        <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
+                        <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="true" aria-label="BQX-391 visible para los pasajeros"></button><span class="flota-permiso-texto">PERMITIDO</span></span>
+                      </li>
+                      <li class="flota-fila flota-fila--sin-senal" data-bus="LMR-826" hidden>
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir LMR-826, sin señal"></button>
+                        <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
+                        <span class="flota-fila-placa">LMR-826<i></i></span>
+                        <span class="flota-chip">Vivero Paraíso</span>
+                        <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
+                        <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="true" aria-label="LMR-826 visible para los pasajeros"></button><span class="flota-permiso-texto">PERMITIDO</span></span>
+                      </li>
+                    </ul>
+                    <!-- `_emptyMessage`: lo escribe el guion según la
+                         pestaña, cuando no queda ninguna fila. -->
+                    <p class="flota-vacio" hidden>Sin buses registrados</p>
+                  </div>
+
+                  <!-- El Stack de la derecha: ControlMap y encima la
+                       ficha del bus seleccionado. -->
+                  <div class="flota-mapa">
+                    <!-- Un plano propio, pintado para este hueco a 2x: el
+                         de la ciudad de la portada, estirado aquí, salía
+                         borroso y demasiado lejos. Ver `.flota-plano`.
+                         Sin `lazy`: en pantalla ancha el monitor sale en
+                         la primera vista. -->
+                    <img class="flota-plano" src="./src/assets/map/mapa-panel.webp" alt=""
+                      width="2334" height="1402" decoding="async" />
+
+                    <!-- Pulsar un bus lo elige, como el `onTap` de cada
+                         marcador. Van sin foco de teclado: el mismo gesto
+                         está en su fila, y dos paradas por bus sólo
+                         alargarían el recorrido. Los de la ruta que no se
+                         mira se apagan con `es-fuera`. -->
+                    <span class="flota-bus flota-bus--dmv" data-bus="DMV-238" data-accion="elegir"></span>
+                    <span class="flota-bus flota-bus--tuh es-activo" data-bus="TUH-513" data-accion="elegir"></span>
+                    <span class="flota-bus flota-bus--wnp" data-bus="WNP-659" data-accion="elegir"></span>
+                    <span class="flota-bus flota-bus--sfa es-activo es-elegido" data-bus="SFA-482" data-accion="elegir"></span>
+                    <span class="flota-bus flota-bus--kjt es-activo es-fuera" data-bus="KJT-704" data-accion="elegir"></span>
+                    <span class="flota-bus flota-bus--bqx es-activo es-fuera" data-bus="BQX-391" data-accion="elegir"></span>
+                    <span class="flota-bus flota-bus--lmr es-fuera" data-bus="LMR-826" data-accion="elegir"></span>
+
+                    <!-- _Legend: aquí «En línea» son los que el pasajero
+                         ve en verde, así que 2 —el oculto cuenta aparte—. -->
+                    <div class="flota-leyenda">
+                      <span class="flota-leyenda-titulo">LEYENDA</span>
+                      <span class="flota-leyenda-fila"><i></i>En línea<b data-leyenda="linea">2</b></span>
+                      <span class="flota-leyenda-fila flota-leyenda-fila--gris"><i></i>Sin señal<b data-leyenda="sin-senal">1</b></span>
+                      <span class="flota-leyenda-fila flota-leyenda-fila--gris"><i></i>Ocultos<b data-leyenda="ocultos">1</b></span>
+                    </div>
+
+                    <!-- _SelectedBusCard. Cerrada no se quita: se funde y
+                         baja, y `inert` la saca del teclado. -->
+                    <div class="flota-ficha">
+                      <div class="flota-ficha-cabeza">
+                        <span class="flota-ficha-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
+                        <span class="flota-ficha-placa"><b data-ficha="placa">SFA-482</b><small data-ficha="estado">En línea</small></span>
+                        <button type="button" class="flota-ficha-cerrar" data-accion="cerrar" aria-label="Cerrar la ficha del bus"><svg class="flota-ico"><use href="#fi-cerrar" /></svg></button>
+                      </div>
+                      <span class="flota-ficha-ruta"><svg class="flota-ico"><use href="#fi-ruta" /></svg><span data-ficha="ruta">Tcherassi</span></span>
+                      <div class="flota-ficha-acciones">
+                        <button type="button" class="flota-ocultar" data-accion="visibilidad"><svg class="flota-ico"><use data-ficha="ocultar-icono" href="#fi-ocultar" /></svg><span data-ficha="ocultar">Ocultar</span></button>
+                        <span class="flota-boton-icono flota-boton-icono--gris"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
+                        <span class="flota-boton-icono flota-boton-icono--peligro"><svg class="flota-ico"><use href="#fi-borrar" /></svg></span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="despacho-pie" aria-hidden="true"></div>
+        </div>
+        <!-- La atribución del plano, debajo del monitor y no dentro. En la
+             pantalla iba en la esquina del mapa, como en la app, y a este
+             tamaño era una línea de 7 px medio tapada por la ficha. La
+             licencia de CARTO pide que se lea, y aquí se lee. -->
+        <p class="despacho-credito reveal" data-reveal-delay="120">© OpenStreetMap · © CARTO</p>
+      </div>
+    </section>
+
+    <!-- ============ LO QUE GANA LA EMPRESA ============
+      El dinero, que es lo que faltaba. Tres argumentos y ni una cifra: no
+      tenemos todavía un número medido en una flota que sostenga «+X % de
+      pasajeros», y una cifra inventada en una página para empresas es lo
+      primero que un gerente pregunta de dónde sale. Cada columna cierra
+      con la pieza del panel que la hace posible, para que el beneficio no
+      quede en promesa.
+    -->
+    <section class="panel panel--banda" id="beneficios">
+      <div class="panel-inner">
+        <header class="seccion-cabecera seccion-cabecera--partida reveal">
+          <span class="seccion-rotulo">Lo que gana tu empresa</span>
+          <h2 class="seccion-titulo">Un bus que se ve <span class="apagado">es un pasajero que espera.</span></h2>
+          <!-- Una idea por frase y una frase por columna: con tres
+               párrafos de tres líneas cada columna acababa a una altura y
+               las piezas de abajo no cuadraban entre sí. -->
+          <p class="seccion-lead">Quien no sabe si su bus viene se sube a lo primero que pase. Cada bus
+            tuyo en el mapa es una razón para esperarlo.</p>
+        </header>
+
+        <div class="columnas empresa-razones">
+          <article class="reveal">
+            <h3 class="columna-titulo">No se van con otro</h3>
+            <p class="columna-texto">Quien ve su bus a ocho cuadras lo espera, en vez de irse con el
+              colectivo o el mototaxi.</p>
+            <p class="empresa-razon-pieza">Permitido u oculto, bus por bus</p>
+          </article>
+          <article class="reveal" data-reveal-delay="80">
+            <h3 class="columna-titulo">Adiós a la guerra del centavo</h3>
+            <p class="columna-texto">Dos buses de la misma ruta pegados se ven desde la oficina, en el
+              momento.</p>
+            <p class="empresa-razon-pieza">La ruta entera, en vivo</p>
+          </article>
+          <article class="reveal" data-reveal-delay="160">
+            <h3 class="columna-titulo">Frecuencias que se cumplen</h3>
+            <p class="columna-texto">Mira cuántos buses hay en la calle y dónde se abre un hueco.</p>
+            <p class="empresa-razon-pieza">Filtro por ruta y estado</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CÓMO SE CONECTA ============
+      Lo que antes era la página entera: cómo se instala, las empresas que
+      ya están y el formulario. Ahora llega después de haber visto el panel
+      y lo que se gana, que es cuando alguien de verdad deja su teléfono.
     -->
     <section class="panel" id="solicitar">
       <div class="panel-inner panel-inner--ancho empresa-consulta">
 
         <div class="empresa-ficha reveal">
-          <span class="tracked-eyebrow eyebrow--verde">PARA EMPRESAS</span>
-          <h2>Tus buses en el mapa, y la flota entera en una pantalla</h2>
-
-          <!--
-            El panel de control de verdad, recortado. Las placas salen de la
-            flota de pruebas y las cuentas cuadran entre ellas: «En línea»
-            son los que están transmitiendo, oculto o no, por eso hay tres
-            con uno de ellos escondido para el pasajero.
-          -->
-          <div class="consola" role="img"
-            aria-label="Panel de control de flota: cuatro buses, tres transmitiendo y uno sin señal;
-                        el bus WNP-659 transmite pero está oculto para los pasajeros.">
-            <div class="consola-barra">
-              <span>CONTROL DE FLOTA</span>
-              <span>06:42:32</span>
-            </div>
-
-            <div class="consola-pestanas" aria-hidden="true">
-              <span class="es-activa">Todos 4</span>
-              <span>En Línea 3</span>
-              <span>Ocultos 1</span>
-              <span>Sin Señal 1</span>
-            </div>
-
-            <ul class="consola-flota" aria-hidden="true">
-              <li class="es-elegida">
-                <span class="consola-punto consola-punto--linea"></span>
-                <b>SFA-482</b>
-                <span class="consola-estado">En línea</span>
-                <span class="consola-visible">PERMITIDO</span>
-              </li>
-              <li>
-                <span class="consola-punto consola-punto--linea"></span>
-                <b>TUH-513</b>
-                <span class="consola-estado">En línea</span>
-                <span class="consola-visible">PERMITIDO</span>
-              </li>
-              <li>
-                <span class="consola-punto"></span>
-                <b>DMV-238</b>
-                <span class="consola-estado">Sin señal</span>
-                <span class="consola-visible">PERMITIDO</span>
-              </li>
-              <li>
-                <span class="consola-punto consola-punto--linea"></span>
-                <b>WNP-659</b>
-                <span class="consola-estado">En línea</span>
-                <span class="consola-visible consola-visible--oculto">OCULTO</span>
-              </li>
-            </ul>
-          </div>
+          <!-- El titular de la sección entera va aquí, en la ficha, y no
+               encima del formulario: «Conecta tu flota» es lo mismo que dice
+               el botón del menú que trae hasta aquí, y leído encima de la
+               lista de cómo se instala responde a qué implica conectarla
+               antes de pedir el teléfono. Sin rótulo ni frase debajo: la
+               frase repetía el primer punto de la lista. -->
+          <h2>Conecta tu flota</h2>
 
           <ul class="empresa-lista">
             <li>El GPS va montado en el bus, no en un teléfono: lo instalamos junto con tu flota y quedas conectado sin depender de que alguien recuerde abrir una app.</li>
@@ -256,7 +531,10 @@
         </div>
 
         <div class="empresa-solicitud reveal" data-reveal-delay="120">
-          <h1>Conecta tu flota</h1>
+          <!-- Sin titular propio: el de la sección está en la ficha de al
+               lado, y repetirlo aquí era poner «Conecta tu flota» dos veces
+               en la misma pantalla. La columna arranca con la frase, que es
+               lo que se lee justo antes de rellenar. -->
           <p>Cuántos buses tienes y qué rutas cubren se ve empresa por empresa. Déjanos tus datos y
             te llamamos.</p>
 
@@ -313,13 +591,23 @@
 
   </main>
 
+  <!--
+    El pie de una empresa. Era el mismo de la portada —«La ciudad se mueve
+    contigo» y un botón a probar el mapa—, que le habla al pasajero y
+    manda a la empresa fuera justo al terminar de leer. Ahora cierra con
+    el formulario.
+
+    La única salida hacia la portada que queda, aparte del logo, es «El
+    mapa en vivo», y está a propósito: es donde una empresa ve lo que verán
+    sus pasajeros, y eso ayuda a decidir en vez de distraer.
+  -->
   <footer class="site-footer" id="pie">
     <div class="footer-cta">
-      <span class="tracked-eyebrow eyebrow--ambar">YA VIENE EN BARRANQUILLA</span>
-      <h2>La ciudad se mueve contigo.</h2>
-      <p>Menos adivinar, más llegar. Ya Viene convierte cada ruta de Barranquilla en una respuesta en tiempo real.</p>
+      <span class="tracked-eyebrow eyebrow--ambar">YA VIENE PARA EMPRESAS</span>
+      <h2>Tu flota, a la vista de la ciudad.</h2>
+      <p>Tus pasajeros ven llegar el bus y tú ves la flota entera. Conectarla empieza con una llamada.</p>
       <div class="footer-actions">
-        <a href="/#mapa" class="btn-primary btn-green">Probar el mapa en vivo</a>
+        <a href="#solicitar" class="btn-primary btn-green">Conecta tu flota</a>
         <a href="https://wa.me/573004438626" target="_blank" rel="noopener" class="btn-outline">Hablemos por WhatsApp</a>
       </div>
       <p class="footer-cta-note">En movimiento con Sobusa y sus 6 rutas reales.</p>
@@ -336,14 +624,15 @@
 
       <nav class="footer-nav" aria-label="Navegación del pie de página">
         <div class="footer-nav-group">
-          <span>Explora</span>
-          <a href="/#solucion">Cómo funciona</a>
-          <a href="/#problema">El problema</a>
-          <a href="/#mapa">El mapa en vivo</a>
+          <span>Para empresas</span>
+          <a href="#panel">Panel de control</a>
+          <a href="#beneficios">Beneficios</a>
+          <a href="#solicitar">Conecta tu flota</a>
         </div>
         <div class="footer-nav-group">
-          <span>Conecta</span>
-          <a href="/empresas.html">Para empresas</a>
+          <span>Ya Viene</span>
+          <a href="/">Inicio</a>
+          <a href="/#mapa">El mapa en vivo</a>
           <a href="https://wa.me/573004438626" target="_blank" rel="noopener">WhatsApp</a>
         </div>
       </nav>

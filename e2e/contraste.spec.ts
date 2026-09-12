@@ -96,7 +96,18 @@ const MUESTRAS: Record<string, string[]> = {
     '.nav-island-cta',
     '.btn-green',
     '.form-submit-btn',
-    '.consola-visible',
+    // La cabecera del panel y las tres razones, que van sobre la banda:
+    // el rótulo y el titular en verde, la parte apagada del titular y la
+    // letra chica de cada columna.
+    '.seccion-rotulo',
+    '.seccion-lead',
+    '.acentuado',
+    '.apagado',
+    '#beneficios .columna-texto',
+    '.empresa-razon-pieza',
+    // La atribución del plano, que salió del mapa a la página: letra de
+    // 12 en gris tenue sobre el papel.
+    '.despacho-credito',
     '.footer-nav-group > span',
     '.footer-legal-links a',
   ],
@@ -133,13 +144,43 @@ test.describe('contraste del texto que no va en tinta plena', () => {
         expect(cuantos, `«${sel}» no existe en ${ruta}`).toBeGreaterThan(0);
 
         for (let i = 0; i < cuantos; i += 1) {
+          // Primero se trae a la vista y se deja terminar la aparición. Lo
+          // que va dentro de un `.reveal` entra fundiéndose en 0.7 s, más
+          // su turno de `data-reveal-delay`, y medido a mitad de camino el
+          // fondo sale mezclado con lo de detrás: el botón del formulario
+          // salió a 4.35:1 porque el píxel era su verde al 86 % sobre
+          // blanco, no su verde. Y antes de que el observador lo destape
+          // está en `opacity: 0`, que `checkVisibility` da por escondido y
+          // se saltaba sin medir. Se espera a que todo `.reveal` por
+          // encima esté entero; si alguno no llega, se mide igual y lo que
+          // salga lo dirá la cuenta de abajo, no un tiempo agotado mudo.
+          await page.evaluate(
+            ([s, n]: [string, number]) => {
+              const el = document.querySelectorAll(s)[n] as HTMLElement;
+              el.scrollIntoView({ block: 'center', behavior: 'instant' });
+            },
+            [sel, i] as [string, number]
+          );
+          await page
+            .waitForFunction(
+              ([s, n]: [string, number]) => {
+                const el = document.querySelectorAll(s)[n] as HTMLElement;
+                for (let p = el.closest('.reveal'); p; p = p.parentElement?.closest('.reveal') ?? null) {
+                  if (getComputedStyle(p).opacity !== '1') return false;
+                }
+                return true;
+              },
+              [sel, i] as [string, number],
+              { timeout: 3_000 }
+            )
+            .catch(() => {});
+
           // Se apaga la letra antes de mirar el píxel: así lo que se mide
           // es el fondo de verdad —panel, gradiente, puntitos y lo que
           // haya debajo— y no una mezcla a medias con la propia letra.
           const sitio = await page.evaluate(
             ([s, n]: [string, number]) => {
               const el = document.querySelectorAll(s)[n] as HTMLElement;
-              el.scrollIntoView({ block: 'center', behavior: 'instant' });
               const cs = getComputedStyle(el);
               const c = el.getBoundingClientRect();
               const x = Math.round(c.left + Math.min(c.width / 2, 8));

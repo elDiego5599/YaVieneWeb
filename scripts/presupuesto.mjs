@@ -89,11 +89,44 @@ const KB = 1024;
  *
  *  Los cuatro topes quedan otra vez en la build de hoy más un 3 %. Los
  *  tres que bajan bajan de verdad: dejarlos anchos habría dejado pasar
- *  sin avisar toda la grasa que se acaba de quitar. */
+ *  sin avisar toda la grasa que se acaba de quitar.
+ *
+ *  El 12/09/2026 el de CSS sube de 101 a 114. La build pasa de 99.3 a
+ *  111.0 y lo que pesa es `/empresas.html`: su hoja va de unos 6 a 17.4 KB
+ *  porque el recorte de cuatro placas se cambió por el panel de control
+ *  entero dentro de un monitor, que es lo que una empresa espera ver
+ *  antes de pagar. Es el mismo caso que `phone-simulator.css`: cada regla
+ *  copia un número de `dashboard_screen.dart` y lleva al lado de dónde
+ *  sale, así que recortarlo es desincronizar el mockup. Lo que se pudo
+ *  quitar se quitó —las reglas de la consola vieja y su ajuste para
+ *  pantallas de 420—. Esa hoja sólo la carga esa página, así que la
+ *  primera visita no lo nota: sigue en 486.3 de 560. 114 es la build de
+ *  hoy más el 3 % de siempre.
+ *
+ *  El mismo 12/09/2026 el de todo dist sube de 720 a 797. Lo que pesa son
+ *  los 98.6 KB de `mapa-panel.webp`, el plano del monitor de
+ *  /empresas.html: antes ese hueco reusaba el de la ciudad de la portada,
+ *  que no costaba nada, pero estirado a medio monitor salía borroso y
+ *  demasiado lejos para leer una calle. El nuevo está pintado a 2x para
+ *  ese hueco exacto y a zoom de despachador. Se miró cómo no pagarlo:
+ *  bajar a 1,5x lo deja otra vez blando en una pantalla retina, que es
+ *  donde lo va a mirar el que decide, y bajar la calidad del WebP ensucia
+ *  los rótulos de las calles, que es justo lo que se quería arreglar. La
+ *  primera visita no lo nota —sólo lo pide esa página— y sigue en 486.3.
+ *  797 es la build de hoy, 773.3, más el 3 %.
+ *
+ *  Y el mismo 12/09/2026 el de JavaScript sube de 62 a 66. La build pasa
+ *  de 59.6 a 64.0 y lo que pesa es `panel-flota.ts`: el panel del monitor
+ *  de /empresas.html dejó de ser una imagen quieta y ahora se cambia de
+ *  ruta, se filtra, se elige un bus y se oculta, porque quien decide por
+ *  una empresa se cree lo que prueba y no una captura. Es un solo oyente
+ *  de clics y una función que repinta desde el estado; no hay librería
+ *  que quitar. Sólo lo carga esa página, así que la primera visita sigue
+ *  en 486.3. 66 es la build de hoy más el 3 %. */
 const TOPES = {
-  'todo dist': 720,
-  'JavaScript': 62,
-  'CSS': 101,
+  'todo dist': 797,
+  'JavaScript': 66,
+  'CSS': 114,
   'primera visita': 560,
 };
 
@@ -111,6 +144,8 @@ const NO_ENTRA_EN_LA_PRIMERA_VISITA = [
   // índice común: la portada no lo pide. El de `accesibilidad` sí entra,
   // que ahí es donde el empaquetador dejó la hoja compartida.
   /^empresas-[^/]*\.(js|css)$/,
+  // El plano del monitor de /empresas.html: sólo lo pinta esa página.
+  /^mapa-panel-[^/]*\.webp$/,
 ];
 
 function recorrer(dir, base = '') {
