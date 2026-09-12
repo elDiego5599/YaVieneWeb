@@ -93,6 +93,19 @@
 .pie-bus--abajo-izq { bottom: 9%; left: 7%; }
 .pie-bus--abajo-der { bottom: 9%; right: 7%; }
 
+/*
+  Cada bus arranca su levitación a destiempo para que las cuatro esquinas
+  no suban y bajen a la vez como una sola pieza. Los retrasos iban en un
+  `style` en línea, y la política de contenido de `vercel.json` (sin
+  'unsafe-inline' en `style-src`) los tiraba en producción: allí los
+  cuatro flotaban sincronizados. Dos clases para ganarle al atajo
+  `animation` de `.animate-float-delayed`, que repone el retraso a 1,5 s
+  y así no depende de qué hoja cargue primero. Las otras dos esquinas se
+  quedan con ese 1,5 s: van en diagonal y no se nota que coincidan.
+*/
+.pie-bus.pie-bus--arriba-der { animation-delay: 3.2s; }
+.pie-bus.pie-bus--abajo-izq { animation-delay: 5s; }
+
 @media (max-width: 899px) {
   .pie-buses {
     display: none;

@@ -149,7 +149,13 @@
 
 /*
   El corte va en verde, como la referencia: primera línea en oscuro,
-  segunda en verde.
+  segunda en verde. Y es un corte de verdad, en bloque: el titular va en
+  dos renglones —la pregunta arriba, el bus abajo— también en escritorio.
+  En una sola línea a lo ancho se leía como un cartel corrido, y partido
+  por donde ya cambia de color cada mitad se lee de un vistazo. La letra
+  se queda en su tamaño, así que el hero sólo crece un renglón; el
+  `nowrap` de arriba ahora vale por renglón y ninguno de los dos se acerca
+  al ancho de la caja.
 
   Pero en el verde accesible, no en el de marca. El de marca da 2.89:1
   sobre el crema del hero: no llega ni al 3:1 que la norma AA pide para
@@ -158,7 +164,7 @@
   84 px la diferencia no se ve; lo que se ve es que ya no está lavado.
 */
 .hero-title .highlight {
-  display: inline;
+  display: block;
   color: var(--green-accessible);
 }
 

@@ -1440,7 +1440,7 @@
   la app, dos capturas reconstruidas en HTML con el mismo `--u` que el
   central, para que a cualquier zoom sigan siendo nítidas y midan lo que
   miden en el aparato de verdad. Cada número de aquí abajo sale de
-  route_selector_sheet.dart y de login_screen.dart.
+  route_selector_sheet.dart y de splash_screen.dart.
 
   El selector no se quedó en la vitrina: la demo del hero y el segundo
   momento de la solución lo abren de verdad, así que estas reglas las
@@ -1800,12 +1800,12 @@
   }
 }
 
-/* ── La pantalla de entrada ────────────────────────────────────────── */
+/* ── La pantalla de arranque ───────────────────────────────────────── */
 
 /*
-  El fondo de la pantalla de entrada es `LiveRouteBackdrop`, no un plano de
+  El fondo de la pantalla de arranque es `LiveRouteBackdrop`, no un plano de
   tinta: una red de rutas de noche, con paradas, y un bus recorriendo una de
-  ellas mientras alguien escribe su correo. Se copia aquí paso por paso
+  ellas. Se copia aquí paso por paso
   —cielo, halo, puntos, curvas, bus— porque era justo lo que hacía que el
   teléfono de la izquierda pareciera otro producto que la app.
 
@@ -1816,26 +1816,51 @@
 .phone-screen--tinta {
   display: flex;
   flex-direction: column;
-  /* `_pintarCielo`: la noche se aclara arriba y se hunde donde va a
-     apoyarse la hoja, con un halo verde detrás de la marca (haloY 0,30,
-     radio 0,72 del ancho). */
+  /*
+    Lo que baja el fondo entero —retícula, rutas, paradas y bus— respecto
+    a donde lo pinta `LiveRouteBackdrop`. En la app la ruta viva hace su
+    cresta a 68 puntos del borde, y allí encima no hay nada; en el hero
+    esos 68 puntos son casi todos barra de estado, así que la curva y el
+    bus iban rozando el reloj y la isla, apretados contra el techo
+    mientras la mitad de abajo quedaba vacía. 34 es el `paso` de
+    `_pintarPuntos`, una fila de la retícula: los puntos siguen cayendo en
+    su rejilla, sólo que la fila que abre es la del tresbolillo contrario.
+    Primero se bajó una baldosa entera, 68, y el fondo quedaba caído.
+  */
+  --bajada-fondo: calc(34 * var(--u));
+  /* `_pintarCielo`: la noche se aclara arriba y se hunde abajo, con un
+     halo verde detrás de la marca (radio 0,72 del ancho). `haloY` es
+     «donde vaya a caer la marca», y aquí cae al 47 % del alto: el centro
+     del bloque que calcula `.tinta-hero`, a 410,5 de 875. Si la marca
+     vuelve a moverse, esto se mueve con ella. El cielo no baja con el
+     resto del fondo: es un degradado de la pantalla entera y bajarlo
+     dejaría arriba una franja sin pintar. */
   background-color: var(--ink);
   background-image:
-    radial-gradient(circle calc(289.4 * var(--u)) at 50% 30%,
+    radial-gradient(circle calc(289.4 * var(--u)) at 50% 47%,
       rgba(0, 168, 89, 0.14) 0%, rgba(0, 168, 89, 0) 100%),
     linear-gradient(180deg, #17325F 0%, #102141 34%, #0B1628 62%, #071019 100%);
 }
 
 /*
-  `_pintarPuntos`: la retícula da textura arriba, donde hay sitio, y se
-  apaga antes de llegar a la hoja. El degradado de la máscara es lo que en
+  `_pintarPuntos`: la retícula da textura arriba y se apaga en el último
+  cuarto, igual en las tres pantallas oscuras —el splash no la mueve, solo
+  el halo—. El degradado de la máscara es lo que en
   Flutter es el `desvanecido` del alfa; el corte seco al 72 % es donde el
   bucle se para.
+
+  Baja con el resto del fondo (`--bajada-fondo`), y la máscara gana un
+  tramo de entrada arriba, de la misma medida: sin él la primera fila
+  aparecía de golpe a plena luz justo debajo de la barra de estado, como
+  un borde. Así la retícula sale de la noche en vez de empezar en una
+  línea. La máscara va sobre el elemento ya bajado, así que el corte del
+  72 % baja con él y sigue cayendo donde se para el bucle.
 */
 .phone-screen--tinta::before {
   content: '';
   position: absolute;
   inset: 0;
+  translate: 0 var(--bajada-fondo);
   pointer-events: none;
   background-image:
     radial-gradient(circle at calc(30 * var(--u)) calc(17 * var(--u)),
@@ -1844,17 +1869,31 @@
       rgba(255, 255, 255, 0.075) calc(1.5 * var(--u)), transparent calc(1.6 * var(--u)));
   background-size: calc(34 * var(--u)) calc(68 * var(--u));
   background-position: 0 calc(11 * var(--u));
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.27) 71.9%, transparent 72%);
-  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.27) 71.9%, transparent 72%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 var(--bajada-fondo),
+    rgba(0, 0, 0, 0.27) 71.9%, transparent 72%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 var(--bajada-fondo),
+    rgba(0, 0, 0, 0.27) 71.9%, transparent 72%);
 }
 
+/*
+  Las rutas bajan lo mismo que la retícula, para que las curvas sigan
+  cayendo sobre los mismos puntos que en la app. La máscara hace con ellas
+  lo que con los puntos: la ruta quieta de la izquierda nace por encima
+  del lienzo (y = −20), y bajada 34 su arranque quedaba a la vista, un
+  trazo cortado en seco a la altura de la isla. Con los 34 de entrada se
+  funde con la noche; la ruta viva hace su cresta a 68, pasado el tramo,
+  así que ella y sus paradas se ven enteras.
+*/
 .tinta-rutas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  translate: 0 var(--bajada-fondo);
   fill: none;
   stroke-linecap: round;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 var(--bajada-fondo));
+  mask-image: linear-gradient(180deg, transparent 0%, #000 var(--bajada-fondo));
 }
 
 /* Las dos rutas quietas, al 7 %. */
@@ -1992,8 +2031,26 @@
   color: #FFFFFF;
 }
 
-/* InkHero: logo con halo verde, wordmark y lema, centrado en lo que sobra
-   por encima de la hoja. */
+/*
+  InkHero: logo con halo verde, wordmark y lema, centrados en lo que de
+  verdad se ve de esta pantalla, no en la pantalla entera. En el hero no
+  se ve entera: arriba están los 59 de la barra de estado, y abajo el
+  filo del panel se come los últimos 113 —el `--sangrado` del trío, que
+  corta la pantalla a 762 de sus 875—. Los dos rellenos quitan
+  exactamente eso, y el `center` de flex pone el bloque en el medio de la
+  ventana que queda, a 410,5: hay el mismo aire de noche encima que
+  debajo.
+
+  Antes se copiaba la altura del splash, con el logo 72 puntos por encima
+  del centro de la pantalla entera. Ese número es bueno en el teléfono,
+  que se ve de arriba abajo; aquí, con un octavo de la pantalla escondido
+  bajo el panel, el mismo sitio dejaba la marca arriba y el hueco abajo.
+  Como el trío mide lo mismo en cualquier ancho (`--tel` fijo en 360), el
+  corte cae siempre en el mismo punto y el 113 vale para todos.
+
+  El indicador de carga del splash sigue sin dibujarse: en una captura
+  quieta, un círculo girando se lee como que la página se quedó cargando.
+*/
 .tinta-hero {
   position: relative;
   z-index: 1;
@@ -2003,11 +2060,15 @@
   align-items: center;
   justify-content: center;
   padding-top: var(--alto-estado);
+  padding-bottom: calc(113 * var(--u));
 }
 
+/* 84 y 20 por debajo: `logoSize` y `spacingAfterLogo` del splash, que mide
+   el logo igual que la pantalla nativa a la que releva (84 en
+   `LaunchScreen.storyboard`). */
 .tinta-logo {
-  width: calc(88 * var(--u));
-  height: calc(88 * var(--u));
+  width: calc(84 * var(--u));
+  height: calc(84 * var(--u));
   display: block;
   border-radius: 50%;
   /* Sin extensión y al 22 %: el fondo ya trae su propio halo detrás de la
@@ -2018,7 +2079,7 @@
 }
 
 .tinta-titulo {
-  margin-top: calc(18 * var(--u));
+  margin-top: calc(20 * var(--u));
   font-size: calc(36 * var(--u));
   font-weight: 800;
   letter-spacing: calc(-1.2 * var(--u));
@@ -2033,154 +2094,6 @@
   line-height: 1.4;
   letter-spacing: calc(-0.2 * var(--u));
   color: rgba(255, 255, 255, 0.75);
-}
-
-/*
-  La hoja de abajo. Va en arena, la misma superficie que el selector de ruta
-  y la hoja de distancia: los tres teléfonos del hero se ven de una sola vez
-  y con esta en blanco parecían dos productos distintos. El cambio está
-  también en login_screen.dart, así que el espejo sigue siendo fiel.
-*/
-.login-hoja {
-  position: relative;
-  z-index: 1;
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  padding: calc(30 * var(--u)) calc(28 * var(--u)) calc(30 * var(--u));
-  /* El pliegue por donde la hoja se separa de la noche recoge la luz:
-     arenaAlta que cae a arena en el primer quinto. Con el relleno plano
-     ese borde era una línea muerta y la hoja parecía pegada encima. */
-  background: linear-gradient(180deg, #FFFDF8 0%, var(--arena) 20%);
-  border-radius: calc(32 * var(--u)) calc(32 * var(--u)) 0 0;
-  box-shadow: 0 calc(-16 * var(--u)) calc(44 * var(--u)) rgba(5, 8, 15, 0.2);
-}
-
-.login-titulo {
-  /* AppTextStyles.titulo. */
-  font-size: calc(22 * var(--u));
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: calc(-0.4 * var(--u));
-  color: var(--app-text-primary);
-}
-
-.login-sub {
-  margin-top: calc(6 * var(--u));
-  /* AppTextStyles.cuerpo en gris de rótulo. */
-  font-size: calc(15 * var(--u));
-  font-weight: 400;
-  line-height: 1.5;
-  letter-spacing: calc(-0.2 * var(--u));
-  color: var(--app-text-secondary);
-}
-
-/*
-  El campo. El alto no está escrito en el código: lo saca Material del
-  icono de 22 y el texto de 15 con su relleno, y son los 58 que mide en el
-  aparato —medidos sobre el golden `login_correo`, filo a filo.
-*/
-.login-campo {
-  margin-top: calc(22 * var(--u));
-  height: calc(58 * var(--u));
-  display: flex;
-  align-items: center;
-  /* AppRadius.lg, y el relleno del InputDecorationTheme —no surfaceMuted,
-     que es medio tono más frío y sobre arena se veía sucio. */
-  border-radius: calc(16 * var(--u));
-  background: #F8F9FA;
-  border: 1px solid var(--divider);
-}
-
-.login-campo-icono {
-  flex: none;
-  display: grid;
-  place-items: center;
-  padding: 0 calc(18 * var(--u));
-  color: var(--app-text-secondary);
-}
-
-.login-campo-icono svg {
-  width: calc(22 * var(--u));
-  height: calc(22 * var(--u));
-  display: block;
-}
-
-.login-campo-hint {
-  /* Mide lo que va a medir lo que se escriba, y va en el gris de rótulo:
-     el gris al 60 % daba 1,5:1 sobre el relleno del campo. */
-  font-size: calc(15 * var(--u));
-  font-weight: 400;
-  letter-spacing: calc(-0.2 * var(--u));
-  color: var(--app-text-secondary);
-}
-
-/* Continuar, apagado: es como llega la pantalla, con el correo en blanco. */
-.login-boton {
-  margin-top: calc(24 * var(--u));
-  height: calc(56 * var(--u));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: var(--divider);
-  color: var(--app-text-disabled);
-  /* AppTextStyles.boton. */
-  font-size: calc(16 * var(--u));
-  font-weight: 800;
-  letter-spacing: calc(-0.2 * var(--u));
-}
-
-.login-o {
-  margin-top: calc(16 * var(--u));
-  display: flex;
-  align-items: center;
-  gap: calc(12 * var(--u));
-  font-size: calc(13 * var(--u));
-  font-weight: 600;
-  color: var(--app-text-disabled);
-}
-
-.login-o span {
-  flex: 1;
-  height: 1px;
-  background: var(--divider);
-}
-
-.login-google {
-  margin-top: calc(16 * var(--u));
-  height: calc(52 * var(--u));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: calc(8 * var(--u));
-  border-radius: 999px;
-  background: #FFFFFF;
-  border: 1px solid var(--divider);
-  /* AppTextStyles.cuerpoFuerte sobre el foreground del OutlinedButton. */
-  color: var(--app-text-primary);
-  font-size: calc(15 * var(--u));
-  font-weight: 600;
-  letter-spacing: calc(-0.2 * var(--u));
-}
-
-.login-google svg {
-  width: calc(20 * var(--u));
-  height: calc(20 * var(--u));
-  display: block;
-}
-
-.login-link {
-  margin-top: calc(12 * var(--u));
-  padding: calc(10 * var(--u)) 0;
-  text-align: center;
-  /* AppTextStyles.etiqueta en primaryAccessible: el verde de marca a secas
-     se queda en 3,1:1 sobre arena. */
-  font-size: calc(13 * var(--u));
-  font-weight: 600;
-  letter-spacing: calc(-0.1 * var(--u));
-  color: var(--app-primary-accessible);
 }
 
 /* ── El teléfono de cada momento de la solución ──────────────────────
