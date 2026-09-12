@@ -65,52 +65,11 @@
   margin-left: auto;
 }
 
-/* Los 4 buses de las esquinas, como en el hero original. Viven en una
-   capa propia detrás del contenido (el pie ya recorta lo que se salga);
-   en el teléfono se apagan para no pelear con el texto. */
-.pie-buses {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.footer-cta,
-.footer-grid {
-  position: relative;
-  z-index: 1;
-}
-
-.pie-bus {
-  position: absolute;
-  width: clamp(110px, 11vw, 190px);
-  height: auto;
-  opacity: 0.95;
-}
-
-.pie-bus--arriba-izq { top: 0; left: 13%; }
-.pie-bus--arriba-der { top: 0; right: 13%; }
-.pie-bus--abajo-izq { bottom: 9%; left: 7%; }
-.pie-bus--abajo-der { bottom: 9%; right: 7%; }
-
-/*
-  Cada bus arranca su levitación a destiempo para que las cuatro esquinas
-  no suban y bajen a la vez como una sola pieza. Los retrasos iban en un
-  `style` en línea, y la política de contenido de `vercel.json` (sin
-  'unsafe-inline' en `style-src`) los tiraba en producción: allí los
-  cuatro flotaban sincronizados. Dos clases para ganarle al atajo
-  `animation` de `.animate-float-delayed`, que repone el retraso a 1,5 s
-  y así no depende de qué hoja cargue primero. Las otras dos esquinas se
-  quedan con ese 1,5 s: van en diagonal y no se nota que coincidan.
-*/
-.pie-bus.pie-bus--arriba-der { animation-delay: 3.2s; }
-.pie-bus.pie-bus--abajo-izq { animation-delay: 5s; }
-
-@media (max-width: 899px) {
-  .pie-buses {
-    display: none;
-  }
-}
+/* Aquí iban los cuatro buses de las empresas en las esquinas del cierre,
+   flotando. Se quitaron: el cierre es una invitación —titular, dos
+   botones— y cuatro dibujos moviéndose alrededor le quitaban la vista al
+   botón, que es lo único que tiene que mirarse. Las marcas de las
+   empresas ya salen, en serio, en `/empresas.html`. */
 
 .footer-cta {
   display: flex;

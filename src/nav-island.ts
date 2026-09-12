@@ -111,11 +111,13 @@ export class NavIsland {
       nav.css le pone el trazo verde debajo.
 
       Sólo entran los enlaces que apuntan a una sección de esta misma
-      página. En `empresas.html` los del menú van a `/#solucion` y no
-      empiezan por `#`, así que no hay ninguno y esto no hace nada: allí
-      el enlace de la propia página ya viene marcado a mano en el HTML y
-      nadie se lo toca. El botón del mapa entra como uno más, porque es
-      el único enlace que hay a esa sección.
+      página. En `empresas.html` también los hay desde que su menú dejó
+      de mandar a la portada: «Panel de control», «Beneficios» y el botón
+      del formulario se marcan igual que aquí; «Inicio» va a `/` y se
+      queda fuera. Lo que allí no cambia es el
+      rótulo de la barra plegada, que no lleva `data-nav-lugar` y dice
+      siempre «Para empresas». El botón del mapa entra como uno más,
+      porque es el único enlace que hay a esa sección.
     */
     const dianas: [HTMLElement, HTMLElement][] = [];
     for (const enlace of isla.querySelectorAll<HTMLAnchorElement>(
@@ -129,8 +131,8 @@ export class NavIsland {
     // El rótulo de la barra plegada. Debajo de 880 los enlaces no están a
     // la vista, así que la marca que se les pone no la ve nadie: el
     // nombre de la sección se escribe también aquí. Lo que se copia es
-    // `data-lugar` si el enlace lo trae —el botón del mapa dice «Probar
-    // el mapa», que arriba no pega— y si no, su propio texto.
+    // `data-lugar` si el enlace lo trae —el botón del mapa dice «Ver el
+    // mapa en vivo», que arriba no pega— y si no, su propio texto.
     const lugar = isla.querySelector<HTMLElement>('[data-nav-lugar]');
 
     /*

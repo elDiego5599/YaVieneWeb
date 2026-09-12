@@ -191,10 +191,17 @@
             <a href="#problema" class="nav-link">El problema</a>
             <a href="/empresas.html" class="nav-link">Para empresas</a>
           </nav>
-          <!-- `data-lugar` es cómo se llama la sección, que no es lo que
-               dice el botón: arriba tiene que leerse «el mapa», no «probar
-               el mapa», que ahí ya no se está invitando a nada. -->
-          <a href="#mapa" class="nav-island-cta" data-lugar="El mapa">Probar el mapa</a>
+          <!-- El botón dice lo mismo que el del hero y el del pie: una sola
+               acción con un solo nombre. Antes aquí era «Probar el mapa», en
+               el hero «Ver el mapa en vivo» y en el pie «Probar mapa en
+               vivo»: tres frases para el mismo sitio, y quien las lee duda
+               de si son tres cosas. Se quedó la del hero porque es la que
+               dice qué hay al llegar —el mapa, y en vivo—, no una prueba.
+
+               `data-lugar` es cómo se llama la sección, que no es lo que
+               dice el botón: arriba tiene que leerse «el mapa», no «ver el
+               mapa en vivo», que ahí ya no se está invitando a nada. -->
+          <a href="#mapa" class="nav-island-cta" data-lugar="El mapa">Ver el mapa en vivo</a>
         </div>
       </div>
 
@@ -1712,20 +1719,12 @@
 
   <footer class="site-footer" id="pie">
     <div class="footer-cta">
-    <!-- Los 4 buses de las empresas en las esquinas del bloque, como los
-         puntos de la maqueta: puro adorno, fuera del flujo y del lector. -->
-    <div class="pie-buses" aria-hidden="true">
-      <img class="pie-bus pie-bus--arriba-izq animate-float-delayed" src="./src/assets/buses/sobusa.webp" alt="" width="280" height="350" loading="lazy" decoding="async" />
-      <img class="pie-bus pie-bus--arriba-der animate-float-delayed" src="./src/assets/buses/transmetro.webp" alt="" width="280" height="350" loading="lazy" decoding="async" />
-      <img class="pie-bus pie-bus--abajo-izq animate-float-delayed" src="./src/assets/buses/sodis.webp" alt="" width="280" height="350" loading="lazy" decoding="async" />
-      <img class="pie-bus pie-bus--abajo-der animate-float-delayed" src="./src/assets/buses/coolitoral.webp" alt="" width="280" height="350" loading="lazy" decoding="async" />
-    </div>
       <span class="tracked-eyebrow eyebrow--ambar">YA VIENE EN BARRANQUILLA</span>
       <h2>La ciudad se mueve contigo.</h2>
       <p>Menos adivinar, más llegar. Ya Viene convierte cada ruta de Barranquilla en una respuesta en tiempo real.</p>
       <div class="footer-actions">
         <a href="/empresas.html" class="btn-primary btn-green">Conecta tu flota</a>
-        <a href="#mapa" class="btn-outline">Probar mapa en vivo</a>
+        <a href="#mapa" class="btn-outline">Ver el mapa en vivo</a>
       </div>
       <p class="footer-cta-note">En movimiento con Sobusa y sus 6 rutas reales.</p>
     </div>
@@ -1744,7 +1743,7 @@
           <span>Explora</span>
           <a href="#solucion">Cómo funciona</a>
           <a href="#problema">El problema</a>
-          <a href="#mapa">Las rutas, en vivo</a>
+          <a href="#mapa">El mapa en vivo</a>
         </div>
         <div class="footer-nav-group">
           <span>Conecta</span>
