@@ -1371,25 +1371,45 @@
   list-style: none;
 }
 
+/* 42 de sangría: la baldosa de 28 del icono más 14 de aire hasta el
+   texto, la mitad de la baldosa, para que el icono se lea como la marca
+   de su línea y no como un dibujo suelto al lado del párrafo. */
 .empresa-lista li {
   position: relative;
-  padding-left: 28px;
+  padding-left: 42px;
   font-size: var(--step-body);
   line-height: 1.5;
   color: var(--text-secondary);
 }
 
-/* La marca de la lista es tipografía, no un icono: un carácter con color
-   de marca pesa lo justo y no añade una petición ni un SVG más. */
-.empresa-lista li::before {
-  content: '✓';
+/*
+  La marca de cada punto es el icono de lo que cuenta, en una baldosa
+  verde clara. Antes era un chulo tipográfico y los cuatro puntos se
+  veían iguales. La baldosa es la del
+  resto de fichas de la página: `--green-tint` de fondo y el verde
+  accesible encima, que en esa pareja da 5,2:1. 28 de lado con el icono
+  a 16 —el 57 %, lo que deja 6 de margen por lado— y radio 8, el de los
+  botones del panel. Va centrada con la primera línea y no con el
+  párrafo: `1.5em` es el alto de esa línea, así que la resta partida en
+  dos es lo que sobra o falta por arriba.
+*/
+.empresa-lista-ico {
   position: absolute;
-  left: 2px;
-  top: 0;
+  left: 0;
+  top: calc((1.5em - 28px) / 2);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--green-tint);
   color: var(--green-accessible);
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.6;
+}
+
+.empresa-lista-ico svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 /* El texto literal que sale en la pantalla del panel. Hereda el color de
