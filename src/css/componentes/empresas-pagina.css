@@ -1300,16 +1300,18 @@
   line-height: 1.55;
 }
 
-/* La pieza del panel que hace posible cada argumento. Versalitas como el
-   rótulo de sección, pero en tinta tenue y no en verde: el verde de la
-   página ya lo gasta el titular de arriba. Sobre la banda da 4,8:1. */
+/* La pieza del panel que hace posible cada argumento. Versalitas y en
+   verde, como el rótulo de sección: es lo que la empresa se lleva, y en
+   tinta tenue quedaba como una nota al pie de la columna. `--acento` y
+   no el verde de marca, que en letra de 12 no llega; sobre la banda da
+   5,3:1. */
 .empresa-razon-pieza {
   margin-top: 16px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
-  color: var(--tinta-tenue);
+  color: var(--acento);
 }
 
 /* ── Cómo se conecta: las dos columnas ─────────────────────────────── */

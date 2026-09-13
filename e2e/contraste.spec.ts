@@ -97,12 +97,12 @@ const MUESTRAS: Record<string, string[]> = {
     '.btn-green',
     '.form-submit-btn',
     // La cabecera del panel y las tres razones, que van sobre la banda:
-    // el rótulo y el titular en verde, la parte apagada del titular y la
-    // letra chica de cada columna.
+    // el rótulo, la parte en verde de los dos titulares —la de
+    // «Beneficios» ya no va apagada, así que en esta página no queda
+    // ningún `.apagado` que medir— y la letra chica de cada columna.
     '.seccion-rotulo',
     '.seccion-lead',
     '.acentuado',
-    '.apagado',
     '#beneficios .columna-texto',
     '.empresa-razon-pieza',
     // La atribución del plano, que salió del mapa a la página: letra de
