@@ -136,16 +136,21 @@ export class NavIsland {
     const lugar = isla.querySelector<HTMLElement>('[data-nav-lugar]');
 
     /*
-      Manda la última sección cuyo filo de arriba ya pasó por debajo de la
-      barra y que todavía no ha salido por ahí. La línea de corte es la
-      barra misma: lo que está tapado por ella no se está leyendo.
+      Manda la sección que cruza la línea de lectura: el 40 % del alto de
+      la ventana, algo por encima de la mitad, que es donde se posa la
+      vista al leer. La línea iba pegada debajo de la barra, y con una
+      sección corta detrás de una larga fallaba: en `empresas.html`
+      «Beneficios» mide 497 y el panel de encima 1072, así que con
+      «Beneficios» ya entera en la pantalla el panel seguía debajo de la
+      barra y era el que salía marcado. La barra queda como suelo, para
+      que en una ventana muy baja la línea no suba por detrás de ella.
 
       Con esa regla, en el hero y en el pie no manda ninguna —ninguna de
       las dos tiene enlace— y la barra se queda sin marca, que es lo
       honesto: no hay a qué apuntar.
     */
     const mirar = (): void => {
-      const linea = (cabecera?.offsetHeight ?? 0) + 8;
+      const linea = Math.max((cabecera?.offsetHeight ?? 0) + 8, window.innerHeight * 0.4);
       let manda: HTMLElement | null = null;
       for (const [seccion, enlace] of dianas) {
         const caja = seccion.getBoundingClientRect();
