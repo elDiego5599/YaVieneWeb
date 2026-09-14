@@ -682,14 +682,22 @@
   color: var(--bus-ghost);
 }
 
-/* La placa ocupa lo que sobra, como el `Expanded`. Los 3 de abajo son el
+/* La placa ocupa lo que sobra, como el `Expanded`. Rejilla de dos columnas
+   en vez de caja flexible: el texto suelto cae solo en la primera, de ancho
+   mínimo fijo, y el punto en la segunda. Así el punto queda siempre en la
+   misma x aunque las placas midan distinto (SFA-482 no mide igual que
+   TUH-513); con `flex` + `gap` el punto colgaba del texto y cada fila lo
+   ponía en un sitio. Si un día llega una placa más larga, la primera columna
+   crece (`max-content`) en vez de romper el texto. Los 3 de abajo son el
    `SizedBox` que la separa de la línea del conductor, que aquí va vacía:
    el GPS va en el bus y no hay nadie que inicie sesión. */
 .flota-fila-placa {
-  display: flex;
-  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(9ch, max-content) auto;
+  justify-content: start;
   align-items: center;
-  gap: calc(8 * var(--u));
+  column-gap: calc(8 * var(--u));
+  flex: 1;
   min-width: 0;
   margin-left: calc(12 * var(--u));
   padding-bottom: calc(3 * var(--u));
@@ -730,12 +738,17 @@
   color: var(--bus-ghost);
 }
 
-/* El interruptor y su rótulo: verde si el pasajero lo ve, gris si no. */
+/* El interruptor y su rótulo: verde si el pasajero lo ve, gris si no. Ancho
+   fijo y no flexible: «PERMITIDO» es más largo que «OCULTO» y sin esto la
+   columna se encoge al ocultar, y la píldora de la ruta y el lápiz se mueven
+   con ella. 68 cabe el rótulo largo en la fuente del panel con margen. */
 .flota-permiso {
   display: flex;
+  flex: none;
   flex-direction: column;
   align-items: center;
   gap: calc(2 * var(--u));
+  width: calc(68 * var(--u));
   margin-left: calc(2 * var(--u));
   color: var(--green);
   font-size: calc(8 * var(--u));
