@@ -6,18 +6,40 @@ on:
   pull_request:
     branches: [main]
 
+# Las acciones van en versiones que corren en Node 24: GitHub quita Node 20
+# de sus runners el 16 de septiembre de 2026 y las @v4 dejan de arrancar.
 jobs:
+  # Barrido de secretos (T3.12). gitleaks-action revisa los commits del push
+  # o del PR, no el árbol: no tiene modo sin git. Necesita el historial
+  # completo para ver lo que entró en cualquier commit del rango.
+  secretos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_VERSION: 8.30.1
+
   landing:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
 
       - name: Instalar dependencias
         run: npm ci
+
+      # Todas las dependencias de la web son de desarrollo, pero no por eso
+      # inocuas: Vite sirve la página en local y arma la build que se sube.
+      # Una vulnerabilidad alta o crítica en cualquiera de ellas tumba la CI.
+      - name: Auditoría de dependencias
+        run: npm audit --audit-level=high
 
       - name: Typecheck
         run: npm run typecheck
@@ -38,7 +60,7 @@ jobs:
       # ejecuciones y sólo se vuelve a descargar si cambia la versión de
       # Playwright que hay en el package-lock.
       - name: Caché de Chromium
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-navegador
         with:
           path: ~/.cache/ms-playwright
@@ -57,7 +79,9 @@ jobs:
 
       - name: Guardar el informe si algo falla
         if: failure()
-        uses: actions/upload-artifact@v4
+        # upload-artifact@v5 todavía corre en Node 20; la primera en Node 24
+        # es la v6.
+        uses: actions/upload-artifact@v6
         with:
           name: informe-playwright
           path: playwright-report/
