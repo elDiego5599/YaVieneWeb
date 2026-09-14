@@ -43,8 +43,10 @@
 #problema[data-cara='ciego'] .seccion-rotulo {
   /* El coral accesible no llega a 4.5:1 sobre el rosa de esta cara con
      letra fina: se oscurece solo aquí, sin tocar la variable que usan
-     los números grandes y las alertas. */
-  color: #871A0E;
+     los números grandes y las alertas. #871A0E tampoco llegaba: en móvil
+     el píxel que mide e2e/contraste.spec.ts es rgb(202,165,158) y daba
+     4.30:1. #7F180D da 4.60:1 sobre ese mismo rosa (fórmula WCAG). */
+  color: #7F180D;
 }
 
 #problema[data-cara='claro'] .seccion-rotulo {
