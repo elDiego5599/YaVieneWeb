@@ -60,3 +60,42 @@ describe('la copia dice lo mismo que los datos', () => {
     });
   }
 });
+
+/**
+ * La app avisa por distancia: cuando el bus entra a 1 km de donde está el
+ * pasajero (`alertRadiusMeters = 1000` en app_pasajero). No sabe de paradas
+ * ni calcula minutos. La web prometía «antes de que llegue a tu parada», que
+ * es otra cosa, y la promesa vive justo donde nadie la relee: la descripción,
+ * las tarjetas de compartir y el JSON-LD.
+ *
+ * Se mira la promesa, no toda la copia. «El bus puede tardar tres minutos o
+ * treinta» describe el problema, y las paradas del mockup son dibujo.
+ */
+describe('la web promete lo que la app hace', () => {
+  const RADIO_KM = 1;
+  const promesas = (html: string): string[] => [
+    ...Array.from(
+      html.matchAll(/<meta\s+(?:name|property)="(?:description|og:description|twitter:description)"\s+content="([^"]*)"/g),
+      (m) => m[1]
+    ),
+    ...Array.from(html.matchAll(/"description":\s*"([^"]*)"/g), (m) => m[1]),
+  ];
+
+  for (const pagina of PAGINAS) {
+    it(`${pagina} no promete parada ni minutos`, () => {
+      const html = leer(pagina);
+      expect(html).not.toMatch(/tu parada|su parada|antes de que llegue/i);
+      for (const texto of promesas(html)) {
+        expect(texto, texto).not.toMatch(/parada|minuto|\bmin\b/i);
+      }
+    });
+  }
+
+  it('index.html promete el radio de la app en los cuatro sitios', () => {
+    const avisos = promesas(leer('index.html')).filter((t) => /avisa/i.test(t));
+    expect(avisos).toHaveLength(4);
+    for (const texto of avisos) {
+      expect(texto).toContain(`a menos de ${RADIO_KM} km`);
+    }
+  });
+});

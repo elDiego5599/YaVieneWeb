@@ -5,8 +5,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ya Viene</title>
+  <!-- La promesa es la de la app, con su número: avisa por distancia, no
+       por tiempo ni por parada. «1 km» espeja `alertRadiusMeters = 1000`
+       (app_pasajero/lib/features/notifications/presentation/providers/
+       proximity_alerts_provider.dart). Va igual en la descripción, en las
+       dos tarjetas sociales y en el JSON-LD; si cambia el radio, cambian
+       las cuatro. -->
   <meta name="description"
-    content="Ya Viene: mira tu bus moverse en el mapa de Barranquilla en tiempo real y recibe un aviso automático antes de que llegue a tu parada." />
+    content="Ya Viene: mira tu bus moverse en el mapa de Barranquilla en tiempo real y te avisamos cuando tu bus esté a menos de 1 km." />
   <link rel="canonical" href="%VITE_SITE_URL%/" />
 
   <!-- Open Graph / Meta Social.
@@ -21,7 +27,7 @@
   <meta property="og:url" content="%VITE_SITE_URL%/" />
   <meta property="og:title" content="Ya Viene — Tu bus en tiempo real en Barranquilla" />
   <meta property="og:description"
-    content="Mira el bus moverse en el mapa y te avisamos antes de que llegue el tuyo. Seis rutas reales de Barranquilla." />
+    content="Mira el bus moverse en el mapa y te avisamos cuando tu bus esté a menos de 1 km. Seis rutas reales de Barranquilla." />
   <meta property="og:image" content="%VITE_SITE_URL%/og.png" />
   <meta property="og:image:secure_url" content="%VITE_SITE_URL%/og.png" />
   <meta property="og:image:type" content="image/png" />
@@ -33,7 +39,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Ya Viene — Tu bus en tiempo real en Barranquilla" />
   <meta name="twitter:description"
-    content="Mira el bus moverse en el mapa y te avisamos antes de que llegue el tuyo." />
+    content="Mira el bus moverse en el mapa y te avisamos cuando tu bus esté a menos de 1 km." />
   <meta name="twitter:image" content="%VITE_SITE_URL%/og.png" />
 
   <!--
@@ -64,7 +70,7 @@
           "url": "%VITE_SITE_URL%/",
           "logo": "%VITE_SITE_URL%/logo.svg",
           "image": "%VITE_SITE_URL%/og.png",
-          "description": "Ya Viene muestra el bus moverse en el mapa de Barranquilla en tiempo real y avisa al pasajero antes de que llegue a su parada.",
+          "description": "Ya Viene muestra el bus moverse en el mapa de Barranquilla en tiempo real y te avisa cuando tu bus esté a menos de 1 km.",
           "areaServed": {
             "@type": "City",
             "name": "Barranquilla",
