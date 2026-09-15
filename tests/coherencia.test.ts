@@ -98,4 +98,15 @@ describe('la web promete lo que la app hace', () => {
       expect(texto).toContain(`a menos de ${RADIO_KM} km`);
     }
   });
+
+  /**
+   * En iPhone el aviso solo suena con la app abierta: la app no declara
+   * `UIBackgroundModes` y no hay push. La pantalla de avisos de la app lo
+   * dice con esta frase, y el paso del aviso de la web, con la misma.
+   */
+  it('index.html dice en el paso del aviso que en iPhone suena con la app abierta', () => {
+    const paso = leer('index.html').match(/data-paso-boton="2"[\s\S]*?<\/button>/)?.[0] ?? '';
+    expect(paso, 'ya no está el paso del aviso').toContain('Te avisamos');
+    expect(paso).toContain('En iPhone el aviso suena con la app abierta.');
+  });
 });

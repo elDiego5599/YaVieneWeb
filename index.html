@@ -1343,10 +1343,16 @@
                   </button>
                 </li>
                 <li>
+                  <!--
+                    En iPhone el aviso solo suena con la app abierta: la app
+                    no declara segundo plano y no hay push. La pantalla de
+                    avisos de la app lo dice con la misma frase, y
+                    tests/coherencia.test.ts vigila que siga aquí.
+                  -->
                   <button type="button" class="paso-boton" data-paso-boton="2">
                     <span class="columna-indice">Paso 3</span>
                     <span class="columna-titulo">Te avisamos</span>
-                    <span class="paso-boton-texto"><span class="columna-texto">Activa el aviso y te notificamos cuando el bus esté a un kilómetro. Sigue con lo tuyo mientras tanto.</span></span>
+                    <span class="paso-boton-texto"><span class="columna-texto">Activa el aviso y te notificamos cuando el bus esté a un kilómetro. Sigue con lo tuyo mientras tanto. En iPhone el aviso suena con la app abierta.</span></span>
                   </button>
                 </li>
               </ol>
