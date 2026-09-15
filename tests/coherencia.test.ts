@@ -110,3 +110,35 @@ describe('la web promete lo que la app hace', () => {
     expect(paso).toContain('En iPhone el aviso suena con la app abierta.');
   });
 });
+
+/**
+ * Desde T6.9 (decisión D3) el pasajero no tiene cuenta: la app no pide
+ * correo ni contraseña, no tiene «Cerrar sesión» y no usa Firebase. Las
+ * páginas legales describían esa cuenta en varios sitios —qué guarda, cómo
+ * se borra, la contraseña, Firebase entre los apoyos— y un aviso legal que
+ * describe lo que la app ya no hace engaña igual que uno que se calla.
+ *
+ * Quien creó una cuenta en una versión anterior sí puede leer sobre ella:
+ * por eso se mira el texto que describe la app de hoy (títulos, la lista de
+ * apoyos, la contraseña, la sesión), no cada vez que sale la palabra.
+ */
+describe('lo legal no describe una cuenta que la app ya no tiene', () => {
+  const sinComentarios = (html: string): string => html.replace(/<!--[\s\S]*?-->/g, '');
+
+  for (const pagina of ['privacidad.html', 'terminos.html']) {
+    it(`${pagina} no habla de contraseña, de sesión ni de «tu cuenta» en un título`, () => {
+      const html = sinComentarios(leer(pagina));
+      expect(html).not.toMatch(/contraseña|sesión/i);
+      const titulos = Array.from(html.matchAll(/<h2>([^<]*)<\/h2>/g), (m) => m[1]);
+      expect(titulos.length, 'la página ya no tiene títulos').toBeGreaterThan(0);
+      expect(titulos.filter((t) => /cuenta/i.test(t))).toEqual([]);
+    });
+  }
+
+  it('privacidad.html ya no cuenta a Firebase entre los apoyos de la app', () => {
+    const apoyos =
+      sinComentarios(leer('privacidad.html')).match(/Con quién se apoya la app<\/h2>\s*<ul[\s\S]*?<\/ul>/)?.[0] ?? '';
+    expect(apoyos, 'ya no está la lista de apoyos').toContain('OpenStreetMap');
+    expect(apoyos).not.toMatch(/firebase/i);
+  });
+});

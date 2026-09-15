@@ -51,17 +51,17 @@
   </header>
 
   <main id="contenido" class="legal-hoja">
-    <p class="legal-fecha">Actualizado el 11 de septiembre de 2026</p>
+    <p class="legal-fecha">Actualizado el 15 de septiembre de 2026</p>
     <h1>Privacidad</h1>
     <p class="legal-entrada">Ya Viene es una aplicación para saber por dónde va tu bus. Para
       eso necesita muy poco, y lo poco que necesita casi todo se queda dentro de tu
       teléfono. Esta página dice exactamente qué es cada cosa.</p>
 
-    <h2>Lo que guarda tu cuenta</h2>
-    <p>Dos datos: tu correo electrónico y el nombre que se muestra. Nada más. Puedes
-      entrar con tu correo y una contraseña o con tu cuenta de Google; las cuentas las
-      administra Firebase Authentication, de Google, y la contraseña nunca la vemos
-      nosotros.</p>
+    <!-- Aquí iba «Lo que guarda tu cuenta». Desde T6.9 (decisión D3) la app
+         del pasajero no tiene cuenta: no pide correo, ni nombre, ni
+         contraseña, y no usa Firebase (app_router.dart arranca en el splash y
+         va a la bienvenida o al mapa). Las cuentas de versiones anteriores se
+         cuentan al final, en «Si usaste una versión anterior». -->
 
     <h2>Tu ubicación no sale del teléfono</h2>
     <p>La app te pide permiso de ubicación para dos cosas: centrar el mapa donde estás y
@@ -87,13 +87,15 @@
          mismos topes que el código: 50 entradas, 30 días, los activos nunca se
          purgan. La copia de Android la excluyen backup_rules.xml y
          data_extraction_rules.xml; iOS no tiene esa exclusión, por eso se dice
-         aparte. -->
+         aparte. El punto de espera ya no se borra al cerrar sesión, porque
+         desde T6.9 no hay sesión: se quita con «Quitar» en la píldora de
+         ubicación del mapa (location_status_chip.dart → clearManualPin). -->
     <h2>Lo que se queda guardado en tu teléfono</h2>
     <p>Algunas cosas sí se guardan, pero solo dentro del teléfono, en el espacio privado
       de la app. Ninguna se manda a un servidor:</p>
     <ul class="legal-lista">
       <li><strong>El punto de espera</strong> que hayas marcado a mano, para no tener que
-        volver a marcarlo. Se borra al cerrar sesión.</li>
+        volver a marcarlo. Lo quitas con «Quitar», en el mismo mapa.</li>
       <li><strong>Tus avisos.</strong> Por cada bus al que le activaste uno: el bus, la
         ruta, cuándo lo activaste, cuándo sonó y, si lo activaste sobre un punto marcado a
         mano, ese punto. Es lo que deja que un aviso siga vivo aunque cierres la app. Se
@@ -115,20 +117,28 @@
       y la velocidad. Eso es un vehículo de servicio público en su recorrido, y es lo que
       hace posible que tú lo veas en el mapa.</p>
 
+    <!-- Firebase salió de esta lista en T6.9: sin cuenta no hay registro ni
+         inicio de sesión, y la app ya no lo lleva dentro (pubspec.yaml sin
+         firebase_core, firebase_auth ni google_sign_in). -->
     <h2>Con quién se apoya la app</h2>
     <ul class="legal-lista">
-      <li><strong>Firebase (Google)</strong> — el registro y el inicio de sesión.</li>
       <li><strong>OpenStreetMap y CARTO</strong> — las imágenes del mapa. Se descargan
         como cualquier imagen de una página; no llevan quién eres.</li>
       <li><strong>Servidores propios</strong> — las posiciones de los buses pasan por
         infraestructura nuestra, no por un servicio ajeno.</li>
     </ul>
 
-    <h2>Borrar tu cuenta</h2>
-    <p>Escríbenos por WhatsApp al 300 443 8626 y la eliminamos junto con el correo y el
-      nombre asociados. En nuestros servidores no hay nada más tuyo, así que allá no queda
-      nada. Lo que la app guardó en tu teléfono lo borras tú: desinstalándola, o desde la
-      app, cerrando sesión y borrando tus avisos.</p>
+    <!-- Antes «Borrar tu cuenta». Las cuentas creadas antes de T6.9 siguen en
+         Firebase Authentication hasta que se borren, así que quien tenga una
+         debe saber que existe, qué guarda y cómo pedir que se borre. El
+         título no dice «cuenta» a propósito: tests/coherencia.test.ts vigila
+         que ningún título describa una cuenta que la app de hoy no tiene. -->
+    <h2>Si usaste una versión anterior</h2>
+    <p>Las primeras versiones de prueba pedían entrar con un correo o con Google; la de
+      hoy ya no. Si creaste una cuenta entonces, en ella quedaron dos datos, tu correo y
+      el nombre que se mostraba, guardados en Firebase Authentication, de Google. En
+      nuestros servidores no hay nada más tuyo. Escríbenos por WhatsApp al 300 443 8626 y
+      la borramos.</p>
 
     <h2>Cambios</h2>
     <p>Si algo de esto cambia, cambia también esta página y su fecha. Ya Viene está en
