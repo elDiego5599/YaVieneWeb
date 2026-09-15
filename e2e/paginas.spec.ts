@@ -303,3 +303,34 @@ test.describe('el mapa en vivo con el teclado', () => {
     expect(await page.evaluate(() => window.scrollY)).toBe(alto);
   });
 });
+
+test.describe('el mapa en vivo dice que es una simulación', () => {
+  /*
+    Los dos buses del mapa los mueve la propia página (src/mapa-vivo.ts):
+    no hay un bus de verdad detrás. La entrada de la sección lo decía, pero
+    el mapa se mira sin leer lo de arriba, y un bus que avanza sobre rutas
+    reales se lee como uno real. Por eso el mapa lleva su propio rótulo
+    (T6.10, decisión D8). Aquí se mira que esté dentro del mapa y que se vea
+    entero: el lienzo recorta lo que se sale (`overflow: hidden`), así que en
+    el móvil un rótulo que no cabe se cortaría sin que nada fallara. Su
+    contraste lo mide contraste.spec.ts.
+  */
+  test('el mapa lleva el rótulo «Simulación» y se ve entero', async ({ page }) => {
+    await page.goto('/');
+    const lienzo = page.locator('[data-mapa-lienzo]');
+    const rotulo = lienzo.locator('[data-mapa-simulacion]');
+    await expect(rotulo, 'el mapa no lleva el rótulo').toHaveCount(1);
+    await rotulo.scrollIntoViewIfNeeded();
+    await expect(rotulo).toBeVisible();
+    await expect(rotulo).toHaveText('Simulación');
+
+    const caja = await rotulo.boundingBox();
+    const marco = await lienzo.boundingBox();
+    expect(caja, 'el rótulo no tiene caja').not.toBeNull();
+    expect(marco, 'el mapa no tiene caja').not.toBeNull();
+    expect(caja!.x).toBeGreaterThanOrEqual(marco!.x);
+    expect(caja!.y).toBeGreaterThanOrEqual(marco!.y);
+    expect(caja!.x + caja!.width).toBeLessThanOrEqual(marco!.x + marco!.width);
+    expect(caja!.y + caja!.height).toBeLessThanOrEqual(marco!.y + marco!.height);
+  });
+});
