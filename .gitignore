@@ -3,6 +3,14 @@ dist/
 .vite/
 *.local
 
+# Los ficheros de entorno se quedan en cada máquina: sólo viaja la
+# plantilla. Hoy en `.env` iría el dominio, que es público, pero es el
+# sitio donde se escribirá la siguiente variable y ésa sí puede ser una
+# clave. El valor con el que se publica lo pone Vercel en el proyecto.
+.env
+.env.*
+!.env.example
+
 .DS_Store
 .idea/
 .vscode/

@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -7,7 +8,8 @@ import { afterAll, describe, expect, it } from 'vitest';
 
 /**
  * Lo que se publica y no se ve leyendo las páginas: las cabeceras que manda
- * Vercel y lo que la construcción escribe a partir de `VITE_SITE_URL`.
+ * Vercel, lo que la construcción escribe a partir de `VITE_SITE_URL` y qué
+ * ficheros de entorno viajan dentro del repositorio.
  *
  * Entorno `node` y no happy-dom: aquí se construye la web de verdad, y un
  * DOM falso en los globales no pinta nada en una construcción.
@@ -60,9 +62,9 @@ describe('las cabeceras de seguridad de vercel.json', () => {
 
 /*
   Dos construcciones reales, una con dominio y otra sin la variable. El
-  `.env` del repo la trae vacía, así que la de «sin definir» usa una carpeta
-  de entorno vacía: es lo que pasa en una máquina o un CI donde ese fichero
-  no está.
+  `.env` de cada máquina puede traer lo que sea, así que la de «sin definir»
+  usa una carpeta de entorno vacía: es lo que pasa en un CI, donde ese
+  fichero no está.
 */
 const temporales: string[] = [];
 
@@ -143,4 +145,36 @@ describe('la construcción y VITE_SITE_URL', () => {
     // toma por recurso y copia con hash a assets/.
     expect(readdirSync(join(salida, 'assets')).filter((f) => f.endsWith('.html'))).toEqual([]);
   }, 120_000);
+});
+
+/*
+  Un fichero de entorno rastreado es una puerta que queda abierta. En `.env`
+  hoy va sólo `VITE_SITE_URL`, que no es secreto —el dominio es público—,
+  pero es el sitio donde se escribirá la siguiente variable, y ésa sí puede
+  ser una clave: entraría al repositorio sin que nadie la mirase, porque un
+  fichero que ya estaba no se revisa. Así que viaja la plantilla y nada más;
+  el valor de trabajo se queda en cada máquina y el de publicación lo pone
+  Vercel en el proyecto.
+*/
+describe('los ficheros de entorno no viajan en el repositorio', () => {
+  const git = (...argumentos: string[]) =>
+    spawnSync('git', argumentos, { cwd: raiz, encoding: 'utf8' });
+
+  it('sólo la plantilla está rastreada', () => {
+    const salida = git('ls-files', '-z', '--', '.env', '.env.*');
+    expect(salida.error ?? salida.status, 'no se pudo preguntar a git').toBe(0);
+    expect(salida.stdout.split('\0').filter(Boolean)).toEqual(['.env.example']);
+  });
+
+  it('las reglas de ignorado tapan cualquier .env menos la plantilla', () => {
+    // `--no-index` mira las reglas y no lo que ya esté rastreado: lo que se
+    // exige es que la regla exista, no que hoy dé la casualidad.
+    const ignorado = (nombre: string): boolean =>
+      git('check-ignore', '--no-index', '-q', '--', nombre).status === 0;
+
+    for (const nombre of ['.env', '.env.local', '.env.production', '.env.development']) {
+      expect(ignorado(nombre), `${nombre} debería estar ignorado`).toBe(true);
+    }
+    expect(ignorado('.env.example'), 'la plantilla tiene que seguir viajando').toBe(false);
+  });
 });

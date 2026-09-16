@@ -30,15 +30,17 @@ Las cuatro últimas son las que corre la integración continua en cada
 
 ## Antes de publicar
 
-`VITE_SITE_URL` está **vacía** en `.env`. De esa única variable salen la
-etiqueta canónica, las de Open Graph, los datos estructurados, el
-`robots.txt` y el `sitemap.xml`. Mientras siga vacía, las rutas quedan
-relativas y no se generan los dos ficheros — la build lo avisa por
-consola. El día que haya dominio se rellena esa línea y ya.
+De `VITE_SITE_URL` salen la etiqueta canónica, las de Open Graph, los
+datos estructurados, el `robots.txt` y el `sitemap.xml`. Si está vacía —o
+si no está— las rutas quedan relativas y no se generan esos dos ficheros;
+la build lo avisa por consola.
 
-En Vercel esa variable ya está puesta en el proyecto, así que lo
-publicado sí lleva URL absoluta, `robots.txt` y `sitemap.xml`. El `.env`
-del repo se queda vacío a propósito: es el valor de trabajo local.
+En Vercel la variable está puesta en el proyecto, así que lo publicado sí
+lleva URL absoluta, `robots.txt` y `sitemap.xml`. Para trabajar en local,
+`cp .env.example .env` y se deja vacía, o se rellena para ver cómo queda
+lo que se comparte. Ese `.env` no viaja en el repositorio —sólo la
+plantilla—: una clave escrita ahí por descuido no se va con un `push`, y
+lo que Vercel tenga puesto le gana igual al fichero.
 
 ## Cabeceras
 
