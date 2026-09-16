@@ -9,9 +9,9 @@
  *
  * Lo único simulado son los buses. Las rutas, los kilómetros, las
  * distancias y el texto del aviso salen del repositorio; el bus de esta
- * página avanza a un ritmo fijo porque aquí no hay un conductor con la app
- * abierta. La sección lo dice con todas las letras encima del mapa: no hay
- * nada que aparentar.
+ * página avanza a un ritmo fijo porque aquí no hay un GPS de verdad
+ * emitiendo desde un vehículo. La sección lo dice con todas las letras
+ * encima del mapa: no hay nada que aparentar.
  *
  * Todo vive en el espacio de usuario del SVG —pin, buses y radio son
  * elementos SVG, no divs en porcentajes—, así que el mapa se puede

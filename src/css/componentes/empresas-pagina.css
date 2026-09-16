@@ -689,8 +689,9 @@
    TUH-513); con `flex` + `gap` el punto colgaba del texto y cada fila lo
    ponía en un sitio. Si un día llega una placa más larga, la primera columna
    crece (`max-content`) en vez de romper el texto. Los 3 de abajo son el
-   `SizedBox` que la separa de la línea del conductor, que aquí va vacía:
-   el GPS va en el bus y no hay nadie que inicie sesión. */
+   `SizedBox` que la separa de la línea del nombre del conductor
+   (`fleet_list_tile.dart`, `if (bus.driverName != null)`), que aquí va
+   vacía porque ningún bus del maquetado lo trae asignado. */
 .flota-fila-placa {
   display: grid;
   grid-template-columns: minmax(9ch, max-content) auto;
