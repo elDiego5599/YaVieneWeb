@@ -38,8 +38,9 @@
   El 404 de una app que sabe decir «no sé».
 
   Cuando un bus lleva cinco minutos sin reportar, la app no enseña su
-  última posición como si fuera la de ahora: lo apaga al gris de
-  `bus_marker.dart` y dice que no sabe. Esta página es esa misma regla
+  última posición como si fuera la de ahora: le cambia el ícono por el
+  fantasma de `map_markers.dart` —el gris de `AppColors.textDisabled`,
+  sin sombra ni parabrisas— y dice que no sabe. Esta página es esa misma regla
   aplicada a una dirección que no existe —de ahí el gris del número y de
   ahí el texto—, y por eso no hay mapa de adorno ni ruta inventada: no
   habría nada de verdad que dibujar.
