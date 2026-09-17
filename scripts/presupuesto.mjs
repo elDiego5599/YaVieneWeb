@@ -131,12 +131,10 @@ const TOPES = {
 };
 
 /** Lo que el navegador se baja de verdad al abrir la portada por primera
- *  vez. El resto de dist (las otras tres páginas, los subconjuntos
- *  latin-ext, la imagen para redes) no entra en esta cuenta porque en esa
- *  visita no se pide. */
+ *  vez. El resto de dist (las otras tres páginas, la imagen para redes) no
+ *  entra en esta cuenta porque en esa visita no se pide. */
 const NO_ENTRA_EN_LA_PRIMERA_VISITA = [
   /^(privacidad|terminos|404|empresas)\.html$/,
-  /latin-ext-[^/]*\.woff2$/,
   /^og\.png$/,
   /^logo\.svg$/,
   /^(hoja|404|accesibilidad)-[^/]*\.js$/,
