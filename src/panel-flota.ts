@@ -23,16 +23,68 @@
 export type Estado = 'todos' | 'linea' | 'ocultos' | 'sin-senal';
 
 /**
- * Lo que el panel sabe de un bus. `isGhost` no está: es el bus que el
- * servidor da por muerto aunque siga mandando posiciones, y en esta flota
- * no hay ninguno, así que `online && !isGhost` se queda en `online`.
+ * Lo que el panel sabe de un bus. `isGhost` es el que lleva más de 90 s sin
+ * mandar posición con el turno todavía abierto. Cuando el servidor lo marca
+ * así, `online` baja con él: «en línea es haber reportado y no ser
+ * fantasma», dice el oyente de `bus:position` en `fleet_providers.dart`.
  */
 export interface Bus {
   placa: string;
   ruta: string;
   online: boolean;
+  isGhost: boolean;
   visible: boolean;
 }
+
+/**
+ * `BusEstado` (`bus_estado.dart`): en qué situación está un bus para el
+ * operador. De aquí salen el icono y el color de la fila, la ficha, el
+ * marcador y la leyenda, así que las cuatro piezas no pueden contar
+ * historias distintas.
+ */
+export type BusEstado = 'en-linea' | 'inactivo' | 'sin-senal' | 'oculto';
+
+/** `BusEstado.values`, en su orden, que es el de los renglones de la leyenda. */
+export const BUS_ESTADOS: readonly BusEstado[] = ['en-linea', 'inactivo', 'sin-senal', 'oculto'];
+
+/**
+ * `BusEstado.de`, con su misma precedencia. «Oculto» va primero porque es
+ * lo que explica que el pasajero no lo vea y lo único que el operador
+ * decidió a mano; después, el fantasma es «Inactivo» transmita o no.
+ */
+export function estadoDe(bus: Bus): BusEstado {
+  if (!bus.visible) return 'oculto';
+  if (bus.isGhost) return 'inactivo';
+  return bus.online ? 'en-linea' : 'sin-senal';
+}
+
+/** `BusEstado.rotulo`. */
+export const ROTULO: Readonly<Record<BusEstado, string>> = {
+  'en-linea': 'En línea',
+  inactivo: 'Inactivo',
+  'sin-senal': 'Sin señal',
+  oculto: 'Oculto',
+};
+
+/** `_explicacion` de `fleet_list_tile.dart`: el aviso que sale al pasar sobre el icono. */
+export const EXPLICACION: Readonly<Record<BusEstado, string>> = {
+  'en-linea': 'En línea: el bus está transmitiendo',
+  inactivo: 'Inactivo: lleva más de 90 s sin reportar, pero el turno sigue abierto',
+  'sin-senal': 'Sin señal: el bus no está transmitiendo',
+  oculto: 'Oculto: lo quitaste del mapa de los pasajeros',
+};
+
+/**
+ * `BusEstado.icono`, como el símbolo que lo guarda en el HTML:
+ * `wifi_tethering`, `pause_circle_outline`, `wifi_off` y `visibility_off`.
+ * El de «Oculto» es el mismo ojo tachado del botón de ocultar.
+ */
+export const ICONO: Readonly<Record<BusEstado, string>> = {
+  'en-linea': '#fi-emitiendo',
+  inactivo: '#fi-pausa',
+  'sin-senal': '#fi-sin-senal',
+  oculto: '#fi-ocultar',
+};
 
 /** El catálogo de rutas, con el nombre que sale en la píldora y en el chip. */
 export const RUTAS: Readonly<Record<string, string>> = {
@@ -42,19 +94,22 @@ export const RUTAS: Readonly<Record<string, string>> = {
 
 /**
  * La flota de partida, en el orden de la lista: por identificador de bus,
- * que es como la ordena `fleetList`. En cada ruta hay uno sin señal y en
- * Tcherassi además uno oculto, para que cada pestaña tenga algo que
+ * que es como la ordena `fleetList`. Cada ruta tiene uno que no transmite
+ * y Tcherassi además uno oculto, para que cada pestaña tenga algo que
  * enseñar y la de «Ocultos» de Vivero Paraíso salga vacía hasta que se
- * oculte uno.
+ * oculte uno. El de Vivero Paraíso es el inactivo, LMR-826: así los cuatro
+ * estados de la leyenda tienen un bus en el mapa, y la ruta con la que
+ * abre la página enseña los tres que se ven a la primera —en línea, sin
+ * señal, oculto—.
  */
 export const FLOTA: readonly Bus[] = [
-  { placa: 'SFA-482', ruta: 'tcherassi', online: true, visible: true },
-  { placa: 'TUH-513', ruta: 'tcherassi', online: true, visible: true },
-  { placa: 'DMV-238', ruta: 'tcherassi', online: false, visible: true },
-  { placa: 'WNP-659', ruta: 'tcherassi', online: true, visible: false },
-  { placa: 'KJT-704', ruta: 'vivero', online: true, visible: true },
-  { placa: 'BQX-391', ruta: 'vivero', online: true, visible: true },
-  { placa: 'LMR-826', ruta: 'vivero', online: false, visible: true },
+  { placa: 'SFA-482', ruta: 'tcherassi', online: true, isGhost: false, visible: true },
+  { placa: 'TUH-513', ruta: 'tcherassi', online: true, isGhost: false, visible: true },
+  { placa: 'DMV-238', ruta: 'tcherassi', online: false, isGhost: false, visible: true },
+  { placa: 'WNP-659', ruta: 'tcherassi', online: true, isGhost: false, visible: false },
+  { placa: 'KJT-704', ruta: 'vivero', online: true, isGhost: false, visible: true },
+  { placa: 'BQX-391', ruta: 'vivero', online: true, isGhost: false, visible: true },
+  { placa: 'LMR-826', ruta: 'vivero', online: false, isGhost: true, visible: true },
 ];
 
 /** El `switch (statusFilter)` de `fleetList`. */
@@ -63,11 +118,11 @@ export function pasaElFiltro(bus: Bus, estado: Estado): boolean {
     case 'todos':
       return true;
     case 'linea':
-      return bus.online;
+      return bus.online && !bus.isGhost;
     case 'ocultos':
       return !bus.visible;
     case 'sin-senal':
-      return !bus.online;
+      return !bus.online || bus.isGhost;
   }
 }
 
@@ -82,33 +137,35 @@ export const lista = (buses: readonly Bus[], ruta: string, estado: Estado): Bus[
 /**
  * Las cifras de las pestañas: `totalBuses`, `onlineBuses`, `hiddenBuses` y
  * `offlineBuses`. Todas de la ruta y ninguna del filtro de estado, así que
- * no cambian al pasar de una pestaña a otra.
+ * no cambian al pasar de una pestaña a otra. Se solapan a propósito, como
+ * allá: son filtros y no estados, y el oculto que transmite está en «En
+ * línea» y en «Ocultos» a la vez.
  */
 export function cuentas(buses: readonly Bus[], ruta: string): Record<Estado, number> {
   const r = deLaRuta(buses, ruta);
   return {
     todos: r.length,
-    linea: r.filter((b) => b.online).length,
-    ocultos: r.filter((b) => !b.visible).length,
-    'sin-senal': r.filter((b) => !b.online).length,
+    linea: r.filter((b) => pasaElFiltro(b, 'linea')).length,
+    ocultos: r.filter((b) => pasaElFiltro(b, 'ocultos')).length,
+    'sin-senal': r.filter((b) => pasaElFiltro(b, 'sin-senal')).length,
   };
 }
 
 /**
- * Las de la leyenda del mapa, que no son las de las pestañas: aquí «En
- * línea» es lo que el pasajero ve en verde, así que el oculto que
- * transmite no entra (`control_map.dart`, `_Legend`).
+ * Las de la leyenda del mapa, que no son las de las pestañas: cada bus de
+ * la ruta cae en un estado y sólo en uno, así que las cuatro suman el
+ * total (el `conteo` de `ControlMap.build`). El oculto que transmite cuenta
+ * como oculto y no como en línea.
  */
-export function leyenda(
-  buses: readonly Bus[],
-  ruta: string
-): { linea: number; 'sin-senal': number; ocultos: number } {
-  const r = deLaRuta(buses, ruta);
-  return {
-    linea: r.filter((b) => b.online && b.visible).length,
-    'sin-senal': r.filter((b) => !b.online).length,
-    ocultos: r.filter((b) => !b.visible).length,
+export function leyenda(buses: readonly Bus[], ruta: string): Record<BusEstado, number> {
+  const conteo: Record<BusEstado, number> = {
+    'en-linea': 0,
+    inactivo: 0,
+    'sin-senal': 0,
+    oculto: 0,
   };
+  for (const b of deLaRuta(buses, ruta)) conteo[estadoDe(b)] += 1;
+  return conteo;
 }
 
 /** `_emptyMessage`, con una ruta siempre elegida. */
@@ -238,28 +295,37 @@ export class PanelFlota {
 
     for (const fila of this.filas) {
       const bus = this.bus(fila.dataset.bus!);
+      const estado = estadoDe(bus);
       const elegida = bus.placa === this.elegido;
       fila.hidden = !enLista.has(bus.placa);
+      fila.dataset.busEstado = estado;
       fila.classList.toggle('es-elegida', elegida);
       fila.classList.toggle('flota-fila--oculta', !bus.visible);
-      fila.querySelector('[data-accion="elegir"]')!.setAttribute('aria-pressed', String(elegida));
+      // El icono junto a la placa, con el aviso de `Tooltip` en su
+      // `<title>`. El lector de pantalla no lo recorre: el rótulo ya va en
+      // el nombre del botón de la fila, que es lo que sí se recorre.
+      fila.querySelector('.flota-fila-placa use')!.setAttribute('href', ICONO[estado]);
+      fila.querySelector('.flota-fila-placa title')!.textContent = EXPLICACION[estado];
+      const elegir = fila.querySelector('[data-accion="elegir"]')!;
+      elegir.setAttribute('aria-pressed', String(elegida));
+      elegir.setAttribute('aria-label', `Elegir ${bus.placa}, ${ROTULO[estado].toLowerCase()}`);
       fila.querySelector('[data-accion="visibilidad"]')!.setAttribute('aria-checked', String(bus.visible));
       fila.querySelector('.flota-permiso-texto')!.textContent = bus.visible ? 'PERMITIDO' : 'OCULTO';
     }
 
     // El marcador sale de la misma `fleetList` que la lista: lo que el
-    // filtro quita de una lo quita del otro. Verde sólo si transmite y el
-    // pasajero lo ve, como `active:` en `_buildMarker`.
+    // filtro quita de una lo quita del otro. Cómo se dibuja lo dice su
+    // estado, el mismo `BusEstado.de` que pinta la fila.
     for (const m of this.marcadores) {
       const bus = this.bus(m.dataset.bus!);
       const elegido = bus.placa === this.elegido;
       m.classList.toggle('es-fuera', !enLista.has(bus.placa));
-      m.classList.toggle('es-activo', bus.online && bus.visible);
+      m.dataset.busEstado = estadoDe(bus);
       m.classList.toggle('es-elegido', elegido);
     }
 
     for (const c of this.cifrasLeyenda) {
-      c.textContent = String(cifrasMapa[c.dataset.leyenda as keyof typeof cifrasMapa]);
+      c.textContent = String(cifrasMapa[c.dataset.leyenda as BusEstado]);
     }
 
     // El botón de la barra ofrece lo contrario de lo que hay: ocultar
@@ -285,9 +351,11 @@ export class PanelFlota {
     if (!bus) return;
 
     const campo = (nombre: string): Element => this.ficha.querySelector(`[data-ficha="${nombre}"]`)!;
-    this.ficha.classList.toggle('flota-ficha--sin-senal', !bus.online);
+    const estado = estadoDe(bus);
+    this.ficha.dataset.busEstado = estado;
     campo('placa').textContent = bus.placa;
-    campo('estado').textContent = bus.online ? 'En línea' : 'Sin señal';
+    campo('estado').textContent = ROTULO[estado];
+    campo('estado-icono').setAttribute('href', ICONO[estado]);
     campo('ruta').textContent = RUTAS[bus.ruta];
     campo('ocultar').textContent = bus.visible ? 'Ocultar' : 'Mostrar';
     campo('ocultar-icono').setAttribute('href', bus.visible ? '#fi-ocultar' : '#fi-mostrar');

@@ -208,6 +208,11 @@
                   <symbol id="fi-editar" viewBox="0 0 24 24"><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z" /></symbol>
                   <symbol id="fi-cerrar" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" /></symbol>
                   <symbol id="fi-borrar" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4z" /></symbol>
+                  <symbol id="fi-emitiendo" viewBox="0 0 24 24"><path d="M12 11.02c-1.08 0-2.02.89-2.02 1.96 0 1.13.94 2.02 2.02 2.02 1.08 0 2.02-.89 2.02-2.02 0-1.07-.94-1.96-2.02-1.96zm6 1.96c0-3.28-2.67-6-6-6-3.33 0-6 2.72-6 6 0 2.25 1.22 4.18 3 5.21l.98-1.74c-1.17-.7-1.96-1.97-1.96-3.47 0-2.2 1.78-3.98 3.98-3.98 2.2 0 3.98 1.78 3.98 3.98 0 1.5-.79 2.77-1.96 3.47l.98 1.74c1.78-1.03 3-2.96 3-5.21zm-6-9.98c-5.53 0-9.98 4.5-9.98 9.98 0 3.71 2.01 6.94 4.96 8.68l.99-1.74c-2.35-1.4-3.99-3.98-3.99-6.94 0-4.4 3.61-7.96 8.02-7.96 4.41 0 8.02 3.56 8.02 7.96 0 2.96-1.64 5.54-4.04 6.94l1.04 1.74c2.95-1.74 4.96-4.97 4.96-8.68 0-5.48-4.45-9.98-9.98-9.98z" /></symbol>
+                  <symbol id="fi-pausa" viewBox="0 0 24 24"><path d="M9 15.98h2.02v-7.96h-2.02v7.96zm3-13.96c-5.53 0-9.98 4.45-9.98 9.98 0 5.53 4.45 9.98 9.98 9.98 5.53 0 9.98-4.45 9.98-9.98 0-5.53-4.45-9.98-9.98-9.98zm0 18c-4.41 0-8.02-3.61-8.02-8.02 0-4.41 3.61-8.02 8.02-8.02 4.41 0 8.02 3.61 8.02 8.02 0 4.41-3.61 8.02-8.02 8.02zm.98-4.04h2.02v-7.96h-2.02v7.96z" /></symbol>
+                  <symbol id="fi-sin-senal" viewBox="0 0 24 24"><path d="M22.97 9c-3.8-3.84-9.19-5.25-14.11-4.22l2.48 2.53c3.47-.19 6.99 1.03 9.66 3.71l1.97-2.02zm-3.99 3.98c-1.26-1.26-2.81-2.1-4.5-2.53l3.57 3.52.93-.99zm-16.96-9.93 3.04 3.04c-1.45.71-2.86 1.69-4.08 2.91l2.02 2.02c1.22-1.27 2.67-2.16 4.17-2.77l2.25 2.2c-1.59.43-3.14 1.27-4.4 2.53v.05l1.96 1.97c1.36-1.36 3.14-2.06 4.93-2.06l7.07 7.08 1.27-1.27-16.97-16.97-1.26 1.27zm6.98 13.97 3 3 3-3c-1.64-1.69-4.36-1.69-6 0z" /></symbol>
+                  <!-- El aro punteado del bus del mapa: ver `.flota-trazo`. -->
+                  <symbol id="fi-trazo" viewBox="0 0 17.6 33"><path d="M0 24.2V8.8a8.8 8.8 0 0 1 17.6 0v15.4a8.8 8.8 0 0 1-17.6 0z" /></symbol>
                   <symbol id="fi-ruta" viewBox="0 0 24 24"><path d="M19 15.18V7c0-2.21-1.79-4-4-4s-4 1.79-4 4v10c0 1.1-.9 2-2 2s-2-.9-2-2V8.82C8.16 8.4 9 7.3 9 6c0-1.66-1.34-3-3-3S3 4.34 3 6c0 1.3.84 2.4 2 2.82V17c0 2.21 1.79 4 4 4s4-1.79 4-4V7c0-1.1.9-2 2-2s2 .9 2 2v8.18c-1.16.41-2 1.51-2 2.82 0 1.66 1.34 3 3 3s3-1.34 3-3c0-1.3-.84-2.4-2-2.82z" /></symbol>
                 </svg>
 
@@ -273,58 +278,58 @@
                          el interruptor va por encima con el suyo, como el
                          `Switch` dentro del `InkWell` de la fila. -->
                     <ul class="flota-buses">
-                      <li class="flota-fila es-elegida" data-bus="SFA-482">
-                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="true" aria-label="Elegir SFA-482"></button>
+                      <li class="flota-fila es-elegida" data-bus="SFA-482" data-bus-estado="en-linea">
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="true" aria-label="Elegir SFA-482, en línea"></button>
                         <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
-                        <span class="flota-fila-placa">SFA-482<i></i></span>
+                        <span class="flota-fila-placa">SFA-482<svg class="flota-ico" data-accion="elegir" aria-hidden="true"><title>En línea: el bus está transmitiendo</title><use href="#fi-emitiendo" /></svg></span>
                         <span class="flota-chip">Tcherassi</span>
                         <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
                         <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="true" aria-label="SFA-482 visible para los pasajeros"></button><span class="flota-permiso-texto">PERMITIDO</span></span>
                       </li>
-                      <li class="flota-fila" data-bus="TUH-513">
-                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir TUH-513"></button>
+                      <li class="flota-fila" data-bus="TUH-513" data-bus-estado="en-linea">
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir TUH-513, en línea"></button>
                         <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
-                        <span class="flota-fila-placa">TUH-513<i></i></span>
+                        <span class="flota-fila-placa">TUH-513<svg class="flota-ico" data-accion="elegir" aria-hidden="true"><title>En línea: el bus está transmitiendo</title><use href="#fi-emitiendo" /></svg></span>
                         <span class="flota-chip">Tcherassi</span>
                         <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
                         <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="true" aria-label="TUH-513 visible para los pasajeros"></button><span class="flota-permiso-texto">PERMITIDO</span></span>
                       </li>
-                      <li class="flota-fila flota-fila--sin-senal" data-bus="DMV-238">
+                      <li class="flota-fila flota-fila--sin-senal" data-bus="DMV-238" data-bus-estado="sin-senal">
                         <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir DMV-238, sin señal"></button>
                         <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
-                        <span class="flota-fila-placa">DMV-238<i></i></span>
+                        <span class="flota-fila-placa">DMV-238<svg class="flota-ico" data-accion="elegir" aria-hidden="true"><title>Sin señal: el bus no está transmitiendo</title><use href="#fi-sin-senal" /></svg></span>
                         <span class="flota-chip">Tcherassi</span>
                         <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
                         <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="true" aria-label="DMV-238 visible para los pasajeros"></button><span class="flota-permiso-texto">PERMITIDO</span></span>
                       </li>
-                      <li class="flota-fila flota-fila--oculta" data-bus="WNP-659">
-                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir WNP-659"></button>
+                      <li class="flota-fila flota-fila--oculta" data-bus="WNP-659" data-bus-estado="oculto">
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir WNP-659, oculto"></button>
                         <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
-                        <span class="flota-fila-placa">WNP-659<i></i></span>
+                        <span class="flota-fila-placa">WNP-659<svg class="flota-ico" data-accion="elegir" aria-hidden="true"><title>Oculto: lo quitaste del mapa de los pasajeros</title><use href="#fi-ocultar" /></svg></span>
                         <span class="flota-chip">Tcherassi</span>
                         <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
                         <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="false" aria-label="WNP-659 visible para los pasajeros"></button><span class="flota-permiso-texto">OCULTO</span></span>
                       </li>
-                      <li class="flota-fila" data-bus="KJT-704" hidden>
-                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir KJT-704"></button>
+                      <li class="flota-fila" data-bus="KJT-704" data-bus-estado="en-linea" hidden>
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir KJT-704, en línea"></button>
                         <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
-                        <span class="flota-fila-placa">KJT-704<i></i></span>
+                        <span class="flota-fila-placa">KJT-704<svg class="flota-ico" data-accion="elegir" aria-hidden="true"><title>En línea: el bus está transmitiendo</title><use href="#fi-emitiendo" /></svg></span>
                         <span class="flota-chip">Vivero Paraíso</span>
                         <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
                         <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="true" aria-label="KJT-704 visible para los pasajeros"></button><span class="flota-permiso-texto">PERMITIDO</span></span>
                       </li>
-                      <li class="flota-fila" data-bus="BQX-391" hidden>
-                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir BQX-391"></button>
+                      <li class="flota-fila" data-bus="BQX-391" data-bus-estado="en-linea" hidden>
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir BQX-391, en línea"></button>
                         <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
-                        <span class="flota-fila-placa">BQX-391<i></i></span>
+                        <span class="flota-fila-placa">BQX-391<svg class="flota-ico" data-accion="elegir" aria-hidden="true"><title>En línea: el bus está transmitiendo</title><use href="#fi-emitiendo" /></svg></span>
                         <span class="flota-chip">Vivero Paraíso</span>
                         <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
                         <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="true" aria-label="BQX-391 visible para los pasajeros"></button><span class="flota-permiso-texto">PERMITIDO</span></span>
                       </li>
-                      <li class="flota-fila flota-fila--sin-senal" data-bus="LMR-826" hidden>
-                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir LMR-826, sin señal"></button>
+                      <li class="flota-fila flota-fila--sin-senal" data-bus="LMR-826" data-bus-estado="inactivo" hidden>
+                        <button type="button" class="flota-fila-elegir" data-accion="elegir" aria-pressed="false" aria-label="Elegir LMR-826, inactivo"></button>
                         <span class="flota-fila-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
-                        <span class="flota-fila-placa">LMR-826<i></i></span>
+                        <span class="flota-fila-placa">LMR-826<svg class="flota-ico" data-accion="elegir" aria-hidden="true"><title>Inactivo: lleva más de 90 s sin reportar, pero el turno sigue abierto</title><use href="#fi-pausa" /></svg></span>
                         <span class="flota-chip">Vivero Paraíso</span>
                         <span class="flota-fila-editar"><svg class="flota-ico"><use href="#fi-editar" /></svg></span>
                         <span class="flota-permiso"><button type="button" role="switch" class="flota-interruptor" data-accion="visibilidad" aria-checked="true" aria-label="LMR-826 visible para los pasajeros"></button><span class="flota-permiso-texto">PERMITIDO</span></span>
@@ -351,29 +356,33 @@
                          está en su fila, y dos paradas por bus sólo
                          alargarían el recorrido. Los de la ruta que no se
                          mira se apagan con `es-fuera`. -->
-                    <span class="flota-bus flota-bus--dmv" data-bus="DMV-238" data-accion="elegir"></span>
-                    <span class="flota-bus flota-bus--tuh es-activo" data-bus="TUH-513" data-accion="elegir"></span>
-                    <span class="flota-bus flota-bus--wnp" data-bus="WNP-659" data-accion="elegir"></span>
-                    <span class="flota-bus flota-bus--sfa es-activo es-elegido" data-bus="SFA-482" data-accion="elegir"></span>
-                    <span class="flota-bus flota-bus--kjt es-activo es-fuera" data-bus="KJT-704" data-accion="elegir"></span>
-                    <span class="flota-bus flota-bus--bqx es-activo es-fuera" data-bus="BQX-391" data-accion="elegir"></span>
-                    <span class="flota-bus flota-bus--lmr es-fuera" data-bus="LMR-826" data-accion="elegir"></span>
+                    <span class="flota-bus flota-bus--dmv" data-bus="DMV-238" data-bus-estado="sin-senal" data-accion="elegir"><svg class="flota-trazo" aria-hidden="true"><use href="#fi-trazo" /></svg></span>
+                    <span class="flota-bus flota-bus--tuh" data-bus="TUH-513" data-bus-estado="en-linea" data-accion="elegir"><svg class="flota-trazo" aria-hidden="true"><use href="#fi-trazo" /></svg></span>
+                    <span class="flota-bus flota-bus--wnp" data-bus="WNP-659" data-bus-estado="oculto" data-accion="elegir"><svg class="flota-trazo" aria-hidden="true"><use href="#fi-trazo" /></svg></span>
+                    <span class="flota-bus flota-bus--sfa es-elegido" data-bus="SFA-482" data-bus-estado="en-linea" data-accion="elegir"><svg class="flota-trazo" aria-hidden="true"><use href="#fi-trazo" /></svg></span>
+                    <span class="flota-bus flota-bus--kjt es-fuera" data-bus="KJT-704" data-bus-estado="en-linea" data-accion="elegir"><svg class="flota-trazo" aria-hidden="true"><use href="#fi-trazo" /></svg></span>
+                    <span class="flota-bus flota-bus--bqx es-fuera" data-bus="BQX-391" data-bus-estado="en-linea" data-accion="elegir"><svg class="flota-trazo" aria-hidden="true"><use href="#fi-trazo" /></svg></span>
+                    <span class="flota-bus flota-bus--lmr es-fuera" data-bus="LMR-826" data-bus-estado="inactivo" data-accion="elegir"><svg class="flota-trazo" aria-hidden="true"><use href="#fi-trazo" /></svg></span>
 
-                    <!-- _Legend: aquí «En línea» son los que el pasajero
-                         ve en verde, así que 2 —el oculto cuenta aparte—. -->
+                    <!-- `FleetLegend`: un renglón por estado y cada bus de
+                         la ruta en uno solo, así que suman los 4 de
+                         Tcherassi. WNP-659 transmite pero cuenta como
+                         oculto, y «Inactivo» sale en 0 hasta que se mira
+                         Vivero Paraíso. -->
                     <div class="flota-leyenda">
                       <span class="flota-leyenda-titulo">LEYENDA</span>
-                      <span class="flota-leyenda-fila"><i></i>En línea<b data-leyenda="linea">2</b></span>
-                      <span class="flota-leyenda-fila flota-leyenda-fila--gris"><i></i>Sin señal<b data-leyenda="sin-senal">1</b></span>
-                      <span class="flota-leyenda-fila flota-leyenda-fila--gris"><i></i>Ocultos<b data-leyenda="ocultos">1</b></span>
+                      <span class="flota-leyenda-fila" data-bus-estado="en-linea"><svg class="flota-ico" aria-hidden="true"><use href="#fi-emitiendo" /></svg>En línea<b data-leyenda="en-linea">2</b></span>
+                      <span class="flota-leyenda-fila" data-bus-estado="inactivo"><svg class="flota-ico" aria-hidden="true"><use href="#fi-pausa" /></svg>Inactivo<b data-leyenda="inactivo">0</b></span>
+                      <span class="flota-leyenda-fila" data-bus-estado="sin-senal"><svg class="flota-ico" aria-hidden="true"><use href="#fi-sin-senal" /></svg>Sin señal<b data-leyenda="sin-senal">1</b></span>
+                      <span class="flota-leyenda-fila" data-bus-estado="oculto"><svg class="flota-ico" aria-hidden="true"><use href="#fi-ocultar" /></svg>Oculto<b data-leyenda="oculto">1</b></span>
                     </div>
 
                     <!-- _SelectedBusCard. Cerrada no se quita: se funde y
                          baja, y `inert` la saca del teclado. -->
-                    <div class="flota-ficha">
+                    <div class="flota-ficha" data-bus-estado="en-linea">
                       <div class="flota-ficha-cabeza">
                         <span class="flota-ficha-icono"><svg class="flota-ico"><use href="#fi-bus" /></svg></span>
-                        <span class="flota-ficha-placa"><b data-ficha="placa">SFA-482</b><small data-ficha="estado">En línea</small></span>
+                        <span class="flota-ficha-placa"><b data-ficha="placa">SFA-482</b><small><svg class="flota-ico" aria-hidden="true"><use data-ficha="estado-icono" href="#fi-emitiendo" /></svg><span data-ficha="estado">En línea</span></small></span>
                         <button type="button" class="flota-ficha-cerrar" data-accion="cerrar" aria-label="Cerrar la ficha del bus"><svg class="flota-ico"><use href="#fi-cerrar" /></svg></button>
                       </div>
                       <span class="flota-ficha-ruta"><svg class="flota-ico"><use href="#fi-ruta" /></svg><span data-ficha="ruta">Tcherassi</span></span>

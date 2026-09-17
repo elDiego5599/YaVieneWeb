@@ -167,7 +167,8 @@
 /*
   Los colores que la página no tiene con el mismo valor salen aquí, con el
   nombre que llevan en `app_theme.dart`; los que coinciden —superficie,
-  divisor, arena, verde, marino, gris fantasma— usan el token de la web.
+  divisor, arena, marino, gris fantasma y los cuatro de estado— usan el
+  token de la web.
 
   `line-height: 1.26` es el alto natural de Plus Jakarta Sans —ascendente
   1038 más descendente 222 sobre 1000—, que es el que usa Flutter cuando
@@ -214,6 +215,27 @@
   width: calc(var(--i, 20) * var(--u));
   height: calc(var(--i, 20) * var(--u));
   fill: currentColor;
+}
+
+/* `BusEstado.color`. Cada pieza que habla de un bus —la fila, el marcador,
+   la ficha y el renglón de la leyenda— dice su estado en
+   `data-bus-estado` y toma de `--e` el color que le toca: `online`,
+   `ghost`, `offline` y `hidden` de `app_theme.dart`, que son las variantes
+   accesibles del sistema y pasan 4,5:1 sobre el blanco de las tarjetas. */
+[data-bus-estado='en-linea'] {
+  --e: var(--app-primary-accessible);
+}
+
+[data-bus-estado='inactivo'] {
+  --e: var(--app-warn-accessible);
+}
+
+[data-bus-estado='sin-senal'] {
+  --e: var(--app-coral-accessible);
+}
+
+[data-bus-estado='oculto'] {
+  --e: var(--app-text-secondary);
 }
 
 /* Los botones del panel, que ahora los hay. `base.css` les quita el borde
@@ -290,8 +312,9 @@
   color: var(--bus-ghost);
 }
 
-/* La píldora de conexión con el servidor: el verde al 10 % de fondo y el
-   punto de 7 con 7 de aire, como `_ConnectionPill`. */
+/* La píldora de conexión con el servidor, la de `DashboardHeader`: el
+   color de «En línea», `AppColors.online`, al 10 % de fondo, y el punto de
+   7 con 7 de aire. */
 .flota-conexion {
   display: flex;
   align-items: center;
@@ -299,8 +322,8 @@
   margin-left: auto;
   padding: calc(6 * var(--u)) calc(10 * var(--u));
   border-radius: 999px;
-  background: rgba(0, 168, 89, 0.1);
-  color: var(--green);
+  background: color-mix(in srgb, var(--app-primary-accessible) 10%, transparent);
+  color: var(--app-primary-accessible);
   font-size: calc(11.5 * var(--u));
   font-weight: 700;
 }
@@ -539,6 +562,8 @@
   font-weight: 700;
 }
 
+/* En `AppColors.online` y no en el verde de marca, que con la letra blanca
+   da 3,1:1. */
 .flota-agregar-bus {
   --i: 17;
   display: flex;
@@ -547,7 +572,7 @@
   margin-left: calc(8 * var(--u));
   padding: calc(9 * var(--u)) calc(14 * var(--u));
   border-radius: calc(12 * var(--u));
-  background: var(--green);
+  background: var(--app-primary-accessible);
   color: #fff;
   font-size: calc(12.5 * var(--u));
   font-weight: 800;
@@ -663,8 +688,8 @@
   }
 }
 
-/* El icono en el color del estado al 12 %. Verde para las que
-   transmiten, oculta incluida: ocultar no apaga el GPS. */
+/* El recuadro del bus, en el color de su estado al 12 %. Dice qué es la
+   fila; en qué situación está lo dice el icono junto a la placa. */
 .flota-fila-icono {
   --i: 20;
   display: grid;
@@ -673,33 +698,35 @@
   width: calc(40 * var(--u));
   height: calc(40 * var(--u));
   border-radius: calc(12 * var(--u));
-  background: rgba(0, 168, 89, 0.12);
-  color: var(--green);
+  background: color-mix(in srgb, var(--e) 12%, transparent);
+  color: var(--e);
 }
 
-.flota-fila--sin-senal .flota-fila-icono {
-  background: rgba(148, 163, 184, 0.12);
-  color: var(--bus-ghost);
-}
-
-/* La placa ocupa lo que sobra, como el `Expanded`. Rejilla de dos columnas
-   en vez de caja flexible: el texto suelto cae solo en la primera, de ancho
-   mínimo fijo, y el punto en la segunda. Así el punto queda siempre en la
-   misma x aunque las placas midan distinto (SFA-482 no mide igual que
-   TUH-513); con `flex` + `gap` el punto colgaba del texto y cada fila lo
-   ponía en un sitio. Si un día llega una placa más larga, la primera columna
-   crece (`max-content`) en vez de romper el texto. Los 3 de abajo son el
+/* La placa ocupa lo que sobra, como el `Expanded` de allá, pero nunca
+   menos de lo que mide: si la fila no alcanza, la que cede es la píldora
+   de la ruta. Antes cedía la placa, y con «Vivero Paraíso», o a 390 con
+   cualquier ruta, el icono de estado quedaba encima de la píldora.
+   Rejilla de dos columnas en vez de caja flexible: el texto suelto cae
+   solo en la primera, de ancho mínimo fijo, y el icono de estado en la
+   segunda. Así el icono queda siempre en la misma x aunque las placas
+   midan distinto (SFA-482 no mide igual que TUH-513); con `flex` + `gap`
+   colgaba del texto y cada fila lo ponía en un sitio. El mínimo de 76 es
+   la más ancha de las siete, WNP-659, que mide 73,5, y 2 y medio para lo
+   que cambia el dibujo de la letra de un navegador a otro; con él a la
+   ruta le quedan 82, casi los 88 que le quedan allá con esa placa —los 6
+   de diferencia se los lleva el rótulo «PERMITIDO», que aquí es más ancho
+   que el interruptor de la app—, y «Tcherassi» se lee entera. Si un día llega una placa más larga, la primera columna crece
+   (`max-content`) en vez de romper el texto. Los 3 de abajo son el
    `SizedBox` que la separa de la línea del nombre del conductor
    (`fleet_list_tile.dart`, `if (bus.driverName != null)`), que aquí va
    vacía porque ningún bus del maquetado lo trae asignado. */
 .flota-fila-placa {
   display: grid;
-  grid-template-columns: minmax(9ch, max-content) auto;
+  grid-template-columns: minmax(calc(76 * var(--u)), max-content) auto;
   justify-content: start;
   align-items: center;
   column-gap: calc(8 * var(--u));
-  flex: 1;
-  min-width: 0;
+  flex: 1 0 auto;
   margin-left: calc(12 * var(--u));
   padding-bottom: calc(3 * var(--u));
   font-size: calc(14.5 * var(--u));
@@ -707,18 +734,28 @@
   letter-spacing: calc(0.4 * var(--u));
 }
 
-.flota-fila-placa i {
-  width: calc(6 * var(--u));
-  height: calc(6 * var(--u));
-  border-radius: 50%;
-  background: var(--green);
+/* El icono de estado, de 14 y en su color. Colocado, y después del botón
+   de la fila en el HTML, para quedar encima de él: si no, el ratón nunca
+   le llega y no sale el aviso de su `<title>`, que es el `Tooltip` de
+   allá. Pulsarlo elige el bus, como el resto de la fila. */
+.flota-fila-placa svg {
+  --i: 14;
+  position: relative;
+  color: var(--e);
+  cursor: pointer;
 }
 
-.flota-fila--sin-senal .flota-fila-placa i {
-  background: var(--bus-ghost);
-}
-
+/* La píldora de la ruta, la que cede: se corta con puntos suspensivos
+   y la placa sigue entera, como el chip de `FleetListTile`. Allá, en una
+   pantalla angosta, deja de pintarse del todo (`_huecoParaRuta`, 161);
+   aquí la maqueta es siempre la ventana de 1600, donde a la placa y la
+   ruta les quedan 180 en el escritorio y 169 en el teléfono —los bordes
+   de 1 px no encogen con ella—, de sobra para los 161, así que va
+   siempre. `overflow` es también lo que la deja encoger: sin él, una caja
+   flexible no baja de lo que mide su texto. */
 .flota-chip {
+  overflow: hidden;
+  text-overflow: ellipsis;
   padding: calc(4 * var(--u)) calc(9 * var(--u));
   border-radius: 999px;
   background: rgba(11, 22, 40, 0.06);
@@ -728,21 +765,28 @@
   letter-spacing: calc(0.3 * var(--u));
 }
 
-/* `IconButton` compacto: la caja de 40 menos los 8 de la densidad. */
+/* `IconButton` compacto: el de 17 con la densidad recogida mide 33 de
+   ancho por 32 de alto en macOS y en Windows, que es donde corre el panel
+   (los 16 de relleno que le quedan a cada lado del dibujo, y de alto la
+   caja de 40 menos los 8 de la densidad). No flexible: sin `flex: none`
+   se encogía cuando la píldora de la ruta pedía sitio —con «Vivero
+   Paraíso» quedaba en 27— y el lápiz salía más chico que en la app. */
 .flota-fila-editar {
   --i: 17;
   display: grid;
+  flex: none;
   place-items: center;
-  width: calc(32 * var(--u));
+  width: calc(33 * var(--u));
   height: calc(32 * var(--u));
   margin-left: calc(6 * var(--u));
   color: var(--bus-ghost);
 }
 
-/* El interruptor y su rótulo: verde si el pasajero lo ve, gris si no. Ancho
-   fijo y no flexible: «PERMITIDO» es más largo que «OCULTO» y sin esto la
-   columna se encoge al ocultar, y la píldora de la ruta y el lápiz se mueven
-   con ella. 68 cabe el rótulo largo en la fuente del panel con margen. */
+/* El interruptor y su rótulo: en el color de «En línea» si el pasajero lo
+   ve y en el de «Oculto» si no, `online` y `hidden`. Ancho fijo y no
+   flexible: «PERMITIDO» es más largo que «OCULTO» y sin esto la columna se
+   encoge al ocultar, y la píldora de la ruta y el lápiz se mueven con
+   ella. 68 cabe el rótulo largo en la fuente del panel con margen. */
 .flota-permiso {
   display: flex;
   flex: none;
@@ -751,7 +795,7 @@
   gap: calc(2 * var(--u));
   width: calc(68 * var(--u));
   margin-left: calc(2 * var(--u));
-  color: var(--green);
+  color: var(--app-primary-accessible);
   font-size: calc(8 * var(--u));
   font-weight: 800;
   letter-spacing: calc(1.2 * var(--u));
@@ -759,11 +803,12 @@
 }
 
 .flota-fila--oculta .flota-permiso {
-  color: var(--bus-ghost);
+  color: var(--app-text-secondary);
 }
 
 /* El `Switch` de Material 3 recogido a su tamaño, 52 × 32. Encendido:
-   pista verde y botón blanco de 24, a 4 del borde: 52 − 4 − 24 = 24 desde
+   pista en `AppColors.online`, como dice el `switchTheme` del panel, y
+   botón blanco de 24, a 4 del borde: 52 − 4 − 24 = 24 desde
    la izquierda. Se mide siempre desde la izquierda, y no desde la derecha
    encendido y desde la izquierda apagado, porque entre `right` y `left`
    no hay transición y el botón saltaría en vez de cruzar. Colocado y
@@ -775,7 +820,7 @@
   width: calc(52 * var(--u));
   height: calc(32 * var(--u));
   border-radius: calc(16 * var(--u));
-  background: var(--green);
+  background: var(--app-primary-accessible);
   transition: background-color var(--f-tiempo);
 }
 
@@ -879,10 +924,10 @@
   `(26 + (zoom − 11) × 5)` sin pasar de 44: a 14,6 da 44, y ésa es la
   caja. Dentro, la cápsula: alto h = 44 × 0,75 = 33 y ancho
   h × 32 / 60 = 17,6, radio la mitad del ancho, centrada —13,2 a los
-  lados, 5,5 arriba y abajo—. El aro es de w × 0,08 = 1,408; en el lienzo
-  va centrado sobre el filo y aquí por dentro, que es medio aro de
-  diferencia y deja la cápsula del mismo tamaño por fuera. Cada caja gira
-  con el rumbo del bus, como el `Transform.rotate` del marcador.
+  lados, 5,5 arriba y abajo—. El aro va en el lienzo centrado sobre el
+  filo y aquí por dentro, que es medio aro de diferencia y deja la
+  cápsula del mismo tamaño por fuera. Cada caja gira con el rumbo del
+  bus, como el `Transform.rotate` del marcador.
 
   Se pulsa para elegirlo, como el `onTap` de allá.
 */
@@ -908,6 +953,13 @@
   visibility: hidden;
 }
 
+/*
+  La cápsula llena, la de los que reportan: «En línea» e «Inactivo»
+  (`_lleno`). El degradado baja del color del estado mezclado al 30 % con
+  blanco —el `Color.lerp` de allá, #4FA189 en línea y #C28651 inactivo—
+  al color entero, y el aro es blanco al 92 % y de w × 0,08 = 1,408.
+  `border-box` para que el degradado corra también bajo el aro.
+*/
 .flota-bus::after {
   content: '';
   position: absolute;
@@ -915,28 +967,84 @@
   left: calc(13.2 * var(--u));
   width: calc(17.6 * var(--u));
   height: calc(33 * var(--u));
-  border: calc(1.408 * var(--u)) solid rgba(255, 255, 255, 0.5);
+  border: calc(1.408 * var(--u)) solid rgba(255, 255, 255, 0.92);
   border-radius: calc(8.8 * var(--u));
-  background: var(--bus-ghost);
+  background: linear-gradient(color-mix(in srgb, var(--e) 70%, #fff), var(--e));
+  background-origin: border-box;
 }
 
 /*
-  El que transmite y ve el pasajero. El degradado baja del verde mezclado
-  al 30 % con blanco —#4DC28B— al verde de marca, y el parabrisas es un
-  óvalo blanco al 30 % de w × 0,72 por h × 0,26 —radios 6,336 y 4,29— con
-  el centro a h × 0,26 por encima del medio, el 24 % del alto. La sombra
-  sale de la elevación h × 0,12 = 3,96 y del desplazamiento
-  h × 0,05 = 1,65. `border-box` para que el degradado corra también bajo
-  el aro.
+  «En línea» lleva además el parabrisas, un óvalo blanco al 30 % de
+  w × 0,72 por h × 0,26 —radios 6,336 y 4,29— con el centro a h × 0,26
+  por encima del medio, el 24 % del alto, y la única sombra del mapa: su
+  color al 45 %, con la elevación h × 0,12 = 3,96 y el desplazamiento
+  h × 0,05 = 1,65.
 */
-.flota-bus.es-activo::after {
-  border-color: rgba(255, 255, 255, 0.92);
+.flota-bus[data-bus-estado='en-linea']::after {
   background:
     radial-gradient(calc(6.336 * var(--u)) calc(4.29 * var(--u)) at 50% 24%,
       rgba(255, 255, 255, 0.3) 96%, transparent 100%),
-    linear-gradient(#4DC28B, var(--green));
-  background-origin: border-box;
-  box-shadow: 0 calc(1.65 * var(--u)) calc(3.96 * var(--u)) rgba(0, 168, 89, 0.45);
+    linear-gradient(color-mix(in srgb, var(--e) 70%, #fff), var(--e));
+  box-shadow: 0 calc(1.65 * var(--u)) calc(3.96 * var(--u))
+    color-mix(in srgb, var(--e) 45%, transparent);
+}
+
+/* La hueca, la de los que no reportan: «Sin señal» y «Oculto». Blanco al
+   88 %, para que siga siendo una silueta sobre las calles, y el aro, que
+   es todo lo que hay, en el color del estado y de w × 0,14 = 2,464. */
+.flota-bus[data-bus-estado='sin-senal']::after,
+.flota-bus[data-bus-estado='oculto']::after {
+  border: calc(2.464 * var(--u)) solid var(--e);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+/* «Inactivo» y «Oculto» van con el aro punteado (`_punteado`): el liso se
+   vuelve transparente, sin cambiar de grosor, y lo dibuja `.flota-trazo`. */
+.flota-bus[data-bus-estado='inactivo']::after,
+.flota-bus[data-bus-estado='oculto']::after {
+  border-color: transparent;
+}
+
+/*
+  El aro punteado. `border-style: dashed` no sirve: cada navegador reparte
+  sus guiones a su manera y no se dejan medir. Éste es el contorno de la
+  cápsula (`#fi-trazo`, la misma de `::after`: 17,6 × 33 con radio 8,8)
+  con guiones de 1,8 aros y huecos de 1,4, lo que corta `_aPunteado`. El
+  contorno empieza al pie del lado izquierdo y sube, que es donde empieza
+  el `addRRect` de `_FlatBusPainter`: así los guiones caen donde caen
+  allá. En el lienzo el aro va centrado sobre el filo; aquí
+  se traza al doble de grueso y el recorte a la cápsula deja la mitad de
+  dentro, que es donde va el aro liso. Por encima del `::after`, que es el
+  relleno.
+*/
+.flota-trazo {
+  position: absolute;
+  z-index: 1;
+  top: calc(5.5 * var(--u));
+  left: calc(13.2 * var(--u));
+  display: none;
+  width: calc(17.6 * var(--u));
+  height: calc(33 * var(--u));
+  clip-path: inset(0 round calc(8.8 * var(--u)));
+  fill: none;
+}
+
+/* Sobre la llena, blanco al 92 %: aro de 1,408, guiones de 2,5344 y
+   huecos de 1,9712. */
+.flota-bus[data-bus-estado='inactivo'] .flota-trazo {
+  display: block;
+  stroke: rgba(255, 255, 255, 0.92);
+  stroke-width: 2.816;
+  stroke-dasharray: 2.5344 1.9712;
+}
+
+/* Sobre la hueca, en el color del estado: aro de 2,464, guiones de 4,4352
+   y huecos de 3,4496. */
+.flota-bus[data-bus-estado='oculto'] .flota-trazo {
+  display: block;
+  stroke: var(--e);
+  stroke-width: 4.928;
+  stroke-dasharray: 4.4352 3.4496;
 }
 
 /* El halo del elegido: un círculo de radio h × 0,62 = 20,46 en el azul de
@@ -1004,9 +1112,10 @@
   Los tres de Vivero Paraíso, sobre su ruta y con la misma cuenta. La
   ruta baja en diagonal desde el centro del plano hacia el suroeste:
   KJT-704 y LMR-826 van en ese sentido y BQX-391 sube por el otro, que
-  vuelve a ser lo que se ve en un turno. LMR-826, el que no tiene señal,
-  queda abajo pero a 50 a la derecha de la leyenda, y ninguno se acerca a
-  la ficha, que empieza en 859.
+  vuelve a ser lo que se ve en un turno. LMR-826, el inactivo, queda
+  abajo pero a 39 a la derecha de la leyenda, que termina en 136, y
+  ninguno se acerca a la ficha, que empieza en 859: el más cercano es
+  KJT-704, que termina en 598.
 */
 .flota-bus--kjt {
   top: calc(361.8 * var(--u));
@@ -1027,13 +1136,13 @@
 }
 
 /*
-  `_Legend`, abajo a la izquierda, con la sombra suave del tema: #0F172A
-  al 5 %, 12 de desenfoque y 4 hacia abajo.
+  `FleetLegend`, abajo a la izquierda, con la sombra suave del tema:
+  #0F172A al 5 %, 12 de desenfoque y 4 hacia abajo.
 
-  Tres columnas —punto, nombre, cifra— que comparten las tres filas con
+  Tres columnas —icono, nombre, cifra— que comparten las cuatro filas con
   `subgrid`, con 8 entre una y otra. Antes cada fila era un flex suelto y
-  la cifra iba pegada detrás de su nombre: «En línea», «Sin señal» y
-  «Ocultos» miden distinto, así que los tres números salían cada uno a
+  la cifra iba pegada detrás de su nombre: «En línea», «Inactivo», «Sin
+  señal» y «Oculto» miden distinto, así que los números salían cada uno a
   una altura. Ahora la columna del medio es tan ancha como el nombre más
   largo y las cifras caen alineadas a la derecha, unas encima de otras.
   Es lo que hace el Dart desde el mismo cambio: `IntrinsicWidth` con las
@@ -1064,7 +1173,7 @@
 }
 
 /* Cada fila ocupa las tres columnas y las hereda: el nombre suelto entre
-   el punto y la cifra es texto sin etiqueta, y la rejilla lo envuelve en
+   el icono y la cifra es texto sin etiqueta, y la rejilla lo envuelve en
    su propia celda, así que cae en la del medio sin tocar el HTML. */
 .flota-leyenda-fila {
   grid-column: 1 / -1;
@@ -1077,18 +1186,11 @@
   font-weight: 500;
 }
 
-/* El punto de 9 con su resplandor del mismo color al 50 %. */
-.flota-leyenda-fila i {
-  width: calc(9 * var(--u));
-  height: calc(9 * var(--u));
-  border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 calc(5 * var(--u)) rgba(0, 168, 89, 0.5);
-}
-
-.flota-leyenda-fila--gris i {
-  background: var(--bus-ghost);
-  box-shadow: 0 0 calc(5 * var(--u)) rgba(148, 163, 184, 0.5);
+/* El icono de 13 del estado, en su color: el mismo que lleva el bus en la
+   fila, así que la leyenda explica también la lista. */
+.flota-leyenda-fila svg {
+  --i: 13;
+  color: var(--e);
 }
 
 .flota-leyenda-fila b {
@@ -1136,6 +1238,7 @@
   align-self: stretch;
 }
 
+/* El recuadro del bus en el color de su estado, aquí al 14 %. */
 .flota-ficha-icono {
   --i: 19;
   display: grid;
@@ -1144,15 +1247,8 @@
   width: calc(36 * var(--u));
   height: calc(36 * var(--u));
   border-radius: calc(12 * var(--u));
-  background: rgba(0, 168, 89, 0.14);
-  color: var(--green);
-}
-
-/* El bus sin señal lleva el icono en su gris al mismo 14 %: el color del
-   estado, como en la fila. */
-.flota-ficha--sin-senal .flota-ficha-icono {
-  background: rgba(148, 163, 184, 0.14);
-  color: var(--bus-ghost);
+  background: color-mix(in srgb, var(--e) 14%, transparent);
+  color: var(--e);
 }
 
 .flota-ficha-placa {
@@ -1168,10 +1264,21 @@
   letter-spacing: calc(0.4 * var(--u));
 }
 
+/* El estado, con su icono de 12 a 5 del rótulo: el mismo de la fila y de
+   la leyenda. El rótulo va en `textSecondary`, que a 10,5 sí se lee sobre
+   la tarjeta blanca. */
 .flota-ficha-placa small {
+  --i: 12;
+  display: flex;
+  align-items: center;
+  gap: calc(5 * var(--u));
   font-size: calc(10.5 * var(--u));
   font-variant-numeric: tabular-nums;
-  color: var(--bus-ghost);
+  color: var(--f-texto-2);
+}
+
+.flota-ficha-placa small svg {
+  color: var(--e);
 }
 
 /* Redonda, como el `IconButton` que es: el hover y el anillo del teclado
@@ -1215,7 +1322,8 @@
   margin-top: calc(12 * var(--u));
 }
 
-/* «Ocultar» ocupa lo que sobra y mide 40, el mínimo que le da el Dart. */
+/* «Ocultar» ocupa lo que sobra y mide 40, el mínimo que le da el Dart. Va
+   en el gris de «Oculto», `AppColors.hidden`, que es lo que hace. */
 .flota-ocultar {
   --i: 16;
   display: flex;
@@ -1225,7 +1333,7 @@
   gap: calc(8 * var(--u));
   height: calc(40 * var(--u));
   border-radius: calc(12 * var(--u));
-  background: var(--bus-ghost);
+  background: var(--app-text-secondary);
   color: #fff;
   font-size: calc(12 * var(--u));
   font-weight: 800;
@@ -1236,7 +1344,7 @@
 /* Con el bus oculto el botón ofrece lo contrario, «Mostrar», en el verde
    de `AppColors.online`. */
 .flota-ocultar.es-mostrar {
-  background: var(--green);
+  background: var(--app-primary-accessible);
 }
 
 .flota-boton-icono--gris {
