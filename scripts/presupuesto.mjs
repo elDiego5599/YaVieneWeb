@@ -122,11 +122,33 @@ const KB = 1024;
  *  una empresa se cree lo que prueba y no una captura. Es un solo oyente
  *  de clics y una función que repinta desde el estado; no hay librería
  *  que quitar. Sólo lo carga esa página, así que la primera visita sigue
- *  en 486.3. 66 es la build de hoy más el 3 %. */
+ *  en 486.3. 66 es la build de hoy más el 3 %.
+ *
+ *  El 18/09/2026 el de CSS sube de 114 a 117, y esta vez no lo paga una
+ *  sección nueva: lo paga que ya no hay de dónde sacar. Con 112.9 de
+ *  build quedaba un kilobyte escaso, y un tope que sólo avisa cuando ya
+ *  se reventó no sirve de nada. Antes de subirlo se buscó grasa de
+ *  verdad: se listaron las 435 clases de los cuatro paquetes de dist y
+ *  se cruzaron contra el HTML y contra los `.ts` de `src/` —sin mirar el
+ *  propio CSS, que si no cada clase se encuentra a sí misma— y no hay
+ *  ninguna muerta. Los dos pesos gordos son `phone-simulator.css` (66
+ *  KB) y `empresas-pagina.css`, que son los espejos de las pantallas de
+ *  Dart y llevan al lado el número de allá que justifica cada regla:
+ *  recortarlos es desincronizar el mockup, que es lo contrario de lo que
+ *  se quiere. La otra salida era meter un minificador de CSS de verdad
+ *  (lightningcss) y quedó descartada por ahora: una dependencia más en
+ *  la construcción, a cambio de un margen que este tope ya da. 117 es la
+ *  build de hoy más el 3 % de siempre.
+ *
+ *  Los otros tres no se mueven, aunque `todo dist` haya bajado a 744.9
+ *  al dejar de empaquetar los subconjuntos de tipografía que nadie
+ *  pedía. Bajarlo a la medida de hoy dejaría el peso donde está, sí,
+ *  pero también convertiría en una pelea cada imagen nueva de las que
+ *  todavía faltan; el kilo que se recuperó allí no es el que aprieta. */
 const TOPES = {
   'todo dist': 797,
   'JavaScript': 66,
-  'CSS': 114,
+  'CSS': 117,
   'primera visita': 560,
 };
 
