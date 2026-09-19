@@ -334,3 +334,40 @@ test.describe('el mapa en vivo dice que es una simulación', () => {
     expect(caja!.y + caja!.height).toBeLessThanOrEqual(marco!.y + marco!.height);
   });
 });
+
+/* Aislamiento entre orígenes. COOP deja a la página sola en su grupo de
+   ventanas: otra pestaña que la abra no conserva una referencia con la
+   que tocarla. CORP same-origin impide que otro sitio incruste nuestros
+   archivos. La excepción es `og.png`: la leen desde fuera las
+   previsualizaciones de enlaces (WhatsApp, redes), y con same-origin
+   algunas la dejan de mostrar. La regla de `vercel.json` excluye ese
+   archivo con una expresión; aquí se comprueba contra qué rutas casa. */
+test.describe('las cabeceras de aislamiento de vercel.json', () => {
+  type Regla = { source: string; headers: { key: string; value: string }[] };
+  const reglas = (JSON.parse(
+    readFileSync(fileURLToPath(new URL('../vercel.json', import.meta.url)), 'utf8'),
+  ) as { headers: Regla[] }).headers;
+
+  /** Lo que Vercel mandaría para esa ruta: la última regla que casa gana. */
+  function cabecera(ruta: string, clave: string): string | undefined {
+    let valor: string | undefined;
+    for (const regla of reglas) {
+      if (!new RegExp(`^${regla.source}$`).test(ruta)) continue;
+      const h = regla.headers.find((x) => x.key === clave);
+      if (h) valor = h.value;
+    }
+    return valor;
+  }
+
+  test('COOP en todo, CORP same-origin salvo og.png', () => {
+    // La CSP la lee vite.config.ts de la primera regla: sigue ahí.
+    expect(reglas[0].headers.some((h) => h.key === 'Content-Security-Policy')).toBe(true);
+    for (const ruta of ['/', '/empresas.html', '/assets/index.js', '/og.png']) {
+      expect(cabecera(ruta, 'Cross-Origin-Opener-Policy')).toBe('same-origin');
+    }
+    for (const ruta of ['/', '/empresas.html', '/assets/index.js', '/og.png.bak', '/x/og.png']) {
+      expect(cabecera(ruta, 'Cross-Origin-Resource-Policy'), ruta).toBe('same-origin');
+    }
+    expect(cabecera('/og.png', 'Cross-Origin-Resource-Policy')).toBe('cross-origin');
+  });
+});
