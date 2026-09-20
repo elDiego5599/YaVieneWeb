@@ -1,0 +1,119 @@
+name: YaVieneWeb — estabilidad
+
+# Una prueba que falla una vez de cada veinte no se ve: se repite la corrida,
+# sale verde y nadie vuelve a mirarla. En la web el riesgo es mayor que en el
+# resto, porque las de navegador esperan a cosas que tardan lo que quieren.
+# Esto corre las dos suites diez veces seguidas y, si una sola vuelta se cae,
+# abre un issue con la vuelta y el final del log.
+#
+# El plan lo pedía nocturno. Va semanal porque la cuota de Actions se acabó
+# (2026-09-19) y diez vueltas con navegador no son baratas; para volver a lo
+# nocturno se cambia el `cron` a '31 8 * * *'. A mano se lanza cuando se
+# quiera, y ahí se elige cuántas vueltas.
+on:
+  workflow_dispatch:
+    inputs:
+      vueltas:
+        description: Cuántas veces correr las dos suites
+        default: '10'
+  schedule:
+    # Viernes 03:31 en Barranquilla (08:31 UTC), fuera de la hora en punto.
+    - cron: '31 8 * * 5'
+
+# Lectura del repositorio, y escritura solo de issues: es lo único que este
+# workflow crea, y lo crea con el token de la propia corrida.
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  repetir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Caché de Chromium
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        id: cache-navegador
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Instalar Chromium
+        if: steps.cache-navegador.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      # Sin `set -e` en el bucle a propósito: una vuelta roja no puede cortar
+      # las que faltan, porque lo que se quiere saber es cuántas de diez.
+      - name: Vueltas a las dos suites
+        id: vueltas
+        env:
+          VUELTAS: ${{ github.event.inputs.vueltas || '10' }}
+        run: |
+          fallos=0
+          rojas=""
+          for i in $(seq 1 "$VUELTAS"); do
+            echo "::group::vuelta $i de $VUELTAS"
+            malo=0
+            npm run test:cobertura > "vuelta-$i-unidad.log" 2>&1 || malo=1
+            npm run test:e2e > "vuelta-$i-navegador.log" 2>&1 || malo=1
+            if [ "$malo" -eq 0 ]; then
+              echo "vuelta $i verde"
+            else
+              fallos=$((fallos + 1))
+              rojas="$rojas $i"
+              echo "vuelta $i ROJA"
+              tail -60 "vuelta-$i-unidad.log"
+              tail -60 "vuelta-$i-navegador.log"
+            fi
+            echo "::endgroup::"
+          done
+          {
+            echo "fallos=$fallos"
+            echo "rojas=$rojas"
+            echo "vueltas=$VUELTAS"
+          } >> "$GITHUB_OUTPUT"
+          if [ "$fallos" -gt 0 ]; then
+            {
+              echo "### Intermitentes"
+              echo "$fallos de $VUELTAS vueltas rojas:$rojas"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      # Un issue por temporada, no uno por corrida: si ya hay uno abierto con
+      # este título, se le añade un comentario. `gh` viene en el runner.
+      - name: Abrir o comentar el issue
+        if: failure() && steps.vueltas.outputs.fallos != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FALLOS: ${{ steps.vueltas.outputs.fallos }}
+          ROJAS: ${{ steps.vueltas.outputs.rojas }}
+          VUELTAS: ${{ steps.vueltas.outputs.vueltas }}
+        run: |
+          titulo="Prueba intermitente en la web"
+          enlace="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          # Con printf y no con un texto a varias líneas: la sangría del YAML
+          # se colaría en el issue y diez espacios delante son un bloque de
+          # código en Markdown.
+          cuerpo="$(printf '%s\n\n%s\n\n%s\n' \
+            "$FALLOS de $VUELTAS vueltas rojas (vueltas:$ROJAS)." \
+            "El log de cada vuelta roja está en la corrida: $enlace" \
+            "Una prueba que falla a veces oculta una condición de carrera de verdad tan a menudo como es un fallo de la prueba. Hasta saber cuál de las dos es, no se cierra.")"
+          numero="$(gh issue list --state open --search "in:title \"$titulo\"" \
+            --json number --jq '.[0].number // empty')"
+          if [ -n "$numero" ]; then
+            gh issue comment "$numero" --body "$cuerpo"
+          else
+            gh issue create --title "$titulo" --body "$cuerpo"
+          fi
