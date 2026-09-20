@@ -51,7 +51,7 @@
   </header>
 
   <main id="contenido" class="legal-hoja">
-    <p class="legal-fecha">Actualizado el 15 de septiembre de 2026</p>
+    <p class="legal-fecha">Actualizado el 19 de septiembre de 2026</p>
     <h1>Privacidad</h1>
     <p class="legal-entrada">Ya Viene es una aplicación para saber por dónde va tu bus. Para
       eso necesita muy poco, y lo poco que necesita casi todo se queda dentro de tu
@@ -75,6 +75,22 @@
       moverse, y cuando entra en un kilómetro a la redonda lanza una notificación local
       —la crea el teléfono, no la manda un servidor—. La app no usa ningún servicio de
       mensajería push.</p>
+
+    <!-- Este párrafo es la otra mitad de lo que hace el servicio en primer
+         plano de Android (background_keep_alive.dart): mantiene vivo el
+         socket, no la ubicación. La app pide «solo mientras la uso» y el
+         manifiesto no declara ACCESS_BACKGROUND_LOCATION, así que con la app
+         cerrada la distancia se mide contra el último punto conocido o contra
+         el pin. Callarlo engañaba por los dos lados: quien sale de la app
+         creía que seguía midiendo en vivo, y quien veía la notificación fija
+         creía que le seguían el rastro. La misma frase está en
+         legal_docs.dart, y allí una prueba la ata al manifiesto. -->
+    <p>Cuando sales de la app, en Android el seguimiento sigue vivo —verás una
+      notificación fija que lo dice— pero tu ubicación deja de actualizarse: la app
+      pide el permiso de ubicación «solo mientras la uso» y no el de segundo plano,
+      así que la distancia se mide contra el último punto que conoció, o contra el
+      punto de espera que hayas marcado a mano. En iPhone el aviso solo suena con la
+      app abierta.</p>
 
     <h2>Sin analítica, sin rastreo, sin publicidad</h2>
     <p>La aplicación no incluye herramientas de analítica, de perfiles de uso ni de

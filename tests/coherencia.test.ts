@@ -142,3 +142,46 @@ describe('lo legal no describe una cuenta que la app ya no tiene', () => {
     expect(apoyos).not.toMatch(/firebase/i);
   });
 });
+
+/**
+ * Lo que pasa cuando el pasajero sale de la app (T5.5, paso 3).
+ *
+ * En Android la app arranca un servicio en primer plano para que el socket no
+ * muera al salir de ella, y eso le deja al usuario una notificación fija. Lo
+ * que ese servicio **no** hace es seguir leyendo el GPS: la app pide «solo
+ * mientras la uso» y no declara `ACCESS_BACKGROUND_LOCATION`, así que la
+ * distancia se mide contra el último punto conocido o contra el punto de
+ * espera marcado a mano.
+ *
+ * La política publicada no lo decía, y callarlo tiene dos caras malas: quien
+ * cierra la app cree que lo sigue midiendo en vivo, y quien ve la notificación
+ * fija cree que la app le está siguiendo el rastro. La copia de la app
+ * (`legal_docs.dart` en el repo de Flutter) dice ahora lo mismo; allí la
+ * vigila `test/legal_segundo_plano_test.dart`, y el permiso que haría falsa
+ * la frase lo vigila esa prueba leyendo el manifiesto.
+ */
+describe('la privacidad dice qué pasa con la app cerrada', () => {
+  const texto = (): string =>
+    leer('privacidad.html')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/\s+/g, ' ');
+
+  it('dice que la ubicación deja de actualizarse y contra qué se mide', () => {
+    const html = texto();
+    expect(html).toContain('solo mientras la uso');
+    expect(html).toContain('no el de segundo plano');
+    expect(html).toContain('la distancia se mide contra el último punto que conoció');
+  });
+
+  it('nombra la notificación fija de Android y el caso del iPhone', () => {
+    const html = texto();
+    expect(html).toContain('notificación fija');
+    expect(html).toContain('En iPhone el aviso solo suena con la app abierta.');
+  });
+
+  it('la fecha del documento acompaña al cambio', () => {
+    // Un texto legal que cambia sin cambiar su fecha no se distingue del
+    // anterior, y la app usa la misma fecha para decir cuál está leyendo.
+    expect(leer('privacidad.html')).toContain('Actualizado el 19 de septiembre de 2026');
+  });
+});
