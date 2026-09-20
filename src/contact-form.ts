@@ -64,8 +64,12 @@ export class ContactForm {
       // empresa acaba en WhatsApp igualmente—, pero tiene una consecuencia
       // que conviene tener escrita: quien rellena y no le da a enviar en
       // WhatsApp se pierde, y nadie se entera. El día que haya dónde
-      // guardarlas, basta con declarar la variable: este camino ya está
-      // hecho y `mostrarExito` ya cuenta cada final por separado.
+      // guardarlas, este camino ya está hecho y `mostrarExito` ya cuenta
+      // cada final por separado, pero declarar la variable **no basta**: la
+      // CSP de `vercel.json` dice `connect-src 'self'` y el navegador
+      // cortaría el envío en producción. Hay que añadir el origen ahí en el
+      // mismo commit; `vite.config.ts` revienta la construcción si no se
+      // hace, y `tests/csp-contacto.test.ts` vigila que siga reventando.
       const endpoint = import.meta.env.VITE_CONTACT_ENDPOINT;
       if (endpoint) await ContactForm.publicar(endpoint, this.datos);
       else this.abrirWhatsApp();

@@ -18,7 +18,10 @@ import { defineConfig, type Plugin } from 'vite';
 */
 const PAGINAS = ['/', '/empresas.html', '/privacidad.html', '/terminos.html'];
 
-function seoDeRaiz(): Plugin {
+// Se exporta para que `tests/csp-contacto.test.ts` pueda pedirle el candado
+// del `connect-src` sin construir la web entera. El plugin se sigue montando
+// abajo igual; la exportación no cambia lo que corre en la construcción.
+export function seoDeRaiz(): Plugin {
   let sitio = '';
 
   return {
