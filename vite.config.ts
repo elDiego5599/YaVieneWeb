@@ -197,6 +197,30 @@ export default defineConfig({
     // Sólo los de humo: e2e/ es de Playwright y Vitest se atraganta con su
     // `test.describe` al recogerlo.
     include: ['tests/**/*.test.ts'],
+    /*
+      Trinquete de cobertura (T8.7). Los umbrales son la cobertura del día
+      que se puso, redondeada hacia abajo, y sólo suben: quien los baje tiene
+      que decir en el commit por qué.
+
+      Mide los módulos que las pruebas de Vitest tocan, no todo `src/`. Con
+      `all: true` el número sale en 10 %, porque la mayor parte de la landing
+      es código de navegador —animaciones, mapa, simulador del teléfono— que
+      se prueba con Playwright, no aquí; un trinquete en 10 % no frena nada.
+
+      **Hueco declarado**: así, un módulo nuevo sin pruebas no baja el
+      número, porque no entra en la cuenta. Lo que este trinquete cuida es
+      que no se destape lo que ya está probado.
+    */
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary'],
+      thresholds: {
+        statements: 91,
+        branches: 71,
+        functions: 94,
+        lines: 94,
+      },
+    },
   },
   build: {
     outDir: 'dist',
