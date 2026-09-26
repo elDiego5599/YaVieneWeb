@@ -1,0 +1,14 @@
+{
+  /* Las pruebas de Vitest se escriben aparte de `src`, y el tsconfig
+     principal no las incluye: un error de tipos en un test pasaba por alto
+     en `npm run typecheck`, que es la compuerta de la CI. Van en su propio
+     fichero —como las de e2e con tsconfig.e2e.json— para que el tsconfig
+     principal siga midiendo solo lo que se publica. Los tests sí necesitan
+     los tipos de Node: varios leen ficheros y hablan con `process`. */
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+  },
+  "include": ["tests", "src", "vite.config.ts"]
+}
