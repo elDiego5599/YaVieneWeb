@@ -97,17 +97,17 @@
   color: var(--acento);
 }
 
-/* El azul profundo del fondo anterior, ahora en el número: el fantasma
-   dejó de ser gris de bus mudo y pasó a ser tinta de marca a plena voz.
-   Sobre la arena manda sin gritar —es el ancla de la página— y el titular
-   de abajo queda en tinta normal. */
+/* El azul de la bienvenida de la app (`live_route_backdrop.dart`: el
+   degradado arranca en #17325F): el mismo fondo del pasajero, medido del
+   código y no a ojo. Sobre la arena va sólido, a plena voz —es el ancla
+   de la página— y el titular de abajo queda en tinta normal. */
 .err-codigo {
   font-family: var(--font-display);
   font-size: clamp(78px, 15vw, 148px);
   font-weight: 800;
   line-height: 0.82;
   letter-spacing: -0.05em;
-  color: var(--ink-deep);
+  color: #17325F;
 }
 
 .err-hoja h1 {
