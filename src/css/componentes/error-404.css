@@ -97,10 +97,11 @@
   color: var(--acento);
 }
 
-/* El azul de la bienvenida de la app (`live_route_backdrop.dart`: el
-   degradado arranca en #17325F): el mismo fondo del pasajero, medido del
-   código y no a ojo. Sobre la arena va sólido, a plena voz —es el ancla
-   de la página— y el titular de abajo queda en tinta normal. */
+/* El azul de la bienvenida fundiéndose al verde de marca, de arriba
+   abajo: la noche de la ciudad arriba, el bus en vivo abajo. Es texto con
+   degradado (`background-clip: text`), así que lleva respaldo: sin
+   soporte el número queda en el azul sólido de la versión anterior, nunca
+   invisible (el `color: transparent` sólo se pone dentro del `@supports`). */
 .err-codigo {
   font-family: var(--font-display);
   font-size: clamp(78px, 15vw, 148px);
@@ -108,6 +109,15 @@
   line-height: 0.82;
   letter-spacing: -0.05em;
   color: #17325F;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .err-codigo {
+    background: linear-gradient(180deg, #17325F 0%, #00A859 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 }
 
 .err-hoja h1 {
