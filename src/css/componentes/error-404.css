@@ -149,6 +149,12 @@
   border-radius: 14px;
   background: var(--surface);
   box-shadow: var(--sombra-tarjeta);
+  /* Doble filo sin tocar el HTML: el `outline` dibuja la cáscara exterior
+     a 6 px, siguiendo el mismo radio en los navegadores de hoy. La tarjeta
+     se lee como pieza mecanizada —placa en bandeja— en vez de caja plana.
+     No mueve el layout: el outline no ocupa sitio. */
+  outline: 1px solid var(--linea);
+  outline-offset: 6px;
 }
 
 .err-pedida-rotulo {

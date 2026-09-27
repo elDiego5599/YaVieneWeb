@@ -143,7 +143,11 @@
    arriba: el salto era lo que delataba).
 
    Dos versiones porque hay dos botones: sobre tinta y verde el círculo
-   es blanco translúcido; sobre papel es tinta translúcida. */
+   es blanco translúcido; sobre papel es tinta translúcida.
+
+   Regla de uso: la flecha es del primario, el que lleva a alguna parte.
+   El secundario no la lleva —dos flechas en el mismo gesto pelean por el
+   ojo y ninguna gana. */
 .btn-flecha {
   display: inline-flex;
   align-items: center;
@@ -155,22 +159,13 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 1;
-  transition: transform 0.38s var(--ease-spring), background-color var(--transition-hover);
-}
-
-.btn-primary .btn-flecha,
-.btn-green .btn-flecha {
   background: rgba(255, 255, 255, 0.16);
-}
-
-.btn-outline .btn-flecha {
-  background: rgba(11, 18, 32, 0.07);
+  transition: transform 0.38s var(--ease-spring), background-color var(--transition-hover);
 }
 
 @media (hover: hover) {
   .btn-primary:hover .btn-flecha,
-  .btn-green:hover .btn-flecha,
-  .btn-outline:hover .btn-flecha {
+  .btn-green:hover .btn-flecha {
     transform: translate(2px, -2px) scale(1.06);
   }
 }
