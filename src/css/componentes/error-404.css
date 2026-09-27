@@ -21,7 +21,12 @@
    oscuro del mapa en vez de la arena de las páginas legales, y de ahí que
    lo único que se ofrezca sea una lista de sitios que sí existen. */
 .err-body {
+  /* `100vh` en el móvil cuenta la barra de direcciones y la página salta
+     cuando se esconde; `100dvh` mide lo visible de verdad (`svh` para el
+     que no lo entienda, que entonces usa lo chico y no rompe nada). */
   min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background:

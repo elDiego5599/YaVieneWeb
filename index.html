@@ -227,11 +227,16 @@
 
         <!-- Columna Izquierda: Mensaje Comercial / Copy -->
         <div class="hero-copy">
-          <h1 class="hero-title">¿Cuánto falta <span class="highlight">para tu bus?</span></h1>
-          <p class="hero-description">Mira el bus moverse en el mapa, con la distancia que le falta para
+          <!-- La copia entra por turnos con el mismo `.reveal` del resto
+               de la página (lo recoge `ScrollEffects` solo): titular,
+               descripción, botones y tiendas, cada uno 80 ms después del
+               anterior. Antes el texto salía de golpe y sólo los
+               teléfonos escalonaban. -->
+          <h1 class="hero-title reveal" data-reveal-delay="0">¿Cuánto falta <span class="highlight">para tu bus?</span></h1>
+          <p class="hero-description reveal" data-reveal-delay="80">Mira el bus moverse en el mapa, con la distancia que le falta para
             llegar a tu paradero.</p>
 
-          <div class="hero-actions">
+          <div class="hero-actions reveal" data-reveal-delay="160">
             <a href="#mapa" class="btn-primary btn-green">Ver el mapa en vivo</a>
             <a href="/empresas.html" class="btn-outline">Para empresas</a>
           </div>
@@ -240,7 +245,7 @@
                cualquiera que acaba de leer el titular. Las dos marcas van
                dibujadas, no en una fuente de iconos: trazos de un solo
                camino que heredan el color del texto. -->
-          <p class="hero-subtext">
+          <p class="hero-subtext reveal" data-reveal-delay="240">
             <span class="hero-subtext-lead">Ya Viene, disponible en</span>
             <span class="tienda-chips">
               <span class="tienda-chip">

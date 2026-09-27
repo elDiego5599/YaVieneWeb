@@ -273,6 +273,12 @@
   border: 0;
   pointer-events: none;
   overflow: visible;
+  /* La deriva que pone `hero-deriva.ts` al hacer scroll: el trío baja
+     hasta 56 px mientras la copia sube. `transform` no pelea con la
+     respiración de los teléfonos porque esa anima `translate`, que es
+     otra propiedad; y con `prefers-reduced-motion` la variable nunca se
+     escribe, así que esto se queda en cero. */
+  transform: translate3d(0, calc(var(--hero-deriva, 0) * 1px), 0);
 }
 
 /* El trío mide lo mismo en cualquier ancho: sin escalones por

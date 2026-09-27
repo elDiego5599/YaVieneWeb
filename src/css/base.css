@@ -132,3 +132,25 @@ p {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--tinta-tenue);
 }
+
+/* ── Grano ─────────────────────────────────────────────────────────────
+   Los fondos de la página (papel, banda, arena del hero) son planos del
+   todo: sin nada que los rompa se leen estériles al lado de los mapas,
+   que traen su propia textura. Una capa fija de ruido al 3 % rompe lo
+   digital sin ensuciar nada —a esa alfa el contraste medido no se mueve,
+   así que los 4.5:1 siguen intactos—.
+
+   `z-index: 1000` es la capa más alta de la página a propósito: el grano
+   va encima de todo, incluido el nav (999). No bloquea nada porque no
+   recibe puntero, y al ser `position: fixed` no crea caja ni mueve el
+   layout. Si un día hace falta algo por encima (un modal global), ese
+   algo estrena el 1001 con su comentario. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
