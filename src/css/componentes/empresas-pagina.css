@@ -1621,6 +1621,12 @@
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
+  /* La flecha en su círculo, como los primarios de la portada: el botón
+     pasa a fila flexible para que el círculo quede centrado con el texto. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   transition: background var(--transition-hover), box-shadow var(--transition-hover),
     transform var(--transition-hover);
 }
@@ -1633,6 +1639,10 @@
   .form-submit-btn:hover {
     background: #036145;
     box-shadow: 0 6px 16px -8px rgba(4, 116, 84, 0.55);
+  }
+
+  .form-submit-btn:hover .btn-flecha {
+    transform: translate(2px, -2px) scale(1.06);
   }
 }
 
