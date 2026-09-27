@@ -97,17 +97,17 @@
   color: var(--acento);
 }
 
-/* El mismo gris al que la app apaga un bus que dejó de reportar. Grande
-   pero apagado: es el dato, no el titular. Sobre la arena no hace falta
-   la noche para que se lea fantasma: el gris de los mudos al 45 % basta. */
+/* El azul profundo del fondo anterior, ahora en el número: el fantasma
+   dejó de ser gris de bus mudo y pasó a ser tinta de marca a plena voz.
+   Sobre la arena manda sin gritar —es el ancla de la página— y el titular
+   de abajo queda en tinta normal. */
 .err-codigo {
   font-family: var(--font-display);
   font-size: clamp(78px, 15vw, 148px);
   font-weight: 800;
   line-height: 0.82;
   letter-spacing: -0.05em;
-  color: var(--app-text-disabled);
-  opacity: 0.45;
+  color: var(--ink-deep);
 }
 
 .err-hoja h1 {
