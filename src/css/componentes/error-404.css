@@ -17,9 +17,12 @@
    aplicada a una dirección. Cuando un bus lleva cinco minutos sin
    reportar, la app no enseña su última posición como si fuera la de
    ahora —la apaga al gris de los buses mudos y dice que no sabe—, y aquí
-   pasa lo mismo. De ahí el número en ese gris exacto, de ahí el fondo
-   oscuro del mapa en vez de la arena de las páginas legales, y de ahí que
-   lo único que se ofrezca sea una lista de sitios que sí existen. */
+   pasa lo mismo. De ahí el número en ese gris exacto y de ahí el texto.
+
+   Y va en claro, como el resto de la página: el fondo oscuro era un
+   pegote en medio del sistema día (papel, banda, tinta). La historia no
+   necesitaba la noche, sólo el gris apagado —que sobre arena se lee
+   igual de fantasma— y el tablero de salidas con lo que sí existe. */
 .err-body {
   /* `100vh` en el móvil cuenta la barra de direcciones y la página salta
      cuando se esconde; `100dvh` mide lo visible de verdad (`svh` para el
@@ -29,11 +32,14 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background:
-    radial-gradient(900px circle at 8% -10%, rgba(0, 168, 89, 0.16), transparent 60%),
-    radial-gradient(700px circle at 100% 108%, rgba(20, 39, 78, 0.9), transparent 62%),
-    var(--ink-deep);
-  color: var(--text-white);
+  /* La misma arena del hero con sus dos respiros de color, apagados un
+     punto para que el fantasma mande: el verde abajo a la izquierda, el
+     azul arriba a la derecha. */
+  background-color: #FAF6F0;
+  background-image:
+    radial-gradient(circle at 12% 88%, rgba(0, 168, 89, 0.12) 0%, transparent 55%),
+    radial-gradient(circle at 87% 8%, rgba(43, 92, 184, 0.10) 0%, transparent 45%);
+  color: var(--tinta);
 }
 
 .err-top {
@@ -55,13 +61,13 @@
   font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.14em;
-  color: var(--text-white);
+  color: var(--tinta);
 }
 
 .err-volver {
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--green);
+  color: var(--acento);
 }
 
 .err-volver:hover {
@@ -79,8 +85,21 @@
   padding: clamp(34px, 6vh, 76px) var(--gutter) clamp(30px, 4vw, 52px);
 }
 
+/* La ceja, con la voz de los rótulos de sección: versales verdes con
+   aire. Es lo que vuelve premium una página de error: orden antes del
+   número. */
+.err-ojo {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--acento);
+}
+
 /* El mismo gris al que la app apaga un bus que dejó de reportar. Grande
-   pero apagado: es el dato, no el titular. */
+   pero apagado: es el dato, no el titular. Sobre la arena no hace falta
+   la noche para que se lea fantasma: el gris de los mudos al 45 % basta. */
 .err-codigo {
   font-family: var(--font-display);
   font-size: clamp(78px, 15vw, 148px);
@@ -88,7 +107,7 @@
   line-height: 0.82;
   letter-spacing: -0.05em;
   color: var(--app-text-disabled);
-  opacity: 0.58;
+  opacity: 0.45;
 }
 
 .err-hoja h1 {
@@ -98,7 +117,7 @@
   font-weight: 700;
   line-height: 1.06;
   letter-spacing: -0.04em;
-  color: var(--text-white);
+  color: var(--tinta);
   text-wrap: balance;
 }
 
@@ -106,17 +125,19 @@
   max-width: 58ch;
   font-size: 16.5px;
   line-height: 1.66;
-  color: var(--text-white-dim);
+  color: var(--tinta-media);
 }
 
 .err-entrada em {
   font-style: normal;
   font-weight: 700;
-  color: var(--app-text-disabled);
+  color: var(--tinta);
 }
 
 /* La dirección que falló, tal cual llegó. Sirve para ver de un vistazo si
-   el enlace venía mal escrito, así que va en monoespaciada y entera. */
+   el enlace venía mal escrito, así que va en monoespaciada y entera. En
+   claro es una tarjeta blanca con filo y sombra mínima, como las del
+   resto de la página. */
 .err-pedida {
   display: flex;
   flex-wrap: wrap;
@@ -124,9 +145,10 @@
   gap: 6px 12px;
   margin-top: clamp(8px, 1.4vh, 18px);
   padding: 14px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--linea);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface);
+  box-shadow: var(--sombra-tarjeta);
 }
 
 .err-pedida-rotulo {
@@ -134,13 +156,13 @@
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--text-white-sub);
+  color: var(--tinta-tenue);
 }
 
 .err-pedida code {
   font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
   font-size: 14px;
-  color: var(--text-white);
+  color: var(--tinta);
   overflow-wrap: anywhere;
 }
 
@@ -150,7 +172,7 @@
   display: flex;
   flex-direction: column;
   margin-top: clamp(14px, 2.6vh, 30px);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid var(--linea-fuerte);
 }
 
 .err-indice-rotulo {
@@ -159,20 +181,38 @@
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--green);
+  color: var(--acento);
 }
 
 .err-fila {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 4px 14px;
   padding: 15px 8px 15px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-white);
+  border-top: 1px solid var(--linea);
+  color: var(--tinta);
   transition:
     padding-left var(--transition-hover),
     background-color var(--transition-hover);
+}
+
+/* La flecha no está en el marcado: es decoración y nace aquí. Entra
+   deslizándose al hover, como las filas del tablero que señalan a dónde
+   llevan. */
+.err-fila::after {
+  content: "→";
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  translate: -6px -50%;
+  opacity: 0;
+  font-weight: 700;
+  color: var(--acento);
+  transition:
+    opacity var(--transition-hover),
+    translate var(--transition-hover);
 }
 
 .err-fila strong {
@@ -183,24 +223,40 @@
 
 .err-fila span {
   font-size: 14px;
-  color: var(--text-white-sub);
+  color: var(--tinta-tenue);
 }
 
 /* El foco fuera del guarda, el puntero dentro. Ver botones.css. */
 .err-fila:focus-visible {
   padding-left: 10px;
-  background: rgba(255, 255, 255, 0.045);
+  background: rgba(4, 116, 84, 0.06);
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+
+.err-fila:focus-visible::after {
+  opacity: 1;
+  translate: 0 -50%;
 }
 
 @media (hover: hover) {
   .err-fila:hover {
     padding-left: 10px;
-    background: rgba(255, 255, 255, 0.045);
+    background: rgba(4, 116, 84, 0.06);
   }
 
   .err-fila:hover strong {
-    color: var(--green);
+    color: var(--acento);
   }
+
+  .err-fila:hover::after {
+    opacity: 1;
+    translate: 0 -50%;
+  }
+}
+
+.err-fila:active {
+  transform: translateY(1px);
 }
 
 .err-pie {
@@ -213,13 +269,13 @@
   width: 100%;
   margin: 0 auto;
   padding: 20px var(--gutter) clamp(28px, 4vw, 48px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--linea);
   font-size: 13.5px;
-  color: var(--text-white-sub);
+  color: var(--tinta-tenue);
 }
 
 .err-pie a {
-  color: var(--green);
+  color: var(--acento);
   font-weight: 600;
 }
 
