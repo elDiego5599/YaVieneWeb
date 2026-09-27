@@ -212,7 +212,7 @@
   color: var(--acento);
   transition:
     opacity var(--transition-hover),
-    translate var(--transition-hover);
+    translate 0.38s var(--ease-spring);
 }
 
 .err-fila strong {

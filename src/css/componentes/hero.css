@@ -43,6 +43,27 @@
   border-bottom-right-radius: 32px;
   /* El filo redondeado corta los teléfonos: el escenario sangra. */
   overflow: hidden;
+  /* El hero respira: los tres degradados se corren ±2.5 % en 28 s. No es
+     gratis —`background-position` no lo mueve la tarjeta, hay que
+     repintar el panel (ver animations.css)—, pero es un solo panel, va
+     despacio y `reposo.ts` lo duerme fuera de pantalla (`.en-reposo`
+     pausa las animaciones). Con `prefers-reduced-motion` ni arranca. */
+  animation: hero-respira 28s ease-in-out infinite alternate;
+}
+
+@keyframes hero-respira {
+  from {
+    background-position: 0% 0%, 0% 0%, 0% 0%;
+  }
+  to {
+    background-position: 2.5% 3%, -2.5% -3%, 0% 4%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-panel {
+    animation: none;
+  }
 }
 
 /*

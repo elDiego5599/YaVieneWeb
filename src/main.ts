@@ -33,6 +33,7 @@ import { dormirLoQueNoSeVe } from './reposo';
 import { encenderScrollSuave } from './scroll-suave';
 import { entrarEscena, ScrollEffects } from './scroll-effects';
 import { encenderDerivaHero } from './hero-deriva';
+import { encenderFocoFichas } from './spotlight';
 import { sinMovimiento } from './scrolly';
 
 const arrancar = (): void => {
@@ -58,6 +59,8 @@ const arrancar = (): void => {
   entrarEscena();
   // La deriva del trío al hacer scroll (sólo transform, con tope).
   encenderDerivaHero();
+  // El wash verde que sigue al puntero en las fichas de ruta.
+  encenderFocoFichas();
 
   // Y lo contrario: lo que está fuera de pantalla deja de animarse. Es lo
   // primero que se enciende porque sólo mira secciones, no depende de que
