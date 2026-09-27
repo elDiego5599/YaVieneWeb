@@ -53,14 +53,14 @@
   padding: clamp(22px, 3vw, 40px) var(--gutter) 0;
 }
 
+/* La misma marca del nav principal: el texto lo pone `.wordmark`
+   (13 px, 800, tracking 0.22em) y aquí sólo se hereda —si la marca
+   cambia, cambia en los dos sitios. El color sí es propio: tinta sobre
+   arena en vez de blanco sobre navy. */
 .err-marca {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  font-family: var(--font-family);
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
+  gap: 10px;
   color: var(--tinta);
 }
 
