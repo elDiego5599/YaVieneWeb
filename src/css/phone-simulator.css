@@ -38,7 +38,7 @@
      de metal y 1,8 de negro —el negro empatado con el metal, no por
      debajo: más fino que esto el marco se convertía en un pelo y la
      pantalla parecía pegada al canto. Ninguno de los dos le cuesta nada a la app:
-     el `container-type` mide la caja de contenido, así que al adelgazar
+     `--u` sale del ancho menos los dos biseles, así que al adelgazar
      el bisel la interfaz crece entera y en proporción. */
   --riel: calc(var(--ancho) * 0.018);
   --negro: calc(var(--ancho) * 0.018);
@@ -104,9 +104,6 @@
     inset 0 0 0 0.5px rgba(0, 0, 0, 0.3),
     inset 0 -0.5px 0 rgba(0, 0, 0, 0.28);
 
-  /* La pantalla consulta este contenedor: como el relleno es el bisel, el
-     ancho de consulta es exactamente el ancho de la pantalla. */
-  container-type: inline-size;
 }
 
 /* Luz ambiental detrás del aparato, el reflejo verde de la marca. */
@@ -175,8 +172,15 @@
 
 .phone-screen {
   /* Un píxel lógico de un iPhone de 402 pt. Toda la interfaz de la app se
-     mide con esto. */
-  --u: 0.24876cqw;
+     mide con esto: el ancho de la pantalla —el de la carcasa menos el
+     bisel de cada lado— entre 402.
+
+     En píxeles y no en `cqw`: el teléfono de los pasos vive dentro del
+     `zoom` de la escena, y Safari aplica ese zoom dos veces a las
+     unidades de contenedor —la carcasa se encogía una vez y la app dos,
+     y la isla y la rayita quedaban en dos tercios de su tamaño
+     (tests/pantalla-sin-cq.test.ts). */
+  --u: calc((var(--ancho) - 2 * var(--bisel)) / 402);
   /* Lo que la app tiene prohibido por arriba: reloj e isla. El
      `SafeArea` de iOS en este aparato mide 59 pt, y de él cuelgan tanto la
      barra de estado como el sitio donde empieza a dibujar la app —si se
