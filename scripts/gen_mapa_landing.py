@@ -73,6 +73,10 @@ ZOOM_GL = 12.54
 # La pantalla del iPhone que reproduce el mockup, en puntos: 402 de ancho,
 # y el alto que le da el aspecto de .phone-screen (0,4594).
 PANTALLA_PT = (402, 875)
+# La barra de estado del iPhone: el `SafeArea` superior de 59 pt, el mismo
+# `--alto-estado` de phone-simulator.css. Ahí van el reloj y la isla, y un
+# rótulo del mapa debajo se lee como basura; la captura no lleva ninguno.
+BARRA_ESTADO_PT = 59
 # A 2x, como la pantalla retina: en el teléfono del hero cae uno a uno.
 DPR = 2
 # Tolerancia de la simplificación, en unidades del lienzo (medio punto a
@@ -233,15 +237,18 @@ def emitir_ts(body, generado, out_w, out_h):
     OUT_TS.write_text("\n".join(lineas), encoding="utf-8")
 
 
-def pintar(centro, zoom_gl, ancho, alto, destino):
-    """Pinta con render_mapa.mjs y guarda en WebP; devuelve su tamaño."""
+def pintar(centro, zoom_gl, ancho, alto, destino, franja=0):
+    """Pinta con render_mapa.mjs y guarda en WebP; devuelve su tamaño.
+
+    [franja] son los puntos de arriba sin rótulos (ver render_mapa.mjs).
+    """
     with tempfile.TemporaryDirectory() as tmp:
         png = Path(tmp) / "mapa.png"
         subprocess.run(
             [
                 "node", str(RAIZ / "scripts" / "render_mapa.mjs"),
                 "%.6f" % centro[0], "%.6f" % centro[1], str(zoom_gl),
-                str(ancho), str(alto), str(DPR), str(png),
+                str(ancho), str(alto), str(DPR), str(png), str(franja),
             ],
             check=True,
             cwd=RAIZ,
@@ -284,7 +291,7 @@ def main():
     )
 
     print(f"encuadre: {ancho} x {alto} pt a zoom {ZOOM_GL}, x{DPR}")
-    out_w, out_h = pintar(centro, ZOOM_GL, ancho, alto, OUT_IMG)
+    out_w, out_h = pintar(centro, ZOOM_GL, ancho, alto, OUT_IMG, BARRA_ESTADO_PT)
 
     # El lienzo del SVG es la captura en sus propios píxeles, así la
     # polilínea y el fondo comparten sistema de coordenadas. Se simplifica
