@@ -1,3 +1,4 @@
+import { cifraViva } from './cifra-viva';
 import { encajeDe } from './encaje';
 import type { PhoneMap } from './phone-map';
 import { sinMovimiento } from './scrolly';
@@ -635,7 +636,8 @@ export class PasoDemo {
   private setMetros(metros: number): void {
     const m = this.redondear(metros);
     // _metricParts(): bajo el kilómetro en metros, por encima en kilómetros.
-    this.texto('eta-value', m < 1000 ? String(m) : (m / 1000).toFixed(1));
+    const cifra = this.el('eta-value');
+    if (cifra) cifraViva(cifra, m < 1000 ? String(m) : (m / 1000).toFixed(1), m);
     this.texto('eta-unit', m < 1000 ? 'm de ti' : 'km de ti');
 
     // _urgencyColor() de eta_bottom_sheet.dart: coral bajo los 300 metros,

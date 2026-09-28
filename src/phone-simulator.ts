@@ -19,6 +19,7 @@
  * es el de proximity_alerts_provider.dart.
  */
 
+import { cifraViva } from './cifra-viva';
 import type { PhoneMap } from './phone-map';
 import type { RutaLanding } from './types';
 import {
@@ -479,7 +480,8 @@ export class PhoneSimulator {
     // detalle: el número ya lo dice todo.
     if (!this.avisoActivo) this.setDetalle('');
 
-    this.texto('eta-value', valor);
+    const cifra = this.el('eta-value');
+    if (cifra) cifraViva(cifra, valor, metros);
     this.texto('eta-unit', unidad);
     this.notificacion(metros);
     // La franja y el número llevan el mismo color: en la app los dos
