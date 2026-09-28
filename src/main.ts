@@ -29,6 +29,7 @@ import { PhoneMap } from './phone-map';
 import { PhoneSimulator } from './phone-simulator';
 import { Problema } from './problema';
 import { pintarCifras } from './rutas';
+import { reboteDelPie } from './rebote';
 import { dormirLoQueNoSeVe } from './reposo';
 import { encenderScrollSuave } from './scroll-suave';
 import { entrarEscena, ScrollEffects } from './scroll-effects';
@@ -64,6 +65,7 @@ const arrancar = (): void => {
   const isla = document.querySelector<HTMLElement>('.nav-island');
   const botonIsla = isla?.querySelector<HTMLButtonElement>('.nav-island-toggle');
   if (isla && botonIsla) new NavIsland(isla, botonIsla);
+  reboteDelPie();
 
   const svg = document.querySelector<SVGSVGElement>('#phone-routes');
   const lienzo = document.querySelector<HTMLElement>('#phone-map');

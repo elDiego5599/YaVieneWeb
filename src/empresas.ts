@@ -28,6 +28,7 @@ import './css/accesibilidad.css';
 
 import { ContactForm } from './contact-form';
 import { NavIsland } from './nav-island';
+import { reboteDelPie } from './rebote';
 import { PanelFlota } from './panel-flota';
 import { encenderScrollSuave } from './scroll-suave';
 import { ScrollEffects } from './scroll-effects';
@@ -38,6 +39,7 @@ const arrancar = (): void => {
   const isla = document.querySelector<HTMLElement>('.nav-island');
   const botonIsla = isla?.querySelector<HTMLButtonElement>('.nav-island-toggle');
   if (isla && botonIsla) new NavIsland(isla, botonIsla);
+  reboteDelPie();
 
   const flota = document.querySelector<HTMLElement>('.flota');
   if (flota) new PanelFlota(flota);

@@ -345,6 +345,11 @@
    ventana entera como el del encabezado. Luz desde abajo —verde marca a
    la izquierda, navy a la derecha— sobre el papel, fija y sin respirar. */
 .site-footer {
+  /* El color de la última fila del pie, al centro, en un teléfono (de 375
+     a 440 de ancho sale entre #86B7AC y #88B8AE): es el que toma el
+     lienzo en el rebote de iOS (rebote.ts). Si cambian estos degradados,
+     e2e/rebote.spec.ts lo mide y avisa. */
+  --rebote: #87B7AD;
   background:
     radial-gradient(1200px 520px at 8% 106%, rgba(0, 168, 89, 0.34), transparent 70%),
     radial-gradient(1200px 520px at 92% 106%, rgba(19, 43, 87, 0.36), transparent 70%),
