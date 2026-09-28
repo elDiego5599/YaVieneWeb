@@ -195,8 +195,7 @@ export function carrilRutas(rutas: readonly RutaLanding[]): HTMLElement {
   return carril(
     rutas.map(ruta => {
       const fila = document.createElement('div');
-      // Dos líneas: el ListTile sube de 56 a 72.
-      fila.className = 'app-tile app-tile--dos-lineas';
+      fila.className = 'app-tile';
       fila.dataset.ruta = ruta.id;
       const partes = codigoDeRuta(ruta.nombre);
       fila.innerHTML = `
