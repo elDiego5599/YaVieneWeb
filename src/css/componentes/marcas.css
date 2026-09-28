@@ -14,14 +14,14 @@
    ────────────────────────────────────────────────────────────────── */
 .marcas-claras {
   background: var(--papel);
-  padding: clamp(36px, 4vw, 60px) 0 38px;
+  padding: clamp(36px, 4vw, 60px) var(--calle) 38px;
 }
 
 /* El rótulo estaba sólo en el `aria-label` de la sección: se oía y no se
    leía. Siete logos sin nada que los presente no dicen qué son —¿clientes,
    alianzas, medios?—, y ésa es justo la frase que hace que valgan. */
 .marcas-claras-rotulo {
-  margin: 0 var(--calle) clamp(16px, 2vw, 30px);
+  margin: 0 0 clamp(16px, 2vw, 30px);
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
@@ -31,11 +31,14 @@
   color: var(--tinta-tenue);
 }
 
-/* A lo ancho de la columna de la página y no de la ventana: en un
-   escritorio ancho, una cinta de borde a borde se mira de reojo. La
-   vuelta tarda más que en empresas porque la cinta es más larga: así los
-   logos pasan a la misma velocidad en las dos páginas, unos 40 px/s. */
-.empresa-marcas-carrusel--portada {
+/* El mismo ancho que tenía la fila quieta de logos: la columna de la
+   página con sus calles a los lados, hasta 1180 px. Una cinta de borde a
+   borde de la ventana se mira de reojo. Va con `.marcas-claras` delante
+   porque `.empresa-marcas-carrusel`, más abajo, pone `max-width: 100%` y
+   a igual peso ganaba él: la cinta se iba a todo el ancho. La vuelta
+   tarda más que en empresas porque la cinta es más larga: así los logos
+   pasan a la misma velocidad en las dos páginas, unos 40 px/s. */
+.marcas-claras .empresa-marcas-carrusel--portada {
   --marcas-vuelta: 44s;
   max-width: 1180px;
   margin: 0 auto;
@@ -121,7 +124,10 @@
   2. Se desvanecen (`::before` y `::after`, encima del velo) con una
      curva suave y no con una recta: una recta aclara deprisa al
      principio y deja una línea donde empieza; con más paradas el
-     desvanecido no tiene dónde verse.
+     desvanecido no tiene dónde verse. Llega a blanco macizo al 58 % del
+     tramo y no al final: acabando en el filo, el borde se veía como un
+     cristal transparente; así el logo entra desde el blanco de la página,
+     y el desenfoque solo se ve en la franja de paso.
 
   Nada de esto toca la pista que se mueve. El apagón iba antes con
   `mask-image` sobre la pista, y una máscara sobre algo que se anima
@@ -186,11 +192,10 @@
   background: linear-gradient(
     var(--hacia),
     var(--surface-nada),
-    color-mix(in srgb, var(--surface) 20%, transparent) 26%,
-    color-mix(in srgb, var(--surface) 50%, transparent) 50%,
-    color-mix(in srgb, var(--surface) 80%, transparent) 72%,
-    color-mix(in srgb, var(--surface) 95%, transparent) 88%,
-    var(--surface)
+    color-mix(in srgb, var(--surface) 30%, transparent) 18%,
+    color-mix(in srgb, var(--surface) 70%, transparent) 34%,
+    color-mix(in srgb, var(--surface) 94%, transparent) 48%,
+    var(--surface) 58%
   );
 }
 

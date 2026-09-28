@@ -328,6 +328,23 @@ for (const ruta of ['/', '/empresas.html']) {
   });
 }
 
+/* En la portada la cinta ocupa el ancho que tenía la fila quieta de logos:
+   la columna de la página, con sus calles, hasta 1180 px. Una regla de
+   `.empresa-marcas-carrusel` con el mismo peso la estiraba a todo el ancho. */
+test('la cinta de la portada no pasa del ancho de la columna', async ({ page }) => {
+  for (const ancho of [1600, 390]) {
+    await page.setViewportSize({ width: ancho, height: 900 });
+    await page.goto('/', { waitUntil: 'load' });
+    const caja = await page.locator('.empresa-marcas-carrusel').evaluate((c) => {
+      const r = c.getBoundingClientRect();
+      return { izq: r.left, der: document.documentElement.clientWidth - r.right, ancho: r.width };
+    });
+    expect(caja.ancho, `${ancho} px: más ancha que la columna`).toBeLessThanOrEqual(1180);
+    expect(caja.izq, `${ancho} px: pegada al borde izquierdo`).toBeGreaterThanOrEqual(16);
+    expect(Math.abs(caja.izq - caja.der), `${ancho} px: no queda centrada`).toBeLessThan(2);
+  }
+});
+
 test('con movimiento reducido la cinta de empresas se queda quieta', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/', { waitUntil: 'load' });
