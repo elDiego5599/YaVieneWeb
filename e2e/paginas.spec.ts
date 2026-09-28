@@ -272,6 +272,69 @@ test.describe('la banda de empresas', () => {
   });
 });
 
+/*
+  La cinta de empresas, en la portada y en /empresas.html. La portada
+  tenía los siete logos quietos en una rejilla; ahora corren como en
+  empresas. Y en empresas los logos llegaban al filo y se cortaban contra
+  una franja estrecha: parecía una pared. Los bordes ahora se desenfocan
+  por capas —cada capa más borrosa que la anterior— y a la vez se
+  desvanecen en un tramo ancho, así que un logo se disuelve al salir en
+  vez de chocar.
+*/
+for (const ruta of ['/', '/empresas.html']) {
+  test(`la cinta de empresas corre y se disuelve en los bordes en ${ruta}`, async ({ page }) => {
+    await page.goto(ruta, { waitUntil: 'load' });
+    const cinta = page.locator('.empresa-marcas-carrusel');
+    await expect(cinta).toHaveCount(1);
+    await cinta.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(700);
+
+    const medida = () =>
+      page.evaluate(() => {
+        const c = document.querySelector<HTMLElement>('.empresa-marcas-carrusel')!;
+        const pista = c.querySelector<HTMLElement>('.empresa-marcas-track')!;
+        const imgs = Array.from(c.querySelectorAll<HTMLImageElement>('.empresa-marcas-logo'));
+        const velos = Array.from(c.querySelectorAll<HTMLElement>('.marcas-velo')).map((v) => ({
+          ancho: v.getBoundingClientRect().width,
+          desenfoques: Array.from(v.children).map((capa) => {
+            const f = getComputedStyle(capa).backdropFilter || (getComputedStyle(capa) as CSSStyleDeclaration & { webkitBackdropFilter?: string }).webkitBackdropFilter || '';
+            return Number(/blur\(([\d.]+)px\)/.exec(f)?.[1] ?? 0);
+          }),
+        }));
+        return {
+          x: new DOMMatrix(getComputedStyle(pista).transform).m41,
+          logos: imgs.length,
+          sinCargar: imgs.filter((i) => !(i.complete && i.naturalWidth > 0)).map((i) => i.alt || i.src),
+          anchoCinta: c.getBoundingClientRect().width,
+          velos,
+        };
+      });
+
+    const antes = await medida();
+    await page.waitForTimeout(600);
+    const despues = await medida();
+
+    expect(antes.logos, 'siete logos y su copia para cerrar la vuelta').toBe(14);
+    expect(antes.sinCargar, 'logos sin cargar: la cinta enseñaría un hueco').toEqual([]);
+    expect(despues.x, 'la cinta no se mueve').toBeLessThan(antes.x);
+
+    expect(antes.velos.length, 'un velo por borde').toBe(2);
+    for (const velo of antes.velos) {
+      expect(velo.ancho, 'un borde estrecho corta los logos como una pared').toBeGreaterThanOrEqual(Math.min(96, antes.anchoCinta * 0.14));
+      expect(velo.desenfoques.length, 'el desenfoque va por capas').toBeGreaterThanOrEqual(4);
+      expect(Math.max(...velo.desenfoques), 'el filo no llega a desenfocarse').toBeGreaterThanOrEqual(6);
+      expect([...velo.desenfoques].sort((a, b) => a - b), 'cada capa, más borrosa que la anterior').toEqual(velo.desenfoques);
+    }
+  });
+}
+
+test('con movimiento reducido la cinta de empresas se queda quieta', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/', { waitUntil: 'load' });
+  const nombre = await page.locator('.empresa-marcas-track').evaluate((p) => getComputedStyle(p).animationName);
+  expect(nombre).toBe('none');
+});
+
 test.describe('el mapa en vivo con el teclado', () => {
   /*
     El punto de espera sólo se movía tocando o pinchando el mapa, así que
