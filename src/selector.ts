@@ -151,6 +151,8 @@ const COLA = `
 const carril = (filas: HTMLElement[]): HTMLElement => {
   const nodo = document.createElement('div');
   nodo.className = 'sheet-lista-inner';
+  // Turno de entrada de cada fila (`_escalonFila`): topado en la sexta.
+  filas.forEach((fila, i) => fila.style.setProperty('--i', String(Math.min(i, 5))));
   nodo.append(...filas);
   return nodo;
 };
