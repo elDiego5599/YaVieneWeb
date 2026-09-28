@@ -54,8 +54,9 @@
   color: var(--green-accessible);
 }
 
-/* Tres colores que ya reparte la página: el verde de «la solución», el
-   coral de «el problema» y la tinta marina de la marca. Los dos primeros
+/* Tres colores de la marca: el verde de «la solución», el coral —que
+   «Qué resuelve» ya no usa: allí el problema pasó al azul de los
+   botones, 2026-09-28— y la tinta marina. Los dos primeros
    en su versión accesible, que es la que aguanta el texto sobre la banda
    —el coral de marca se quedaba en 2.92:1, por debajo del 3:1 de la
    norma incluso a este tamaño. */

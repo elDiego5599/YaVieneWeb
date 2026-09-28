@@ -1820,8 +1820,9 @@
 /*
   El botón nunca está muerto: siempre lleva a algún sitio. Sin empresa dice
   "Elegir empresa", sin ruta "Elegir ruta" y con las dos "Ver buses en
-  vivo", y sólo entonces se pone verde. Hasta ahí es navy, que es la manera
-  de decir "sigue" sin decir "listo".
+  vivo", y sólo entonces se pone verde. Hasta ahí va en el azul de los
+  botones de la app (route_selector_sheet.dart:1001, `AppColors.acento`),
+  que es la manera de decir "sigue" sin decir "listo".
 */
 .app-launch {
   margin-top: calc(26 * var(--u));
@@ -1830,7 +1831,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: var(--navy);
+  background: var(--azul-boton);
   color: #FFFFFF;
   /* AppTextStyles.boton, el mismo rótulo que el botón de la hoja de
      distancia: los dos son el botón grande de su pantalla. */

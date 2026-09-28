@@ -489,9 +489,12 @@
     box-shadow var(--f-tiempo);
 }
 
+/* Lo activo lleno va como en el panel de control: `AppColors.boton`
+   (app_control/lib/core/theme/app_theme.dart), el azul de los botones
+   de la app. */
 .flota-filtros .es-activo {
-  border-color: var(--ink);
-  background: var(--ink);
+  border-color: var(--azul-boton);
+  background: var(--azul-boton);
   color: #fff;
 }
 
@@ -621,7 +624,7 @@
 }
 
 .flota-pestanas .es-activa {
-  background: var(--ink);
+  background: var(--azul-boton);
   color: #fff;
 }
 

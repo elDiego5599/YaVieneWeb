@@ -5,7 +5,7 @@
 
    «A ciegas» es el problema dibujado: chispazos, cinco voces
    sueltas preguntando lo mismo, tres fichas desparramadas y torcidas,
-   y en medio una alerta roja que dice que nadie sabe dónde va el bus.
+   y en medio una alerta azul que dice que nadie sabe dónde va el bus.
 
    «Con Ya Viene» es lo mismo puesto en su sitio: el ruido se va, la
    nosotros los que lo resuelven—, y de ella baja un árbol de líneas que
@@ -41,12 +41,10 @@
 }
 
 #problema[data-cara='ciego'] .seccion-rotulo {
-  /* El coral accesible no llega a 4.5:1 sobre el rosa de esta cara con
-     letra fina: se oscurece solo aquí, sin tocar la variable que usan
-     los números grandes y las alertas. #871A0E tampoco llegaba: en móvil
-     el píxel que mide e2e/contraste.spec.ts es rgb(202,165,158) y daba
-     4.30:1. #7F180D da 4.60:1 sobre ese mismo rosa (fórmula WCAG). */
-  color: #7F180D;
+  /* El azul de los botones de la app, que reemplazó al rojo de esta cara
+     (pedido del dueño, 2026-09-28): 6,6:1 sobre la banda, sin tener que
+     oscurecerlo como al rojo (e2e/contraste.spec.ts lo mide). */
+  color: var(--azul-boton);
 }
 
 #problema[data-cara='claro'] .seccion-rotulo {
@@ -131,10 +129,10 @@
   color: var(--acento);
 }
 
-/* En la cara del problema el matiz va en el mismo rojo de la píldora
+/* En la cara del problema el matiz va en el mismo azul de la píldora
    de estado ("Nadie sabe dónde va el bus"): es la misma alerta. */
 #problema .cara--ciego .apagado {
-  color: var(--coral-accessible);
+  color: var(--azul-boton);
 }
 
 /* ── Las dos caras ─────────────────────────────────────────────────────
@@ -236,7 +234,7 @@
 
    Los tres colores son de aquí y no de `variables.css` porque no los usa
    nada más: `--hilo` es el verde de `--acento` aclarado hasta poder ser
-   un filo de un píxel sin gritar, `--hilo-alerta` es el rojo de los
+   un filo de un píxel sin gritar, `--hilo-alerta` es el azul de los
    cables del circuito y `--chispazo` tiene que verse sobre la banda sin
    llamar la atención antes que las fichas.
    ────────────────────────────────────────────────────────────────────── */
@@ -244,7 +242,7 @@
 .escenario {
   --hueco: clamp(16px, 2vw, 28px);
   --hilo: #9CCDBA;
-  --hilo-alerta: var(--coral-accessible);
+  --hilo-alerta: var(--azul-boton);
   --chispazo: #C0D1C6;
   position: relative;
   display: flex;
@@ -385,10 +383,10 @@
   width: var(--ancho-estado, max-content);
   padding: 9px 24px;
   border-radius: 999px;
-  background: var(--coral-accessible);
+  background: var(--azul-boton);
   box-shadow:
-    0 0 0 6px rgba(206, 45, 29, 0.08),
-    0 10px 24px rgba(206, 45, 29, 0.16);
+    0 0 0 6px rgba(30, 86, 168, 0.08),
+    0 10px 24px rgba(30, 86, 168, 0.16);
   color: #FFFFFF;
   font-family: var(--font-mono);
   font-size: 12.5px;
@@ -438,7 +436,7 @@
 /* ── El núcleo ─────────────────────────────────────────────────────────
 
    La ceremonia de `problema.ts`. Pasar de una cara a la otra no es un
-   cambio de estado, es una escena: la alerta roja se encoge hasta ser el
+   cambio de estado, es una escena: la alerta azul se encoge hasta ser el
    logo, se lleva por delante todo lo que hay suelto en el escenario,
    late, y se vuelve a abrir en verde diciendo «Ya Viene». De ahí baja el
    árbol. Lo que se cuenta es que el desorden no se desvanece solo: se lo
@@ -746,8 +744,8 @@
   width: 34px;
   height: 34px;
   border-radius: 11px;
-  background: var(--coral-light);
-  color: var(--coral-accessible);
+  background: var(--azul-boton-claro);
+  color: var(--azul-boton);
   transition:
     background-color 0.5s var(--ease-out-cubic),
     color 0.5s var(--ease-out-cubic);

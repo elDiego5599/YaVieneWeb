@@ -80,7 +80,7 @@ const MUESTRAS: Record<string, string[]> = {
     '.hero-subtext-lead',
     '.apagado',
     // La banda de «Qué resuelve»: fondo propio, así que su rótulo en
-    // coral y su letra chica se miden aparte de los de papel blanco.
+    // azul y su letra chica se miden aparte de los de papel blanco.
     '#problema .seccion-rotulo',
     '#problema .columna-texto',
     '.rutas-dato-numero',
@@ -179,7 +179,11 @@ test.describe('contraste del texto que no va en tinta plena', () => {
 
           // Se apaga la letra antes de mirar el píxel: así lo que se mide
           // es el fondo de verdad —panel, gradiente, puntitos y lo que
-          // haya debajo— y no una mezcla a medias con la propia letra.
+          // haya debajo— y no una mezcla a medias con la propia letra. Sin
+          // transición: el rótulo de «Qué resuelve» funde su color en
+          // 0,5 s, y a los 120 ms de la captura la letra seguía a medio
+          // irse y teñía el «fondo» (salía rosa con el rojo y azulado con
+          // el azul, y el rótulo daba menos contraste del que tiene).
           const sitio = await page.evaluate(
             ([s, n]: [string, number]) => {
               const el = document.querySelectorAll(s)[n] as HTMLElement;
@@ -202,6 +206,8 @@ test.describe('contraste del texto que no va en tinta plena', () => {
               const color = cs.color;
               if (visible) {
                 el.dataset.contrasteColor = el.style.color;
+                el.dataset.contrasteTransicion = el.style.transition;
+                el.style.transition = 'none';
                 el.style.color = 'transparent';
               }
               return {
@@ -225,7 +231,9 @@ test.describe('contraste del texto que no va en tinta plena', () => {
             ([s, n]: [string, number]) => {
               const el = document.querySelectorAll(s)[n] as HTMLElement;
               el.style.color = el.dataset.contrasteColor || '';
+              el.style.transition = el.dataset.contrasteTransicion || '';
               delete el.dataset.contrasteColor;
+              delete el.dataset.contrasteTransicion;
             },
             [sel, i] as [string, number]
           );

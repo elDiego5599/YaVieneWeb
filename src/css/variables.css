@@ -12,6 +12,15 @@
   --coral-accessible: #CE2D1D;
   --coral-light: #FBE7E4;
   --amber-accessible: #8A6700;
+
+  /* El azul de los botones de la app: `AppColors.acento` en
+     ya_viene_core/lib/core/theme/app_theme.dart, que el dueño eligió
+     (2026-09-28) para lo que va lleno —botones, filtros y pestañas
+     activos— y no para íconos. Blanco encima da 7,1:1 y como letra da
+     6,6:1 sobre la banda. El claro es su baldosa: el azul encima queda en
+     6,2:1 (tests/azul-boton.test.ts). */
+  --azul-boton: #1E56A8;
+  --azul-boton-claro: #E8EFF9;
   --amber-tint: #FFF8E1;
 
   /* Los `-accessible` son los mismos colores de marca, con el mismo tono y
