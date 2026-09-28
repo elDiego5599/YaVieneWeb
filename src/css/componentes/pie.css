@@ -89,7 +89,7 @@
   letter-spacing: -0.065em;
 }
 
-.footer-cta > p:not(.footer-cta-note) {
+.footer-cta > p {
   max-width: 56ch;
   color: var(--text-secondary);
   font-size: clamp(17px, 1.45vw, 22px);
@@ -114,11 +114,6 @@
     border-color: rgba(11, 22, 40, 0.38);
     background: rgba(255, 255, 255, 0.8);
   }
-}
-
-.footer-cta-note {
-  color: var(--text-muted);
-  font-size: 13px;
 }
 
 .footer-grid {
@@ -377,7 +372,7 @@
   text-wrap: balance;
 }
 
-.footer-cta > p:not(.footer-cta-note) {
+.footer-cta > p {
   margin: 18px 0 0;
   max-width: 50ch;
   font-size: clamp(16px, 1rem + 0.2vw, 17.5px);
@@ -394,12 +389,6 @@
   background: var(--papel);
   border: 1px solid var(--linea-fuerte);
   color: var(--tinta);
-}
-
-.footer-cta-note {
-  margin: 24px 0 0;
-  font-size: 12.5px;
-  color: var(--tinta-tenue);
 }
 
 .footer-grid {

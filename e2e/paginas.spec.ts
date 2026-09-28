@@ -380,6 +380,31 @@ test('en el teléfono, el aparato de los pasos se lleva más de la mitad del anc
   expect(escena.sobra, 'la escena ya no cabe en la ventana').toBeLessThanOrEqual(1);
 });
 
+/* El carril de rutas del teléfono estira las fichas a la más alta. Con
+   230 px fijos la C13 partía su tramo en tres líneas y las seis quedaban
+   en 107 px con el texto flotando en medio. */
+test('en el teléfono, las fichas de ruta van en una línea y a su alto', async ({ page }) => {
+  await page.setViewportSize({ width: 402, height: 760 });
+  await page.goto('/', { waitUntil: 'load' });
+  const fichas = await page.locator('.mv-rutas .ruta-ficha').evaluateAll((todas) =>
+    todas.map((f) => {
+      const alto = (el: Element) => el.getBoundingClientRect().height;
+      return {
+        alto: alto(f),
+        cabeza: alto(f.querySelector('.ruta-ficha-cabeza')!),
+        tramo: alto(f.querySelector('.ruta-ficha-tramo')!),
+      };
+    })
+  );
+  expect(fichas).toHaveLength(6);
+  const [primera] = fichas;
+  for (const ficha of fichas) {
+    expect(ficha.alto, 'una ficha más alta que el resto').toBe(primera.alto);
+    expect(ficha.tramo, 'el tramo se parte en dos líneas').toBeLessThan(ficha.cabeza * 1.5);
+  }
+  expect(primera.alto, 'las fichas se estiran').toBeLessThanOrEqual(72);
+});
+
 test('con movimiento reducido la cinta de empresas se queda quieta', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/', { waitUntil: 'load' });

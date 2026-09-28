@@ -88,7 +88,6 @@ const MUESTRAS: Record<string, string[]> = {
     // El rótulo «Simulación» del mapa en vivo (T6.10): letra de 10,5 en la
     // pastilla de la atribución, que es blanca a medias sobre el mosaico.
     '[data-mapa-simulacion]',
-    '.footer-cta-note',
     '.footer-nav-group > span',
     '.footer-status > span',
     '.footer-nav a',

@@ -669,9 +669,15 @@
     display: none;
   }
 
+  /* Del ancho de lo que dice, con 230 de suelo. A 230 fijos la C13
+     partía su tramo en tres líneas y el carril, que estira las fichas a
+     la más alta, dejaba las seis en 107 px con dos líneas centradas en
+     medio: aire arriba y abajo. Así las seis van en una línea y en 68. */
   .ruta-ficha {
     flex: 0 0 auto;
-    width: 230px;
+    width: max-content;
+    min-width: 230px;
+    max-width: 100%;
   }
 }
 
