@@ -286,9 +286,14 @@ export class PasoDemo {
   /* ---------- Reposo: la foto con la que arranca cada bucle ---------- */
 
   private reposo(): void {
-    this.mapa.showPin(false);
+    // El punto de espera y la cabecera sólo empiezan vacíos en el primer
+    // momento, que es el que los pone. En los otros dos ya están puestos
+    // y se quedan entre vuelta y vuelta: apagarlos dejaba en el hueco del
+    // bucle un mapa pelado con una línea azul, que no es ninguna pantalla
+    // de la app.
+    this.mapa.showPin(this.guion !== 1);
     this.mapa.showBuses(false);
-    this.prender('chip', false);
+    this.prender('chip', this.guion !== 1);
     this.prender('scrim', false);
     this.prender('sheet', false);
     this.prender('notif', false);
@@ -305,6 +310,7 @@ export class PasoDemo {
       // Todavía no hay ruta elegida, así que el mapa no tiene ninguna que
       // dibujar: el recorrido entra cuando el guion lo elige, no antes.
       this.mapa.showRoute(false);
+      this.cabecera(false);
       this.setSelector(0);
       this.mostrarVista('selector');
       this.desplazarLista('company-list', null);
@@ -372,6 +378,22 @@ export class PasoDemo {
     else if (empresaHecha) rotulo = 'Elegir ruta';
     this.el('launch')?.classList.toggle('is-lista', rutaHecha);
     this.texto('launch', rotulo);
+  }
+
+  /**
+   * La cabecera del segundo momento: la píldora y el chip antes y después
+   * de elegir ruta. Es `_rutaActiva` de search_pill_bar.dart —con ruta,
+   * «Ruta activa» encima del nombre y el botón de la derecha para
+   * limpiar— y `_manualPill` de location_status_chip.dart, que sin ruta
+   * sólo nombra el punto y con ella cuenta los buses que hay cerca.
+   */
+  private cabecera(conRuta: boolean): void {
+    this.el('topbar')?.classList.remove('esta-apartada');
+    this.el('pill-etiqueta')?.toggleAttribute('hidden', !conRuta);
+    this.texto('pill-title', conRuta ? this.ruta.nombre : '¿Qué bus esperas?');
+    this.el('pill-sub')?.toggleAttribute('hidden', conRuta);
+    this.el('pill-der')?.classList.toggle('es-cerrar', conRuta);
+    this.texto('chip-text', conRuta ? '2 buses cerca de tu punto' : 'Tu punto de espera');
   }
 
   /* ---------- Las vistas del selector ---------- */
@@ -506,9 +528,11 @@ export class PasoDemo {
    * entran al pulsar «Ver buses en vivo», que es de lo que trata el botón.
    */
   private guionRuta(): void {
-    this.mapa.showPin(true);
-
+    // En la app el selector se abre tocando la píldora, y al abrirse la
+    // cabecera se aparta hacia arriba (cabecera_flotante.dart).
+    this.a(260, () => this.toqueSobre('pill'));
     this.a(500, () => {
+      this.el('topbar')?.classList.add('esta-apartada');
       this.prender('scrim', true);
       this.prender('sheet', true);
     });
@@ -542,17 +566,24 @@ export class PasoDemo {
     this.a(8360, () => {
       this.prender('scrim', false);
       this.prender('sheet', false);
+      this.cabecera(true);
       this.mapa.showRoute(true);
       this.colocarBuses([800, 1700]);
       this.mapa.showBuses(true);
       this.moverBuses();
     });
 
+    // El bucle vuelve a empezar sin ruta, y en la app la ruta se quita con
+    // la X de la píldora (search_pill_bar.dart, `_rutaActiva`): se toca y
+    // la cabecera vuelve a «¿Qué bus esperas?» a la vez que se van la
+    // línea y los buses. Quitarlos sin tocarla dejaba la píldora
+    // anunciando la C16 sobre un mapa sin ella.
+    this.a(13360, () => this.toqueSobre('pill-der'));
     this.a(13600, () => {
       this.pararBuses();
       this.mapa.showBuses(false);
       this.mapa.showRoute(false);
-      this.mapa.showPin(false);
+      this.cabecera(false);
     });
     this.a(14500, () => this.ciclo());
   }
@@ -580,8 +611,6 @@ export class PasoDemo {
    * dedo. Sale a 1250 m justo para que ese cruce caiga dentro del bucle.
    */
   private guionAviso(): void {
-    this.mapa.showPin(true);
-
     this.a(500, () => {
       this.colocarBuses([1250]);
       this.mapa.showBuses(true);
@@ -607,7 +636,6 @@ export class PasoDemo {
       this.prender('sheet', false);
       this.mapa.setBusElegido(null);
       this.mapa.showBuses(false);
-      this.mapa.showPin(false);
     });
     this.a(13100, () => this.ciclo());
   }

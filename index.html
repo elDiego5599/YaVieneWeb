@@ -1141,6 +1141,51 @@
 
                     <!-- El indicador de inicio de iOS. -->
                     <div class="phone-gesture"></div>
+                    <!-- La cabecera de la app, la misma del hero: sin ruta dice qué
+                         falta y se aparta mientras el selector ocupa la
+                         pantalla (cabecera_flotante.dart). Sin JavaScript la
+                         foto es el selector abierto, así que va apartada. -->
+                    <div class="phone-topbar phone-topbar--vivo esta-apartada" data-el="topbar">
+                      <div class="app-pill" data-el="pill">
+                        <span class="app-pill-btn">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round">
+                            <path d="M4 7h16M4 12h16M4 17h16" />
+                          </svg>
+                        </span>
+                        <span class="app-pill-text">
+                          <span class="app-pill-etiqueta" data-el="pill-etiqueta" hidden>Ruta activa</span>
+                          <span class="app-pill-title" data-el="pill-title">¿Qué bus esperas?</span>
+                          <span class="app-pill-sub" data-el="pill-sub">Toca para buscar tu ruta</span>
+                        </span>
+                        <span class="app-pill-btn app-pill-btn--der" data-el="pill-der">
+                          <svg class="icono-tune" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round">
+                            <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+                            <circle cx="15" cy="7" r="2" />
+                            <circle cx="9" cy="17" r="2" />
+                          </svg>
+                          <svg class="icono-cerrar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                            stroke-linecap="round">
+                            <path d="M7 7l10 10M17 7L7 17" />
+                          </svg>
+                        </span>
+                      </div>
+                      <!-- _manualPill de location_status_chip.dart: sin ruta no
+                           hay buses que contar y el chip sólo nombra el punto. -->
+                      <div class="app-chip" data-el="chip">
+                        <span class="app-chip-icon">
+                          <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0
+                              9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" />
+                          </svg>
+                        </span>
+                        <span class="app-chip-textos">
+                          <span class="app-chip-text" data-el="chip-text">Tu punto de espera</span>
+                        </span>
+                        <span class="app-chip-action app-chip-action--suave">Quitar</span>
+                      </div>
+                    </div>
                     <div class="phone-scrim" data-el="scrim"></div>
                     <div class="phone-sheet phone-sheet--fija tiene-vistas" data-el="sheet">
                       <span class="sheet-handle"></span>
@@ -1310,6 +1355,48 @@
 
                     <!-- El indicador de inicio de iOS. -->
                     <div class="phone-gesture"></div>
+                    <!-- La cabecera no se va porque haya un bus elegido: en la app
+                         sólo se aparta con el selector abierto. La ruta es la C16
+                         y el chip cuenta el único bus del guion, en singular como
+                         lo escribe _manualPill. -->
+                    <div class="phone-topbar">
+                      <div class="app-pill">
+                        <span class="app-pill-btn">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round">
+                            <path d="M4 7h16M4 12h16M4 17h16" />
+                          </svg>
+                        </span>
+                        <span class="app-pill-text">
+                          <span class="app-pill-etiqueta">Ruta activa</span>
+                          <span class="app-pill-title" data-el="pill-title">C16 Calle 72 Uninorte</span>
+                        </span>
+                        <span class="app-pill-btn app-pill-btn--der es-cerrar">
+                          <svg class="icono-tune" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                            stroke-linecap="round">
+                            <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+                            <circle cx="15" cy="7" r="2" />
+                            <circle cx="9" cy="17" r="2" />
+                          </svg>
+                          <svg class="icono-cerrar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                            stroke-linecap="round">
+                            <path d="M7 7l10 10M17 7L7 17" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="app-chip" data-el="chip">
+                        <span class="app-chip-icon">
+                          <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0
+                              9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" />
+                          </svg>
+                        </span>
+                        <span class="app-chip-textos">
+                          <span class="app-chip-text" data-el="chip-text">1 bus cerca de tu punto</span>
+                        </span>
+                        <span class="app-chip-action app-chip-action--suave">Quitar</span>
+                      </div>
+                    </div>
                     <div class="phone-sheet phone-sheet--fija phone-sheet--eta" data-el="sheet">
                       <!-- Volver a tu punto: en la app va pegado al borde
                            de arriba de la hoja, y viaja con ella. -->

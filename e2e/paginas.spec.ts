@@ -399,6 +399,69 @@ test('en el teléfono, el aparato de los pasos se lleva más de la mitad del anc
   expect(escena.sobra, 'la escena ya no cabe en la ventana').toBeLessThanOrEqual(1);
 });
 
+/* Las tres tomas de «Cómo funciona» llevan la cabecera de la app en el
+   mismo sitio y con textos distintos. En el relevo la que entra se aclara
+   encima de la que sale, y se leían dos píldoras superpuestas —«¿Qué bus
+   esperas?» sobre «C16…», dos «Quitar»—. En ningún cuadro del viaje puede
+   haber más de una cabecera a la vista. */
+test('en el relevo de los pasos nunca hay dos cabeceras a la vez', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/', { waitUntil: 'load' });
+  await page.locator('#solucion .pasos-cuadro').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(1200);
+  for (const paso of [1, 2]) {
+    const peor = await page.evaluate(async (i) => {
+      const visibles = (): number =>
+        [...document.querySelectorAll<HTMLElement>('.pasos-pase .paso-columna')].filter((col) => {
+          const barra = col.querySelector<HTMLElement>('.phone-topbar')!;
+          return Number(getComputedStyle(col).opacity) * Number(getComputedStyle(barra).opacity) > 0.08;
+        }).length;
+      document.querySelectorAll<HTMLElement>('.paso-boton')[i]!.click();
+      let max = 0;
+      const fin = performance.now() + 2200;
+      while (performance.now() < fin) {
+        max = Math.max(max, visibles());
+        await new Promise(requestAnimationFrame);
+      }
+      return max;
+    }, paso);
+    expect(peor, `relevo al paso ${paso + 1}`).toBeLessThanOrEqual(1);
+  }
+});
+
+/* El aviso del tercer momento sale del hombro del teléfono, arriba. Desde
+   que la toma lleva la cabecera de la app, a esa altura está la píldora:
+   la tarjeta se montaba sobre media «C16 Calle 72 Uninorte» y se leían
+   las dos a medias. Tiene que caer en el mapa, entre el chip y la hoja. */
+test('el aviso de los pasos no pisa la cabecera ni la hoja', async ({ page }) => {
+  for (const [ancho, alto] of [[1440, 900], [1024, 768], [402, 760]] as const) {
+    await page.setViewportSize({ width: ancho, height: alto });
+    await page.goto('/', { waitUntil: 'load' });
+    await page.locator('#solucion .pasos-cuadro').scrollIntoViewIfNeeded();
+    const choques = await page.evaluate(() => {
+      const toma = document.querySelector<HTMLElement>('[data-demo="3"]')!;
+      const pieza = (sel: string) => toma.querySelector<HTMLElement>(sel)!;
+      const aviso = pieza('[data-el="notif"]');
+      const hoja = pieza('[data-el="sheet"]');
+      for (const el of [aviso, hoja]) {
+        el.style.transition = 'none';
+        el.classList.add('is-on');
+      }
+      const a = aviso.getBoundingClientRect();
+      const pisa = (el: HTMLElement): boolean => {
+        const r = el.getBoundingClientRect();
+        return a.left < r.right && r.left < a.right && a.top < r.bottom && r.top < a.bottom;
+      };
+      return {
+        pildora: pisa(pieza('.app-pill')),
+        chip: pisa(pieza('[data-el="chip"]')),
+        hoja: pisa(hoja),
+      };
+    });
+    expect(choques, `${ancho}×${alto}`).toEqual({ pildora: false, chip: false, hoja: false });
+  }
+});
+
 /* El carril de rutas del teléfono estira las fichas a la más alta. Con
    230 px fijos la C13 partía su tramo en tres líneas y las seis quedaban
    en 107 px con el texto flotando en medio. */

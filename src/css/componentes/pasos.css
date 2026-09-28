@@ -89,7 +89,13 @@
      marco no abre contexto de apilado, así que sus piezas compiten con
      ésta de tú a tú. */
   z-index: 60;
-  top: clamp(16px, 4%, 34px);
+  /* Arriba, pero por debajo de la cabecera de la app. Iba al 4 % y, desde
+     que la toma lleva la píldora de la ruta, se montaba sobre media «C16
+     Calle 72 Uninorte». Medido en las cuatro ventanas de la prueba, el
+     chip acaba en el 23 % del alto de la toma y la hoja empieza en el
+     63 %; la tarjeta ocupa como mucho un 11 %, así que al 27 % cae en el
+     mapa con aire por los dos lados. */
+  top: 27%;
   bottom: auto;
   /* Negativo: el borde derecho de la tarjeta cae fuera del teléfono. El
      tope de -190 px es lo que hay hasta el margen de la página con la
@@ -141,7 +147,6 @@
    está en el hero. */
 @media (max-width: 1199px) {
   .scene-card--paso {
-    top: 4%;
     right: clamp(-136px, -11vw, -46px);
     max-width: min(214px, 56vw);
     padding: 10px 13px;
@@ -381,6 +386,43 @@
   transition:
     opacity var(--paso-viaje) var(--paso-curva),
     visibility 0s linear 0s;
+}
+
+/*
+  La cabecera de la app —píldora y chip— no entra en el fundido de la
+  toma. Las tres la tienen en el mismo sitio y con textos distintos (el
+  primer momento con la C16, el segundo todavía sin ruta), y con el reparto
+  de arriba la que entra se aclara encima de la que sale: durante el viaje
+  se leían dos píldoras superpuestas, «¿Qué bus esperas?» sobre «C16…» y
+  dos «Quitar». Así que la de la toma que sale se apaga ya, en 0,2 s, y la
+  de la que entra espera a medio viaje para aparecer: en ningún momento
+  hay dos cabeceras a la vez.
+
+  La entrada va con animación y no con transición porque la transición de
+  `.phone-topbar--vivo` (0,28 s, la de cabecera_flotante.dart) tiene que
+  seguir siendo la de la app cuando el segundo momento aparta la cabecera
+  en mitad del bucle; la animación sólo corre al volverse activa la toma.
+  Sin `to`: llega al valor que tenga la cabecera, apartada o no.
+*/
+.pasos-pase .paso-columna:not(.is-activa) .phone-topbar {
+  opacity: 0;
+  transition: opacity 0.2s var(--ease-out-cubic);
+}
+
+.pasos-pase .paso-columna.is-activa .phone-topbar {
+  animation: cabecera-relevo 0.36s var(--ease-out-cubic) calc(var(--paso-viaje) * 0.5) backwards;
+}
+
+@keyframes cabecera-relevo {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pasos-pase .paso-columna.is-activa .phone-topbar {
+    animation: none;
+  }
 }
 
 /* El teléfono ya no lleva caja propia: el cuadro es uno solo y dentro de
