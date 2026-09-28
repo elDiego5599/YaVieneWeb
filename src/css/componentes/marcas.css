@@ -1,7 +1,7 @@
 /* ── MARCAS: cinta de empresas ────────────────────────────────────
 
-   Los mismos siete logos en la portada (una fila quieta sobre blanco) y
-   en `/empresas.html` (un carrusel al pie de la ficha). Una sola fuente:
+   Los mismos siete logos en la portada (una cinta sobre blanco) y en
+   `/empresas.html` (la misma cinta, al pie de la ficha). Una sola fuente:
    este fichero lo cargan las dos páginas desde el paquete común.
    ────────────────────────────────────────────────────────────────── */
 
@@ -31,16 +31,17 @@
   color: var(--tinta-tenue);
 }
 
-/* El mismo ancho que tenía la fila quieta de logos: la columna de la
-   página con sus calles a los lados, hasta 1180 px. Una cinta de borde a
-   borde de la ventana se mira de reojo. Va con `.marcas-claras` delante
+/* Algo más que la fila quieta de logos que había antes (1180): hasta
+   1280, con las calles de la página a los lados; el dueño la pidió un
+   poco más ancha. Una cinta de borde a borde de la ventana se mira de
+   reojo. Va con `.marcas-claras` delante
    porque `.empresa-marcas-carrusel`, más abajo, pone `max-width: 100%` y
    a igual peso ganaba él: la cinta se iba a todo el ancho. La vuelta
    tarda más que en empresas porque la cinta es más larga: así los logos
    pasan a la misma velocidad en las dos páginas, unos 40 px/s. */
 .marcas-claras .empresa-marcas-carrusel--portada {
   --marcas-vuelta: 44s;
-  max-width: 1180px;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
@@ -111,91 +112,42 @@
 }
 
 /*
-  Los bordes. Antes eran dos franjas estrechas del color del fondo: el
-  logo llegaba nítido hasta el filo y en 30 px desaparecía, y eso se lee
-  como una pared contra la que choca. Ahora hacen dos cosas a la vez, en
-  un tramo ancho —el 18 % de la cinta, entre 64 y 200 px—:
+  Los bordes. Al principio eran dos franjas de 28 a 56 px: el logo
+  llegaba nítido hasta el filo y desaparecía de golpe, como contra una
+  pared. Luego se probó desenfocarlos por capas en un tramo de hasta
+  200 px, y el dueño lo vio demasiado borroso: los logos se leían mal
+  justo donde entran. Ahora los logos van nítidos siempre y el tramo es
+  intermedio, de 40 a 110 px, con el blanco macizo en el filo y cayendo
+  en curva hacia dentro: una recta aclara deprisa al principio y deja
+  una línea donde empieza.
 
-  1. Se desenfocan por capas (`.marcas-velo`). Cuatro capas, cada una
-     con el doble de desenfoque que la anterior (1, 2, 4 y 8 px), y cada
-     una recortada a su franja del tramo con un degradado: el logo se
-     va emborronando poco a poco según se acerca al filo, sin saltos. Es
-     la técnica del «progressive blur» de 21st.dev en CSS a secas.
-  2. Se desvanecen (`::before` y `::after`, encima del velo) con una
-     curva suave y no con una recta: una recta aclara deprisa al
-     principio y deja una línea donde empieza; con más paradas el
-     desvanecido no tiene dónde verse. Llega a blanco macizo al 58 % del
-     tramo y no al final: acabando en el filo, el borde se veía como un
-     cristal transparente; así el logo entra desde el blanco de la página,
-     y el desenfoque solo se ve en la franja de paso.
+  El desvanecido termina en el mismo fondo con alfa 0 y no en
+  `transparent`, que es negro transparente: un degradado de blanco hacia
+  ahí pasa por grises y deja una sombra sucia en el filo. `color-mix()`
+  mezcla con alfa premultiplicado, así que sus paradas tampoco ensucian.
 
   Nada de esto toca la pista que se mueve. El apagón iba antes con
   `mask-image` sobre la pista, y una máscara sobre algo que se anima
   obliga a bastantes móviles de gama media a recomponerla en cada cuadro:
-  ahí el carrusel se arrastraba. El velo y el desvanecido son piezas
-  quietas encima, y el desenfoque se calcula sólo en las dos franjas del
-  borde, no en toda la cinta.
-*/
-/* El aire de arriba y abajo es para el desenfoque: un logo borroso se
-   derrama unos 10 px fuera de su caja, y sin ese margen el borrón se
-   cortaba en recto contra el alto de la cinta. */
-.empresa-marcas-carrusel {
-  --marcas-velo: clamp(64px, 18%, 200px);
-  padding-block: 10px;
-}
-
-.marcas-velo,
-.empresa-marcas-carrusel::before,
-.empresa-marcas-carrusel::after {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: var(--marcas-velo);
-  pointer-events: none;
-}
-
-.marcas-velo { z-index: 1; }
-
-/* Cada capa cubre dos quintos del tramo, solapada con la siguiente, y
-   empieza un quinto más cerca del filo que la anterior (`--desde`); la
-   última llega hasta el filo. `--hacia` apunta al filo. */
-.marcas-velo--izq { left: 0; --hacia: to left; }
-.marcas-velo--der { right: 0; --hacia: to right; }
-
-.marcas-velo i {
-  position: absolute;
-  inset: 0;
-  --banda: linear-gradient(var(--hacia), transparent var(--desde), #000 calc(var(--desde) + 20%), #000 calc(var(--desde) + 40%), transparent calc(var(--desde) + 60%));
-  -webkit-mask-image: var(--banda);
-  mask-image: var(--banda);
-  -webkit-backdrop-filter: blur(var(--borron));
-  backdrop-filter: blur(var(--borron));
-}
-
-.marcas-velo i:nth-child(1) { --desde: 0%; --borron: 1px; }
-.marcas-velo i:nth-child(2) { --desde: 20%; --borron: 2px; }
-.marcas-velo i:nth-child(3) { --desde: 40%; --borron: 4px; }
-.marcas-velo i:nth-child(4) { --desde: 60%; --borron: 8px; }
-
-/*
-  El desvanecido termina en el mismo fondo con alfa 0 y no en
-  `transparent`, que es negro transparente: un degradado de blanco hacia
-  ahí pasa por grises y deja una sombra sucia en el filo. Y va en curva,
-  no en recta: opaco en el filo y cada vez más despacio hacia dentro.
-  `color-mix()` mezcla con alfa premultiplicado, así que el blanco
-  transparente de sus paradas no ensucia.
+  ahí el carrusel se arrastraba. Las dos franjas son piezas quietas
+  encima.
 */
 .empresa-marcas-carrusel::before,
 .empresa-marcas-carrusel::after {
   content: '';
-  z-index: 2;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: clamp(40px, 9%, 110px);
+  pointer-events: none;
   background: linear-gradient(
     var(--hacia),
     var(--surface-nada),
-    color-mix(in srgb, var(--surface) 30%, transparent) 18%,
-    color-mix(in srgb, var(--surface) 70%, transparent) 34%,
-    color-mix(in srgb, var(--surface) 94%, transparent) 48%,
-    var(--surface) 58%
+    color-mix(in srgb, var(--surface) 35%, transparent) 30%,
+    color-mix(in srgb, var(--surface) 75%, transparent) 58%,
+    color-mix(in srgb, var(--surface) 95%, transparent) 82%,
+    var(--surface)
   );
 }
 
@@ -263,8 +215,7 @@
     overflow-x: auto;
   }
   .empresa-marcas-carrusel::before,
-  .empresa-marcas-carrusel::after,
-  .marcas-velo {
+  .empresa-marcas-carrusel::after {
     display: none;
   }
 }

@@ -275,14 +275,13 @@ test.describe('la banda de empresas', () => {
 /*
   La cinta de empresas, en la portada y en /empresas.html. La portada
   tenía los siete logos quietos en una rejilla; ahora corren como en
-  empresas. Y en empresas los logos llegaban al filo y se cortaban contra
-  una franja estrecha: parecía una pared. Los bordes ahora se desenfocan
-  por capas —cada capa más borrosa que la anterior— y a la vez se
-  desvanecen en un tramo ancho, así que un logo se disuelve al salir en
-  vez de chocar.
+  empresas. Los bordes se probaron desenfocados por capas y el dueño los
+  vio demasiado borrosos: los logos van nítidos hasta que el blanco se los
+  come, con un desvanecido algo más ancho que las franjas de 56 px del
+  principio, que cortaban como una pared.
 */
 for (const ruta of ['/', '/empresas.html']) {
-  test(`la cinta de empresas corre y se disuelve en los bordes en ${ruta}`, async ({ page }) => {
+  test(`la cinta de empresas corre y se desvanece en los bordes en ${ruta}`, async ({ page }) => {
     await page.goto(ruta, { waitUntil: 'load' });
     const cinta = page.locator('.empresa-marcas-carrusel');
     await expect(cinta).toHaveCount(1);
@@ -294,19 +293,19 @@ for (const ruta of ['/', '/empresas.html']) {
         const c = document.querySelector<HTMLElement>('.empresa-marcas-carrusel')!;
         const pista = c.querySelector<HTMLElement>('.empresa-marcas-track')!;
         const imgs = Array.from(c.querySelectorAll<HTMLImageElement>('.empresa-marcas-logo'));
-        const velos = Array.from(c.querySelectorAll<HTMLElement>('.marcas-velo')).map((v) => ({
-          ancho: v.getBoundingClientRect().width,
-          desenfoques: Array.from(v.children).map((capa) => {
-            const f = getComputedStyle(capa).backdropFilter || (getComputedStyle(capa) as CSSStyleDeclaration & { webkitBackdropFilter?: string }).webkitBackdropFilter || '';
-            return Number(/blur\(([\d.]+)px\)/.exec(f)?.[1] ?? 0);
-          }),
-        }));
+        const desenfocados = Array.from(c.querySelectorAll<HTMLElement>('*')).filter((e) => {
+          const f = getComputedStyle(e).backdropFilter || '';
+          return (f && f !== 'none') || getComputedStyle(e).filter !== 'none';
+        });
         return {
           x: new DOMMatrix(getComputedStyle(pista).transform).m41,
           logos: imgs.length,
           sinCargar: imgs.filter((i) => !(i.complete && i.naturalWidth > 0)).map((i) => i.alt || i.src),
-          anchoCinta: c.getBoundingClientRect().width,
-          velos,
+          desenfocados: desenfocados.length,
+          filos: ['::before', '::after'].map((p) => ({
+            ancho: Number.parseFloat(getComputedStyle(c, p).width),
+            fondo: getComputedStyle(c, p).backgroundImage,
+          })),
         };
       });
 
@@ -317,20 +316,39 @@ for (const ruta of ['/', '/empresas.html']) {
     expect(antes.logos, 'siete logos y su copia para cerrar la vuelta').toBe(14);
     expect(antes.sinCargar, 'logos sin cargar: la cinta enseñaría un hueco').toEqual([]);
     expect(despues.x, 'la cinta no se mueve').toBeLessThan(antes.x);
-
-    expect(antes.velos.length, 'un velo por borde').toBe(2);
-    for (const velo of antes.velos) {
-      expect(velo.ancho, 'un borde estrecho corta los logos como una pared').toBeGreaterThanOrEqual(Math.min(96, antes.anchoCinta * 0.14));
-      expect(velo.desenfoques.length, 'el desenfoque va por capas').toBeGreaterThanOrEqual(4);
-      expect(Math.max(...velo.desenfoques), 'el filo no llega a desenfocarse').toBeGreaterThanOrEqual(6);
-      expect([...velo.desenfoques].sort((a, b) => a - b), 'cada capa, más borrosa que la anterior').toEqual(velo.desenfoques);
+    expect(antes.desenfocados, 'algo de la cinta sale borroso').toBe(0);
+    for (const filo of antes.filos) {
+      expect(filo.fondo, 'el borde no se desvanece').toContain('gradient');
+      expect(filo.ancho, 'un borde estrecho corta los logos como una pared').toBeGreaterThanOrEqual(40);
+      expect(filo.ancho, 'un borde ancho se come la cinta').toBeLessThanOrEqual(120);
     }
   });
 }
 
-/* En la portada la cinta ocupa el ancho que tenía la fila quieta de logos:
-   la columna de la página, con sus calles, hasta 1180 px. Una regla de
-   `.empresa-marcas-carrusel` con el mismo peso la estiraba a todo el ancho. */
+/* En empresas la cinta llega a los dos lados de la ficha: dentro del
+   relleno se quedaba más estrecha que la línea que la separa del texto,
+   y el dueño la pidió un poco más ancha. El blanco de sus filos es el de
+   la ficha, así que no se ve dónde acaba. */
+test('en empresas, la cinta va de lado a lado de la ficha', async ({ page }) => {
+  for (const ancho of [1440, 390]) {
+    await page.setViewportSize({ width: ancho, height: 900 });
+    await page.goto('/empresas.html', { waitUntil: 'load' });
+    const caja = await page.evaluate(() => {
+      const ficha = document.querySelector('.empresa-ficha')!.getBoundingClientRect();
+      const cinta = document.querySelector('.empresa-marcas-carrusel')!.getBoundingClientRect();
+      return { izq: cinta.left - ficha.left, der: ficha.right - cinta.right, rebosa: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+    });
+    expect(caja.izq, `${ancho} px: no llega al lado izquierdo de la ficha`).toBeLessThanOrEqual(2);
+    expect(caja.der, `${ancho} px: no llega al lado derecho de la ficha`).toBeLessThanOrEqual(2);
+    expect(caja.izq, `${ancho} px: se sale de la ficha`).toBeGreaterThanOrEqual(0);
+    expect(caja.rebosa, `${ancho} px: la página se desborda de lado`).toBe(0);
+  }
+});
+
+/* En la portada la cinta ocupa algo más que la fila quieta de logos que
+   tenía antes (1180): hasta 1280, con las calles de la página a los
+   lados. Una regla de `.empresa-marcas-carrusel` con el mismo peso la
+   estiraba a todo el ancho. */
 test('la cinta de la portada no pasa del ancho de la columna', async ({ page }) => {
   for (const ancho of [1600, 390]) {
     await page.setViewportSize({ width: ancho, height: 900 });
@@ -339,7 +357,8 @@ test('la cinta de la portada no pasa del ancho de la columna', async ({ page }) 
       const r = c.getBoundingClientRect();
       return { izq: r.left, der: document.documentElement.clientWidth - r.right, ancho: r.width };
     });
-    expect(caja.ancho, `${ancho} px: más ancha que la columna`).toBeLessThanOrEqual(1180);
+    expect(caja.ancho, `${ancho} px: más ancha que la columna`).toBeLessThanOrEqual(1280);
+    if (ancho === 1600) expect(caja.ancho, 'no ganó el ancho pedido').toBeGreaterThan(1180);
     expect(caja.izq, `${ancho} px: pegada al borde izquierdo`).toBeGreaterThanOrEqual(16);
     expect(Math.abs(caja.izq - caja.der), `${ancho} px: no queda centrada`).toBeLessThan(2);
   }
