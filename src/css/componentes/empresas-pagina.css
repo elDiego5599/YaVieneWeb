@@ -52,6 +52,16 @@
   display: block;
 }
 
+/* Bajo 880 la barra ya dice «Para empresas» (`.nav-lugar`, fijo en esta
+   página) y el rótulo, justo debajo, lo repetía: la misma etiqueta dos
+   veces en la primera pantalla. Como en los pasos de la portada, se va el
+   de la sección; de 880 para arriba la barra no la lleva y él se queda. */
+@media (max-width: 879px) {
+  #panel .seccion-rotulo {
+    display: none;
+  }
+}
+
 /* ── El monitor ────────────────────────────────────────────────────── */
 
 /*

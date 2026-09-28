@@ -511,3 +511,19 @@ test.describe('las cabeceras de aislamiento de vercel.json', () => {
     expect(cabecera('/og.png', 'Cross-Origin-Resource-Policy')).toBe('cross-origin');
   });
 });
+
+/* En empresas la barra dice siempre «Para empresas» bajo 880 px, y el
+   rótulo del hero, justo debajo, decía «Para empresas de transporte»: la
+   misma etiqueta dos veces en la primera pantalla. En el teléfono se va
+   el del hero; en el escritorio la barra no la lleva y el rótulo sigue. */
+test('en empresas, el rótulo del hero no repite la barra en el teléfono', async ({ page }) => {
+  const rotulo = page.locator('#panel .seccion-rotulo');
+  await page.setViewportSize({ width: 402, height: 760 });
+  await page.goto('/empresas.html', { waitUntil: 'load' });
+  await expect(page.locator('.nav-lugar')).toBeVisible();
+  await expect(page.locator('.nav-lugar')).toHaveText('Para empresas');
+  await expect(rotulo, 'el rótulo repite el de la barra').toBeHidden();
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await expect(page.locator('.nav-lugar')).toBeHidden();
+  await expect(rotulo, 'sin barra que lo diga, el rótulo hace falta').toBeVisible();
+});
