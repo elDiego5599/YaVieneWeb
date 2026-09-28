@@ -345,6 +345,41 @@ test('la cinta de la portada no pasa del ancho de la columna', async ({ page }) 
   }
 });
 
+/* En un teléfono el aparato de «Cómo funciona» se quedaba en 191 px de
+   ancho —menos de la mitad de la pantalla— y su letra no se leía. Todo lo
+   que no es teléfono se aprieta (sin el rótulo repetido de la barra, el
+   titular a dos líneas) y el aparato se lleva lo ganado. Y la escena
+   sigue cabiendo entera: si no, lo que sobra de una escena pegada no se
+   alcanza nunca. */
+test('en el teléfono, el aparato de los pasos se lleva más de la mitad del ancho', async ({ page }) => {
+  await page.setViewportSize({ width: 402, height: 760 });
+  await page.goto('/', { waitUntil: 'load' });
+  await page.locator('#solucion .pasos-cuadro').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(400);
+  const escena = await page.evaluate(() => {
+    const marco = document.querySelector<HTMLElement>('#solucion .escena')!;
+    const dentro = marco.firstElementChild!.getBoundingClientRect();
+    const hueco = window.innerHeight - Number.parseFloat(getComputedStyle(marco).paddingTop);
+    return {
+      telefono: document.querySelector('.paso-columna.is-activa .phone-shell')!.getBoundingClientRect().width,
+      rotulo: getComputedStyle(document.querySelector('.pasos-cabecera .seccion-rotulo')!).display,
+      // La caja sale en píxeles de pantalla y el interlineado sin el
+      // `zoom` de `encaje`: se multiplica por el factor para comparar.
+      lineas: (() => {
+        const titulo = document.querySelector('.pasos-cabecera .seccion-titulo')!;
+        const factor = Number.parseFloat(getComputedStyle(marco).getPropertyValue('--encaje')) || 1;
+        const interlineado = Number.parseFloat(getComputedStyle(titulo).lineHeight) * factor;
+        return Math.round(titulo.getBoundingClientRect().height / interlineado);
+      })(),
+      sobra: dentro.height - hueco,
+    };
+  });
+  expect(escena.telefono, 'el aparato sigue pequeño').toBeGreaterThanOrEqual(210);
+  expect(escena.rotulo, 'el rótulo repite el de la barra').toBe('none');
+  expect(escena.lineas, 'el titular ocupa más de dos líneas').toBeLessThanOrEqual(2);
+  expect(escena.sobra, 'la escena ya no cabe en la ventana').toBeLessThanOrEqual(1);
+});
+
 test('con movimiento reducido la cinta de empresas se queda quieta', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/', { waitUntil: 'load' });

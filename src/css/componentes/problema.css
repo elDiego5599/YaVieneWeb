@@ -737,20 +737,26 @@
   box-shadow: var(--sombra-tarjeta);
 }
 
+/* Una baldosa y no un círculo: el círculo de 26 era un sello para una
+   letra, y un dibujo de 18 pide aire alrededor. 34 con 11 de radio es la
+   misma curva que el icono de la app a su escala. */
 .ficha-glifo {
   justify-self: start;
   place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
   background: var(--coral-light);
   color: var(--coral-accessible);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1;
   transition:
     background-color 0.5s var(--ease-out-cubic),
     color 0.5s var(--ease-out-cubic);
+}
+
+/* En bloque: en línea, el dibujo se sentaba en la línea base del texto y
+   quedaba 2,5 px por encima del centro de la baldosa. */
+.ficha-glifo svg {
+  display: block;
 }
 
 [data-cara='claro'] .ficha-glifo {

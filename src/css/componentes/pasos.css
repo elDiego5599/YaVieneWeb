@@ -647,7 +647,7 @@
 /* Pantalla estrecha: el aparato se lleva casi todo el ancho del visor. */
 @media (max-width: 859px) {
   .pasos-cabecera .seccion-titulo {
-    max-width: 18ch;
+    max-width: none;
     font-size: clamp(29px, 7.6vw, 44px);
   }
 
@@ -699,7 +699,23 @@
      0.71, que sobre los 17 px del título de cada paso son 12.1 px: los
      mismos que se leían antes. Se gana teléfono sin perder letra. */
   .pasos-pase {
-    --col-paso: min(clamp(190px, 32vh, 300px), 72vw);
+    --col-paso: min(clamp(190px, 38vh, 300px), 72vw);
+  }
+
+  /* Y el aire que no es teléfono se aprieta más. El rótulo «Cómo
+     funciona» ya lo dice la barra de arriba (`.nav-lugar`), y repetido
+     justo debajo sólo gastaba una línea. El titular sin tope en `ch` cae
+     en dos líneas y no en tres, y la explicación del paso llega hasta el
+     borde en vez de partirse a media pantalla. Con esas tres líneas menos,
+     los 38vh de arriba dejan el aparato en 217 px a 402 × 760 —eran 191,
+     un 14 % más— con el factor en 0,75: el título de cada paso queda en
+     12,8 px. */
+  .pasos-cabecera .seccion-rotulo {
+    display: none;
+  }
+
+  .paso-boton .columna-texto {
+    max-width: none;
   }
 
   .pasos-lado-lead {
