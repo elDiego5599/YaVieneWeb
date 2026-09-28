@@ -35,3 +35,6 @@ __pycache__/
 
 # Capturas sueltas de verificación, no son del sitio.
 shot-*.png
+
+# Grafo local de graphify: caché de búsqueda que se regenera, no es del repo.
+graphify-out/

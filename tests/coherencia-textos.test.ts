@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -27,11 +28,67 @@ const leer = (nombre: string): string =>
 /** El HTML parte rótulos a lo largo de varias líneas; la app no. */
 const enUnaLinea = (texto: string): string => texto.replace(/\s+/g, ' ');
 
-/** frase → archivos de la web donde la frase tiene que estar. */
+/**
+ * Solo lo que se pinta. La versión anterior buscaba la frase en el archivo
+ * entero, y la auditoría del 2026-09-27 (R-04) cambió «Ruta activa» en la
+ * píldora del simulador sin que la prueba se enterara: la frase seguía en
+ * un comentario del mismo archivo. Aquí no cuentan los comentarios, ni los
+ * atributos (`aria-label`, `alt`, `title`, `data-*`), ni los scripts y
+ * estilos en línea del HTML.
+ */
+function textoPintado(nombre: string): string {
+  const fuente = leer(nombre);
+  if (nombre.endsWith('.html')) {
+    // Vitest corre sobre happy-dom. Dentro de un `<template>` el HTML se
+    // parsea inerte: un DOMParser iría a buscar las hojas de estilo.
+    const plantilla = document.createElement('template');
+    plantilla.innerHTML = fuente;
+    const cuerpo = plantilla.content;
+    cuerpo.querySelectorAll('script, style').forEach((nodo) => nodo.remove());
+    return enUnaLinea(cuerpo.textContent ?? '');
+  }
+  // En TypeScript lo pintado sale de literales de texto (`this.texto(...)`,
+  // `textContent = ...`, las tablas del selector); los comentarios no son
+  // nodos del árbol y no llegan aquí.
+  const arbol = ts.createSourceFile(nombre, fuente, ts.ScriptTarget.Latest, true);
+  const textos: string[] = [];
+  const visitar = (nodo: ts.Node): void => {
+    if (
+      (ts.isStringLiteralLike(nodo) || ts.isTemplateLiteralToken(nodo)) &&
+      !esRotuloAccesible(nodo)
+    ) {
+      textos.push(nodo.text);
+    }
+    ts.forEachChild(nodo, visitar);
+  };
+  visitar(arbol);
+  return enUnaLinea(textos.join('\n'));
+}
+
+/** `setAttribute('aria-…', x)` o `el.ariaLabel = x`: se oye, no se ve. */
+function esRotuloAccesible(nodo: ts.Node): boolean {
+  const padre = nodo.parent;
+  if (ts.isCallExpression(padre)) {
+    const [atributo] = padre.arguments;
+    return (
+      atributo !== nodo &&
+      atributo !== undefined &&
+      ts.isStringLiteralLike(atributo) &&
+      atributo.text.startsWith('aria-')
+    );
+  }
+  return (
+    ts.isBinaryExpression(padre) &&
+    ts.isPropertyAccessExpression(padre.left) &&
+    padre.left.name.text === 'ariaLabel'
+  );
+}
+
+/** frase → archivos de la web donde la frase tiene que verse. */
 const FRASES: Record<string, string[]> = {
   '¿Qué bus esperas?': ['index.html'],
   'Toca para buscar tu ruta': ['index.html'],
-  'Ruta activa': ['src/phone-simulator.ts'],
+  'Ruta activa': ['index.html'],
   'Elige tu ruta': ['index.html'],
   'Elige empresa': ['index.html'],
   'Elegir empresa': ['index.html'],
@@ -44,6 +101,7 @@ const FRASES: Record<string, string[]> = {
   'Avisarme cuando esté cerca': ['index.html', 'src/paso-demo.ts'],
   'Aviso activado': ['index.html', 'src/phone-simulator.ts'],
   'Toca el mapa para indicar dónde estás': ['index.html'],
+  'Ahí ponemos tu punto de espera y medimos desde él': ['index.html'],
   'Puedes cambiar de aplicación; no cierres Ya Viene del todo': ['index.html'],
   'Localizando tu ubicación…': ['index.html', 'src/paso-demo.ts'],
   'Arrástralo para moverlo': ['index.html', 'src/paso-demo.ts'],
@@ -54,10 +112,8 @@ const FRASES: Record<string, string[]> = {
 describe('los rótulos de la interfaz son los de la app', () => {
   for (const [frase, archivos] of Object.entries(FRASES)) {
     for (const archivo of archivos) {
-      it(`«${frase}» sigue en ${archivo}`, () => {
-        expect(enUnaLinea(leer(archivo)), `${frase} · ${archivo}`).toContain(
-          frase
-        );
+      it(`«${frase}» se pinta en ${archivo}`, () => {
+        expect(textoPintado(archivo), `${frase} · ${archivo}`).toContain(frase);
       });
     }
   }

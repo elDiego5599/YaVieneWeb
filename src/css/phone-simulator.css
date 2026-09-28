@@ -645,33 +645,12 @@
   gap: calc(2 * var(--u));
 }
 
-.app-pill-linea {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: calc(6 * var(--u));
-  max-width: 100%;
-}
-
-/* Punto verde: sólo con ruta activa. */
-.app-pill-dot {
-  width: calc(8 * var(--u));
-  height: calc(8 * var(--u));
-  border-radius: 50%;
-  background: var(--green);
-  flex: none;
-  opacity: 0;
-  transform: scale(0.4);
-  transition: opacity 0.25s var(--ease-out-cubic), transform 0.25s var(--ease-spring);
-}
-
-.app-pill-dot.is-on {
-  opacity: 1;
-  transform: scale(1);
-}
-
+/* Sin punto verde delante, como en search_pill_bar.dart desde que el
+   dueño lo quitó (2026-09-27): el título va solo. El 100 % le deja
+   recortarse con puntos suspensivos dentro de la columna centrada. */
 .app-pill-title {
   /* AppTextStyles.subtitulo. */
+  max-width: 100%;
   font-size: calc(18 * var(--u));
   font-weight: 700;
   line-height: 1.3;
@@ -691,13 +670,57 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: color 0.25s var(--ease-out-cubic);
 }
 
-/* Con ruta activa el subtítulo pasa a verde accesible (4.5:1 sobre
-   blanco); el verde de marca a secas se queda en ~3.1:1. */
-.app-pill-sub.is-activa {
-  color: var(--green-accessible);
+/*
+  «Ruta activa» sobre el nombre de la ruta: EtiquetaRutaActiva de
+  search_pill_bar.dart. Una franja de luz la cruza y luego descansa.
+  Sin `display`, para que el atributo `hidden` la siga escondiendo.
+  - pie (12) en w600, una línea y puntos suspensivos, como en la app.
+  - Tinta #064E3B (9,7:1 sobre blanco) y franja #008846 (4,56:1, ~3,1
+    veces la luz de la tinta): legible en toda la pasada.
+  - La franja mide 0,3 del texto a cada lado del centro (`medioAncho`).
+    El fondo mide el doble del texto, así que 0,3 son 15 puntos del
+    degradado: 35 % · 50 % · 65 %.
+  - Con un fondo del 200 %, la posición p deja el centro de la franja en
+    (1 − p) veces el ancho: 130 % → −0,3 y −30 % → 1,3, el recorrido de la
+    app. En los dos extremos la franja queda fuera y solo se ve tinta.
+  - −1u abajo: la columna separa con 2, la app con `SizedBox(height: 1)`.
+*/
+.app-pill-etiqueta {
+  max-width: 100%;
+  margin-bottom: calc(-1 * var(--u));
+  font-size: calc(12 * var(--u));
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: transparent;
+  background: linear-gradient(90deg, #064E3B 35%, #008846 50%, #064E3B 65%) 130% 0 / 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  /* pasadaDura 1600 ms + pausa 1400 ms = 3 s. */
+  animation: pill-destello 3s infinite;
+}
+
+/* La pasada ocupa 1,6 de los 3 s (53,333 %), con la curva de la app
+   (Cubic(0.45, 0, 0.55, 1)); el resto se queda quieta en tinta. */
+@keyframes pill-destello {
+  0% {
+    background-position: 130% 0;
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  53.333%, 100% {
+    background-position: -30% 0;
+  }
+}
+
+/* Como `MediaQuery.disableAnimations` en la app: quieta, toda en tinta. */
+@media (prefers-reduced-motion: reduce) {
+  .app-pill-etiqueta {
+    animation: none;
+  }
 }
 
 /* ── Chip de ubicación: location_status_chip.dart ──────────────────── */
@@ -776,11 +799,10 @@
 }
 
 /*
-  Escena fija del hero: la píldora y el chip enseñan una sola línea cada
-  uno —sin "Ruta activa • Toca para cambiar" ni "Arrástralo para
-  moverlo"— y los textos que quedan van centrados.
+  Escena fija del hero: el chip enseña una sola línea —sin "Arrástralo
+  para moverlo"— y los textos que quedan van centrados. La píldora ya va
+  como la app con ruta: «Ruta activa» sobre el nombre.
 */
-.es-fija [data-el="pill-sub"],
 .es-fija [data-el="chip-sub"] {
   display: none;
 }
@@ -791,15 +813,15 @@
 }
 
 /*
-  Pasos 1 y 2, igual que la escena fija del hero: una sola línea por
-  tarjeta —sin "Toca para buscar tu ruta" ni "Arrástralo para moverlo"
-  en el 1º, sin "Dos pasos…" ni los subtítulos de las fichas en el 2º—.
+  Pasos 1 y 2, igual que la escena fija del hero: el chip del 1º en una
+  sola línea —sin "Arrástralo para moverlo"— y en el 2º sin "Dos pasos…"
+  ni los subtítulos de las fichas. La píldora del 1º va con ruta, como la
+  del hero: «Ruta activa» sobre la C16.
   En el 1º los textos que quedan van centrados; en el 2º los títulos se
   quedan a la izquierda, donde estaban. Solo CSS: el guion sigue
   escribiendo los subtítulos y la foto sin JS los trae, pero no se
   enseñan, como hace `.es-fija` con los del hero.
 */
-[data-demo="1"] .app-pill-sub,
 [data-demo="1"] [data-el="chip-sub"] {
   display: none;
 }
@@ -1017,22 +1039,31 @@
   }
 }
 
-/* Estado vacío: ícono gris, título y subtítulo centrados. */
+/* Estado vacío: medallón, título y subtítulo centrados. */
 .sheet-empty {
   padding-bottom: calc(16 * var(--u));
   text-align: center;
 }
 
+/* _buildEmptyState de eta_bottom_sheet.dart: el icono va en un medallón
+   de 56 × 56, blanco (AppColors.surface), radio AppRadius.lg (16) y filo
+   AppColors.hairline; luego SizedBox(height: 14) hasta el título. */
 .sheet-empty-icon {
-  color: var(--app-text-disabled);
-  margin-bottom: calc(12 * var(--u));
+  display: grid;
+  place-items: center;
+  width: calc(56 * var(--u));
+  height: calc(56 * var(--u));
+  margin: 0 auto calc(14 * var(--u));
+  background: #fff;
+  border: 1px solid var(--app-hairline);
+  border-radius: calc(16 * var(--u));
+  /* El icono en textSecondary y a 26, como el Icon del medallón. */
+  color: var(--app-text-secondary);
 }
 
 .sheet-empty-icon svg {
-  width: calc(32 * var(--u));
-  height: calc(32 * var(--u));
-  display: block;
-  margin: 0 auto;
+  width: calc(26 * var(--u));
+  height: calc(26 * var(--u));
 }
 
 .sheet-empty-icon [hidden] {

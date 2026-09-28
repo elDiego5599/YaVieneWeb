@@ -9,12 +9,11 @@
    primero si más abajo en el orden de carga hay otra con la misma
    especificidad. Es el fallo que más veces ha pasado en esta base.
 
-   Del rediseño v3: dejan de ser píldoras y pasan a ser rectángulos de
-   radio 10. Una píldora se lee como algo de consumo —una etiqueta, un
-   filtro—; un rectángulo de esquina corta se lee como un control. Y se
-   les quita el salto de dos píxeles al pasar el puntero: lo que cambia es
-   el fondo, que es lo que hace una herramienta. El salto era el gesto que
-   más delataba a la página.
+   Del rediseño v3 se queda una cosa: sin el salto de dos píxeles al pasar
+   el puntero. Lo que cambia es el fondo, que es lo que hace una
+   herramienta; el salto era el gesto que más delataba a la página. La
+   forma, en cambio, volvió a la píldora (ver `border-radius` abajo): los
+   rectángulos de radio 10 de aquel rediseño no casaban con los del hero.
    ────────────────────────────────────────────────────────────────── */
 
 .btn-primary,
@@ -36,8 +35,9 @@
     box-shadow var(--transition-hover);
 }
 
-/* El principal es tinta llena. Es el único bloque oscuro de una página
-   clara, así que no necesita nada más para ser lo primero que se pulsa. */
+/* El principal pone la forma y un relleno de tinta de respaldo. El color
+   que se ve es otro: todos los primarios de la página llevan además
+   `.btn-green`, que va después y lo pisa. */
 .btn-primary {
   border: 1px solid var(--tinta);
   background: var(--tinta);
@@ -142,8 +142,8 @@
    casa; el botón en sí no se mueve (ver el comentario del rediseño v3
    arriba: el salto era lo que delataba).
 
-   Dos versiones porque hay dos botones: sobre tinta y verde el círculo
-   es blanco translúcido; sobre papel es tinta translúcida.
+   Una sola versión, blanco translúcido: la flecha sólo va en botones de
+   relleno oscuro —el verde accesible—, nunca sobre papel.
 
    Regla de uso: la flecha es del primario, el que lleva a alguna parte.
    El secundario no la lleva —dos flechas en el mismo gesto pelean por el

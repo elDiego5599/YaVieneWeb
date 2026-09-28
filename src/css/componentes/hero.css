@@ -43,27 +43,6 @@
   border-bottom-right-radius: 32px;
   /* El filo redondeado corta los teléfonos: el escenario sangra. */
   overflow: hidden;
-  /* El hero respira: los tres degradados se corren ±2.5 % en 28 s. No es
-     gratis —`background-position` no lo mueve la tarjeta, hay que
-     repintar el panel (ver animations.css)—, pero es un solo panel, va
-     despacio y `reposo.ts` lo duerme fuera de pantalla (`.en-reposo`
-     pausa las animaciones). Con `prefers-reduced-motion` ni arranca. */
-  animation: hero-respira 28s ease-in-out infinite alternate;
-}
-
-@keyframes hero-respira {
-  from {
-    background-position: 0% 0%, 0% 0%, 0% 0%;
-  }
-  to {
-    background-position: 2.5% 3%, -2.5% -3%, 0% 4%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-panel {
-    animation: none;
-  }
 }
 
 /*
@@ -294,12 +273,48 @@
   border: 0;
   pointer-events: none;
   overflow: visible;
-  /* La deriva que pone `hero-deriva.ts` al hacer scroll: el trío baja
-     hasta 56 px mientras la copia sube. `transform` no pelea con la
-     respiración de los teléfonos porque esa anima `translate`, que es
-     otra propiedad; y con `prefers-reduced-motion` la variable nunca se
-     escribe, así que esto se queda en cero. */
-  transform: translate3d(0, calc(var(--hero-deriva, 0) * 1px), 0);
+}
+
+/* La deriva: al hacer scroll el trío baja hasta 56 px mientras la copia
+   sube, como si se quedara atrás. Es lo que le da peso a la primera
+   pantalla: sin ella copia y escena se mueven pegadas y el hero se lee
+   plano.
+
+   La lleva el propio scroll de la página (`animation-timeline`), no un
+   listener: el navegador la mueve en el compositor, sin JavaScript y sin
+   perder un cuadro. Los números son los de la versión con listener que
+   sustituye (`hero-deriva.ts`, PT-01): 7 px de deriva por cada 100 de
+   scroll y tope en 56, que se alcanza a los 800 px (56 / 0,07).
+
+   `transform` no pelea con la respiración de los teléfonos, que anima
+   `translate` —otra propiedad— y en los hijos, no aquí.
+
+   Solo donde el navegador sabe atar una animación al scroll: donde no,
+   `animation` correría por reloj y el trío bajaría solo al cargar. Y con
+   `prefers-reduced-motion` se apaga del todo: el suelo de
+   `animations.css` solo acorta duraciones, y una animación atada al
+   scroll no tiene duración que acortar. */
+@supports (animation-timeline: scroll()) {
+  .hero-scene {
+    animation: hero-deriva linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 800px;
+  }
+
+  @keyframes hero-deriva {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(0, 56px, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-scene {
+      animation: none;
+    }
+  }
 }
 
 /* El trío mide lo mismo en cualquier ancho: sin escalones por

@@ -227,16 +227,17 @@
 
         <!-- Columna Izquierda: Mensaje Comercial / Copy -->
         <div class="hero-copy">
-          <!-- La copia entra por turnos con el mismo `.reveal` del resto
-               de la página (lo recoge `ScrollEffects` solo): titular,
-               descripción, botones y tiendas, cada uno 80 ms después del
-               anterior. Antes el texto salía de golpe y sólo los
-               teléfonos escalonaban. -->
-          <h1 class="hero-title reveal" data-reveal-delay="0">¿Cuánto falta <span class="highlight">para tu bus?</span></h1>
-          <p class="hero-description reveal" data-reveal-delay="80">Mira el bus moverse en el mapa, con la distancia que le falta para
+          <!-- El titular está desde el primer cuadro: es lo más grande de
+               la primera pantalla —lo que el navegador mide como LCP— y
+               no puede esperar a que llegue el JavaScript (R-03). Lo que
+               entra por turnos es lo de debajo, con el mismo `.reveal`
+               del resto de la página: descripción, botones y tiendas,
+               cada uno 80 ms después del anterior. -->
+          <h1 class="hero-title">¿Cuánto falta <span class="highlight">para tu bus?</span></h1>
+          <p class="hero-description reveal" data-reveal-delay="0">Mira el bus moverse en el mapa, con la distancia que le falta para
             llegar a tu paradero.</p>
 
-          <div class="hero-actions reveal" data-reveal-delay="160">
+          <div class="hero-actions reveal" data-reveal-delay="80">
             <a href="#mapa" class="btn-primary btn-green">Ver el mapa en vivo <span class="btn-flecha" aria-hidden="true">→</span></a>
             <a href="/empresas.html" class="btn-outline">Para empresas</a>
           </div>
@@ -245,7 +246,7 @@
                cualquiera que acaba de leer el titular. Las dos marcas van
                dibujadas, no en una fuente de iconos: trazos de un solo
                camino que heredan el color del texto. -->
-          <p class="hero-subtext reveal" data-reveal-delay="240">
+          <p class="hero-subtext reveal" data-reveal-delay="160">
             <span class="hero-subtext-lead">Ya Viene, disponible en</span>
             <span class="tienda-chips">
               <span class="tienda-chip">
@@ -614,10 +615,11 @@
                     </span>
 
                     <span class="app-pill-text">
-                      <span class="app-pill-linea">
-                        <span class="app-pill-dot" data-el="pill-dot"></span>
-                        <span class="app-pill-title" data-el="pill-title">¿Qué bus esperas?</span>
-                      </span>
+                      <!-- Con ruta, _rutaActiva de search_pill_bar.dart: arriba
+                           «Ruta activa» y debajo el nombre; sin ruta la etiqueta
+                           se esconde y vuelve «Toca para buscar tu ruta». -->
+                      <span class="app-pill-etiqueta" data-el="pill-etiqueta" hidden>Ruta activa</span>
+                      <span class="app-pill-title" data-el="pill-title">¿Qué bus esperas?</span>
                       <span class="app-pill-sub" data-el="pill-sub">Toca para buscar tu ruta</span>
                     </span>
 
@@ -701,7 +703,7 @@
                         Toca el mapa para indicar dónde estás
                       </div>
                       <div class="sheet-empty-sub" data-el="empty-sub">
-                        Pon tu punto de espera; después podrás mover el pin si hace falta
+                        Ahí ponemos tu punto de espera y medimos desde él
                       </div>
                     </div>
                   </div>
@@ -1006,11 +1008,8 @@
                                salir: en la app, mientras no se elige una, no hay
                                recorrido que pintar ni buses que buscar. Es la misma
                                que eligen el segundo momento y el hero. -->
-                          <span class="app-pill-linea">
-                            <span class="app-pill-dot is-on"></span>
-                            <span class="app-pill-title">C16 Calle 72 Uninorte</span>
-                          </span>
-                          <span class="app-pill-sub is-activa">Ruta activa • Toca para cambiar</span>
+                          <span class="app-pill-etiqueta">Ruta activa</span>
+                          <span class="app-pill-title">C16 Calle 72 Uninorte</span>
                         </span>
                         <span class="app-pill-btn app-pill-btn--der es-cerrar">
                           <svg class="icono-tune" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"

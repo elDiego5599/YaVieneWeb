@@ -25,10 +25,11 @@
    igual de fantasma— y el tablero de salidas con lo que sí existe. */
 .err-body {
   /* `100vh` en el móvil cuenta la barra de direcciones y la página salta
-     cuando se esconde; `100dvh` mide lo visible de verdad (`svh` para el
-     que no lo entienda, que entonces usa lo chico y no rompe nada). */
+     cuando se esconde; `100dvh` mide lo visible de verdad. El `100vh` se
+     queda solo para el navegador que no entienda `dvh`: un escalón `svh`
+     en medio no serviría a nadie, porque los tres llegaron juntos a cada
+     navegador (PT-07). */
   min-height: 100vh;
-  min-height: 100svh;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;

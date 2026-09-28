@@ -5,7 +5,7 @@
  * sin bucle y sin interacción. Al arrancar se coloca una sola vez el estado
  * que en la app corresponde a ruta activa con aviso puesto —
  *
- *   pill "Ruta activa • Toca para cambiar" → search_pill_bar.dart
+ *   pill "Ruta activa" sobre el nombre     → search_pill_bar.dart
  *   chip "2 buses cerca de tu punto"      → location_status_chip.dart
  *   hoja con distancia y "Aviso activado"  → eta_bottom_sheet.dart
  *   tarjeta "Ruta activa" y aviso flotantes → data-escena="route"/"notif"
@@ -340,13 +340,15 @@ export class PhoneSimulator {
     );
   }
 
-  /** Píldora de búsqueda: los dos textos de search_pill_bar.dart. */
+  /**
+   * Píldora de búsqueda como search_pill_bar.dart: con ruta, la etiqueta
+   * «Ruta activa» sobre el nombre (_rutaActiva); sin ella, la pregunta y
+   * «Toca para buscar tu ruta» debajo.
+   */
   private setPildora(ruta: RutaLanding | null): void {
     this.texto('pill-title', ruta ? ruta.nombre : '¿Qué bus esperas?');
-    this.texto('pill-sub', ruta ? 'Ruta activa • Toca para cambiar' : 'Toca para buscar tu ruta');
-    const punto = this.el('pill-dot');
-    if (punto) punto.classList.toggle('is-on', ruta !== null);
-    this.el('pill-sub')?.classList.toggle('is-activa', ruta !== null);
+    this.el('pill-etiqueta')?.toggleAttribute('hidden', ruta === null);
+    this.el('pill-sub')?.toggleAttribute('hidden', ruta !== null);
     this.el('pill-der')?.classList.toggle('es-cerrar', ruta !== null);
     if (ruta) this.escenaTexto('route-name', ruta.nombre);
     this.escena?.querySelector('[data-escena="route"]')?.classList.toggle('is-on', ruta !== null);

@@ -118,26 +118,45 @@
     background var(--transition-hover);
 }
 
-/* El foco que sigue al puntero (lo enciende `spotlight.ts`): un wash
-   verde apagado que se posa donde está el cursor, como un resaltador.
-   No es información —la elegida sigue mandando por `aria-pressed`— y
-   por eso vive en un `::before` sin puntero, por debajo del texto pero
-   por encima del fondo. La `opacity` sí transiciona aunque la maneje una
-   variable: lo que cambia es el valor computado de `opacity`, y esa
-   transición vale. Sólo existe con puntero fino (ver el módulo). */
-.ruta-ficha::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(
-    130px circle at var(--spot-x, 50%) var(--spot-y, 50%),
-    rgba(0, 168, 89, 0.13),
-    transparent 70%
-  );
-  opacity: var(--spot-op, 0);
-  pointer-events: none;
-  transition: opacity var(--transition-hover);
+/* El foco de la ficha: un wash verde apagado que se enciende al pasar el
+   ratón, como un resaltador. No es información —la elegida sigue mandando
+   por `aria-pressed`— y por eso vive en un `::before` sin puntero.
+
+   Va por debajo del texto de verdad: un pseudo posicionado pinta encima
+   de los hijos que no lo están (CSS 2.1, apéndice E), y antes teñía las
+   letras (R-20). `z-index: -1` lo baja detrás de ellas y `isolation` en
+   la ficha hace que ese «detrás» se quede dentro de la ficha, por encima
+   de su propio fondo y no debajo de la sección.
+
+   El degradado es fijo, centrado: antes lo movía `spotlight.ts` siguiendo
+   al cursor, y ese seguimiento era lo único que pedía JavaScript sin
+   decir nada que el `:hover` no diga ya (PT-03). 130 px y el 13 % son los
+   de entonces. Solo con puntero fino: en el táctil no hay pasar por
+   encima, y el acuse del dedo es el `:active` de más abajo. */
+.ruta-ficha {
+  isolation: isolate;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ruta-ficha::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(
+      130px circle at 50% 50%,
+      rgba(0, 168, 89, 0.13),
+      transparent 70%
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-hover);
+  }
+
+  .ruta-ficha:hover::before {
+    opacity: 1;
+  }
 }
 
 /* El foco fuera del guarda, el puntero dentro. Ver botones.css. */
