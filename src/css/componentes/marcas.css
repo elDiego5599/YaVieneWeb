@@ -14,7 +14,10 @@
    ────────────────────────────────────────────────────────────────── */
 .marcas-claras {
   background: var(--papel);
-  padding: clamp(36px, 4vw, 60px) var(--calle) 38px;
+  /* Sin relleno abajo: debajo va la escena de los pasos, que ya trae el
+     suyo —el hueco de la barra de arriba para cuando se pega— y los dos
+     sumaban 130 px de blanco en el teléfono (e2e/pasos-aire.spec.ts). */
+  padding: clamp(36px, 4vw, 60px) var(--calle) 0;
 }
 
 /* El rótulo estaba sólo en el `aria-label` de la sección: se oía y no se
