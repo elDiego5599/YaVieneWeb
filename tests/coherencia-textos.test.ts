@@ -106,7 +106,7 @@ const FRASES: Record<string, string[]> = {
   'Localizando tu ubicación…': ['index.html', 'src/paso-demo.ts'],
   'Arrástralo para moverlo': ['index.html', 'src/paso-demo.ts'],
   'Fija tu punto de espera': ['index.html'],
-  'Tu ciudad en tiempo real.': ['index.html'],
+  'Tu ciudad en tiempo real.': ['index.html', 'empresas.html'],
 };
 
 describe('los rótulos de la interfaz son los de la app', () => {
@@ -116,5 +116,22 @@ describe('los rótulos de la interfaz son los de la app', () => {
         expect(textoPintado(archivo), `${frase} · ${archivo}`).toContain(frase);
       });
     }
+  }
+});
+
+/**
+ * La marca firma con un solo lema. En la app, bajo el logo del arranque y
+ * de la bienvenida (`ink_hero.dart`), dice «Tu ciudad en tiempo real.»; el
+ * pie de las dos páginas, bajo el mismo logo, decía «Tu ruta, cuando
+ * importa. Barranquilla se mueve contigo.»: dos lemas para una marca.
+ */
+describe('el pie firma con el lema de la app', () => {
+  for (const pagina of ['index.html', 'empresas.html']) {
+    it(pagina, () => {
+      const plantilla = document.createElement('template');
+      plantilla.innerHTML = leer(pagina);
+      const lema = plantilla.content.querySelector('.footer-intro p')?.textContent;
+      expect(enUnaLinea(lema ?? '').trim()).toBe('Tu ciudad en tiempo real.');
+    });
   }
 });
