@@ -19,7 +19,7 @@
  * es el de proximity_alerts_provider.dart.
  */
 
-import { cifraViva } from './cifra-viva';
+import { cifraViva, metrica } from './cifra-viva';
 import type { PhoneMap } from './phone-map';
 import type { RutaLanding } from './types';
 import {
@@ -436,12 +436,7 @@ export class PhoneSimulator {
     }
   }
 
-  /* ---------- Distancia (espeja _metricParts/_urgencyColor) ---------- */
-
-  private partesMetrica(metros: number): [string, string] {
-    if (metros < 1000) return [Math.round(metros).toString(), 'm de ti'];
-    return [(metros / 1000).toFixed(1), 'km de ti'];
-  }
+  /* ---------- Distancia (espeja _urgencyColor; la cifra, metrica()) ---------- */
 
   private colorUrgencia(metros: number): string {
     if (metros < 300) return 'var(--app-coral-accessible)';
@@ -470,7 +465,7 @@ export class PhoneSimulator {
     if (bus === undefined || crudo === null) return;
 
     const metros = crudo < 100 ? Math.max(10, Math.round(crudo)) : Math.round(crudo / 10) * 10;
-    const [valor, unidad] = this.partesMetrica(metros);
+    const [valor, unidad] = metrica(metros);
 
     // eta_bottom_sheet.dart (busTitulo): encima de la distancia va "Bus" y
     // la placa; la ruta ya la nombra la píldora de arriba.

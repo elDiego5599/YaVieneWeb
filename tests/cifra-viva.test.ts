@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { cifraViva } from '../src/cifra-viva';
+import { cifraViva, metrica } from '../src/cifra-viva';
 
 /**
  * Espejo de `cifra_viva.dart` (app_pasajero): la distancia de la hoja gira
@@ -39,8 +39,8 @@ describe('cifraViva', () => {
     expect(cifras(el).map(([, c]) => c)).toEqual(['', 'cifra-sube', 'cifra-sube']);
   });
 
-  it('las cifras se casan por la derecha: 1.0 → 990', () => {
-    const el = nuevo('1.0');
+  it('las cifras se casan por la derecha: 1,0 → 990', () => {
+    const el = nuevo('1,0');
     el.dataset.valor = '1000';
     cifraViva(el, '990', 990);
     expect(cifras(el)).toEqual([
@@ -71,5 +71,22 @@ describe('cifraViva', () => {
     expect(css).toMatch(
       /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.cifra-sube,\s*\.cifra-baja\s*\{\s*animation: none/
     );
+  });
+});
+
+/**
+ * `_metricParts` de eta_bottom_sheet.dart: bajo el kilómetro en metros,
+ * por encima en kilómetros con un decimal y coma —la hoja de la app, la
+ * voz, las fichas de ruta y el mapa en vivo ya la escribían así; los dos
+ * teléfonos de la landing ponían punto—.
+ */
+describe('metrica', () => {
+  it('bajo el kilómetro, metros enteros', () => {
+    expect(metrica(850)).toEqual(['850', 'm de ti']);
+  });
+
+  it('desde el kilómetro, kilómetros con coma decimal', () => {
+    expect(metrica(1000)).toEqual(['1,0', 'km de ti']);
+    expect(metrica(1250)).toEqual(['1,3', 'km de ti']);
   });
 });

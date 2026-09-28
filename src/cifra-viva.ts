@@ -2,7 +2,7 @@
  * Espejo de `cifra_viva.dart`: la distancia de la hoja gira solo en las
  * cifras que cambian, con una estela vertical. Si el bus se acerca, lo
  * nuevo entra desde arriba (`cifra-baja`); si se aleja, desde abajo. Las
- * cifras se casan por la derecha —unidades con unidades—, así «1.0» →
+ * cifras se casan por la derecha —unidades con unidades—, así «1,0» →
  * «990» mueve las dos primeras y deja quieto el cero.
  *
  * De palabra a número no hay cifras que casar y cambia en seco. Con
@@ -29,4 +29,14 @@ export function cifraViva(el: HTMLElement, texto: string, valor: number): void {
       return span;
     })
   );
+}
+
+/**
+ * `_metricParts` de eta_bottom_sheet.dart: la cifra grande y su unidad.
+ * Bajo el kilómetro en metros; por encima en kilómetros con un decimal y
+ * coma, como la escribe la app.
+ */
+export function metrica(metros: number): [string, string] {
+  if (metros < 1000) return [String(Math.round(metros)), 'm de ti'];
+  return [(metros / 1000).toFixed(1).replace('.', ','), 'km de ti'];
 }
