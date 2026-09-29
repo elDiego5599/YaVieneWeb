@@ -41,3 +41,56 @@ test('con el teclado, tabular hasta la isla la abre', async ({ page }, info) => 
   expect(await isla.evaluate((n) => n.contains(document.activeElement)), 'el foco no llegó a la isla').toBe(true);
   await expect(isla).toHaveClass(/\bis-open\b/);
 });
+
+test('con el ratón se abre al entrar y se cierra al salir', async ({ page }, info) => {
+  test.skip(info.project.name !== 'escritorio', 'el puntero es del escritorio');
+  await page.goto('/');
+  const isla = page.locator('.nav-island');
+  await isla.hover();
+  await expect(isla).toHaveClass(/\bis-open\b/);
+  await page.mouse.move(5, 700);
+  await expect(isla).not.toHaveClass(/\bis-open\b/);
+});
+
+test('Escape la cierra y deja el foco en el botón, sin reabrirla', async ({ page }, info) => {
+  test.skip(info.project.name !== 'escritorio', 'el teclado es del escritorio');
+  // Con la barra plegada, que es cuando el botón está a la vista: desde
+  // 880 px los enlaces van en línea y el botón no se enseña.
+  await page.setViewportSize({ width: 800, height: 900 });
+  await page.goto('/');
+  const isla = page.locator('.nav-island');
+  const boton = isla.locator('.nav-island-toggle');
+  for (let i = 0; i < 6 && !(await isla.evaluate((n) => n.contains(document.activeElement))); i += 1) {
+    await page.keyboard.press('Tab');
+  }
+  await expect(isla).toHaveClass(/\bis-open\b/);
+  await page.keyboard.press('Escape');
+  await expect(boton).toBeFocused();
+  // Tras un Escape el foco devuelto es `:focus-visible`: sin el pestillo,
+  // su `focusin` la volvería a abrir.
+  await page.waitForTimeout(300);
+  await expect(isla).not.toHaveClass(/\bis-open\b/);
+});
+
+test('en táctil, un toque fuera la cierra', async ({ page }, info) => {
+  test.skip(info.project.name !== 'movil', 'el toque es del teléfono');
+  await page.goto('/');
+  const isla = page.locator('.nav-island');
+  await isla.locator('.nav-island-toggle').tap();
+  await expect(isla).toHaveClass(/\bis-open\b/);
+  await page.touchscreen.tap(20, (page.viewportSize()?.height ?? 800) - 40);
+  await expect(isla).not.toHaveClass(/\bis-open\b/);
+});
+
+test('marca la sección que se está leyendo, y ninguna en el hero', async ({ page }) => {
+  await page.goto('/');
+  const marcado = page.locator('.nav-island [aria-current="location"]');
+  await expect(marcado).toHaveCount(0);
+  for (const [id, href] of [['problema', '#problema'], ['mapa', '#mapa']]) {
+    await page.locator(`#${id}`).evaluate((s) => window.scrollTo(0, s.getBoundingClientRect().top + window.scrollY - innerHeight * 0.3));
+    await expect(marcado, `#${id}`).toHaveAttribute('href', href);
+    await expect(marcado).toHaveCount(1);
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(marcado).toHaveCount(0);
+});
