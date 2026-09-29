@@ -112,55 +112,55 @@ export class PhoneMap {
   readonly mapa: MapaBase = YV_RUTAS.mapa;
   activeRoute: RutaLanding;
 
-  private readonly svg: SVGSVGElement;
-  private readonly host: HTMLElement;
-  private readonly lienzo: { w: number; h: number };
-  private readonly camara: { x: number; y: number; w: number; h: number };
+  readonly #svg: SVGSVGElement;
+  readonly #host: HTMLElement;
+  readonly #lienzo: { w: number; h: number };
+  readonly #camara: { x: number; y: number; w: number; h: number };
 
-  private readonly casingEl: SVGPathElement;
-  private readonly activeEl: SVGPathElement;
-  private readonly terminalsEl: SVGGElement;
-  private readonly radioEl: SVGCircleElement;
-  private readonly markersEl: SVGGElement;
-  private readonly pinNode: SVGGElement;
-  private readonly busNodes: SVGGElement[] = [];
-  private readonly sufijo: string;
+  readonly #casingEl: SVGPathElement;
+  readonly #activeEl: SVGPathElement;
+  readonly #terminalsEl: SVGGElement;
+  readonly #radioEl: SVGCircleElement;
+  readonly #markersEl: SVGGElement;
+  readonly #pinNode: SVGGElement;
+  readonly #busNodes: SVGGElement[] = [];
+  readonly #sufijo: string;
 
-  private largo = 0;
-  private unitsPerPx = 1;
-  private busScale = 1;
-  private pinScale = 1;
+  #largo = 0;
+  #unitsPerPx = 1;
+  #busScale = 1;
+  #pinScale = 1;
   /** Radio de las terminales, ya en unidades del mosaico. */
-  private terminalR = 7;
-  private pinT: number | null = null;
-  private busTs: number[] = [];
+  #terminalR = 7;
+  #pinT: number | null = null;
+  #busTs: number[] = [];
 
-  private readonly onResize = (): void => this.medir();
+  readonly #onResize = (): void => this.#medir();
 
   constructor(svg: SVGSVGElement, host: HTMLElement) {
-    this.svg = svg;
-    this.host = host;
-    this.sufijo = String(++instancias);
+    this.#svg = svg;
+    this.#host = host;
+    this.#sufijo = String(++instancias);
 
     const [vx, vy, w, h] = YV_RUTAS.viewBox;
-    this.camara = {
+    this.#camara = {
       x: vx + w * CAMARA.x,
       y: vy + h * CAMARA.y,
       w: w * CAMARA.w,
       h: h * CAMARA.h,
     };
-    this.lienzo = { w: this.camara.w, h: this.camara.h };
+    this.#lienzo = { w: this.#camara.w, h: this.#camara.h };
     this.activeRoute = this.rutas[0];
 
-    this.svg.replaceChildren();
+    this.#svg.replaceChildren();
     // Encuadre fijo sobre el tronco de las rutas. `slice` lo escala hasta
     // cubrir la pantalla del teléfono y recorta lo que sobre, sin deformar
     // nada. La imagen sigue entrando entera: lo que la recorta es esto.
-    this.svg.setAttribute('viewBox',
-      `${this.camara.x} ${this.camara.y} ${this.camara.w} ${this.camara.h}`);
-    this.svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+    this.#svg.setAttribute('viewBox',
+      `${this.#camara.x} ${this.#camara.y} ${this.#camara.w} ${this.#camara.h}`);
+    this.#svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
 
-    const s = this.sufijo;
+    const s = this.#sufijo;
     const defs = nuevo('defs');
     defs.innerHTML = `
       <linearGradient id="busBody-${s}" x1="0" y1="0" x2="0" y2="1">
@@ -187,7 +187,7 @@ export class PhoneMap {
         <stop offset="0%" stop-color="#065F46"/>
         <stop offset="100%" stop-color="#00A859"/>
       </linearGradient>`;
-    this.svg.appendChild(defs);
+    this.#svg.appendChild(defs);
 
     const img = nuevo('image');
     img.setAttribute('href', this.mapa.src);
@@ -197,43 +197,43 @@ export class PhoneMap {
     img.setAttribute('y', String(vy));
     img.setAttribute('width', String(w));
     img.setAttribute('height', String(h));
-    this.svg.appendChild(img);
+    this.#svg.appendChild(img);
 
     // Radio "cerca de ti": debajo de la ruta, como en la app, donde la
     // capa de relleno va antes que la polilínea.
-    this.radioEl = nuevo('circle');
-    this.radioEl.setAttribute('class', 'map-radio');
-    this.svg.appendChild(this.radioEl);
+    this.#radioEl = nuevo('circle');
+    this.#radioEl.setAttribute('class', 'map-radio');
+    this.#svg.appendChild(this.#radioEl);
 
     // Ruta activa: la orla blanca y encima la línea verde, las dos capas
     // que map_widget.dart le pone a la ruta (estilo_ruta.dart) y las
     // mismas del mapa de «El producto».
-    this.casingEl = nuevo('path');
-    this.casingEl.setAttribute('class', 'map-route-casing');
-    this.svg.appendChild(this.casingEl);
+    this.#casingEl = nuevo('path');
+    this.#casingEl.setAttribute('class', 'map-route-casing');
+    this.#svg.appendChild(this.#casingEl);
 
-    this.activeEl = nuevo('path');
-    this.activeEl.setAttribute('class', 'map-route-active');
-    this.svg.appendChild(this.activeEl);
+    this.#activeEl = nuevo('path');
+    this.#activeEl.setAttribute('class', 'map-route-active');
+    this.#svg.appendChild(this.#activeEl);
 
-    this.terminalsEl = nuevo('g');
-    this.terminalsEl.setAttribute('class', 'map-terminals');
-    this.svg.appendChild(this.terminalsEl);
+    this.#terminalsEl = nuevo('g');
+    this.#terminalsEl.setAttribute('class', 'map-terminals');
+    this.#svg.appendChild(this.#terminalsEl);
 
-    this.markersEl = nuevo('g');
-    this.markersEl.setAttribute('class', 'map-markers');
-    this.svg.appendChild(this.markersEl);
+    this.#markersEl = nuevo('g');
+    this.#markersEl.setAttribute('class', 'map-markers');
+    this.#svg.appendChild(this.#markersEl);
 
-    this.pinNode = PhoneMap.makePin(this.sufijo);
-    this.markersEl.appendChild(this.pinNode);
+    this.#pinNode = PhoneMap.#makePin(this.#sufijo);
+    this.#markersEl.appendChild(this.#pinNode);
 
     this.setRoute(this.activeRoute.id);
-    this.medir();
-    window.addEventListener('resize', this.onResize, { passive: true });
+    this.#medir();
+    window.addEventListener('resize', this.#onResize, { passive: true });
   }
 
   destroy(): void {
-    window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('resize', this.#onResize);
   }
 
   /* ---------- Escala ---------- */
@@ -246,9 +246,9 @@ export class PhoneMap {
    * deshacerlo, o el bus y el pin —que se dibujan en píxeles del
    * teléfono— saldrían del tamaño que tendrían sin encoger.
    */
-  private caja(): { width: number; height: number } {
-    const rect = this.host.getBoundingClientRect();
-    const k = encajeDe(this.host);
+  #caja(): { width: number; height: number } {
+    const rect = this.#host.getBoundingClientRect();
+    const k = encajeDe(this.#host);
     return { width: rect.width / k, height: rect.height / k };
   }
 
@@ -257,26 +257,26 @@ export class PhoneMap {
    * `slice` el SVG se escala por el lado que más aumento necesita, así
    * que manda el menor de los dos cocientes.
    */
-  private medir(): void {
-    const rect = this.caja();
+  #medir(): void {
+    const rect = this.#caja();
     if (rect.width > 0 && rect.height > 0) {
-      this.unitsPerPx = Math.min(this.lienzo.w / rect.width, this.lienzo.h / rect.height);
+      this.#unitsPerPx = Math.min(this.#lienzo.w / rect.width, this.#lienzo.h / rect.height);
     }
     const pt = rect.width / ANCHO_PANTALLA_PT;
-    this.busScale = (BUS_PT * pt * this.unitsPerPx) / BUS_ALTO;
-    this.pinScale = (PIN_PT * pt * this.unitsPerPx) / PIN_ALTO;
-    this.terminalR = 7 * pt * this.unitsPerPx;
-    this.drawTerminales();
-    this.drawPin();
-    this.drawBuses();
+    this.#busScale = (BUS_PT * pt * this.#unitsPerPx) / BUS_ALTO;
+    this.#pinScale = (PIN_PT * pt * this.#unitsPerPx) / PIN_ALTO;
+    this.#terminalR = 7 * pt * this.#unitsPerPx;
+    this.#drawTerminales();
+    this.#drawPin();
+    this.#drawBuses();
   }
 
   /** Las terminales también se miden aquí, y no sólo al elegir ruta: si
    *  no, al cambiar el ancho de la ventana se quedaban con el radio del
    *  tamaño anterior. */
-  private drawTerminales(): void {
-    const r = this.terminalR.toFixed(1);
-    for (const c of Array.from(this.terminalsEl.children)) {
+  #drawTerminales(): void {
+    const r = this.#terminalR.toFixed(1);
+    for (const c of Array.from(this.#terminalsEl.children)) {
       c.setAttribute('r', r);
     }
   }
@@ -302,7 +302,7 @@ export class PhoneMap {
    * tamaño de la app un disco duro de 22 puntos parecía una moneda pegada
    * al bus.
    */
-  private static makeBus(s: string): SVGGElement {
+  static #makeBus(s: string): SVGGElement {
     const g = nuevo('g');
     g.setAttribute('class', 'map-bus');
     g.innerHTML = `
@@ -324,7 +324,7 @@ export class PhoneMap {
    * descentrada no son adorno: sin ellos el pin se ve como una calcomanía
    * plana y el de la app no lo es.
    */
-  private static makePin(s: string): SVGGElement {
+  static #makePin(s: string): SVGGElement {
     const g = nuevo('g');
     g.setAttribute('class', 'map-pin');
     g.innerHTML = `
@@ -345,11 +345,11 @@ export class PhoneMap {
     if (!route) return;
     this.activeRoute = route;
 
-    this.casingEl.setAttribute('d', route.d);
-    this.activeEl.setAttribute('d', route.d);
-    this.largo = this.activeEl.getTotalLength();
+    this.#casingEl.setAttribute('d', route.d);
+    this.#activeEl.setAttribute('d', route.d);
+    this.#largo = this.#activeEl.getTotalLength();
 
-    this.terminalsEl.replaceChildren();
+    this.#terminalsEl.replaceChildren();
     for (const [x, y] of route.extremos) {
       const c = nuevo('circle');
       c.setAttribute('cx', String(x));
@@ -359,13 +359,13 @@ export class PhoneMap {
       // ventana: se pasan a la escala del lienzo en `medir()`, igual que
       // el bus y el pin, para que midan lo mismo en el teléfono grande
       // del hero y en los chicos de la solución.
-      c.setAttribute('r', this.terminalR.toFixed(1));
-      this.terminalsEl.appendChild(c);
+      c.setAttribute('r', this.#terminalR.toFixed(1));
+      this.#terminalsEl.appendChild(c);
     }
 
-    this.drawRadio();
-    this.drawPin();
-    this.drawBuses();
+    this.#drawRadio();
+    this.#drawPin();
+    this.#drawBuses();
   }
 
   /**
@@ -374,7 +374,7 @@ export class PhoneMap {
    * la misma regla: 1 km en la hoja es 1 km sobre el mapa.
    */
   get metrosDeRuta(): number {
-    return this.largo * this.metrosPorUnidad;
+    return this.#largo * this.#metrosPorUnidad;
   }
 
   /**
@@ -384,15 +384,15 @@ export class PhoneMap {
    * del recorrido —la C16 dice 62,6 y su polilínea mide 59,7—, así que
    * el radio de 2 km salía un 5 % más chico que el de la app.
    */
-  private get metrosPorUnidad(): number {
+  get #metrosPorUnidad(): number {
     return YV_RUTAS.metrosPorUnidad;
   }
 
   /** Punto en unidades del SVG. t: 0 = terminal A, 1 = terminal B. */
   pointAt(t: number): Punto | null {
-    if (!this.largo) return null;
+    if (!this.#largo) return null;
     const clamped = Math.max(0, Math.min(1, t));
-    return this.activeEl.getPointAtLength(clamped * this.largo);
+    return this.#activeEl.getPointAtLength(clamped * this.#largo);
   }
 
   /**
@@ -408,14 +408,14 @@ export class PhoneMap {
    * queda el otro fuera de cuadro.
    */
   tVisible(fx: number, fy: number, atras: number[] = [], muestras = 360): number {
-    const rect = this.caja();
-    if (!this.largo || rect.width === 0 || rect.height === 0) return 0.5;
+    const rect = this.#caja();
+    if (!this.#largo || rect.width === 0 || rect.height === 0) return 0.5;
 
     // De fracción de pantalla a unidades del mosaico. Con `slice` el
     // contenido queda centrado en la cámara, así que el desvío es simétrico
     // respecto al centro del recorte —no del mosaico entero.
-    const cx = (fx - 0.5) * rect.width * this.unitsPerPx + this.camara.x + this.camara.w / 2;
-    const cy = (fy - 0.5) * rect.height * this.unitsPerPx + this.camara.y + this.camara.h / 2;
+    const cx = (fx - 0.5) * rect.width * this.#unitsPerPx + this.#camara.x + this.#camara.w / 2;
+    const cy = (fy - 0.5) * rect.height * this.#unitsPerPx + this.#camara.y + this.#camara.h / 2;
 
     const metros = this.metrosDeRuta;
     const saltos = metros > 0 ? atras.map(m => m / metros) : [];
@@ -440,8 +440,8 @@ export class PhoneMap {
 
   /** Rumbo en grados, midiendo un tramo corto hacia adelante. */
   headingAt(t: number): number {
-    if (!this.largo) return 0;
-    const step = Math.min(0.004, 12 / this.largo);
+    if (!this.#largo) return 0;
+    const step = Math.min(0.004, 12 / this.#largo);
     const a = this.pointAt(t);
     const b = this.pointAt(Math.min(1, t + step)) ?? a;
     if (!a || !b) return 0;
@@ -455,65 +455,65 @@ export class PhoneMap {
   /* ---------- Colocación ---------- */
 
   setPin(t: number): void {
-    this.pinT = t;
-    this.drawPin();
-    this.drawRadio();
+    this.#pinT = t;
+    this.#drawPin();
+    this.#drawRadio();
   }
 
-  private drawPin(): void {
-    if (this.pinT === null) return;
-    const p = this.pointAt(this.pinT);
+  #drawPin(): void {
+    if (this.#pinT === null) return;
+    const p = this.pointAt(this.#pinT);
     if (!p) return;
-    this.pinNode.setAttribute('transform', `translate(${p.x} ${p.y}) scale(${this.pinScale})`);
+    this.#pinNode.setAttribute('transform', `translate(${p.x} ${p.y}) scale(${this.#pinScale})`);
   }
 
-  private drawRadio(): void {
-    if (this.pinT === null || !this.metrosPorUnidad) return;
-    const p = this.pointAt(this.pinT);
+  #drawRadio(): void {
+    if (this.#pinT === null || !this.#metrosPorUnidad) return;
+    const p = this.pointAt(this.#pinT);
     if (!p) return;
-    this.radioEl.setAttribute('cx', String(p.x));
-    this.radioEl.setAttribute('cy', String(p.y));
-    this.radioEl.setAttribute('r', (RADIO_CERCA_M / this.metrosPorUnidad).toFixed(1));
+    this.#radioEl.setAttribute('cx', String(p.x));
+    this.#radioEl.setAttribute('cy', String(p.y));
+    this.#radioEl.setAttribute('r', (RADIO_CERCA_M / this.#metrosPorUnidad).toFixed(1));
   }
 
   /** Coloca tantos buses como valores de t reciba, orientados a su rumbo. */
   setBuses(ts: number[]): void {
-    this.busTs = ts;
-    while (this.busNodes.length < ts.length) {
-      const node = PhoneMap.makeBus(this.sufijo);
+    this.#busTs = ts;
+    while (this.#busNodes.length < ts.length) {
+      const node = PhoneMap.#makeBus(this.#sufijo);
       // Encima del pin. El pin es del usuario, pero es un punto quieto y
       // el bus es la noticia: debajo, el disco del pin se lo comía justo
       // en el momento en que hay que verlo llegar.
-      this.markersEl.appendChild(node);
-      this.busNodes.push(node);
+      this.#markersEl.appendChild(node);
+      this.#busNodes.push(node);
     }
-    this.busNodes.forEach((node, i) => {
+    this.#busNodes.forEach((node, i) => {
       node.style.display = i < ts.length ? '' : 'none';
     });
-    this.drawBuses();
+    this.#drawBuses();
   }
 
-  private drawBuses(): void {
-    this.busTs.forEach((t, i) => {
-      const node = this.busNodes[i];
+  #drawBuses(): void {
+    this.#busTs.forEach((t, i) => {
+      const node = this.#busNodes[i];
       if (!node) return;
       const p = this.pointAt(t);
       if (!p) return;
       const deg = this.headingAt(t);
       node.setAttribute(
         'transform',
-        `translate(${p.x} ${p.y}) rotate(${deg.toFixed(1)}) scale(${this.busScale})`
+        `translate(${p.x} ${p.y}) rotate(${deg.toFixed(1)}) scale(${this.#busScale})`
       );
     });
   }
 
   showPin(on: boolean): void {
-    this.pinNode.classList.toggle('is-on', on);
-    this.radioEl.classList.toggle('is-on', on);
+    this.#pinNode.classList.toggle('is-on', on);
+    this.#radioEl.classList.toggle('is-on', on);
   }
 
   showBuses(on: boolean): void {
-    for (const n of this.busNodes) n.classList.toggle('is-on', on);
+    for (const n of this.#busNodes) n.classList.toggle('is-on', on);
   }
 
   /**
@@ -521,17 +521,17 @@ export class PhoneMap {
    * marcar, que es como están mientras nadie ha tocado ninguno.
    */
   setBusElegido(indice: number | null): void {
-    this.busNodes.forEach((n, i) => n.classList.toggle('is-elegida', i === indice));
+    this.#busNodes.forEach((n, i) => n.classList.toggle('is-elegida', i === indice));
   }
 
   /** El nodo de un bus, para que el guion pueda poner el dedo encima. */
   nodoBus(indice: number): SVGGElement | null {
-    return this.busNodes[indice] ?? null;
+    return this.#busNodes[indice] ?? null;
   }
 
   showRoute(on: boolean): void {
-    this.casingEl.classList.toggle('is-on', on);
-    this.activeEl.classList.toggle('is-on', on);
-    this.terminalsEl.classList.toggle('is-on', on);
+    this.#casingEl.classList.toggle('is-on', on);
+    this.#activeEl.classList.toggle('is-on', on);
+    this.#terminalsEl.classList.toggle('is-on', on);
   }
 }

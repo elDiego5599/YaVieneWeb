@@ -52,40 +52,40 @@ interface PasoFocoPiezas {
 }
 
 export class PasoFoco {
-  private readonly piezas: PasoFocoPiezas;
+  readonly #piezas: PasoFocoPiezas;
 
-  private actual = -1;
-  private llenado = -1;
-  private giro = -1;
-  private pedido = 0;
-  private dentro = false;
+  #actual = -1;
+  #llenado = -1;
+  #giro = -1;
+  #pedido = 0;
+  #dentro = false;
 
   constructor(piezas: PasoFocoPiezas) {
-    this.piezas = piezas;
+    this.#piezas = piezas;
 
     // El riel arranca vacío: hasta que la pista no empieza a correr no
     // hay nada recorrido. El valor por omisión que trae la hoja es el
     // tramo lleno, y ése es para cuando este módulo no llega a cargar.
-    this.llenar(0, 0);
+    this.#llenar(0, 0);
 
     // Un margen generoso para que el primer paso ya esté encendido cuando
     // la sección asoma, y no arranque el bucle a mitad de gesto.
     const mirilla = new IntersectionObserver(
       ([entrada]) => {
         if (!entrada) return;
-        this.dentro = entrada.isIntersecting;
-        if (this.dentro) this.medir();
-        else this.aplicar(-1);
+        this.#dentro = entrada.isIntersecting;
+        if (this.#dentro) this.#medir();
+        else this.#aplicar(-1);
       },
       { rootMargin: '300px 0px' }
     );
     mirilla.observe(piezas.pista);
 
     const avisar = () => {
-      if (!this.dentro || this.pedido) return;
-      this.pedido = requestAnimationFrame(() => {
-        this.pedido = 0;
-        this.medir();
+      if (!this.#dentro || this.#pedido) return;
+      this.#pedido = requestAnimationFrame(() => {
+        this.#pedido = 0;
+        this.#medir();
       });
     };
 
@@ -93,11 +93,11 @@ export class PasoFoco {
     addEventListener('resize', avisar, { passive: true });
   }
 
-  private medir(): void {
-    const total = this.piezas.columnas.length;
+  #medir(): void {
+    const total = this.#piezas.columnas.length;
     if (total === 0) return;
 
-    const caja = this.piezas.pista.getBoundingClientRect();
+    const caja = this.#piezas.pista.getBoundingClientRect();
     // Lo que la pista sobra por encima de la ventana es el recorrido real
     // de la escena pegada. Si no sobra nada —animaciones desactivadas,
     // pista encogida— manda el primero y no hay tramos que repartir.
@@ -116,8 +116,8 @@ export class PasoFoco {
     // donde deja la pista su botón, ver `irAPaso` en main.ts— y el relevo
     // de clases cae a medio camino entre dos, cuando el rodillo va justo
     // entre ellos. El primero y el último esperan medio tramo quietos.
-    this.llenar(topar(bruto - indice, 0, 1), topar(bruto - 0.5, 0, total - 1));
-    this.aplicar(indice);
+    this.#llenar(topar(bruto - indice, 0, 1), topar(bruto - 0.5, 0, total - 1));
+    this.#aplicar(indice);
   }
 
   /**
@@ -132,14 +132,14 @@ export class PasoFoco {
    * El giro sale igual, a `--paso-giro`, y lo gasta el rodillo de la lista
    * en escritorio (pasos.css); en el teléfono nadie lo lee.
    */
-  private llenar(parte: number, giro: number): void {
+  #llenar(parte: number, giro: number): void {
     const redondo = Math.round(parte * 1000) / 1000;
     const vuelta = Math.round(giro * 1000) / 1000;
-    if (redondo === this.llenado && vuelta === this.giro) return;
-    this.llenado = redondo;
-    this.giro = vuelta;
-    this.piezas.riel?.style.setProperty('--paso-llenado', String(redondo));
-    this.piezas.riel?.style.setProperty('--paso-giro', String(vuelta));
+    if (redondo === this.#llenado && vuelta === this.#giro) return;
+    this.#llenado = redondo;
+    this.#giro = vuelta;
+    this.#piezas.riel?.style.setProperty('--paso-llenado', String(redondo));
+    this.#piezas.riel?.style.setProperty('--paso-giro', String(vuelta));
   }
 
   /**
@@ -150,20 +150,20 @@ export class PasoFoco {
    * bucles; las clases no se tocan, de modo que al volver la escena está
    * ya donde se dejó.
    */
-  private aplicar(indice: number): void {
-    if (indice === this.actual) return;
-    this.actual = indice;
+  #aplicar(indice: number): void {
+    if (indice === this.#actual) return;
+    this.#actual = indice;
 
     if (indice >= 0) {
-      this.piezas.columnas.forEach((columna, i) => {
+      this.#piezas.columnas.forEach((columna, i) => {
         columna.classList.toggle('is-activa', i === indice);
       });
 
-      this.piezas.marcas.forEach((marca, i) => {
+      this.#piezas.marcas.forEach((marca, i) => {
         marca.classList.toggle('is-activa', i === indice);
       });
     }
 
-    this.piezas.alCambiar(indice);
+    this.#piezas.alCambiar(indice);
   }
 }
