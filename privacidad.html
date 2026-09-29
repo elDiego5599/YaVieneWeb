@@ -92,7 +92,7 @@
   </header>
 
   <main id="contenido" class="legal-hoja">
-    <p class="legal-fecha">Actualizado el 19 de septiembre de 2026</p>
+    <p class="legal-fecha">Actualizado el 29 de septiembre de 2026</p>
     <h1>Privacidad</h1>
     <p class="legal-entrada">Ya Viene es una aplicación para saber por dónde va tu bus. Para
       eso necesita muy poco, y lo poco que necesita casi todo se queda dentro de tu
@@ -125,13 +125,18 @@
          el pin. Callarlo engañaba por los dos lados: quien sale de la app
          creía que seguía midiendo en vivo, y quien veía la notificación fija
          creía que le seguían el rastro. La misma frase está en
-         legal_docs.dart, y allí una prueba la ata al manifiesto. -->
-    <p>Cuando sales de la app, en Android el seguimiento sigue vivo —verás una
-      notificación fija que lo dice— pero tu ubicación deja de actualizarse: la app
-      pide el permiso de ubicación «solo mientras la uso» y no el de segundo plano,
-      así que la distancia se mide contra el último punto que conoció, o contra el
-      punto de espera que hayas marcado a mano. En iPhone el aviso solo suena con la
-      app abierta.</p>
+         legal_docs.dart, y allí una prueba la ata al manifiesto.
+         Desde el 29 de septiembre de 2026 (auditoría H1) el servicio solo
+         vive con un aviso armado y muere al cerrar la app desde recientes
+         (stopWithTask="true"): de ahí «sin cerrarla» y la frase del cierre. -->
+    <p>Cuando sales de la app sin cerrarla y tienes un aviso activo, en Android el
+      seguimiento sigue vivo —verás una notificación fija que lo dice— pero tu ubicación
+      deja de actualizarse: la app pide el permiso de ubicación «solo mientras la uso» y
+      no el de segundo plano, así que la distancia se mide contra el último punto que
+      conoció, o contra el punto de espera que hayas marcado a mano. Si cierras la app
+      del todo, el seguimiento se detiene y la notificación desaparece: el aviso queda
+      guardado y vuelve a vigilar cuando abres la app otra vez. En iPhone el aviso solo
+      suena con la app abierta.</p>
 
     <h2>Sin analítica, sin rastreo, sin publicidad</h2>
     <p>La aplicación no incluye herramientas de analítica, de perfiles de uso ni de
@@ -155,7 +160,7 @@
         volver a marcarlo. Lo quitas con «Quitar», en el mismo mapa.</li>
       <li><strong>Tus avisos.</strong> Por cada bus al que le activaste uno: el bus, la
         ruta, cuándo lo activaste, cuándo sonó y, si lo activaste sobre un punto marcado a
-        mano, ese punto. Es lo que deja que un aviso siga vivo aunque cierres la app. Se
+        mano, ese punto. Es lo que deja que un aviso siga armado cuando vuelves a abrir la app. Se
         guardan los 50 más recientes de los últimos 30 días; los que todavía no han sonado
         se quedan hasta que suenen o los quites. Los borras todos desde Notificaciones.</li>
       <li><strong>Lo que ya aprendiste</strong>: si ya viste la bienvenida y la guía del

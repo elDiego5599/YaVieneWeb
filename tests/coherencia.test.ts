@@ -179,9 +179,18 @@ describe('la privacidad dice qué pasa con la app cerrada', () => {
     expect(html).toContain('En iPhone el aviso solo suena con la app abierta.');
   });
 
+  it('dice que cerrar la app del todo detiene el seguimiento', () => {
+    // Desde la auditoría 2026-09 (H1 de la app) el servicio de Android solo
+    // vive con un aviso armado y muere al cerrar la app desde recientes.
+    const html = texto();
+    expect(html).toContain('sin cerrarla y tienes un aviso activo');
+    expect(html).toContain('Si cierras la app del todo, el seguimiento se detiene');
+    expect(html).not.toContain('aunque cierres la app');
+  });
+
   it('la fecha del documento acompaña al cambio', () => {
     // Un texto legal que cambia sin cambiar su fecha no se distingue del
     // anterior, y la app usa la misma fecha para decir cuál está leyendo.
-    expect(leer('privacidad.html')).toContain('Actualizado el 19 de septiembre de 2026');
+    expect(leer('privacidad.html')).toContain('Actualizado el 29 de septiembre de 2026');
   });
 });
