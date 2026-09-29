@@ -278,3 +278,51 @@ describe('ContactForm con la página incompleta', () => {
     expect(error().hidden).toBe(true);
   });
 });
+
+describe('ContactForm después de un envío bueno', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+    HTMLElement.prototype.scrollIntoView = vi.fn();
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  // Riesgo: el panel de éxito sale debajo de un formulario vacío que sigue a la vista, como si no hubiera pasado nada.
+  it('el formulario se esconde y queda sólo el panel de éxito', async () => {
+    vi.stubEnv('VITE_CONTACT_ENDPOINT', '');
+    vi.stubGlobal('open', vi.fn().mockReturnValue({ opener: {}, location: { href: '' } }));
+
+    const form = montar();
+    new ContactForm(form);
+    await enviar(form);
+
+    expect(form.hidden).toBe(true);
+    expect(exito().hidden).toBe(false);
+    expect(error().hidden).toBe(true);
+  });
+
+  // Riesgo: un segundo envío que falla deja a la vez «Te abrimos WhatsApp» y «No pudimos enviar».
+  it('si el siguiente envío falla se ve sólo el error, con el formulario para reintentar', async () => {
+    vi.stubEnv('VITE_CONTACT_ENDPOINT', '');
+    vi.stubGlobal(
+      'open',
+      vi.fn().mockReturnValueOnce({ opener: {}, location: { href: '' } }).mockReturnValueOnce(null)
+    );
+
+    const form = montar();
+    new ContactForm(form);
+    await enviar(form);
+    expect(exito().hidden).toBe(false);
+
+    for (const nombre of ['nombre', 'empresa', 'telefono']) campo(nombre).value = 'otra';
+    await enviar(form);
+
+    expect(exito().hidden, 'el éxito del envío anterior sigue a la vista').toBe(true);
+    expect(error().hidden).toBe(false);
+    expect(form.hidden, 'el formulario no vuelve para reintentar').toBe(false);
+  });
+});

@@ -1715,6 +1715,13 @@
   display: none;
 }
 
+/* Y el formulario se va cuando sale el aviso (contact-form.ts). Hace falta
+   escribirlo: el `display: flex` de arriba le gana al `display: none` que
+   el navegador le da a `hidden`. */
+.contact-form-card[hidden] {
+  display: none;
+}
+
 .form-success-message h3 {
   color: var(--ink);
   font-size: var(--step-h3);

@@ -4,9 +4,9 @@
  * No finge nada: si hay un endpoint configurado (VITE_CONTACT_ENDPOINT) el
  * formulario lo llama de verdad y respeta lo que responda; si no lo hay,
  * abre WhatsApp con el mensaje ya escrito, que es el canal que la página
- * ofrece dos párrafos más arriba. En los dos caminos el botón vuelve a
- * quedar utilizable y los campos se limpian, para que un segundo envío no
- * choque contra un formulario muerto.
+ * ofrece dos párrafos más arriba. Si sale bien, el formulario deja su
+ * sitio al panel que cuenta qué pasó; si falla, se queda con los datos
+ * escritos, el aviso de error y el botón listo para reintentar.
  */
 
 /** El WhatsApp de Ya Viene, el mismo del botón de la sección. Se exporta
@@ -51,7 +51,11 @@ export class ContactForm {
     if (!this.#form.reportValidity()) return;
 
     this.#enviando = true;
+    // Cada intento parte limpio: sin el aviso de error del anterior y sin
+    // su éxito. Si no, un fallo después de un envío bueno dejaba a la vez
+    // «Te abrimos WhatsApp» y «No pudimos enviar».
     this.#mostrarError('');
+    if (this.#exito) this.#exito.hidden = true;
     this.#boton.disabled = true;
     this.#boton.textContent = 'Enviando…';
 
@@ -76,12 +80,14 @@ export class ContactForm {
       this.#form.reset();
       this.#mostrarExito(!endpoint);
     } catch {
+      // El formulario vuelve con los datos escritos, para reintentar.
+      this.#form.hidden = false;
       this.#mostrarError(
         'No pudimos enviar la solicitud. Vuelve a intentarlo o escríbenos por WhatsApp.'
       );
     } finally {
-      // Pase lo que pase el botón vuelve: si falló hay que poder reintentar,
-      // y si funcionó puede llegar otra empresa desde el mismo navegador.
+      // Pase lo que pase el botón vuelve: si falló hay que poder reintentar
+      // sin recargar la página.
       this.#enviando = false;
       this.#boton.disabled = false;
       this.#boton.textContent = this.#etiquetaOriginal;
@@ -144,6 +150,11 @@ export class ContactForm {
           'La conversación va con tus datos ya escritos. Dale a enviar y te respondemos por ahí.';
       }
     }
+    // El panel sale donde estaba el formulario, y el formulario se va: ya
+    // está enviado, y dejarlo a la vista vacío pedía rellenarlo otra vez.
+    // Sólo si hay panel que enseñar; sin él, el formulario es lo único
+    // que queda en pie.
+    this.#form.hidden = true;
     this.#exito.hidden = false;
     this.#exito.scrollIntoView({ behavior: 'smooth', block: 'center' });
     // Llevar la vista hasta el panel sólo sirve a quien mira. El foco es lo
