@@ -18,9 +18,9 @@
  * donde parten las líneas, y con él el alto natural de la escena. No hay
  * regla de tres que valga —esa cuenta dejó la escena temblando en los
  * teléfonos, saltando entre dos factores para siempre—. Lo único cierto
- * es que a menos factor, menos ocupa, así que el factor se busca por
- * bisección: se prueba, se mide y se parte el margen, todo dentro de un
- * mismo cuadro.
+ * es que a menos factor, menos ocupa, así que el factor se busca en una
+ * rejilla fija, midiendo, hasta dar con el mayor que cabe: todo dentro de
+ * un mismo cuadro.
  *
  * Todo lo que hay dentro hereda el factor en `--encaje`, y de ahí lo lee
  * el poco código que mezcla píxeles de pantalla con píxeles del elemento
@@ -31,12 +31,32 @@
 const MINIMO = 0.5;
 
 /**
- * Cuántas veces se parte el margen buscando el factor.
+ * Cuántos escalones tiene la rejilla donde se busca el factor.
  *
- * Ocho cortes dejan el intervalo [0.5, 1] en medio milésimo, que es más
- * fino que los tres decimales con los que se escribe el factor.
+ * Son los que dejaban ocho cortes de bisección sobre [0.5, 1], la
+ * búsqueda de antes: el escalón `i` vale `MINIMO + i · 0.5 / 256`, poco
+ * menos de dos milésimas, y el factor que se pone es el escalón más alto
+ * que cabe, redondeado hacia abajo a tres decimales. Con la misma
+ * rejilla y la misma regla sale el mismo factor que daba la bisección,
+ * hasta el último píxel; lo que cambia es cuántos escalones se prueban.
  */
-const CORTES = 8;
+const PASOS = 256;
+
+/**
+ * Cuántas pruebas se guían por la estimación antes de volver a partir el
+ * margen por la mitad. Lo normal son dos; el tope está para que una
+ * estimación que falle una y otra vez no recorra la rejilla de uno en uno.
+ * Con él, el peor caso son trece maquetas —la del factor puesto, cuatro
+ * guiadas y los ocho cortes— contra las diez fijas de la bisección; en la
+ * página, de 375 a 1440 de ancho, han sido dos o tres más la primera.
+ */
+const GUIADAS = 4;
+
+/** El factor del escalón `i`: el 0 es `MINIMO` y `PASOS`, el 1 justo. */
+const escalon = (i: number): number => MINIMO + (i * (1 - MINIMO)) / PASOS;
+
+/** El escalón en el que cae un factor, redondeando hacia abajo. */
+const escalonDe = (k: number): number => Math.floor(((k - MINIMO) * PASOS) / (1 - MINIMO));
 
 /**
  * El factor de encogido que arrastra un elemento.
@@ -75,6 +95,10 @@ export function encajarEscena(escena: HTMLElement): () => void {
     return dentro.getBoundingClientRect().height;
   };
 
+  /** El factor que hay puesto: sin nada escrito, el 1 del CSS. */
+  const puesto = (): number =>
+    Number.parseFloat(escena.style.getPropertyValue('--encaje')) || 1;
+
   const medir = (): void => {
     pedido = 0;
     if (buscando) return;
@@ -100,7 +124,7 @@ export function encajarEscena(escena: HTMLElement): () => void {
     if (libre <= 0) return;
 
     // Ni el hueco ni el contenido han cambiado desde la última búsqueda,
-    // así que la respuesta sería la misma y buscarla cuesta diez maquetas.
+    // así que la respuesta sería la misma y buscarla cuesta maquetas.
     // `offsetHeight` vale aquí de detector de cambios y nada más —lo que
     // devuelva cada navegador con el zoom puesto da igual mientras sea
     // estable—, que es lo que hace falta cuando la barra de direcciones
@@ -121,30 +145,54 @@ export function encajarEscena(escena: HTMLElement): () => void {
       // sin parar, cuadro tras cuadro. Eso es lo que se veía temblar.
       //
       // Lo que sí es cierto siempre es que ocupar más en pantalla pide un
-      // factor mayor —eso es monótono—, y con eso basta para buscar por
-      // bisección el mayor factor que todavía cabe. Nueve o diez maquetas
-      // seguidas, todas en el mismo cuadro y ninguna pintada, y de ahí no
-      // se mueve hasta que cambie el hueco o el contenido.
-      let k: number;
-      if (probar(1) <= libre) {
-        k = 1;
-      } else if (probar(MINIMO) > libre) {
-        // Ni encogido del todo cabe. Se queda en el tope y lo que sobre
-        // se sale: por debajo de esto ya no habría nada que leer.
-        k = MINIMO;
-      } else {
-        let cabe = MINIMO;
-        let sobra = 1;
-        for (let i = 0; i < CORTES; i += 1) {
-          const medio = (cabe + sobra) / 2;
-          if (probar(medio) <= libre) cabe = medio;
-          else sobra = medio;
-        }
-        // Se redondea hacia abajo, nunca hacia arriba: la milésima que
-        // sobra al redondear son píxeles de escena que se salen, y de una
-        // escena pegada lo que se sale no se alcanza.
-        k = Math.floor(cabe * 1000) / 1000;
+      // factor mayor —eso es monótono—, y con eso basta para buscar el
+      // mayor escalón de la rejilla que todavía cabe.
+      //
+      // Se buscaba partiendo el margen a ciegas: ocho cortes más las dos
+      // puntas, diez maquetas de 13 a 22 ms cada una, casi toda la tarea
+      // larga del arranque. La regla de tres no sirve de respuesta, pero
+      // sí de puntería: el alto medido con el factor puesto dice por qué
+      // escalón andará la respuesta, y cada prueba afina la siguiente con
+      // su propio alto. Se prueba ese escalón y el de encima: si el de
+      // abajo cabe y el de encima no, es la respuesta, y es la misma que
+      // habría dado la bisección, porque ninguna de las dos se fía de la
+      // cuenta, sólo de lo medido. Lo normal son dos maquetas.
+      //
+      // `cabe` es el escalón más alto que se sabe que cabe, y `sobra` el
+      // más bajo que se sabe que no. Arrancan fuera de la rejilla por
+      // arriba y en el 0 por abajo: si ni el 0 cabe la respuesta es el
+      // tope, `MINIMO`, que es lo mismo que da el escalón 0, así que no
+      // hace falta probarlo.
+      let cabe = 0;
+      let sobra = PASOS + 1;
+
+      // La primera medida es la del factor que ya está puesto, sin
+      // escribir nada: esa maqueta el navegador la iba a hacer de todos
+      // modos. Si es el 1, además, ya dice de qué lado queda la rejilla
+      // entera.
+      let factor = puesto();
+      let ocupa = dentro.getBoundingClientRect().height;
+      if (factor === 1) {
+        if (ocupa <= libre) cabe = PASOS;
+        else sobra = PASOS;
       }
+
+      for (let guiadas = 0; sobra - cabe > 1; guiadas += 1) {
+        // Donde caería el factor si el alto propio no cambiara al encoger.
+        let i = escalonDe(libre / (ocupa / factor));
+        if (guiadas >= GUIADAS) i = Math.floor((cabe + sobra) / 2);
+        else i = Math.min(Math.max(i, cabe + 1), sobra - 1);
+
+        factor = Number(escalon(i).toFixed(3));
+        ocupa = probar(escalon(i));
+        if (ocupa <= libre) cabe = i;
+        else sobra = i;
+      }
+
+      // Se redondea hacia abajo, nunca hacia arriba: la milésima que
+      // sobra al redondear son píxeles de escena que se salen, y de una
+      // escena pegada lo que se sale no se alcanza.
+      const k = Math.floor(escalon(cabe) * 1000) / 1000;
 
       escena.style.setProperty('--encaje', k.toFixed(3));
       libreVisto = libre;

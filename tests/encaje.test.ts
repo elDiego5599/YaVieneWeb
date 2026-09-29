@@ -274,6 +274,127 @@ describe('encajarEscena', () => {
       delete (document as unknown as { fonts?: unknown }).fonts;
     }
   });
+
+  describe('la búsqueda del factor', () => {
+    /**
+     * La bisección que buscaba el factor antes, copiada tal cual: ocho
+     * cortes sobre [0.5, 1] probando con tres decimales. Se queda aquí de
+     * vara de medir: la búsqueda nueva tiene que dar el mismo factor,
+     * milésima a milésima, porque un factor distinto es una escena que se
+     * mueve.
+     */
+    function biseccion(alto: (k: number) => number, libre: number): string {
+      const probar = (k: number): number => alto(Number(k.toFixed(3)));
+      if (probar(1) <= libre) return '1.000';
+      if (probar(0.5) > libre) return '0.500';
+      let cabe = 0.5;
+      let sobra = 1;
+      for (let i = 0; i < 8; i += 1) {
+        const medio = (cabe + sobra) / 2;
+        if (probar(medio) <= libre) cabe = medio;
+        else sobra = medio;
+      }
+      return (Math.floor(cabe * 1000) / 1000).toFixed(3);
+    }
+
+    /**
+     * El alto en pantalla de una escena cuyo alto propio `H(k)` pasa por
+     * estos puntos, en tramos rectos y partido en líneas enteras de 17 px:
+     * al encoger, el texto se reparte en menos líneas y la escena ocupa
+     * menos de lo que diría la regla de tres.
+     */
+    const curva =
+      (puntos: [number, number][]) =>
+      (k: number): number => {
+        let i = 1;
+        while (i < puntos.length - 1 && k > puntos[i]![0]) i += 1;
+        const [k0, h0] = puntos[i - 1]!;
+        const [k1, h1] = puntos[i]!;
+        const propio = h0 + ((h1 - h0) * (k - k0)) / (k1 - k0);
+        return Math.ceil(propio / 17) * 17 * k;
+      };
+
+    /**
+     * Las formas medidas en Chromium con la escena de «Cómo funciona»
+     * (alto en pantalla / factor, a varios factores) y dos de libro: la
+     * recta y el salto de línea del temblor.
+     */
+    const curvas: Record<string, (k: number) => number> = {
+      'Pixel 7': curva([[0.5, 892], [0.75, 913], [0.875, 944], [1, 944]]),
+      '375 × 667': curva([[0.5, 798], [0.625, 818], [0.708, 818], [0.75, 848], [1, 868]]),
+      '1440 × 900': curva([[0.5, 832], [0.75, 831], [0.875, 830], [1, 830]]),
+      recta: (k) => 1000 * k,
+      'salto de línea': (k) => (k > 0.87 ? 945 : 835) * k,
+    };
+
+    /** Encaja una escena con esa curva y ese hueco; dice qué factor puso y cuánto midió. */
+    function encajarCon(alto: (k: number) => number, libre: number): { factor: string; medidas: number } {
+      const e = escena({ minHeight: `${libre}px` }, alto);
+      const suelta = encajarEscena(e.escena);
+      const resultado = { factor: e.factor(), medidas: e.medidas() };
+      suelta();
+      e.escena.remove();
+      return resultado;
+    }
+
+    // Riesgo: la búsqueda rápida da otro factor que la de antes y la escena se mueve un pelo en alguna pantalla.
+    it('da el mismo factor que la bisección, hueco a hueco', () => {
+      for (const [nombre, alto] of Object.entries(curvas)) {
+        for (let libre = 300; libre <= 1000; libre += 1) {
+          expect(encajarCon(alto, libre).factor, `${nombre} con ${libre} libres`).toBe(
+            biseccion(alto, libre)
+          );
+        }
+      }
+    });
+
+    // Riesgo: la tarea larga del arranque — cada prueba es una maqueta entera de la página, de 13 a 22 ms.
+    it('con las escenas medidas le bastan cuatro maquetas, no diez', () => {
+      // Los huecos que dejó cada ventana en Chromium. Allí, con el alto
+      // de verdad, fueron tres, cuatro y tres contando la del factor puesto;
+      // aquí las líneas de 17 px lo ponen algo más difícil.
+      expect(encajarCon(curvas['Pixel 7']!, 753).medidas).toBeLessThanOrEqual(4);
+      expect(encajarCon(curvas['375 × 667']!, 580).medidas).toBeLessThanOrEqual(4);
+      expect(encajarCon(curvas['1440 × 900']!, 808).medidas).toBeLessThanOrEqual(4);
+    });
+
+    // Riesgo: una curva rara despista a la estimación y la búsqueda se alarga sin tope.
+    it('en cualquier hueco tiene techo, y de media se queda en la mitad de la bisección', () => {
+      for (const [nombre, alto] of Object.entries(curvas)) {
+        let total = 0;
+        let cuantos = 0;
+        for (let libre = 300; libre <= 1000; libre += 1) {
+          if (alto(1) <= libre) continue;
+          const { medidas } = encajarCon(alto, libre);
+          // La del factor puesto, cuatro guiadas y ocho cortes como mucho.
+          expect(medidas, `${nombre} con ${libre} libres`).toBeLessThanOrEqual(13);
+          total += medidas;
+          cuantos += 1;
+        }
+        expect(total / cuantos, nombre).toBeLessThan(5);
+      }
+    });
+
+    // Riesgo: al volver a buscar tras un cambio de ventana, arrancar del factor puesto da otra respuesta que arrancar del 1.
+    it('al volver a buscar desde un factor ya puesto llega al mismo', () => {
+      const alto = curvas['375 × 667']!;
+      const e = escena({ minHeight: '580px' }, alto);
+      encajar(e.escena);
+      expect(e.factor()).toBe(biseccion(alto, 580));
+
+      for (const libre of [700, 900, 450, 580]) {
+        vi.mocked(window.getComputedStyle).mockImplementation(
+          (el: Element) =>
+            (el === e.escena
+              ? { position: 'sticky', paddingTop: '0px', paddingBottom: '0px', minHeight: `${libre}px` }
+              : {}) as unknown as CSSStyleDeclaration
+        );
+        window.dispatchEvent(new Event('resize'));
+        correrCuadros();
+        expect(e.factor(), `${libre} libres`).toBe(biseccion(alto, libre));
+      }
+    });
+  });
 });
 
 describe('encajeDe', () => {
