@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Términos — Ya Viene</title>
+  <title>Ya Viene Términos</title>
   <meta name="description" content="Las condiciones de uso de Ya Viene: qué es, qué no promete y qué se espera de quien la usa." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="%VITE_SITE_URL%/terminos.html" />
@@ -24,7 +24,7 @@
     <link rel="preload" as="font" type="font/woff2" crossorigin
       href="./src/assets/fonts/bricolage-grotesque-latin.woff2" />
 
-  <script type="module" src="/src/hoja.ts"></script>
+  <script type="module" src="/src/legal.ts"></script>
 
   <!--
     El enlace de salto tiene que estar escondido desde el primer pintado
@@ -35,19 +35,60 @@
   <link rel="stylesheet" href="/src/css/critico.css" />
 </head>
 
-<body class="legal-body">
+<body id="top">
 
   <!-- Primer tabulador de la página: manda directo al contenido y se
        salta la navegación. Vive fuera de cuadro hasta que recibe el
        foco, así que con el ratón no se ve nunca. -->
   <a class="saltar-al-contenido" href="#contenido">Saltar al contenido</a>
 
-  <header class="legal-top">
-    <a class="legal-marca" href="/">
-      <img src="/logo.svg" alt="" width="30" height="30" />
-      <span>Ya Viene</span>
-    </a>
-    <a class="legal-volver" href="/">Volver a la página</a>
+  <!-- ============ CABECERA: LA ISLA DE NAVEGACIÓN ============ -->
+  <!-- La misma isla que la portada y empresas.html: estas páginas tenían
+       cabecera propia —un «Ya Viene» espaciado y «Volver a la página»— y
+       se leían como de otra web. `is-arriba` desde el HTML, como allá, para
+       que la primera pintura no salga con velo. -->
+  <header class="site-header is-arriba">
+    <div class="nav-island">
+      <a href="/" class="nav-island-brand" aria-label="Ya Viene, inicio">
+        <svg class="nav-island-logo" width="28" height="28" viewBox="0 0 512 512" role="img" aria-label="Ya Viene Logo">
+        <circle cx="256" cy="256" r="256" fill="#00A859" />
+        <path d="M 120 130 A 200 200 0 0 1 392 130" fill="none" stroke="#FFFFFF" stroke-width="32"
+        stroke-linecap="round" opacity="0.5" />
+        <path d="M 176 190 A 130 130 0 0 1 336 190" fill="none" stroke="#FFFFFF" stroke-width="32"
+        stroke-linecap="round" />
+        <rect x="136" y="240" width="240" height="180" rx="36" fill="#14274E" />
+        <rect x="166" y="270" width="180" height="72" rx="16" fill="#FFFFFF" />
+        <rect x="290" y="270" width="30" height="72" fill="#14274E" opacity="0.1" />
+        <circle cx="180" cy="375" r="16" fill="#FFC107" />
+        <circle cx="332" cy="375" r="16" fill="#FFC107" />
+        <rect x="160" y="410" width="32" height="24" rx="8" fill="#0A1428" />
+        <rect x="320" y="410" width="32" height="24" rx="8" fill="#0A1428" />
+        </svg>
+        <span class="wordmark">Ya Viene</span>
+      </a>
+
+      <!-- Sin `data-nav-lugar`: aquí no hay secciones que seguir y el
+           rótulo dice siempre en qué página se está. -->
+      <span class="nav-lugar" aria-hidden="true">Términos</span>
+
+      <div class="nav-island-reveal" id="nav-island-menu">
+        <div class="nav-island-inner">
+          <!-- Los mismos destinos que el menú de la portada, pero con la
+               ruta entera: desde aquí todos salen de la página. -->
+          <nav class="nav-island-links" aria-label="Navegación principal">
+            <a href="/" class="nav-link">Inicio</a>
+            <a href="/#solucion" class="nav-link">Cómo funciona</a>
+            <a href="/empresas.html" class="nav-link">Para empresas</a>
+          </nav>
+          <a href="/#mapa" class="nav-island-cta">Ver el mapa en vivo</a>
+        </div>
+      </div>
+
+      <button type="button" class="nav-island-toggle" aria-expanded="false"
+        aria-controls="nav-island-menu" aria-label="Abrir el menú">
+        <span class="nav-island-grip" aria-hidden="true"></span>
+      </button>
+    </div>
   </header>
 
   <main id="contenido" class="legal-hoja">
@@ -96,11 +137,59 @@
     <p>WhatsApp 300 443 8626. Es el mismo número para pasajeros, empresas y autoridades.</p>
   </main>
 
-  <footer class="legal-pie">
-    <p>¿Alguna duda con esto? Escríbenos por
-      <a href="https://wa.me/573004438626" target="_blank" rel="noopener">WhatsApp</a>.</p>
-    <p><a href="/terminos.html">Términos</a> · <a href="/privacidad.html">Privacidad</a></p>
+  <!-- El pie de la portada. La pregunta que cerraba estas páginas
+       («¿Alguna duda con esto?») es ahora su llamada: aquí quien lee acaba
+       de leer las reglas y lo que le toca es preguntar. -->
+  <footer class="site-footer" id="pie">
+    <div class="footer-cta">
+      <span class="tracked-eyebrow eyebrow--ambar">¿ALGUNA DUDA CON ESTO?</span>
+      <h2>Pregúntanos lo que sea.</h2>
+      <p>WhatsApp 300 443 8626. Es el mismo número para pasajeros, empresas y autoridades.</p>
+      <div class="footer-actions">
+        <a href="https://wa.me/573004438626" target="_blank" rel="noopener" class="btn-primary btn-green">Escríbenos por WhatsApp <span class="btn-flecha" aria-hidden="true">→</span></a>
+        <a href="/#mapa" class="btn-outline">Ver el mapa en vivo</a>
+      </div>
+    </div>
+
+    <div class="footer-grid">
+      <div class="footer-intro">
+        <a class="footer-brand" href="/" aria-label="Ya Viene, inicio">
+          <img src="/logo.svg" alt="" width="38" height="38" />
+          <span>Ya Viene</span>
+        </a>
+        <p>Tu ciudad en tiempo real.</p>
+      </div>
+
+      <nav class="footer-nav" aria-label="Navegación del pie de página">
+        <div class="footer-nav-group">
+          <span>Explora</span>
+          <a href="/#solucion">Cómo funciona</a>
+          <a href="/#problema">El problema</a>
+          <a href="/#mapa">El mapa en vivo</a>
+        </div>
+        <div class="footer-nav-group">
+          <span>Conecta</span>
+          <a href="/empresas.html">Para empresas</a>
+          <a href="https://wa.me/573004438626" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+      </nav>
+
+      <div class="footer-status">
+        <span>EN MOVIMIENTO</span>
+        <strong>6 rutas reales</strong>
+        <p>Sobusa ya se mueve en Barranquilla.</p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 YaViene · Barranquilla, Colombia</p>
+      <div class="footer-legal-links">
+        <a aria-current="page" href="/terminos.html">Términos</a>
+        <a href="/privacidad.html">Privacidad</a>
+      </div>
+    </div>
   </footer>
+
 </body>
 
 </html>

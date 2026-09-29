@@ -403,6 +403,7 @@
 /* El SVG se escala para caber en la pantalla; sin non-scaling-stroke los
    trazos se adelgazarían hasta desaparecer. Sólo aplica a la ruta: los
    marcadores sí llevan relleno y su propio tamaño. */
+.map-route-casing,
 .map-route-active,
 .map-terminals circle,
 .map-radio {
@@ -412,29 +413,38 @@
 }
 
 /*
-  Ruta seleccionada. El grosor no es un número escogido a ojo: es el que
-  pide map_widget.dart —`lineWidth: 4.0`, `lineOpacity: 0.9`, color
-  #2563EB— expresado en `--u`, o sea cuatro píxeles lógicos del teléfono.
-  Antes estaba en 2,6 px de pantalla y, como el teléfono del mockup mide
-  la tercera parte de uno de verdad, la ruta salía como un pelo y no se
-  veía sobre el mosaico.
+  Ruta seleccionada: la orla blanca y encima la línea verde, como la pinta
+  «El producto» (mapa.css, `.mv-casing` y `.mv-activa`) y como la pinta
+  la app desde que el dueño pidió una sola ruta en todas partes
+  (2026-09-28). Los números son los de estilo_ruta.dart en `--u`, píxeles
+  lógicos del teléfono: la línea mide 4, lo que medía cuando era azul, y
+  la orla 8 con 0,95 de opacidad, la proporción de 7 contra 3,4 de la
+  web. El grosor no va en píxeles de pantalla porque el teléfono del
+  mockup mide la tercera parte de uno de verdad y la ruta salía como un
+  pelo sobre el mosaico.
 
-  Va sola, sin orla, como en la app: map_widget.dart le pone a la ruta una
-  única capa de línea. La orla blanca que llevaba antes compensaba un
-  fondo del sur lleno de calles amarillas del mismo calibre; con el
-  encuadre del norte el Voyager es clarito y la línea azul se lee sola.
+  La orla había salido cuando la ruta era azul y map_widget.dart la
+  pintaba sola; vuelve porque ahora la app también la lleva, y es la que
+  despega la línea de las calles de su mismo calibre.
 */
-.map-route-active {
+.map-route-casing {
   fill: none;
-  stroke: var(--electric-blue);
-  stroke-width: calc(4 * var(--u));
-  stroke-opacity: 0.9;
+  stroke: #FFFFFF;
+  stroke-width: calc(8 * var(--u));
+  stroke-opacity: 0.95;
 }
 
-/* Terminales: `circleRadius: 7` con borde de 2,5, también de map_widget. */
+.map-route-active {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: calc(4 * var(--u));
+}
+
+/* Terminales: `circleRadius: 7` con borde de 2,5 en el mismo verde, de
+   estilo_ruta.dart. */
 .map-terminals circle {
   fill: #FFFFFF;
-  stroke: var(--electric-blue);
+  stroke: var(--green);
   stroke-width: calc(2.5 * var(--u));
 }
 
@@ -455,12 +465,14 @@
 }
 
 /* La ruta entra y sale con la elección, no de golpe. */
+.map-route-casing,
 .map-route-active,
 .map-terminals {
   opacity: 0;
   transition: opacity 0.45s var(--ease-out-cubic);
 }
 
+.map-route-casing.is-on,
 .map-route-active.is-on,
 .map-terminals.is-on {
   opacity: 1;

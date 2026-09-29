@@ -2,7 +2,7 @@
  * PhoneMap — el mapa del mockup, con el mismo material que ve el pasajero.
  *
  * El fondo es un mosaico real de Barranquilla en CARTO Voyager, el mismo
- * estilo que carga map_widget.dart, y encima va la polilínea azul de la
+ * estilo que carga map_widget.dart, y encima va la polilínea verde de la
  * ruta activa con los waypoints reales de rutas.json. Los generó
  * scripts/gen_mapa_landing.py, así que fondo y trazado comparten el
  * encuadre Web Mercator: la ruta cae sobre las calles que le tocan.
@@ -117,6 +117,7 @@ export class PhoneMap {
   private readonly lienzo: { w: number; h: number };
   private readonly camara: { x: number; y: number; w: number; h: number };
 
+  private readonly casingEl: SVGPathElement;
   private readonly activeEl: SVGPathElement;
   private readonly terminalsEl: SVGGElement;
   private readonly radioEl: SVGCircleElement;
@@ -204,8 +205,13 @@ export class PhoneMap {
     this.radioEl.setAttribute('class', 'map-radio');
     this.svg.appendChild(this.radioEl);
 
-    // Ruta activa: una sola línea azul, la única capa que map_widget.dart
-    // le pone a la ruta sobre MapLibre.
+    // Ruta activa: la orla blanca y encima la línea verde, las dos capas
+    // que map_widget.dart le pone a la ruta (estilo_ruta.dart) y las
+    // mismas del mapa de «El producto».
+    this.casingEl = nuevo('path');
+    this.casingEl.setAttribute('class', 'map-route-casing');
+    this.svg.appendChild(this.casingEl);
+
     this.activeEl = nuevo('path');
     this.activeEl.setAttribute('class', 'map-route-active');
     this.svg.appendChild(this.activeEl);
@@ -339,6 +345,7 @@ export class PhoneMap {
     if (!route) return;
     this.activeRoute = route;
 
+    this.casingEl.setAttribute('d', route.d);
     this.activeEl.setAttribute('d', route.d);
     this.largo = this.activeEl.getTotalLength();
 
@@ -523,6 +530,7 @@ export class PhoneMap {
   }
 
   showRoute(on: boolean): void {
+    this.casingEl.classList.toggle('is-on', on);
     this.activeEl.classList.toggle('is-on', on);
     this.terminalsEl.classList.toggle('is-on', on);
   }

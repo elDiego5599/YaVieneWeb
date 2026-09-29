@@ -17,10 +17,8 @@
      ya_viene_core/lib/core/theme/app_theme.dart, que el dueño eligió
      (2026-09-28) para lo que va lleno —botones, filtros y pestañas
      activos— y no para íconos. Blanco encima da 7,1:1 y como letra da
-     6,6:1 sobre la banda. El claro es su baldosa: el azul encima queda en
-     6,2:1 (tests/azul-boton.test.ts). */
+     6,6:1 sobre la banda (tests/azul-boton.test.ts). */
   --azul-boton: #1E56A8;
-  --azul-boton-claro: #E8EFF9;
   --amber-tint: #FFF8E1;
 
   /* Los `-accessible` son los mismos colores de marca, con el mismo tono y
@@ -65,10 +63,9 @@
   --app-warn-accessible: #A85206;
   --app-green-deep: #065F46;
 
-  /* Colores que el mapa toma prestados de la app (ya_viene_core/app_theme.dart):
-     el azul eléctrico es la ruta activa y el gris es el bus que lleva rato
-     sin reportar. */
-  --electric-blue: #2563EB;
+  /* Color que el mapa toma prestado de la app (ya_viene_core/app_theme.dart):
+     el gris del bus que lleva rato sin reportar. La ruta ya no va en el
+     azul eléctrico: va en `--green`, como en «El producto». */
   --bus-ghost: #94A3B8;
 
   /* ── Sistema día ──────────────────────────────────────────────────────

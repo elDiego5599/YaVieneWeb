@@ -80,7 +80,7 @@ const MUESTRAS: Record<string, string[]> = {
     '.hero-subtext-lead',
     '.apagado',
     // La banda de «Qué resuelve»: fondo propio, así que su rótulo en
-    // azul y su letra chica se miden aparte de los de papel blanco.
+    // rojo y su letra chica se miden aparte de los de papel blanco.
     '#problema .seccion-rotulo',
     '#problema .columna-texto',
     '.rutas-dato-numero',

@@ -12,8 +12,9 @@ import { describe, expect, it } from 'vitest';
  *   como el de `route_selector_sheet.dart`;
  * - el panel de flota dibujado en empresas.html pinta el filtro de ruta
  *   y la pestaña activos como el panel de control (`AppColors.boton`);
- * - «Qué resuelve» cambia su rojo por ese azul: la píldora, el matiz del
- *   titular, el rótulo, los cables y las fichas de la cara «A ciegas».
+ * - (y «Qué resuelve» cambió su rojo por ese azul, pero el dueño lo vio
+ *   y pidió el rojo de vuelta el mismo día: la cara «A ciegas» es una
+ *   alerta y el azul le quitaba la alarma).
  */
 
 const leer = (nombre: string): string =>
@@ -45,16 +46,14 @@ const variable = (css: string, nombre: string): string =>
 describe('el azul de los botones de la app, en la web', () => {
   const variables = leer('src/css/variables.css');
   const azul = variable(variables, '--azul-boton');
-  const claro = variable(variables, '--azul-boton-claro');
 
   it('es el mismo de la app', () => {
     expect(azul.toUpperCase()).toBe('#1E56A8');
   });
 
-  it('se lee: blanco encima, y como letra sobre la banda y sobre su tinte', () => {
+  it('se lee: blanco encima, y como letra sobre la banda', () => {
     expect(contraste('#FFFFFF', azul)).toBeGreaterThanOrEqual(4.5);
     expect(contraste(azul, variable(variables, '--banda'))).toBeGreaterThanOrEqual(4.5);
-    expect(contraste(azul, claro)).toBeGreaterThanOrEqual(4.5);
   });
 
   it('el botón del teléfono lo espeja', () => {
@@ -69,12 +68,12 @@ describe('el azul de los botones de la app, en la web', () => {
     expect(reglas(css, '.flota-pestanas .es-activa')).toMatch(/background:\s*var\(--azul-boton\)/);
   });
 
-  it('«Qué resuelve» ya no lleva rojo', () => {
+  it('«Qué resuelve» conserva su rojo: ni el azul ni su tinte llegan ahí', () => {
     const css = leer('src/css/componentes/problema.css');
-    expect(css).not.toMatch(/coral|#7F180D|206,\s*45,\s*29/i);
-    expect(reglas(css, '.escenario-estado')).toMatch(/background:\s*var\(--azul-boton\)/);
-    expect(reglas(css, "#problema[data-cara='ciego'] .seccion-rotulo")).toMatch(/var\(--azul-boton\)/);
-    expect(reglas(css, '#problema .cara--ciego .apagado')).toMatch(/var\(--azul-boton\)/);
-    expect(reglas(css, '.ficha-glifo')).toMatch(/background:\s*var\(--azul-boton-claro\)/);
+    expect(css).not.toMatch(/azul-boton/);
+    expect(variables).not.toMatch(/--azul-boton-claro/);
+    expect(reglas(css, '.escenario-estado')).toMatch(/background:\s*var\(--coral-accessible\)/);
+    expect(reglas(css, '#problema .cara--ciego .apagado')).toMatch(/var\(--coral-accessible\)/);
+    expect(reglas(css, '.ficha-glifo')).toMatch(/background:\s*var\(--coral-light\)/);
   });
 });

@@ -18,42 +18,10 @@
    propósito —lo que peor se lee de un documento legal es una línea de
    ciento veinte caracteres— y los títulos van en la display para que se
    note que son de la misma casa que la portada. */
-.legal-body {
-  background: var(--arena);
-  color: var(--text-primary);
-}
-
-.legal-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  max-width: 660px;
-  margin: 0 auto;
-  padding: clamp(22px, 3vw, 40px) var(--gutter) 0;
-}
-
-.legal-marca {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  font-family: var(--font-family);
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  color: var(--ink);
-}
-
-.legal-volver {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--green-accessible);
-}
-
-.legal-volver:hover {
-  text-decoration: underline;
-}
-
+/* Sin cabecera ni pie propios: desde el 2026-09-28 llevan la isla de
+   navegación y el pie del sitio (nav.css, pie.css) sobre el papel blanco
+   del body. La arena y el «Ya Viene» espaciado las hacían ver de otra
+   web. Aquí sólo queda la hoja de texto. */
 .legal-hoja {
   display: flex;
   flex-direction: column;
@@ -119,24 +87,9 @@
   color: var(--text-primary);
 }
 
-.legal-hoja a,
-.legal-pie a {
+.legal-hoja a {
   color: var(--green-accessible);
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
-}
-
-.legal-pie {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  max-width: 660px;
-  margin: 0 auto;
-  padding: 22px var(--gutter) clamp(34px, 4vw, 56px);
-  border-top: 1px solid var(--divider);
-  font-size: 13.5px;
-  color: var(--text-secondary);
 }

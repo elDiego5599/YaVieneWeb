@@ -159,7 +159,7 @@ const NO_ENTRA_EN_LA_PRIMERA_VISITA = [
   /^(privacidad|terminos|404|empresas)\.html$/,
   /^og\.png$/,
   /^logo\.svg$/,
-  /^(hoja|404|accesibilidad)-[^/]*\.js$/,
+  /^(hoja|legal|404|accesibilidad)-[^/]*\.js$/,
   // El CSS de /empresas.html va en su propio fichero desde que salió del
   // índice común: la portada no lo pide. El de `accesibilidad` sí entra,
   // que ahí es donde el empaquetador dejó la hoja compartida.

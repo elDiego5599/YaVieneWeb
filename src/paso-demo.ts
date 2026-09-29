@@ -289,7 +289,7 @@ export class PasoDemo {
     // El punto de espera y la cabecera sólo empiezan vacíos en el primer
     // momento, que es el que los pone. En los otros dos ya están puestos
     // y se quedan entre vuelta y vuelta: apagarlos dejaba en el hueco del
-    // bucle un mapa pelado con una línea azul, que no es ninguna pantalla
+    // bucle un mapa pelado con una línea verde, que no es ninguna pantalla
     // de la app.
     this.mapa.showPin(this.guion !== 1);
     this.mapa.showBuses(false);
