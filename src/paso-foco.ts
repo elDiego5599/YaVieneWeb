@@ -111,10 +111,10 @@ export class PasoFoco {
     const bruto = avance * total;
     const indice = Math.min(total - 1, Math.floor(bruto));
 
-    // El giro de la órbita de la lista: en qué paso está su foco, contado
+    // El giro del rodillo de la lista: en qué paso está su foco, contado
     // en continuo. Cada paso llega al foco a mitad de su tramo —que es
     // donde deja la pista su botón, ver `irAPaso` en main.ts— y el relevo
-    // de clases cae a medio camino entre dos, cuando la rueda va justo
+    // de clases cae a medio camino entre dos, cuando el rodillo va justo
     // entre ellos. El primero y el último esperan medio tramo quietos.
     this.llenar(topar(bruto - indice, 0, 1), topar(bruto - 0.5, 0, total - 1));
     this.aplicar(indice);
@@ -129,7 +129,7 @@ export class PasoFoco {
    * cuadros no escriben nada: en un tramo de 200 px una milésima es un
    * quinto de píxel, o sea que el riel se mueve exactamente igual.
    *
-   * El giro sale igual, a `--paso-giro`, y lo gasta la órbita de la lista
+   * El giro sale igual, a `--paso-giro`, y lo gasta el rodillo de la lista
    * en escritorio (pasos.css); en el teléfono nadie lo lee.
    */
   private llenar(parte: number, giro: number): void {

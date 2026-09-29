@@ -1,15 +1,16 @@
 import { test, expect, type Page } from '@playwright/test';
 
 /**
- * Los pasos de «Cómo funciona», a la derecha del visor, giran sobre una
- * órbita mientras se baja (pedido del dueño, 2026-09-28, con la «Circular
- * Split Roll» de hyperiux como referencia): el paso de turno llega al
- * punto más cercano al teléfono y ahí se ve entero; los otros esperan
- * más pequeños y más tenues sobre el mismo arco, arriba y abajo.
+ * Los pasos de «Cómo funciona», a la derecha del visor, ruedan en vertical
+ * mientras se baja (pedido del dueño, 2026-09-28, con la «Circular Split
+ * Roll» de hyperiux como referencia): el paso de turno llega al centro de
+ * la lista y ahí se ve entero; los otros esperan arriba y abajo, más
+ * pequeños y más tenues. Primero se probó sobre un arco y el dueño lo
+ * quiso recto: todo en vertical, nada se corre hacia los lados.
  *
- * Lo que se comprueba es la geometría y no un número de CSS: que los
- * tres caen sobre un mismo círculo, que se mueven con el dedo y no a
- * saltos, y que en el teléfono y sin animaciones la lista sigue plana.
+ * Lo que se comprueba es la geometría y no un número de CSS: que los tres
+ * van en la misma columna, que se mueven con el dedo y no a saltos, y que
+ * en el teléfono y sin animaciones la lista sigue plana.
  */
 
 /**
@@ -68,22 +69,12 @@ const pasos = (page: Page): Promise<Paso[]> =>
     return leer();
   });
 
-/**
- * El radio del círculo que pasa por el punto más a la izquierda de la
- * órbita (el foco, en `x = foco`) y por el paso: con el centro en
- * `(foco + R, 0)` sale de `(x - foco)² + y² = 2R(x - foco)`.
- */
-const radio = (p: Paso, foco: number): number => {
-  const dx = p.x - foco;
-  return (dx * dx + p.y * p.y) / (2 * dx);
-};
-
-test.describe('los pasos giran sobre una órbita', () => {
+test.describe('los pasos ruedan en vertical', () => {
   test.beforeEach(({}, info) => {
-    test.skip(info.project.name !== 'escritorio', 'la órbita es de escritorio');
+    test.skip(info.project.name !== 'escritorio', 'el rodillo es de escritorio');
   });
 
-  test('con un paso en el foco, los otros dos esperan simétricos sobre el arco', async ({ page }) => {
+  test('con un paso en el foco, los otros dos esperan simétricos arriba y abajo', async ({ page }) => {
     await page.goto('/');
     await irA(page, 0.5);
     const [a, b, c] = await pasos(page);
@@ -92,18 +83,18 @@ test.describe('los pasos giran sobre una órbita', () => {
     expect(Math.abs(b!.y)).toBeLessThan(2);
     expect(b!.opacidad).toBe(1);
 
-    // Los otros dos, uno arriba y otro abajo, a la misma distancia y
-    // corridos a la derecha lo mismo: el arco se aleja del teléfono.
+    // Los otros dos, uno arriba y otro abajo, a la misma distancia y en
+    // la misma columna que él: nada se corre hacia los lados.
     expect(a!.y).toBeLessThan(-60);
     expect(c!.y).toBeGreaterThan(60);
     expect(Math.abs(a!.y + c!.y)).toBeLessThan(2);
-    expect(a!.x - b!.x).toBeGreaterThan(12);
-    expect(Math.abs(a!.x - c!.x)).toBeLessThan(2);
+    expect(Math.abs(a!.x - b!.x)).toBeLessThan(1);
+    expect(Math.abs(c!.x - b!.x)).toBeLessThan(1);
     expect(a!.opacidad).toBeLessThan(0.7);
     expect(c!.opacidad).toBeLessThan(0.7);
   });
 
-  test('entre dos pasos los tres siguen sobre el mismo círculo, y se mueven con el dedo', async ({ page }) => {
+  test('entre dos pasos los tres siguen en la misma columna, y se mueven con el dedo', async ({ page }) => {
     await page.goto('/');
     await irA(page, 0.5);
     const foco = (await pasos(page))[1]!.x;
@@ -111,15 +102,14 @@ test.describe('los pasos giran sobre una órbita', () => {
     await irA(page, 0.4);
     const entre = await pasos(page);
 
-    // Ninguno está en el foco: la rueda va a medio camino.
-    for (const p of entre) expect(p.x - foco).toBeGreaterThan(1);
+    // Ninguno está en el foco: el rodillo va a medio camino, sin paso
+    // centrado. Pero ninguno se aparta de la columna.
+    for (const p of entre) {
+      expect(Math.abs(p.y)).toBeGreaterThan(10);
+      expect(Math.abs(p.x - foco)).toBeLessThan(1);
+    }
 
-    // Y los tres caen sobre el mismo círculo.
-    const radios = entre.map((p) => radio(p, foco));
-    const medio = radios.reduce((s, r) => s + r, 0) / radios.length;
-    for (const r of radios) expect(Math.abs(r - medio) / medio).toBeLessThan(0.03);
-
-    // Un poco más abajo, el mismo paso ya está en otro sitio del arco.
+    // Un poco más abajo, el mismo paso ya está más arriba.
     await irA(page, 0.44);
     const despues = await pasos(page);
     expect(despues[1]!.y).toBeLessThan(entre[1]!.y - 10);

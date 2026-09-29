@@ -146,16 +146,17 @@ const KB = 1024;
  *  pero también convertiría en una pelea cada imagen nueva de las que
  *  todavía faltan; el kilo que se recuperó allí no es el que aprieta.
  *
- *  El 28/09/2026 el de CSS sube de 117 a 121 con la órbita de los pasos
- *  de «Cómo funciona» (pedido del dueño: la lista gira sobre un arco al
- *  bajar, como la «Circular Split Roll» de hyperiux). Son 2,1 KB
- *  minificados, y son CSS a propósito: la referencia lo hace con GSAP,
- *  que no cabe en el tope de JavaScript, y aquí `paso-foco.ts` escribe un
- *  solo número y el arco, la escala y la luz de cada paso salen de
- *  `sin()`/`cos()` en pasos.css. Se miró de dónde sacarlos: las reglas
- *  viejas de la lista siguen vivas por debajo de 1024 px y sin
- *  animaciones, y la búsqueda de clases muertas del 18/09 sigue sin
- *  encontrar ninguna. 121 es la build de hoy, 117.3, más el 3 %. */
+ *  El 28/09/2026 el de CSS sube de 117 a 121 con el rodillo de los
+ *  pasos de «Cómo funciona» (pedido del dueño: la lista rueda en vertical
+ *  al bajar, como la «Circular Split Roll» de hyperiux; primero fue sobre
+ *  un arco y el dueño lo quiso recto). Son 1,8 KB minificados, y son CSS
+ *  a propósito: la referencia lo hace con GSAP, que no cabe en el tope de
+ *  JavaScript, y aquí `paso-foco.ts` escribe un solo número y la altura,
+ *  la escala y la luz de cada paso salen de él en pasos.css. Se miró de
+ *  dónde sacarlos: las reglas viejas de la lista siguen vivas por debajo
+ *  de 1024 px y sin animaciones, y la búsqueda de clases muertas del
+ *  18/09 sigue sin encontrar ninguna. 121 es la build de hoy, 117.0, más
+ *  el 3 %. */
 const TOPES = {
   'todo dist': 797,
   'JavaScript': 66,
