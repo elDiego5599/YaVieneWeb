@@ -832,3 +832,163 @@
     opacity: 1;
   }
 }
+
+/* ── La órbita de los pasos ──
+   En escritorio la lista deja de ser una columna y gira sobre un arco
+   (pedido del dueño, 2026-09-28; la referencia es la «Circular Split
+   Roll» de hyperiux en 21st). El paso de turno llega al punto del arco
+   más cercano al teléfono y ahí se ve entero; los otros dos esperan
+   arriba y abajo, más chicos y más tenues, y al bajar la rueda los
+   trae. La referencia usa GSAP; aquí no cabe —el JavaScript va al 99 %
+   del presupuesto— y no hace falta: `paso-foco.ts` escribe un solo
+   número, `--paso-giro`, y lo demás es trigonometría de CSS.
+
+   El número va registrado para que pueda tener transición. El scroll lo
+   escribe en cada cuadro y cada cuadro relanza la curva desde donde iba,
+   así que la rueda sigue al dedo con un cuarto de segundo de inercia en
+   vez de ir pegada a él: la rueda de un tirón pasa suave, no a saltos. */
+@property --paso-giro {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  @supports (width: calc(1px * sin(1deg))) {
+    .pasos-lista {
+      /* El radio. Grande, para que de la circunferencia se vea sólo el
+         arco de la izquierda, como un paréntesis abierto hacia el texto:
+         con la lista de 481 px a 1440 × 900 el arco sube y baja 240 px y
+         se aparta 153 del foco. Va en `vh` porque lo que manda es el alto
+         de la lista, y la lista crece con la ventana. */
+      --orbita: clamp(220px, 29.5vh, 320px);
+      /* Cuánto hay de un paso al siguiente sobre el arco. Con 32° el
+         vecino cae a 0,53 radios del foco —140 px a 1440 × 900—, fuera
+         del fundido de los bordes y sin rozar la explicación abierta del
+         de turno, que ocupa ±75. El siguiente, a 64°, ya cae en el borde
+         y sólo se insinúa. */
+      --orbita-paso: 32deg;
+      /* Lo que se deja a la izquierda del arco para que el punto de cada
+         paso no quede cortado por el borde de la lista. */
+      --orbita-borde: 8px;
+      display: block;
+      border-left: 0;
+      overflow: hidden;
+      /* Los bordes de arriba y de abajo se funden: el paso que se va no
+         se corta contra una línea, se apaga. 12 % son 58 px, menos que
+         lo que dista el borde del vecino. */
+      mask-image: linear-gradient(transparent, #000 12%, #000 88%, transparent);
+      transition: --paso-giro 0.8s var(--ease-out-cubic);
+    }
+
+    /* La órbita misma, en un pelo: el arco por el que pasan los pasos.
+       Es la circunferencia entera, pero sólo se deja ver su lado
+       izquierdo —se apaga antes de un tercio del ancho—: entera se leía
+       como un sello detrás del texto y no como el camino de los pasos. */
+    .pasos-lista::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: var(--orbita-borde);
+      width: calc(var(--orbita) * 2);
+      aspect-ratio: 1;
+      border: 1px solid var(--linea-fuerte);
+      border-radius: 50%;
+      transform: translate(-0.5px, -50%);
+      mask-image: linear-gradient(to right, #000, transparent 30%);
+      pointer-events: none;
+    }
+
+    /* Cada paso se sitúa por el ángulo que le toca: `--d` es cuántos
+       pasos le faltan para el foco —0 en él, con decimales en medio—.
+       Su borde izquierdo va sobre el arco (el centro del círculo queda a
+       un radio a la derecha del foco) y su tamaño y su luz salen de `--t`,
+       que es 1 en el foco y 0 a un paso de distancia. El brillo va al
+       cuadrado para que el de turno se destaque antes de llegar: a medio
+       camino ya se lee, los otros dos siguen en segundo plano. Nada de
+       esto toca el layout: son `transform` y `opacity`. */
+    .pasos-lista > li {
+      --d: calc(var(--i, 0) - var(--paso-giro));
+      --a: calc(var(--d) * var(--orbita-paso));
+      --t: max(0, cos(var(--d) * 90deg));
+      --luz: calc(0.4 + 0.6 * var(--t) * var(--t));
+      position: absolute;
+      top: 50%;
+      left: var(--orbita-borde);
+      right: 0;
+      transform:
+        translate(
+          calc(var(--orbita) * (1 - cos(var(--a)))),
+          calc(var(--orbita) * sin(var(--a)) - 50%)
+        )
+        scale(calc(0.74 + 0.26 * var(--t)));
+      transform-origin: 0 50%;
+      opacity: var(--luz);
+      transition: opacity var(--transition-hover);
+    }
+
+    .pasos-lista > li:nth-child(2) {
+      --i: 1;
+    }
+
+    .pasos-lista > li:nth-child(3) {
+      --i: 2;
+    }
+
+    /* El que espera se aclara bajo el puntero o el foco del teclado: se
+       puede tocar, y tiene que decirlo. */
+    .pasos-lista > li:focus-within {
+      opacity: max(0.75, var(--luz));
+    }
+
+    @media (hover: hover) {
+      .pasos-lista > li:hover {
+        opacity: max(0.75, var(--luz));
+      }
+    }
+
+    /* La luz la lleva la órbita, así que el botón ya no se apaga solo.
+       Y el titular mide igual en los tres: lo que lo agranda en el foco
+       es la escala, que va con el dedo, no un salto de tamaño de letra. */
+    .paso-boton,
+    .paso-boton.is-activa,
+    .paso-boton:hover {
+      opacity: 1;
+      padding-left: 22px;
+    }
+
+    .paso-boton .columna-titulo,
+    .paso-boton.is-activa .columna-titulo {
+      font-size: clamp(21px, 1.8vw, 28px);
+    }
+
+    /* El trazo que se llenaba por tramos sobra: ahora dice dónde vas la
+       rueda entera. En su lugar, un punto sobre el arco por paso, y el de
+       turno en verde con su halo. */
+    .paso-boton::before {
+      display: none;
+    }
+
+    .paso-boton::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: -4px;
+      width: 8px;
+      height: 8px;
+      margin-top: -4px;
+      border-radius: 50%;
+      background: var(--papel);
+      box-shadow: inset 0 0 0 1.5px var(--linea-fuerte);
+      transition: var(--transition-smooth);
+      pointer-events: none;
+    }
+
+    .paso-boton.is-activa::after {
+      background: var(--green);
+      box-shadow:
+        inset 0 0 0 1.5px var(--green),
+        0 0 0 5px var(--green-tint);
+    }
+  }
+}

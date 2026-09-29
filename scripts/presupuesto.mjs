@@ -144,11 +144,22 @@ const KB = 1024;
  *  al dejar de empaquetar los subconjuntos de tipografía que nadie
  *  pedía. Bajarlo a la medida de hoy dejaría el peso donde está, sí,
  *  pero también convertiría en una pelea cada imagen nueva de las que
- *  todavía faltan; el kilo que se recuperó allí no es el que aprieta. */
+ *  todavía faltan; el kilo que se recuperó allí no es el que aprieta.
+ *
+ *  El 28/09/2026 el de CSS sube de 117 a 121 con la órbita de los pasos
+ *  de «Cómo funciona» (pedido del dueño: la lista gira sobre un arco al
+ *  bajar, como la «Circular Split Roll» de hyperiux). Son 2,1 KB
+ *  minificados, y son CSS a propósito: la referencia lo hace con GSAP,
+ *  que no cabe en el tope de JavaScript, y aquí `paso-foco.ts` escribe un
+ *  solo número y el arco, la escala y la luz de cada paso salen de
+ *  `sin()`/`cos()` en pasos.css. Se miró de dónde sacarlos: las reglas
+ *  viejas de la lista siguen vivas por debajo de 1024 px y sin
+ *  animaciones, y la búsqueda de clases muertas del 18/09 sigue sin
+ *  encontrar ninguna. 121 es la build de hoy, 117.3, más el 3 %. */
 const TOPES = {
   'todo dist': 797,
   'JavaScript': 66,
-  'CSS': 117,
+  'CSS': 121,
   'primera visita': 560,
 };
 
