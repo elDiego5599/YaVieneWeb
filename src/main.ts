@@ -201,7 +201,13 @@ const arrancar = (): void => {
             return;
           }
 
-          botones.forEach((boton, i) => boton.classList.toggle('is-activa', i === indice));
+          // La clase lo enciende a la vista y `aria-current` lo dice al
+          // lector de pantalla: `step`, el paso de turno en una secuencia.
+          botones.forEach((boton, i) => {
+            boton.classList.toggle('is-activa', i === indice);
+            if (i === indice) boton.setAttribute('aria-current', 'step');
+            else boton.removeAttribute('aria-current');
+          });
 
           /*
             El bucle del paso de turno arranca ya, con su toma todavía

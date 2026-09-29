@@ -1470,7 +1470,8 @@
               <p class="pasos-lado-rotulo">Pasos</p>
               <ol class="pasos-lista" data-pasos-riel>
                 <li>
-                  <button type="button" class="paso-boton is-activa" data-paso-boton="0">
+                  <!-- `aria-current` va con `is-activa`: lo que se ve encendido también se anuncia. Lo mueve main.ts. -->
+                  <button type="button" class="paso-boton is-activa" aria-current="step" data-paso-boton="0">
                     <span class="columna-indice">Paso 1</span>
                     <span class="columna-titulo">Fija tu punto de espera</span>
                     <span class="paso-boton-texto"><span class="columna-texto">Toca el mapa y marca desde dónde esperas. También puedes usar tu GPS para que el mapa te siga.</span></span>
