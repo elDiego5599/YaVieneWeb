@@ -19,7 +19,6 @@ import './css/phone-simulator.css';
 import './css/animations.css';
 import './css/accesibilidad.css';
 
-import { ContactForm } from './contact-form';
 import { encajarEscena } from './encaje';
 import { MapaVivo } from './mapa-vivo';
 import { NavIsland } from './nav-island';
@@ -99,9 +98,6 @@ const arrancar = (): void => {
   */
   const problema = document.querySelector<HTMLElement>('[data-problema]');
   if (problema) new Problema(problema);
-
-  const form = document.querySelector<HTMLFormElement>('#contact-form');
-  if (form) new ContactForm(form);
 
   /*
     Las dos secciones que se recorren en vez de leerse de un golpe. Cada
