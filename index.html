@@ -564,9 +564,10 @@
                   <svg class="routes-svg-layer" id="phone-routes"></svg>
                 </div>
 
-                <!-- El barrier del showGeneralDialog. En los teléfonos
-                     quietos está siempre puesto; aquí entra y sale con el
-                     selector, que es lo que hace en la app. -->
+                <!-- El velo del selector, que aquí no se abre: va siempre
+                     apagado. Se queda porque quitarlo cambia cómo compone
+                     Chrome la pantalla, y los bordes redondeados de encima
+                     salen con otro suavizado (auditoría, hallazgo 12). -->
                 <div class="phone-scrim phone-scrim--vivo" data-el="scrim"></div>
 
                 <!-- Barra de estado de Android: la app dibuja debajo. -->
@@ -602,9 +603,7 @@
                 <!-- El indicador de inicio de iOS. -->
                 <div class="phone-gesture"></div>
 
-                <!-- Píldora de búsqueda + chip de ubicación. El grupo entero
-                     se aparta mientras el selector está abierto, como hace
-                     CabeceraFlotante en la app. -->
+                <!-- Píldora de búsqueda + chip de ubicación. -->
                 <div class="phone-topbar phone-topbar--vivo" data-el="topbar">
                   <div class="app-pill" data-el="pill">
                     <span class="app-pill-btn">
@@ -660,7 +659,8 @@
                   </div>
                 </div>
 
-                <!-- Hoja inferior: los cuatro estados por los que pasa. -->
+                <!-- Hoja inferior: vacía antes del JavaScript y, después, la
+                     distancia del B-042 con el aviso armado. -->
                 <div class="phone-sheet" data-el="sheet">
                   <!-- Volver a tu punto (map_recenter_button.dart). Cuelga del
                        borde de arriba de la hoja, que es su sitio en la app:
@@ -677,8 +677,8 @@
 
                   <span class="sheet-handle"></span>
 
-                  <!-- El envoltorio que le da alto a la hoja: al cambiar de
-                       vista se anima, como el AnimatedSize del selector. -->
+                  <!-- El envoltorio que le da alto a la hoja: al pasar de la
+                       vacía a la de distancia se anima. -->
                   <div class="sheet-views" data-el="views">
                   <div class="sheet-view active" data-view="empty">
                     <div class="sheet-empty">
@@ -709,123 +709,11 @@
                   </div>
 
                   <!--
-                    El selector de route_selector_sheet.dart, el mismo que
-                    enseña quieto el teléfono de al lado. Aquí vive escondido:
-                    la escena fija está en la hoja de distancia con la C16 y
-                    el aviso armado, y phone-simulator.ts deja el selector
-                    lleno (Sobusa + C16) por si la vista cambiara.
+                    Sin las vistas del selector, de empresas y de rutas: la
+                    escena es fija y ninguna llegaba a verse. El selector que
+                    se ve está en el teléfono del paso 2 (auditoría,
+                    hallazgo 12; e2e/hero-telefono.spec.ts).
                   -->
-                  <div class="sheet-view" data-view="selector">
-                    <div class="sheet-selector">
-                      <div class="sheet-head">
-                        <span class="sheet-head-title">Elige tu ruta</span>
-                      </div>
-                      <p class="sheet-head-sub">Dos pasos y ves los buses moviéndose.</p>
-
-                      <div class="escalon" data-el="paso-empresa">
-                        <span class="escalon-riel">
-                          <span class="escalon-linea"></span>
-                          <span class="escalon-nodo is-actual">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                              stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M5 12.5l4.5 4.5L19 7.5" />
-                            </svg>
-                          </span>
-                          <span class="escalon-linea is-visible"></span>
-                        </span>
-                        <span class="escalon-ficha">
-                          <div class="app-select" data-el="sel-empresa">
-                            <span class="app-select-icon">
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3.5 20.5V9.5l7-3.5" />
-                            <path d="M10.5 20.5V4.6a1.6 1.6 0 0 1 1.6-1.6h6.3A1.6 1.6 0 0 1 20 4.6v15.9" />
-                            <path d="M2 20.5h20" />
-                            <path d="M13.5 7.5h3M13.5 11.5h3M13.5 15.5h3" />
-                              </svg>
-                            </span>
-                            <span class="app-select-body">
-                              <span class="app-select-title" data-el="sel-empresa-title">Empresa</span>
-                              <span class="app-select-sub" data-el="sel-empresa-sub">Con cuál viajas</span>
-                            </span>
-                            <span class="app-select-chevron">
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9.5 5l7 7l-7 7" />
-                              </svg>
-                            </span>
-                          </div>
-                        </span>
-                      </div>
-
-                      <div class="escalon" data-el="paso-ruta">
-                        <span class="escalon-riel">
-                          <span class="escalon-linea is-visible"></span>
-                          <span class="escalon-nodo">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                              stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M5 12.5l4.5 4.5L19 7.5" />
-                            </svg>
-                          </span>
-                          <span class="escalon-linea"></span>
-                        </span>
-                        <span class="escalon-ficha">
-                          <div class="app-select" data-el="sel-ruta">
-                            <span class="app-select-icon">
-                              <!-- Icons.alt_route_rounded, como en el selector. -->
-                              <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                                <path d="M9.78 11.16l-1.42 1.42c-.68-.69-1.34-1.58-1.79-2.94l1.94-.49c.3.89.75 1.5 1.27 2.01zM11 6L7 2 3 6h3.02c.02.81.08 1.54.19 2.17l1.94-.49C8.08 7.2 8.03 6.63 8.02 6H11zm10 0l-4-4-4 4h2.99c-.1 3.68-1.28 4.75-2.54 5.88-.5.44-1.01.92-1.45 1.55-.34-.49-.73-.88-1.13-1.24L9.46 13.6c.93.85 1.54 1.54 1.54 3.4v5h2v-5c0-2.02.71-2.66 1.79-3.63 1.38-1.24 3.08-2.78 3.2-7.37H21z" />
-                              </svg>
-                            </span>
-                            <span class="app-select-body">
-                              <span class="app-select-title" data-el="sel-ruta-title">Ruta</span>
-                              <span class="app-select-sub" data-el="sel-ruta-sub">Cuál esperas</span>
-                            </span>
-                            <span class="app-select-chevron">
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9.5 5l7 7l-7 7" />
-                              </svg>
-                            </span>
-                          </div>
-                        </span>
-                      </div>
-
-                      <div class="app-launch" data-el="launch">Elegir empresa</div>
-                    </div>
-                  </div>
-
-                  <div class="sheet-view sheet-view--lista" data-view="companies">
-                    <div class="sheet-head">
-                      <span class="sheet-back">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                          stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M20 12H4M10 6l-6 6l6 6" />
-                        </svg>
-                      </span>
-                      <span class="sheet-head-title">Elige empresa</span>
-                    </div>
-                    <!-- Las empresas las escribe selector.ts, con las
-                         iniciales y el color que sacaría el selector de cada
-                         una: no están copiadas aquí. -->
-                    <div class="sheet-lista" data-el="company-list"></div>
-                  </div>
-
-                  <div class="sheet-view sheet-view--lista" data-view="routes">
-                    <div class="sheet-head">
-                      <span class="sheet-back">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                          stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M20 12H4M10 6l-6 6l6 6" />
-                        </svg>
-                      </span>
-                      <span class="sheet-head-title">Elige ruta</span>
-                    </div>
-                    <!-- Las seis rutas las escribe selector.ts con los
-                         datos de rutas.json, no están copiadas aquí. -->
-                    <div class="sheet-lista" data-el="route-list"></div>
-                  </div>
-
                   <div class="sheet-view" data-view="eta">
                     <div class="eta-strip" data-el="eta-bar"></div>
                     <div class="eta-route" data-el="eta-route"></div>

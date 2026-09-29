@@ -1858,34 +1858,12 @@
   background: var(--green);
 }
 
-/* ── El selector abierto en la hoja que se mueve ───────────────────── */
+/* ── El velo del teléfono del hero ───────────────────────────────── */
 
 /*
-  El hero no enseña el selector posado: lo abre. Y abrirlo no es cambiar de
-  contenido, es cambiar de superficie —en la app el selector es un diálogo
-  encima del mapa, no la hoja de distancia—, así que mientras está abierto
-  la hoja se viste de Material blanco con el patrón de calles del drawer y
-  el velo entra por debajo. Sólo cambia la piel: el relleno lo siguen
-  poniendo `.phone-sheet` y `.sheet-view`, y por eso la hoja no da un
-  brinco de tamaño al cambiarse de ropa —lo único que se mueve es el alto,
-  que ya lo anima `.sheet-views`.
-*/
-.phone-sheet.es-selector {
-  /* Sólo cambia la elevación: el color ya es el mismo en las dos vistas.
-     elevation: 16 con shadowColor 0x6614274E. */
-  box-shadow: 0 calc(-6 * var(--u)) calc(30 * var(--u)) rgba(20, 39, 78, 0.22);
-}
-
-/* Mismo sitio que en la hoja quieta. Aquí el relleno de arriba lo pone
-   `.phone-sheet` y son 14, así que al asa le tocan 2 más por debajo. */
-.phone-sheet.es-selector .sheet-handle {
-  margin-bottom: calc(42 * var(--u));
-}
-
-/*
-  El velo, en el teléfono que se mueve. En los quietos está siempre puesto
-  —son una foto con la hoja abierta—; aquí entra y sale con el selector, y
-  se va justo cuando el dedo pulsa "Ver buses en vivo".
+  El velo, en el teléfono del hero. En los quietos de los pasos está
+  siempre puesto —son una foto con la hoja abierta—; el hero no abre el
+  selector y lo lleva apagado. Ver el comentario del HTML.
 */
 .phone-scrim--vivo {
   opacity: 0;

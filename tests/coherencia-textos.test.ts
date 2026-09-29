@@ -91,10 +91,13 @@ const FRASES: Record<string, string[]> = {
   'Ruta activa': ['index.html'],
   'Elige tu ruta': ['index.html'],
   'Elige empresa': ['index.html'],
-  'Elegir empresa': ['index.html'],
+  // Estas tres sólo las pinta el guion del paso 2, con el selector vacío.
+  // En index.html vivían en el selector escondido del hero, que no llegaba
+  // a verse y se quitó (auditoría, hallazgo 12).
+  'Elegir empresa': ['src/paso-demo.ts'],
   'Elige ruta': ['index.html'],
-  'Cuál esperas': ['index.html', 'src/selector.ts'],
-  'Con cuál viajas': ['index.html', 'src/selector.ts'],
+  'Cuál esperas': ['src/selector.ts'],
+  'Con cuál viajas': ['src/selector.ts'],
   'Empresa de transporte masivo': ['index.html', 'src/selector.ts'],
   'Ver buses en vivo': ['index.html'],
   'Dos pasos y ves los buses moviéndose.': ['index.html'],

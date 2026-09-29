@@ -22,12 +22,6 @@
 import { cifraViva, metrica } from './cifra-viva';
 import type { PhoneMap } from './phone-map';
 import type { RutaLanding } from './types';
-import {
-  EMPRESA,
-  VACIO_SELECT,
-  carrilEmpresas,
-  carrilRutas
-} from './selector';
 
 interface EstadoBus {
   /**
@@ -39,29 +33,25 @@ interface EstadoBus {
   t: number;
 }
 
-/** Estados del chip de ubicación, calcados de location_status_chip.dart. */
-const CHIPS: Record<
-  'cerca',
-  { icono: string; texto: string; sub: string; accion: string; suave: boolean }
-> = {
-  cerca: {
-    icono: 'pin',
-    texto: '2 buses cerca de tu punto',
-    sub: 'Arrástralo para moverlo',
-    accion: 'Quitar',
-    suave: true
-  }
+/**
+ * El chip de ubicación de la escena, calcado de location_status_chip.dart:
+ * punto puesto y buses dentro del radio. Los otros estados de la app
+ * (localizando, sin punto) los enseña el teléfono del paso 1.
+ */
+const CHIP = {
+  icono: 'pin',
+  texto: '2 buses cerca de tu punto',
+  sub: 'Arrástralo para moverlo',
+  accion: 'Quitar',
+  suave: true
 } as const;
-
-type ClaveChip = keyof typeof CHIPS;
-type ClaveSelect = keyof typeof VACIO_SELECT;
 
 export class PhoneSimulator {
   readonly #map: PhoneMap;
   readonly #raiz: HTMLElement;
   readonly #sheetEl: HTMLElement;
   readonly #vistas: HTMLElement[];
-  /** El envoltorio cuyo alto se anima al cambiar de vista. */
+  /** El envoltorio que le da alto a la hoja. */
   readonly #vistasEl: HTMLElement;
 
   /**
@@ -110,23 +100,18 @@ export class PhoneSimulator {
    */
   static readonly #RUTA_FIJA = 'R-106';
 
-  /** Las vistas que la app dibuja como diálogo y no como hoja. */
-  static readonly #VISTAS_SELECTOR = new Set(['selector', 'companies', 'routes']);
-
-  /** Fracción de la ventana que se come el desvanecido de abajo. */
+  /** Si el aviso está armado: con él y el bus dentro del km sale la tarjeta. */
   #avisoActivo = false;
   /**
    * El bus al que la hoja le sigue el rastro, por su sitio en `buses`:
    * el B-042, como si el dedo lo hubiera tocado.
    */
   #busElegido: number | null = null;
-  /** Lo que mide la tarjeta del selector; las listas se dibujan con ella. */
-  #altoTarjeta = 0;
   /* Lo que decide si se ve el botón de volver a tu punto, igual que en
-     map_recenter_button.dart: hace falta punto de espera y hace falta que
-     el selector no esté ocupando la pantalla. */
+     map_recenter_button.dart: hace falta punto de espera. La otra
+     condición de la app, que el selector no ocupe la pantalla, aquí se
+     cumple siempre: el hero no lo abre. */
   #pinPuesto = false;
-  #enSelector = false;
   #rutaActual: RutaLanding;
 
   constructor(map: PhoneMap, raiz: HTMLElement) {
@@ -142,8 +127,6 @@ export class PhoneSimulator {
     this.#rutas = map.rutas;
     const arranque = this.#rutas.findIndex(r => r.id === PhoneSimulator.#RUTA_FIJA);
     this.#rutaActual = this.#rutas[arranque === -1 ? 0 : arranque];
-    this.#pintarRutas();
-    this.#pintarEmpresas();
     this.#escenaFija();
   }
 
@@ -173,9 +156,7 @@ export class PhoneSimulator {
     this.#busElegido = 0;
     this.#map.setBusElegido(0);
     this.#setPildora(this.#rutaActual);
-    this.#setChip('cerca');
-    this.#setSelector(true, this.#rutaActual);
-    this.#reiniciarFichas();
+    this.#ponerChip();
     this.#sheetEl.classList.remove('hidden-sheet');
     this.#mostrarVista('eta');
     this.#setAviso(true);
@@ -184,45 +165,13 @@ export class PhoneSimulator {
   }
 
   /**
-   * La lista de rutas se arma con los datos, no a mano en el HTML: nombre y
-   * "terminalA ↔ terminalB", igual que _routeSubtitle() del selector.
-   */
-  #pintarRutas(): void {
-    this.#el('route-list')?.replaceChildren(carrilRutas(this.#rutas));
-  }
-
-  /**
-   * La lista de empresas, también con los datos y no a mano: la insignia
-   * lleva las iniciales y el color que le sacaría el selector a cada
-   * nombre. El id que alimenta ese color es el nombre en minúsculas, que
-   * es como está el de Sobusa.
-   */
-  #pintarEmpresas(): void {
-    this.#el('company-list')?.replaceChildren(carrilEmpresas());
-  }
-
-  /**
-   * El alto de la hoja, animado. Es el AnimatedSize del selector: sin él
-   * la hoja cambia de tamaño de golpe en cada paso y el mockup se siente
-   * armado a cortes en vez de manejado por alguien.
-   *
-   * Dentro del selector no cambia: route_selector_sheet.dart mide la
-   * tarjeta principal una sola vez —`_cardHeight`— y dibuja las dos listas
-   * con esa misma altura, así que el diálogo se queda quieto mientras se
-   * entra y se sale de ellas. Aquí igual: se guarda lo que midió la vista
-   * del selector, que es siempre la primera que se abre, y las listas la
-   * heredan.
+   * El alto de la hoja, el de la vista puesta. `.sheet-views` lo anima al
+   * pasar de la hoja vacía, que es la que trae el HTML, a la de distancia.
    */
   #ajustarAlto(): void {
     const activa = this.#vistas.find(v => v.classList.contains('active'));
     if (!activa) return;
-    const vista = activa.dataset.view ?? '';
-    if (vista === 'selector') this.#altoTarjeta = activa.offsetHeight;
-    const alto =
-      PhoneSimulator.#VISTAS_SELECTOR.has(vista) && this.#altoTarjeta > 0
-        ? this.#altoTarjeta
-        : activa.offsetHeight;
-    this.#vistasEl.style.height = `${alto}px`;
+    this.#vistasEl.style.height = `${activa.offsetHeight}px`;
   }
 
   /* ---------- Utilidades ---------- */
@@ -247,76 +196,11 @@ export class PhoneSimulator {
     if (nodo) nodo.textContent = valor;
   }
 
-  /**
-   * Cambia de vista y, con ella, de superficie. Las tres vistas del
-   * selector no son contenido dentro de la hoja de distancia: en la app
-   * son un diálogo encima del mapa, con su Material blanco y su velo. Por
-   * eso el vestido y el velo se deciden aquí y no repartidos por el guion
-   * —una sola línea que decidir, y nunca se quedan puestos de más.
-   */
+  /** Enciende una vista de la hoja y le da su alto. */
   #mostrarVista(vista: string): void {
     for (const v of this.#vistas) v.classList.toggle('active', v.dataset.view === vista);
-    const enSelector = PhoneSimulator.#VISTAS_SELECTOR.has(vista);
-    this.#sheetEl.classList.toggle('es-selector', enSelector);
-    this.#el('scrim')?.classList.toggle('is-on', enSelector);
-    // Y con el selector arriba se aparta también el grupo de la cabecera,
-    // que es el gesto en espejo de la hoja: cabecera_flotante.dart.
-    this.#enSelector = enSelector;
-    this.#el('topbar')?.classList.toggle('esta-apartada', enSelector);
     this.#refrescarRecentrar();
     this.#ajustarAlto();
-  }
-
-  /**
-   * Los dos huecos del selector y el botón de abajo. Vacío el hueco va
-   * apagado y sin subtítulo; puesto se enciende. El botón espera a la
-   * ruta: hasta que la haya es el disabled del ElevatedButton, con su
-   * texto y su gris.
-   */
-  #setSelector(empresa: boolean, ruta: RutaLanding | null): void {
-    this.#setSelect('empresa', empresa ? EMPRESA.nombre : null, EMPRESA.sub, !empresa);
-    this.#setSelect(
-      'ruta',
-      ruta ? ruta.nombre : null,
-      ruta ? `${ruta.terminalA} ↔ ${ruta.terminalB}` : '',
-      empresa && ruta === null
-    );
-    const boton = this.#el('launch');
-    if (!boton) return;
-    // El botón nunca está muerto: dice el paso que falta y, cuando ya no
-    // falta ninguno, se pone verde y promete lo que va a pasar.
-    boton.textContent = ruta
-      ? 'Ver buses en vivo'
-      : empresa
-        ? 'Elegir ruta'
-        : 'Elegir empresa';
-    boton.classList.toggle('is-lista', ruta !== null);
-  }
-
-  /**
-   * Un peldaño del selector: la ficha que se toca y, a su izquierda, el
-   * nodo del riel —hueco, con punto verde si es el que toca ahora, o
-   * relleno con su palomita cuando ya está resuelto—.
-   */
-  #setSelect(
-    cual: ClaveSelect,
-    titulo: string | null,
-    sub: string,
-    actual: boolean
-  ): void {
-    const hecho = titulo !== null;
-    const vacio = VACIO_SELECT[cual];
-    this.#el(`sel-${cual}`)?.classList.toggle('is-activa', hecho);
-    this.#texto(`sel-${cual}-title`, titulo ?? vacio.titulo);
-    this.#texto(`sel-${cual}-sub`, hecho ? sub : vacio.sub);
-    const paso = this.#el(`paso-${cual}`);
-    if (!paso) return;
-    const nodo = paso.querySelector('.escalon-nodo');
-    nodo?.classList.toggle('is-hecho', hecho);
-    nodo?.classList.toggle('is-actual', actual);
-    for (const linea of paso.querySelectorAll('.escalon-linea.is-visible')) {
-      linea.classList.toggle('is-hecho', hecho);
-    }
   }
 
   /* ---------- Superficies de la app ---------- */
@@ -329,54 +213,50 @@ export class PhoneSimulator {
   }
 
   /**
-   * El botón de volver a tu punto: se ve cuando hay punto al que volver y
-   * el selector no está encima. Es la misma condición de la app, sin el
-   * "preparando el mapa" —aquí el mosaico ya está pintado antes de que
-   * arranque el guion—.
+   * El botón de volver a tu punto: se ve cuando hay punto al que volver.
+   * Es la condición de la app sin el "preparando el mapa" —aquí el mosaico
+   * ya está pintado— ni el selector encima, que el hero no abre.
    */
   #refrescarRecentrar(): void {
-    this.#el('recentrar')?.classList.toggle(
-      'is-on',
-      this.#pinPuesto && !this.#enSelector
-    );
+    this.#el('recentrar')?.classList.toggle('is-on', this.#pinPuesto);
   }
 
   /**
-   * Píldora de búsqueda como search_pill_bar.dart: con ruta, la etiqueta
-   * «Ruta activa» sobre el nombre (_rutaActiva); sin ella, la pregunta y
-   * «Toca para buscar tu ruta» debajo.
+   * Píldora de búsqueda como search_pill_bar.dart con ruta: la etiqueta
+   * «Ruta activa» sobre el nombre (_rutaActiva). Sin ruta —la pregunta y
+   * «Toca para buscar tu ruta»— es como la trae el HTML, antes del
+   * JavaScript.
    */
-  #setPildora(ruta: RutaLanding | null): void {
-    this.#texto('pill-title', ruta ? ruta.nombre : '¿Qué bus esperas?');
-    this.#el('pill-etiqueta')?.toggleAttribute('hidden', ruta === null);
-    this.#el('pill-sub')?.toggleAttribute('hidden', ruta !== null);
-    this.#el('pill-der')?.classList.toggle('es-cerrar', ruta !== null);
-    if (ruta) this.#escenaTexto('route-name', ruta.nombre);
-    this.#escena?.querySelector('[data-escena="route"]')?.classList.toggle('is-on', ruta !== null);
+  #setPildora(ruta: RutaLanding): void {
+    this.#texto('pill-title', ruta.nombre);
+    this.#el('pill-etiqueta')?.removeAttribute('hidden');
+    this.#el('pill-sub')?.setAttribute('hidden', '');
+    this.#el('pill-der')?.classList.add('es-cerrar');
+    this.#escenaTexto('route-name', ruta.nombre);
+    this.#escena?.querySelector('[data-escena="route"]')?.classList.add('is-on');
   }
 
-  #setChip(clave: ClaveChip): void {
-    const chip = CHIPS[clave];
-    this.#texto('chip-text', chip.texto);
+  #ponerChip(): void {
+    this.#texto('chip-text', CHIP.texto);
     const pista = this.#el('chip-sub');
     if (pista) {
-      pista.textContent = chip.sub;
-      pista.hidden = chip.sub === '';
+      pista.textContent = CHIP.sub;
+      pista.hidden = false;
     }
     const accion = this.#el('chip-action');
     if (accion) {
-      accion.textContent = chip.accion;
-      accion.hidden = chip.accion === '';
+      accion.textContent = CHIP.accion;
+      accion.hidden = false;
       // "Quitar" solo deshace: va en gris. El verde queda para la acción
       // que propone algo ("Fijar"), como en location_status_chip.dart.
-      accion.classList.toggle('app-chip-action--suave', chip.suave);
+      accion.classList.toggle('app-chip-action--suave', CHIP.suave);
     }
     // El atributo, no la propiedad: los íconos son SVG y `hidden` es de
     // `HTMLElement`. Como propiedad no llega al documento y en pantalla
     // manda lo que dejó escrito el HTML.
     for (const nodo of this.#raiz.querySelectorAll<HTMLElement>('[data-icono]')) {
       if (nodo.dataset.grupo === 'chip') {
-        nodo.toggleAttribute('hidden', nodo.dataset.icono !== chip.icono);
+        nodo.toggleAttribute('hidden', nodo.dataset.icono !== CHIP.icono);
       }
     }
   }
@@ -426,13 +306,6 @@ export class PhoneSimulator {
     this.#texto('alert-label', puesto ? 'Aviso activado' : 'Avisarme cuando esté cerca');
     for (const nodo of this.#raiz.querySelectorAll<HTMLElement>('[data-grupo="aviso"]')) {
       nodo.toggleAttribute('hidden', nodo.dataset.icono !== (puesto ? 'visto' : 'campana'));
-    }
-  }
-
-  #reiniciarFichas(): void {
-    this.#setAviso(false);
-    for (const ficha of this.#raiz.querySelectorAll<HTMLElement>('[data-ruta]')) {
-      ficha.classList.toggle('is-activa', ficha.dataset.ruta === this.#rutaActual.id);
     }
   }
 
