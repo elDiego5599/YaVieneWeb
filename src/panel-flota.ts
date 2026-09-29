@@ -183,74 +183,74 @@ function marcar(el: Element, activo: boolean, clase: string): void {
 }
 
 export class PanelFlota {
-  private readonly buses: Bus[] = FLOTA.map((b) => ({ ...b }));
-  private ruta = 'tcherassi';
-  private estado: Estado = 'todos';
-  private elegido: string | null = 'SFA-482';
+  readonly #buses: Bus[] = FLOTA.map((b) => ({ ...b }));
+  #ruta = 'tcherassi';
+  #estado: Estado = 'todos';
+  #elegido: string | null = 'SFA-482';
 
-  private readonly raiz: HTMLElement;
-  private readonly pildoras: HTMLElement[];
-  private readonly pestanas: HTMLElement[];
-  private readonly filas: HTMLElement[];
-  private readonly marcadores: HTMLElement[];
-  private readonly cifrasLeyenda: HTMLElement[];
-  private readonly cuenta: HTMLElement;
-  private readonly vacio: HTMLElement;
-  private readonly iconoTodos: Element;
-  private readonly ficha: HTMLElement;
+  readonly #raiz: HTMLElement;
+  readonly #pildoras: HTMLElement[];
+  readonly #pestanas: HTMLElement[];
+  readonly #filas: HTMLElement[];
+  readonly #marcadores: HTMLElement[];
+  readonly #cifrasLeyenda: HTMLElement[];
+  readonly #cuenta: HTMLElement;
+  readonly #vacio: HTMLElement;
+  readonly #iconoTodos: Element;
+  readonly #ficha: HTMLElement;
 
   constructor(raiz: HTMLElement) {
-    this.raiz = raiz;
+    this.#raiz = raiz;
     const todos = (sel: string): HTMLElement[] => Array.from(raiz.querySelectorAll<HTMLElement>(sel));
     const uno = (sel: string): HTMLElement => raiz.querySelector<HTMLElement>(sel)!;
-    this.pildoras = todos('[data-accion="ruta"]');
-    this.pestanas = todos('[data-accion="estado"]');
-    this.filas = todos('.flota-fila');
-    this.marcadores = todos('.flota-bus');
-    this.cifrasLeyenda = todos('[data-leyenda]');
-    this.cuenta = uno('.flota-cuenta');
-    this.vacio = uno('.flota-vacio');
-    this.iconoTodos = uno('[data-todos]');
-    this.ficha = uno('.flota-ficha');
+    this.#pildoras = todos('[data-accion="ruta"]');
+    this.#pestanas = todos('[data-accion="estado"]');
+    this.#filas = todos('.flota-fila');
+    this.#marcadores = todos('.flota-bus');
+    this.#cifrasLeyenda = todos('[data-leyenda]');
+    this.#cuenta = uno('.flota-cuenta');
+    this.#vacio = uno('.flota-vacio');
+    this.#iconoTodos = uno('[data-todos]');
+    this.#ficha = uno('.flota-ficha');
 
     // Un solo oyente para todo el panel: cada botón dice qué hace en su
     // `data-accion`, y el bus al que se refiere lo pone la fila o el
     // marcador que lo contiene. El de la ficha no está dentro de ninguno y
     // actúa sobre el elegido, igual que allá.
-    raiz.addEventListener('click', (e) => this.tocar(e));
-    this.pintar();
+    raiz.addEventListener('click', (e) => this.#tocar(e));
+    this.#pintar();
   }
 
-  private bus(placa: string): Bus {
-    return this.buses.find((b) => b.placa === placa)!;
+  #bus(placa: string): Bus {
+    return this.#buses.find((b) => b.placa === placa)!;
   }
 
-  private tocar(e: MouseEvent): void {
+  #tocar(e: MouseEvent): void {
     const boton = (e.target as Element).closest<HTMLElement>('[data-accion]');
-    if (!boton || !this.raiz.contains(boton)) return;
-    const placa = boton.closest<HTMLElement>('[data-bus]')?.dataset.bus ?? this.elegido;
+    if (!boton || !this.#raiz.contains(boton)) return;
+    const placa = boton.closest<HTMLElement>('[data-bus]')?.dataset.bus ?? this.#elegido;
 
     switch (boton.dataset.accion) {
       // `setRouteFilter`. No suelta el bus elegido: allá tampoco, y la
       // ficha se queda abierta con su ruta en el chip mientras se mira la
       // otra.
       case 'ruta':
-        this.ruta = boton.dataset.ruta!;
+        this.#ruta = boton.dataset.ruta!;
         break;
       // `setStatusFilter`.
       case 'estado':
-        this.estado = boton.dataset.estado as Estado;
+        this.#estado = boton.dataset.estado as Estado;
         break;
       // `selectBus`, desde la fila o desde el marcador. Tocar el elegido
       // otra vez no lo suelta: eso lo hace sólo la X de la ficha.
       case 'elegir':
-        this.elegido = placa;
+        this.#elegido = placa;
         break;
       // `toggleVisibility`, desde el interruptor de la fila o el botón de
       // la ficha. Allá espera al servidor con un indicador girando; aquí
       // no hay servidor que esperar.
       case 'visibilidad':
-        if (placa) this.bus(placa).visible = !this.bus(placa).visible;
+        if (placa) this.#bus(placa).visible = !this.#bus(placa).visible;
         break;
       // `selectBus(null)`. La X deja de existir al cerrarse la ficha, así
       // que el foco pasa a la fila del bus que se estaba viendo: si no, se
@@ -259,44 +259,44 @@ export class PanelFlota {
       // lo quita la pestaña—, a la píldora de la ruta que se está mirando,
       // que es donde se decide qué se ve.
       case 'cerrar': {
-        const fila = this.filas.find((f) => f.dataset.bus === this.elegido && !f.hidden);
-        this.elegido = null;
-        this.pintar();
+        const fila = this.#filas.find((f) => f.dataset.bus === this.#elegido && !f.hidden);
+        this.#elegido = null;
+        this.#pintar();
         const destino =
           fila?.querySelector<HTMLElement>('[data-accion="elegir"]') ??
-          this.pildoras.find((p) => p.dataset.ruta === this.ruta);
+          this.#pildoras.find((p) => p.dataset.ruta === this.#ruta);
         destino?.focus({ preventScroll: true });
         return;
       }
       default:
         return;
     }
-    this.pintar();
+    this.#pintar();
   }
 
   /** Todo el panel a partir del estado, de una vez: como `build` en Flutter. */
-  private pintar(): void {
-    const enLista = new Set(lista(this.buses, this.ruta, this.estado).map((b) => b.placa));
-    const cifras = cuentas(this.buses, this.ruta);
-    const cifrasMapa = leyenda(this.buses, this.ruta);
+  #pintar(): void {
+    const enLista = new Set(lista(this.#buses, this.#ruta, this.#estado).map((b) => b.placa));
+    const cifras = cuentas(this.#buses, this.#ruta);
+    const cifrasMapa = leyenda(this.#buses, this.#ruta);
 
-    for (const p of this.pildoras) marcar(p, p.dataset.ruta === this.ruta, 'es-activo');
-    for (const p of this.pestanas) {
+    for (const p of this.#pildoras) marcar(p, p.dataset.ruta === this.#ruta, 'es-activo');
+    for (const p of this.#pestanas) {
       const estado = p.dataset.estado as Estado;
-      marcar(p, estado === this.estado, 'es-activa');
+      marcar(p, estado === this.#estado, 'es-activa');
       p.querySelector('b')!.textContent = String(cifras[estado]);
     }
 
     // La cifra junto a «BUSES» es el largo de la lista, filtro de estado
     // incluido: en el Dart es `buses.length`, no `totalBuses`.
-    this.cuenta.textContent = String(enLista.size);
-    this.vacio.hidden = enLista.size > 0;
-    this.vacio.textContent = VACIO[this.estado];
+    this.#cuenta.textContent = String(enLista.size);
+    this.#vacio.hidden = enLista.size > 0;
+    this.#vacio.textContent = VACIO[this.#estado];
 
-    for (const fila of this.filas) {
-      const bus = this.bus(fila.dataset.bus!);
+    for (const fila of this.#filas) {
+      const bus = this.#bus(fila.dataset.bus!);
       const estado = estadoDe(bus);
-      const elegida = bus.placa === this.elegido;
+      const elegida = bus.placa === this.#elegido;
       fila.hidden = !enLista.has(bus.placa);
       fila.dataset.busEstado = estado;
       fila.classList.toggle('es-elegida', elegida);
@@ -316,27 +316,27 @@ export class PanelFlota {
     // El marcador sale de la misma `fleetList` que la lista: lo que el
     // filtro quita de una lo quita del otro. Cómo se dibuja lo dice su
     // estado, el mismo `BusEstado.de` que pinta la fila.
-    for (const m of this.marcadores) {
-      const bus = this.bus(m.dataset.bus!);
-      const elegido = bus.placa === this.elegido;
+    for (const m of this.#marcadores) {
+      const bus = this.#bus(m.dataset.bus!);
+      const elegido = bus.placa === this.#elegido;
       m.classList.toggle('es-fuera', !enLista.has(bus.placa));
       m.dataset.busEstado = estadoDe(bus);
       m.classList.toggle('es-elegido', elegido);
     }
 
-    for (const c of this.cifrasLeyenda) {
+    for (const c of this.#cifrasLeyenda) {
       c.textContent = String(cifrasMapa[c.dataset.leyenda as BusEstado]);
     }
 
     // El botón de la barra ofrece lo contrario de lo que hay: ocultar
     // todos si todos se ven y mostrarlos si falta alguno. Mira la flota
     // entera, no la ruta, como `allBusesVisible`.
-    this.iconoTodos.setAttribute(
+    this.#iconoTodos.setAttribute(
       'href',
-      this.buses.every((b) => b.visible) ? '#fi-ocultar' : '#fi-mostrar'
+      this.#buses.every((b) => b.visible) ? '#fi-ocultar' : '#fi-mostrar'
     );
 
-    this.pintarFicha();
+    this.#pintarFicha();
   }
 
   /**
@@ -344,21 +344,21 @@ export class PanelFlota {
    * enseñaba, y vaciarla antes dejaría ver una ficha en blanco yéndose.
    * `inert` la saca del recorrido del teclado mientras está cerrada.
    */
-  private pintarFicha(): void {
-    const bus = this.elegido ? this.bus(this.elegido) : null;
-    this.ficha.classList.toggle('es-cerrada', !bus);
-    this.ficha.toggleAttribute('inert', !bus);
+  #pintarFicha(): void {
+    const bus = this.#elegido ? this.#bus(this.#elegido) : null;
+    this.#ficha.classList.toggle('es-cerrada', !bus);
+    this.#ficha.toggleAttribute('inert', !bus);
     if (!bus) return;
 
-    const campo = (nombre: string): Element => this.ficha.querySelector(`[data-ficha="${nombre}"]`)!;
+    const campo = (nombre: string): Element => this.#ficha.querySelector(`[data-ficha="${nombre}"]`)!;
     const estado = estadoDe(bus);
-    this.ficha.dataset.busEstado = estado;
+    this.#ficha.dataset.busEstado = estado;
     campo('placa').textContent = bus.placa;
     campo('estado').textContent = ROTULO[estado];
     campo('estado-icono').setAttribute('href', ICONO[estado]);
     campo('ruta').textContent = RUTAS[bus.ruta];
     campo('ocultar').textContent = bus.visible ? 'Ocultar' : 'Mostrar';
     campo('ocultar-icono').setAttribute('href', bus.visible ? '#fi-ocultar' : '#fi-mostrar');
-    this.ficha.querySelector('.flota-ocultar')!.classList.toggle('es-mostrar', !bus.visible);
+    this.#ficha.querySelector('.flota-ocultar')!.classList.toggle('es-mostrar', !bus.visible);
   }
 }
