@@ -60,8 +60,14 @@ export class NavIsland {
     });
 
     // Teclado: tabular hasta dentro la abre; salir del todo la cierra.
-    isla.addEventListener('focusin', () => {
+    // Sólo el foco de teclado. En Android tocar el botón también le da el
+    // foco, antes del clic: si ese foco abría, el clic que llega detrás
+    // encontraba la isla abierta y la cerraba, y el primer toque no hacía
+    // nada. El foco que deja un toque o un clic no es `:focus-visible`;
+    // el del tabulador, sí.
+    isla.addEventListener('focusin', e => {
       if (this.#devolviendoFoco) return;
+      if (e.target instanceof Element && !e.target.matches(':focus-visible')) return;
       this.#abrir();
     });
     isla.addEventListener('focusout', e => {
