@@ -206,18 +206,8 @@ describe('1. Fija tu punto de espera', () => {
     expect(mapa.pin).toBe(true);
   });
 
-  /*
-    FALLO REAL (no se arregla en esta rama): `reposo()` esconde la acción
-    «Quitar» del chip, pero no la pista de debajo. La foto final del HTML
-    la trae escrita («Arrástralo para moverlo») y en cada vuelta queda
-    puesta de la anterior, así que de 1,0 s a 2,4 s el chip dice
-    «Localizando tu ubicación…» y debajo «Arrástralo para moverlo»: pide
-    arrastrar un punto mientras todavía lo está buscando. El guion la
-    destapa a propósito a los 2,4 s (`pista.hidden = false`), así que la
-    intención es que antes no se vea.
-  */
   // Riesgo: mientras localiza, el chip ya pide arrastrar un punto que aún no está puesto.
-  it.skip('mientras localiza, el chip no enseña la pista de arrastrar', () => {
+  it('mientras localiza, el chip no enseña la pista de arrastrar', () => {
     const { raiz, demo } = montarDemo(1);
     demo.activar(true);
     const fotos = recorrer(7500, () => ({

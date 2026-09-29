@@ -304,6 +304,11 @@ export class PasoDemo {
       this.texto('chip-text', 'Localizando tu ubicación…');
       const accion = this.el('chip-action');
       if (accion) accion.hidden = true;
+      // La pista viene escrita en la foto del HTML y se queda de la vuelta
+      // anterior: sin esconderla, el chip pediría arrastrar un punto que
+      // todavía está localizando. El guion la destapa a los 2,4 s.
+      const pista = this.el('chip-sub');
+      if (pista) pista.hidden = true;
     }
 
     if (this.guion === 2) {
