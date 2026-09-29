@@ -135,7 +135,20 @@ export class PhoneMap {
   #pinT: number | null = null;
   #busTs: number[] = [];
 
-  readonly #onResize = (): void => this.#medir();
+  /**
+   * El `resize` pide la medida para el cuadro y no la hace en el acto: en
+   * el móvil la barra de direcciones lo dispara a cada tirón del scroll, y
+   * son cinco mapas en la portada. Varios avisos seguidos se quedan en una
+   * sola lectura, que cae antes de pintar (e2e/resize-agrupado.spec.ts).
+   */
+  #medida = 0;
+  readonly #onResize = (): void => {
+    if (this.#medida) return;
+    this.#medida = requestAnimationFrame(() => {
+      this.#medida = 0;
+      this.#medir();
+    });
+  };
 
   constructor(svg: SVGSVGElement, host: HTMLElement) {
     this.#svg = svg;
@@ -234,6 +247,8 @@ export class PhoneMap {
 
   destroy(): void {
     window.removeEventListener('resize', this.#onResize);
+    cancelAnimationFrame(this.#medida);
+    this.#medida = 0;
   }
 
   /* ---------- Escala ---------- */

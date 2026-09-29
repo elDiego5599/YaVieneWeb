@@ -109,7 +109,15 @@ export class MapaVivo {
   #ultimo = 0;
   #vigia: IntersectionObserver | null = null;
 
-  readonly #alRedimensionar = (): void => this.#medir();
+  /** Como en phone-map.ts: la medida del `resize`, una por cuadro. */
+  #medida = 0;
+  readonly #alRedimensionar = (): void => {
+    if (this.#medida) return;
+    this.#medida = requestAnimationFrame(() => {
+      this.#medida = 0;
+      this.#medir();
+    });
+  };
 
   constructor(raiz: HTMLElement) {
     this.#raiz = raiz;
@@ -223,6 +231,8 @@ export class MapaVivo {
     this.#vigia = null;
     if (this.#cuadro) cancelAnimationFrame(this.#cuadro);
     this.#cuadro = 0;
+    cancelAnimationFrame(this.#medida);
+    this.#medida = 0;
   }
 
   /* ---------- Piezas ---------- */

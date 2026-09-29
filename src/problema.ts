@@ -194,7 +194,20 @@ export class Problema {
     // texto ocupa otra cosa.
     this.#medirEstado();
     if (document.fonts) void document.fonts.ready.then(() => this.#medirEstado());
-    addEventListener('resize', () => this.#pedirMedida(), { passive: true });
+    // Una medida por cuadro y no una por aviso, como los mapas
+    // (e2e/resize-agrupado.spec.ts): la barra del móvil manda muchos.
+    let medida = 0;
+    addEventListener(
+      'resize',
+      () => {
+        if (medida) return;
+        medida = requestAnimationFrame(() => {
+          medida = 0;
+          this.#pedirMedida();
+        });
+      },
+      { passive: true }
+    );
 
     if (!sinMovimiento()) this.#esperarAQueAsome();
   }
