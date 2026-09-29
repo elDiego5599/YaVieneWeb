@@ -979,9 +979,15 @@
             <div class="pasos-pase" data-pasos-columnas>
           <!-- El primer paso viene ya encendido: las tomas se apilan y sólo
                se ve la marcada, así que sin esto el visor saldría vacío
-               hasta que la sección entra en pantalla. -->
+               hasta que la sección entra en pantalla.
+
+               Los tres teléfonos van con `aria-hidden`, como los del hero:
+               son el dibujo de lo que cuentan los botones de «Pasos», y
+               un lector de pantalla leía su reloj de mentira, los textos
+               que el guion cambia solos y sus íconos sin nombre. Lo que
+               dicen ya está en esos botones. -->
           <article class="paso-columna is-activa" data-paso-columna>
-            <div class="paso-marco">
+            <div class="paso-marco" aria-hidden="true">
               <div class="paso-toma" data-toma data-demo="1">
                 <div class="phone-shell phone-shell--paso">
                   <span class="phone-key phone-key--power"></span>
@@ -1097,7 +1103,7 @@
           </article>
 
           <article class="paso-columna" data-paso-columna>
-            <div class="paso-marco">
+            <div class="paso-marco" aria-hidden="true">
               <div class="paso-toma" data-toma data-demo="2">
                 <div class="phone-shell phone-shell--paso">
                   <span class="phone-key phone-key--power"></span>
@@ -1311,7 +1317,7 @@
           </article>
 
           <article class="paso-columna" data-paso-columna>
-            <div class="paso-marco">
+            <div class="paso-marco" aria-hidden="true">
               <div class="paso-toma" data-toma data-demo="3">
                 <div class="phone-shell phone-shell--paso">
                   <span class="phone-key phone-key--power"></span>
@@ -1837,8 +1843,15 @@
                 recorrido (src/mapa-vivo.ts). El rótulo lo dice, porque es lo
                 único que se oye al llegar aquí; lo que pasa después lo
                 cuenta el `role="status"` de abajo.
+
+                Es un deslizador y no una imagen: con `role="img"`, en modo
+                lectura el lector de pantalla se quedaba las flechas para
+                recorrer el texto y no llegaban al mapa. Un deslizador lo
+                pasa a modo foco. El valor es por dónde va el punto a lo
+                largo del recorrido, de 0 a 100, y lo escribe mapa-vivo.ts
+                junto con su lectura en palabras.
               -->
-              <svg class="mapa-svg" data-mapa-svg role="img" tabindex="0" aria-label="Mapa de Barranquilla con la ruta seleccionada, tu punto de espera y dos buses. Con las flechas mueves tu punto de espera por la ruta"></svg>
+              <svg class="mapa-svg" data-mapa-svg role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-label="Tu punto de espera en el mapa de Barranquilla, sobre la ruta elegida. Con las flechas lo mueves por la ruta"></svg>
               <p class="solo-lectores" data-mapa-voz role="status" aria-live="polite"></p>
               <!--
                 El rótulo «Simulación» (T6.10, decisión D8). Las rutas, los

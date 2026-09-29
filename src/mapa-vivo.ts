@@ -191,7 +191,14 @@ export class MapaVivo {
     this.#setRuta(this.#ruta.id);
     this.#medir();
 
-    this.#svg.addEventListener('pointerdown', e => this.#alTocar(e));
+    /*
+      El clic y no `pointerdown`. En táctil `pointerdown` llega al apoyar
+      el dedo, antes de saber si el gesto es un toque o un desplazamiento,
+      así que quien bajaba la página con el dedo sobre el mapa le movía el
+      punto. El clic sólo llega si el dedo se levantó sin desplazarse, y
+      con el ratón sólo con el botón principal.
+    */
+    this.#svg.addEventListener('click', e => this.#alTocar(e));
     this.#svg.addEventListener('keydown', e => this.#alTeclado(e));
     window.addEventListener('resize', this.#alRedimensionar, { passive: true });
 
@@ -342,7 +349,8 @@ export class MapaVivo {
   }
 
   /** El toque del visitante, pasado del espacio de la pantalla al del SVG. */
-  #alTocar(evento: PointerEvent): void {
+  #alTocar(evento: MouseEvent): void {
+    if (evento.button !== 0) return;
     const ctm = this.#svg.getScreenCTM();
     if (!ctm) return;
     const p = new DOMPoint(evento.clientX, evento.clientY).matrixTransform(ctm.inverse());
@@ -399,6 +407,23 @@ export class MapaVivo {
     this.#dibujarPin();
     this.#reponerBuses();
     this.#actualizarLectura();
+    this.#decirValor();
+  }
+
+  /**
+   * El valor del deslizador: por dónde va el punto a lo largo del
+   * recorrido, de 0 a 100, y dicho en palabras para el lector de
+   * pantalla, que si no leería un porcentaje suelto. Sólo cambia cuando
+   * se mueve el punto o la ruta, nunca con los buses: un valor que
+   * cambiara sesenta veces por segundo sería un lector hablando sin parar.
+   */
+  #decirValor(): void {
+    const avance = Math.round(this.#pinT * 100);
+    this.#svg.setAttribute('aria-valuenow', String(avance));
+    this.#svg.setAttribute(
+      'aria-valuetext',
+      `${legible(this.#pinT * this.#metrosDeRuta)} desde ${this.#ruta.terminalA} en la ${this.#ruta.nombre}`
+    );
   }
 
   /**
