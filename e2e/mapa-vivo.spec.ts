@@ -85,3 +85,22 @@ test('los teléfonos de «Cómo funciona» no se leen con lector de pantalla', a
   // Ni el reloj de mentira, ni los textos del guion, ni los íconos sin nombre.
   expect(arbol).not.toMatch(/7:23|Localizando|Ruta activa|- img/);
 });
+
+test('cada ruta marca sus dos terminales en puntas distintas del mapa', async ({ page }) => {
+  await mapaALaVista(page);
+  const botones = page.locator('[data-mapa-rutas] [data-ruta]');
+  const cuantas = await botones.count();
+  expect(cuantas).toBe(6);
+  for (let i = 0; i < cuantas; i += 1) {
+    await botones.nth(i).click();
+    const centros = await page
+      .locator('.mv-terminales circle')
+      .evaluateAll((cs) => cs.map((c) => [Number(c.getAttribute('cx')), Number(c.getAttribute('cy'))]));
+    const ruta = await botones.nth(i).getAttribute('data-ruta');
+    expect(centros, ruta!).toHaveLength(2);
+    // Antes las dos caían en la salida, una encima de otra. A 6,45 m por
+    // unidad, 155 unidades es 1 km.
+    const [[ax, ay], [bx, by]] = centros;
+    expect(Math.hypot(ax - bx, ay - by), `${ruta}: las dos terminales encimadas`).toBeGreaterThan(155);
+  }
+});

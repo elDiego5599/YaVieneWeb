@@ -319,6 +319,19 @@ def main():
             if not simple or simple[-1] != q:
                 simple.append(q)
         d = "M" + " L".join(f"{x} {y}" for x, y in simple)
+        # Las terminales. Los recorridos de rutas.json son de ida y vuelta:
+        # salen de la terminal A y acaban donde empezaron, así que el primer
+        # y el último punto —lo que se tomaba antes— caen en el mismo sitio
+        # y la otra punta no se marcaba. rutas.json no trae paradas, así que
+        # la B se deduce del trazo: es donde el bus da la vuelta, el vértice
+        # más alejado de la salida. En las seis cae entre el 47 y el 54 % del
+        # largo, que es lo que se espera de una vuelta. Se busca entre los
+        # vértices ya simplificados, y no en los waypoints crudos, para que
+        # el círculo caiga sobre la línea que se dibuja y `d` no cambie.
+        vuelta = max(
+            simple,
+            key=lambda p: math.hypot(p[0] - simple[0][0], p[1] - simple[0][1]),
+        )
         out_rutas.append(
             {
                 "id": r["routeId"],
@@ -329,7 +342,7 @@ def main():
                 "puntos": len(r["waypoints"]),
                 "simples": len(simple),
                 "d": d,
-                "extremos": [list(simple[0]), list(simple[-1])],
+                "extremos": [list(simple[0]), list(vuelta)],
             }
         )
 
