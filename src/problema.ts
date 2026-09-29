@@ -152,39 +152,39 @@ const TRAGO_MINIMO_MS = 150;
 const SUELTA_MS = 340;
 
 export class Problema {
-  private readonly seccion: HTMLElement;
-  private readonly botones: HTMLButtonElement[];
-  private readonly estado: HTMLElement | null;
+  readonly #seccion: HTMLElement;
+  readonly #botones: HTMLButtonElement[];
+  readonly #estado: HTMLElement | null;
 
-  private ojo: IntersectionObserver | null = null;
-  private reloj: number | null = null;
+  #ojo: IntersectionObserver | null = null;
+  #reloj: number | null = null;
 
   /** Los relojes de la ceremonia, para poder cortarla a media escena. */
-  private tramos: number[] = [];
+  #tramos: number[] = [];
   /** Lo que está volando hacia el logo ahora mismo. */
-  private vuelos: Animation[] = [];
+  #vuelos: Animation[] = [];
   /**
    * Las fichas van aparte porque son las únicas que vuelven: lo demás se
    * lo queda el logo, pero ellas salen otra vez en el despliegue y hay
    * que poder cortarles el viaje sin cortar el de las voces.
    */
-  private vuelosFicha: Animation[] = [];
+  #vuelosFicha: Animation[] = [];
   /** Adónde se fue cada ficha, para saber de dónde tiene que volver. */
-  private idas: { ficha: HTMLElement; dx: number; dy: number }[] = [];
+  #idas: { ficha: HTMLElement; dx: number; dy: number }[] = [];
 
   constructor(seccion: HTMLElement) {
-    this.seccion = seccion;
-    this.estado = seccion.querySelector<HTMLElement>('.escenario-estado');
-    this.botones = Array.from(
+    this.#seccion = seccion;
+    this.#estado = seccion.querySelector<HTMLElement>('.escenario-estado');
+    this.#botones = Array.from(
       seccion.querySelectorAll<HTMLButtonElement>('.interruptor-opcion')
     );
 
-    for (const boton of this.botones) {
+    for (const boton of this.#botones) {
       boton.addEventListener('click', () => {
         // Un toque en el interruptor apaga el cambio automático: ya no
         // hace falta enseñar nada, se ha entendido.
-        this.parar();
-        this.poner(boton.dataset.cara ?? 'ciego');
+        this.#parar();
+        this.#poner(boton.dataset.cara ?? 'ciego');
       });
     }
 
@@ -192,16 +192,16 @@ export class Problema {
     // encogerla hasta el círculo: `width: auto` no se puede animar. Se
     // mide con la tipografía ya cargada, porque con la de respaldo el
     // texto ocupa otra cosa.
-    this.medirEstado();
-    if (document.fonts) void document.fonts.ready.then(() => this.medirEstado());
-    addEventListener('resize', () => this.pedirMedida(), { passive: true });
+    this.#medirEstado();
+    if (document.fonts) void document.fonts.ready.then(() => this.#medirEstado());
+    addEventListener('resize', () => this.#pedirMedida(), { passive: true });
 
-    if (!sinMovimiento()) this.esperarAQueAsome();
+    if (!sinMovimiento()) this.#esperarAQueAsome();
   }
 
   destroy(): void {
-    this.parar();
-    this.cortarCeremonia();
+    this.#parar();
+    this.#cortarCeremonia();
   }
 
   /**
@@ -211,20 +211,20 @@ export class Problema {
    * que es por donde hay que empezar a leerla —y, sobre todo, nadie se
    * pierde el cambio por haber pasado de largo mientras corría.
    */
-  private esperarAQueAsome(): void {
-    this.ojo = new IntersectionObserver(
+  #esperarAQueAsome(): void {
+    this.#ojo = new IntersectionObserver(
       (entradas) => {
         for (const entrada of entradas) {
-          if (this.seMira(entrada)) this.contar();
-          else if (entrada.intersectionRatio <= ASOMO_SALE) this.rebobinar();
+          if (this.#seMira(entrada)) this.#contar();
+          else if (entrada.intersectionRatio <= ASOMO_SALE) this.#rebobinar();
         }
       },
       { threshold: [0, ASOMO_SALE, ASOMO_ENTRA, 1] }
     );
-    this.ojo.observe(this.seccion);
+    this.#ojo.observe(this.#seccion);
   }
 
-  private seMira(entrada: IntersectionObserverEntry): boolean {
+  #seMira(entrada: IntersectionObserverEntry): boolean {
     if (!entrada.isIntersecting) return false;
     return (
       entrada.intersectionRatio >= ASOMO_ENTRA ||
@@ -232,38 +232,38 @@ export class Problema {
     );
   }
 
-  private contar(): void {
-    if (this.reloj !== null) return;
-    this.reloj = window.setTimeout(() => {
-      this.reloj = null;
-      this.poner('claro');
+  #contar(): void {
+    if (this.#reloj !== null) return;
+    this.#reloj = window.setTimeout(() => {
+      this.#reloj = null;
+      this.#poner('claro');
     }, ESPERA_MS);
   }
 
-  private rebobinar(): void {
-    if (this.reloj !== null) {
-      window.clearTimeout(this.reloj);
-      this.reloj = null;
+  #rebobinar(): void {
+    if (this.#reloj !== null) {
+      window.clearTimeout(this.#reloj);
+      this.#reloj = null;
     }
-    this.poner('ciego');
+    this.#poner('ciego');
   }
 
-  private parar(): void {
-    if (this.reloj !== null) {
-      window.clearTimeout(this.reloj);
-      this.reloj = null;
+  #parar(): void {
+    if (this.#reloj !== null) {
+      window.clearTimeout(this.#reloj);
+      this.#reloj = null;
     }
-    this.ojo?.disconnect();
-    this.ojo = null;
+    this.#ojo?.disconnect();
+    this.#ojo = null;
   }
 
   // ── La medida de la píldora ────────────────────────────────────────
 
-  private pedirMedida(): void {
+  #pedirMedida(): void {
     // Sólo en reposo: a media ceremonia la píldora está encogida y
     // medirla ahí congelaría el círculo como si fuera su tamaño real.
-    if (this.seccion.dataset.fase && this.seccion.dataset.fase !== 'reposo') return;
-    this.medirEstado();
+    if (this.#seccion.dataset.fase && this.#seccion.dataset.fase !== 'reposo') return;
+    this.#medirEstado();
   }
 
   /**
@@ -273,23 +273,23 @@ export class Problema {
    * el suyo. El bloque de las dos caras no se anima nunca y no baja de
    * su ancho mínimo aunque el padre se cierre: ése es el número bueno.
    */
-  private medirEstado(): void {
-    if (!this.estado) return;
-    const caras = this.estado.querySelector<HTMLElement>('.dos-caras');
+  #medirEstado(): void {
+    if (!this.#estado) return;
+    const caras = this.#estado.querySelector<HTMLElement>('.dos-caras');
     if (!caras) return;
 
-    const estilo = getComputedStyle(this.estado);
+    const estilo = getComputedStyle(this.#estado);
     const aire =
       parseFloat(estilo.paddingLeft || '0') + parseFloat(estilo.paddingRight || '0');
     const ancho = Math.ceil(caras.getBoundingClientRect().width + aire + 16);
 
     if (ancho <= NUCLEO_PX) return;
-    this.estado.style.setProperty('--ancho-estado', `${ancho}px`);
+    this.#estado.style.setProperty('--ancho-estado', `${ancho}px`);
   }
 
   // ── El cambio de cara ──────────────────────────────────────────────
 
-  private poner(cara: string): void {
+  #poner(cara: string): void {
     // Adónde va la sección ahora mismo. Con una ceremonia en marcha va a
     // «claro» aunque el atributo todavía diga otra cosa: la cara sólo se
     // cambia a mitad de la escena. Pedir esa misma cara no es un cambio y
@@ -298,26 +298,26 @@ export class Problema {
     // `data-cara` ya en «claro», y el tramo del enredo —los cables rojos,
     // las voces, las fichas desparramadas— se representaba con los textos
     // y las fichas de «Con Ya Viene».
-    const destino = this.tramos.length ? 'claro' : this.seccion.dataset.cara;
+    const destino = this.#tramos.length ? 'claro' : this.#seccion.dataset.cara;
     if (destino === cara) return;
 
-    this.cortarCeremonia();
+    this.#cortarCeremonia();
 
-    if (cara === 'claro' && !sinMovimiento()) this.ceremonia();
-    else this.cambiar(cara);
+    if (cara === 'claro' && !sinMovimiento()) this.#ceremonia();
+    else this.#cambiar(cara);
   }
 
   /** El cambio pelado, sin escena: es lo que hace la vuelta atrás. */
-  private cambiar(cara: string): void {
-    this.seccion.dataset.fase = 'reposo';
-    if (this.seccion.dataset.cara === cara) return;
-    this.seccion.dataset.cara = cara;
+  #cambiar(cara: string): void {
+    this.#seccion.dataset.fase = 'reposo';
+    if (this.#seccion.dataset.cara === cara) return;
+    this.#seccion.dataset.cara = cara;
 
-    for (const boton of this.botones) {
+    for (const boton of this.#botones) {
       boton.setAttribute('aria-pressed', String(boton.dataset.cara === cara));
     }
 
-    for (const rostro of this.seccion.querySelectorAll<Element>('.cara')) {
+    for (const rostro of this.#seccion.querySelectorAll<Element>('.cara')) {
       if (rostro.classList.contains(`cara--${cara}`)) {
         rostro.removeAttribute('aria-hidden');
       } else {
@@ -328,28 +328,28 @@ export class Problema {
 
   // ── La ceremonia ───────────────────────────────────────────────────
 
-  private ceremonia(): void {
-    this.seccion.dataset.fase = 'aspira';
-    this.aspirar();
+  #ceremonia(): void {
+    this.#seccion.dataset.fase = 'aspira';
+    this.#aspirar();
 
-    this.tramos.push(
+    this.#tramos.push(
       window.setTimeout(() => {
-        this.seccion.dataset.fase = 'carga';
+        this.#seccion.dataset.fase = 'carga';
       }, ASPIRA_MS),
 
       window.setTimeout(() => {
         // La cara cambia justo cuando el logo se vuelve a abrir: de ahí
         // en adelante manda otra vez el CSS de `data-cara`.
-        this.seccion.dataset.fase = 'brota';
-        this.cambiar('claro');
-        this.seccion.dataset.fase = 'brota';
-        this.desplegar();
+        this.#seccion.dataset.fase = 'brota';
+        this.#cambiar('claro');
+        this.#seccion.dataset.fase = 'brota';
+        this.#desplegar();
       }, ASPIRA_MS + CARGA_MS),
 
       window.setTimeout(() => {
-        this.cortarCeremonia();
-        this.seccion.dataset.fase = 'reposo';
-        this.medirEstado();
+        this.#cortarCeremonia();
+        this.#seccion.dataset.fase = 'reposo';
+        this.#medirEstado();
       }, ASPIRA_MS + CARGA_MS + BROTA_MS)
     );
   }
@@ -369,17 +369,17 @@ export class Problema {
    * llevan» de «se apaga»: sin ese impulso, entrar en el logo se lee
    * como un desvanecido cualquiera.
    */
-  private aspirar(): void {
-    if (!this.estado) return;
+  #aspirar(): void {
+    if (!this.#estado) return;
 
-    const nucleo = this.estado.getBoundingClientRect();
+    const nucleo = this.#estado.getBoundingClientRect();
     const destino = {
       x: nucleo.x + nucleo.width / 2,
       y: nucleo.y + nucleo.height / 2,
     };
 
     const piezas = Array.from(
-      this.seccion.querySelectorAll<HTMLElement>(
+      this.#seccion.querySelectorAll<HTMLElement>(
         '.chispa, .ruido, .ficha, .seccion-titulo, .seccion-lead'
       )
     )
@@ -398,7 +398,7 @@ export class Problema {
       .sort((a, b) => a.bulto - b.bulto);
 
     const ultima = Math.max(1, piezas.length - 1);
-    this.idas = [];
+    this.#idas = [];
     const llegadas: number[] = [];
 
     piezas.forEach(({ pieza, dx, dy }, turno) => {
@@ -424,7 +424,7 @@ export class Problema {
       const vuelta = tarjeta ? 12 : pieza.classList.contains('chispa') ? 200 : 42;
       // La postura con la que estaba en la mesa, para que viaje como
       // estaba en vez de enderezarse de un salto al arrancar.
-      const raiz = this.reposoDe(pieza);
+      const raiz = this.#reposoDe(pieza);
       // Lo pesado se resiste menos a moverse hacia atrás: el tirón de
       // una ficha es la mitad del de una voz.
       const tiron = tarjeta ? 0.03 : 0.06;
@@ -460,18 +460,18 @@ export class Problema {
       llegadas.push(espera + (tarjeta ? VIAJE_MS + 90 : VIAJE_MS));
 
       if (vuelve) {
-        this.vuelosFicha.push(vuelo);
-        this.idas.push({ ficha: pieza, dx, dy });
+        this.#vuelosFicha.push(vuelo);
+        this.#idas.push({ ficha: pieza, dx, dy });
       } else {
-        this.vuelos.push(vuelo);
+        this.#vuelos.push(vuelo);
       }
     });
 
-    this.engordar(llegadas);
+    this.#engordar(llegadas);
 
     // El orden de la vuelta es el de la fila, no el del viaje: la de la
     // izquierda se planta primero aunque se haya ido la última.
-    this.idas.sort((a, b) =>
+    this.#idas.sort((a, b) =>
       a.ficha.compareDocumentPosition(b.ficha) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
     );
 
@@ -498,8 +498,8 @@ export class Problema {
    * encogido de un punto justo antes de recibir y el muelle de después,
    * no la deformación.
    */
-  private engordar(llegadas: number[]): void {
-    if (!this.estado) return;
+  #engordar(llegadas: number[]): void {
+    if (!this.#estado) return;
 
     const tragos: number[] = [];
     for (const cuando of [...llegadas].sort((a, b) => a - b)) {
@@ -544,8 +544,8 @@ export class Problema {
     marcar(ASPIRA_MS + CARGA_MS, REVIENTA, 'cubic-bezier(0.16, 1, 0.3, 1)');
     cuadros.push({ offset: 1, transform: 'scale(1)' });
 
-    this.vuelos.push(
-      this.estado.animate(cuadros, {
+    this.#vuelos.push(
+      this.#estado.animate(cuadros, {
         duration: total,
         easing: 'linear',
         fill: 'forwards',
@@ -569,11 +569,11 @@ export class Problema {
    * en cuanto termina manda otra vez el CSS de la cara ordenada, que es
    * exactamente donde lo deja el último fotograma.
    */
-  private desplegar(): void {
-    for (const vuelo of this.vuelosFicha) vuelo.cancel();
-    this.vuelosFicha = [];
+  #desplegar(): void {
+    for (const vuelo of this.#vuelosFicha) vuelo.cancel();
+    this.#vuelosFicha = [];
 
-    this.idas.forEach(({ ficha, dx, dy }, turno) => {
+    this.#idas.forEach(({ ficha, dx, dy }, turno) => {
       // El chorro es el remolino de la entrada con el signo cambiado:
       // lo que se tragó girando hacia un lado sale girando hacia el
       // otro. Se abre poco: lo justo para que el camino sea una curva y
@@ -588,7 +588,7 @@ export class Problema {
       const lado = turno % 2 === 0 ? 1 : -1;
       const giro = lado * (ficha.classList.contains('ficha') ? 7 : 3.5);
 
-      this.vuelosFicha.push(
+      this.#vuelosFicha.push(
         ficha.animate(
           [
             {
@@ -632,18 +632,18 @@ export class Problema {
    * final de la lista —o sea, se aplica primero— para que el viaje se
    * monte encima en vez de enderezarla de golpe al arrancar.
    */
-  private reposoDe(pieza: HTMLElement): string {
+  #reposoDe(pieza: HTMLElement): string {
     const base = getComputedStyle(pieza).transform;
     return !base || base === 'none' ? '' : ` ${base}`;
   }
 
-  private cortarCeremonia(): void {
-    for (const reloj of this.tramos) window.clearTimeout(reloj);
-    this.tramos = [];
-    for (const vuelo of this.vuelos) vuelo.cancel();
-    this.vuelos = [];
-    for (const vuelo of this.vuelosFicha) vuelo.cancel();
-    this.vuelosFicha = [];
-    this.idas = [];
+  #cortarCeremonia(): void {
+    for (const reloj of this.#tramos) window.clearTimeout(reloj);
+    this.#tramos = [];
+    for (const vuelo of this.#vuelos) vuelo.cancel();
+    this.#vuelos = [];
+    for (const vuelo of this.#vuelosFicha) vuelo.cancel();
+    this.#vuelosFicha = [];
+    this.#idas = [];
   }
 }

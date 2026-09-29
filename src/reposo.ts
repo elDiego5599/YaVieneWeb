@@ -19,10 +19,10 @@
 const MARGEN = '200px 0px';
 
 export class Reposo {
-  private readonly ojo: IntersectionObserver;
+  readonly #ojo: IntersectionObserver;
 
   constructor(bloques: HTMLElement[]) {
-    this.ojo = new IntersectionObserver(
+    this.#ojo = new IntersectionObserver(
       (entradas) => {
         for (const entrada of entradas) {
           entrada.target.classList.toggle('en-reposo', !entrada.isIntersecting);
@@ -30,11 +30,11 @@ export class Reposo {
       },
       { rootMargin: MARGEN }
     );
-    for (const bloque of bloques) this.ojo.observe(bloque);
+    for (const bloque of bloques) this.#ojo.observe(bloque);
   }
 
   destroy(): void {
-    this.ojo.disconnect();
+    this.#ojo.disconnect();
   }
 }
 

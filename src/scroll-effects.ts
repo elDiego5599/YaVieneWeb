@@ -58,7 +58,7 @@ const retirarAparicion = (el: HTMLElement): void => {
 };
 
 export class ScrollEffects {
-  private readonly observer: IntersectionObserver | null = null;
+  readonly #observer: IntersectionObserver | null = null;
 
   constructor(raiz: ParentNode = document) {
     const elementos = Array.from(raiz.querySelectorAll<HTMLElement>('.reveal'));
@@ -71,7 +71,7 @@ export class ScrollEffects {
       return;
     }
 
-    this.observer = new IntersectionObserver(
+    this.#observer = new IntersectionObserver(
       (entradas, observador) => {
         for (const entrada of entradas) {
           const el = entrada.target as HTMLElement;
@@ -113,11 +113,11 @@ export class ScrollEffects {
       { threshold: 0, rootMargin: '0px 0px -10% 0px' }
     );
 
-    for (const el of elementos) this.observer.observe(el);
+    for (const el of elementos) this.#observer.observe(el);
   }
 
   destroy(): void {
-    this.observer?.disconnect();
+    this.#observer?.disconnect();
   }
 }
 

@@ -15,30 +15,30 @@
 export const WHATSAPP = '573004438626';
 
 export class ContactForm {
-  private readonly form: HTMLFormElement;
-  private readonly boton: HTMLButtonElement;
-  private readonly exito: HTMLElement | null;
-  private readonly error: HTMLElement | null;
-  private readonly etiquetaOriginal: string;
-  private enviando = false;
+  readonly #form: HTMLFormElement;
+  readonly #boton: HTMLButtonElement;
+  readonly #exito: HTMLElement | null;
+  readonly #error: HTMLElement | null;
+  readonly #etiquetaOriginal: string;
+  #enviando = false;
 
   constructor(form: HTMLFormElement) {
-    this.form = form;
+    this.#form = form;
     const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
     if (!boton) throw new Error('El formulario no tiene botón de envío');
-    this.boton = boton;
-    this.etiquetaOriginal = boton.textContent ?? 'Enviar';
-    this.exito = document.getElementById('form-success');
-    this.error = document.getElementById('form-error');
+    this.#boton = boton;
+    this.#etiquetaOriginal = boton.textContent ?? 'Enviar';
+    this.#exito = document.getElementById('form-success');
+    this.#error = document.getElementById('form-error');
 
     form.addEventListener('submit', e => {
       e.preventDefault();
-      void this.enviar();
+      void this.#enviar();
     });
   }
 
-  private get datos(): Record<string, string> {
-    const campos = new FormData(this.form);
+  get #datos(): Record<string, string> {
+    const campos = new FormData(this.#form);
     const salida: Record<string, string> = {};
     for (const [clave, valor] of campos.entries()) {
       if (typeof valor === 'string') salida[clave] = valor.trim();
@@ -46,14 +46,14 @@ export class ContactForm {
     return salida;
   }
 
-  private async enviar(): Promise<void> {
-    if (this.enviando) return;
-    if (!this.form.reportValidity()) return;
+  async #enviar(): Promise<void> {
+    if (this.#enviando) return;
+    if (!this.#form.reportValidity()) return;
 
-    this.enviando = true;
-    this.mostrarError('');
-    this.boton.disabled = true;
-    this.boton.textContent = 'Enviando…';
+    this.#enviando = true;
+    this.#mostrarError('');
+    this.#boton.disabled = true;
+    this.#boton.textContent = 'Enviando…';
 
     try {
       // Hoy no hay `VITE_CONTACT_ENDPOINT` puesto en Vercel, así que el
@@ -71,24 +71,24 @@ export class ContactForm {
       // mismo commit; `vite.config.ts` revienta la construcción si no se
       // hace, y `tests/csp-contacto.test.ts` vigila que siga reventando.
       const endpoint = import.meta.env.VITE_CONTACT_ENDPOINT;
-      if (endpoint) await ContactForm.publicar(endpoint, this.datos);
-      else this.abrirWhatsApp();
-      this.form.reset();
-      this.mostrarExito(!endpoint);
+      if (endpoint) await ContactForm.#publicar(endpoint, this.#datos);
+      else this.#abrirWhatsApp();
+      this.#form.reset();
+      this.#mostrarExito(!endpoint);
     } catch {
-      this.mostrarError(
+      this.#mostrarError(
         'No pudimos enviar la solicitud. Vuelve a intentarlo o escríbenos por WhatsApp.'
       );
     } finally {
       // Pase lo que pase el botón vuelve: si falló hay que poder reintentar,
       // y si funcionó puede llegar otra empresa desde el mismo navegador.
-      this.enviando = false;
-      this.boton.disabled = false;
-      this.boton.textContent = this.etiquetaOriginal;
+      this.#enviando = false;
+      this.#boton.disabled = false;
+      this.#boton.textContent = this.#etiquetaOriginal;
     }
   }
 
-  private static async publicar(endpoint: string, datos: Record<string, string>): Promise<void> {
+  static async #publicar(endpoint: string, datos: Record<string, string>): Promise<void> {
     const respuesta = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -98,8 +98,8 @@ export class ContactForm {
   }
 
   /** Mensaje con lo que la empresa acaba de escribir, listo para enviar. */
-  private abrirWhatsApp(): void {
-    const { nombre = '', empresa = '', telefono = '' } = this.datos;
+  #abrirWhatsApp(): void {
+    const { nombre = '', empresa = '', telefono = '' } = this.#datos;
     const texto =
       `Hola, soy ${nombre} de ${empresa}. ` +
       `Quiero conectar mi flota a Ya Viene. Mi teléfono es ${telefono}.`;
@@ -133,28 +133,28 @@ export class ContactForm {
    * recibida» sería mentirle sobre el único paso que falta, así que cada
    * camino cuenta lo que de verdad pasó.
    */
-  private mostrarExito(porWhatsApp: boolean): void {
-    if (!this.exito) return;
+  #mostrarExito(porWhatsApp: boolean): void {
+    if (!this.#exito) return;
     if (porWhatsApp) {
-      const titulo = this.exito.querySelector('[data-exito-titulo]');
-      const texto = this.exito.querySelector('[data-exito-texto]');
+      const titulo = this.#exito.querySelector('[data-exito-titulo]');
+      const texto = this.#exito.querySelector('[data-exito-texto]');
       if (titulo) titulo.textContent = 'Te abrimos WhatsApp';
       if (texto) {
         texto.textContent =
           'La conversación va con tus datos ya escritos. Dale a enviar y te respondemos por ahí.';
       }
     }
-    this.exito.hidden = false;
-    this.exito.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    this.#exito.hidden = false;
+    this.#exito.scrollIntoView({ behavior: 'smooth', block: 'center' });
     // Llevar la vista hasta el panel sólo sirve a quien mira. El foco es lo
     // que hace que un lector de pantalla lo lea entero y que el siguiente
     // tabulador salga de aquí y no del formulario que acaba de desaparecer.
-    this.exito.focus({ preventScroll: true });
+    this.#exito.focus({ preventScroll: true });
   }
 
-  private mostrarError(mensaje: string): void {
-    if (!this.error) return;
-    this.error.textContent = mensaje;
-    this.error.hidden = mensaje === '';
+  #mostrarError(mensaje: string): void {
+    if (!this.#error) return;
+    this.#error.textContent = mensaje;
+    this.#error.hidden = mensaje === '';
   }
 }
