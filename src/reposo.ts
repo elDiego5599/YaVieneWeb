@@ -32,10 +32,6 @@ export class Reposo {
     );
     for (const bloque of bloques) this.#ojo.observe(bloque);
   }
-
-  destroy(): void {
-    this.#ojo.disconnect();
-  }
 }
 
 /**

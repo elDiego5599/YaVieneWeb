@@ -212,11 +212,6 @@ export class Problema {
     if (!sinMovimiento()) this.#esperarAQueAsome();
   }
 
-  destroy(): void {
-    this.#parar();
-    this.#cortarCeremonia();
-  }
-
   /**
    * El observador no se apaga después del primer aviso: la cuenta atrás
    * arranca cada vez que la sección se pone delante y se deshace cuando

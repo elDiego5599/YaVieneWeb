@@ -115,10 +115,6 @@ export class ScrollEffects {
 
     for (const el of elementos) this.#observer.observe(el);
   }
-
-  destroy(): void {
-    this.#observer?.disconnect();
-  }
 }
 
 /**

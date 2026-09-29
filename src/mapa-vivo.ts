@@ -225,16 +225,6 @@ export class MapaVivo {
     this.#vigia.observe(raiz);
   }
 
-  destroy(): void {
-    window.removeEventListener('resize', this.#alRedimensionar);
-    this.#vigia?.disconnect();
-    this.#vigia = null;
-    if (this.#cuadro) cancelAnimationFrame(this.#cuadro);
-    this.#cuadro = 0;
-    cancelAnimationFrame(this.#medida);
-    this.#medida = 0;
-  }
-
   /* ---------- Piezas ---------- */
 
   static #hacerBus(): SVGGElement {
