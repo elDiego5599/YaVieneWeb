@@ -76,65 +76,65 @@ interface Bus {
 }
 
 export class MapaVivo {
-  private readonly raiz: HTMLElement;
-  private readonly svg: SVGSVGElement;
-  private readonly lienzo: HTMLElement;
-  private readonly lista: HTMLElement;
-  private readonly aviso: HTMLElement;
-  private readonly avisoTitulo: HTMLElement;
-  private readonly lectura: HTMLElement;
-  private readonly lecturaBus: HTMLElement;
-  private readonly lecturaMetros: HTMLElement;
-  private readonly lecturaPie: HTMLElement;
+  readonly #raiz: HTMLElement;
+  readonly #svg: SVGSVGElement;
+  readonly #lienzo: HTMLElement;
+  readonly #lista: HTMLElement;
+  readonly #aviso: HTMLElement;
+  readonly #avisoTitulo: HTMLElement;
+  readonly #lectura: HTMLElement;
+  readonly #lecturaBus: HTMLElement;
+  readonly #lecturaMetros: HTMLElement;
+  readonly #lecturaPie: HTMLElement;
   /** Lo que se le dice a un lector de pantalla cuando el punto se mueve. */
-  private readonly voz: HTMLElement;
+  readonly #voz: HTMLElement;
 
-  private readonly casing: SVGPathElement;
-  private readonly activa: SVGPathElement;
-  private readonly terminales: SVGGElement;
-  private readonly radio: SVGCircleElement;
-  private readonly pin: SVGGElement;
-  private readonly buses: Bus[] = [];
+  readonly #casing: SVGPathElement;
+  readonly #activa: SVGPathElement;
+  readonly #terminales: SVGGElement;
+  readonly #radio: SVGCircleElement;
+  readonly #pin: SVGGElement;
+  readonly #buses: Bus[] = [];
 
-  private ruta: RutaLanding;
-  private largo = 0;
-  private unidadesPorPx = 1;
-  private pinPunto: Punto = { x: 0, y: 0 };
+  #ruta: RutaLanding;
+  #largo = 0;
+  #unidadesPorPx = 1;
+  #pinPunto: Punto = { x: 0, y: 0 };
   /** El punto del recorrido más cercano al pin: desde ahí llegan los buses. */
-  private pinT = 0;
+  #pinT = 0;
   /** Lo que separa el punto de espera del recorrido, en metros. */
-  private aparte = 0;
-  private avisado = false;
-  private cuadro = 0;
-  private ultimo = 0;
-  private vigia: IntersectionObserver | null = null;
+  #aparte = 0;
+  #avisado = false;
+  #cuadro = 0;
+  #ultimo = 0;
+  #vigia: IntersectionObserver | null = null;
 
-  private readonly alRedimensionar = (): void => this.medir();
+  readonly #alRedimensionar = (): void => this.#medir();
 
   constructor(raiz: HTMLElement) {
-    this.raiz = raiz;
-    this.svg = req<SVGSVGElement>(raiz, '[data-mapa-svg]');
-    this.lienzo = req<HTMLElement>(raiz, '[data-mapa-lienzo]');
-    this.lista = req<HTMLElement>(raiz, '[data-mapa-rutas]');
-    this.aviso = req<HTMLElement>(raiz, '[data-mapa-aviso]');
-    this.avisoTitulo = req<HTMLElement>(raiz, '[data-mapa-aviso-titulo]');
-    this.lectura = req<HTMLElement>(raiz, '[data-mapa-lectura]');
-    this.lecturaBus = req<HTMLElement>(raiz, '[data-mapa-bus]');
-    this.lecturaMetros = req<HTMLElement>(raiz, '[data-mapa-metros]');
-    this.lecturaPie = req<HTMLElement>(raiz, '[data-mapa-lectura-pie]');
-    this.voz = req<HTMLElement>(raiz, '[data-mapa-voz]');
+    this.#raiz = raiz;
+    this.#svg = req<SVGSVGElement>(raiz, '[data-mapa-svg]');
+    this.#lienzo = req<HTMLElement>(raiz, '[data-mapa-lienzo]');
+    this.#lista = req<HTMLElement>(raiz, '[data-mapa-rutas]');
+    this.#aviso = req<HTMLElement>(raiz, '[data-mapa-aviso]');
+    this.#avisoTitulo = req<HTMLElement>(raiz, '[data-mapa-aviso-titulo]');
+    this.#lectura = req<HTMLElement>(raiz, '[data-mapa-lectura]');
+    this.#lecturaBus = req<HTMLElement>(raiz, '[data-mapa-bus]');
+    this.#lecturaMetros = req<HTMLElement>(raiz, '[data-mapa-metros]');
+    this.#lecturaPie = req<HTMLElement>(raiz, '[data-mapa-lectura-pie]');
+    this.#voz = req<HTMLElement>(raiz, '[data-mapa-voz]');
 
     // La C16 Calle 72 Uninorte es la que abre el resto de la página.
-    this.ruta = YV_RUTAS.rutas.find(r => r.id === 'R-106') ?? YV_RUTAS.rutas[0];
+    this.#ruta = YV_RUTAS.rutas.find(r => r.id === 'R-106') ?? YV_RUTAS.rutas[0];
 
     // La ciudad entera y sin recortar: las seis rutas van de Granabastos al
     // norte, y cualquier recorte se come una terminal. Por eso el lienzo es
     // `YV_RUTAS.ciudad` y no el mosaico de los teléfonos, que es la
     // pantalla del pin y dejaba fuera buses, pin y media ruta.
     const [vx, vy, w, h] = YV_RUTAS.ciudad.viewBox;
-    this.svg.replaceChildren();
-    this.svg.setAttribute('viewBox', `${vx} ${vy} ${w} ${h}`);
-    this.svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    this.#svg.replaceChildren();
+    this.#svg.setAttribute('viewBox', `${vx} ${vy} ${w} ${h}`);
+    this.#svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
     const defs = nuevo('defs');
     defs.innerHTML = `
@@ -149,7 +149,7 @@ export class MapaVivo {
         <stop offset="0%" stop-color="#4ADE80"/>
         <stop offset="100%" stop-color="#059669"/>
       </linearGradient>`;
-    this.svg.appendChild(defs);
+    this.#svg.appendChild(defs);
 
     const img = nuevo('image');
     img.setAttribute('href', YV_RUTAS.ciudad.mapa.src);
@@ -158,69 +158,69 @@ export class MapaVivo {
     img.setAttribute('y', String(vy));
     img.setAttribute('width', String(w));
     img.setAttribute('height', String(h));
-    this.svg.appendChild(img);
+    this.#svg.appendChild(img);
 
-    this.radio = nuevo('circle');
-    this.radio.setAttribute('class', 'mv-radio');
-    this.svg.appendChild(this.radio);
+    this.#radio = nuevo('circle');
+    this.#radio.setAttribute('class', 'mv-radio');
+    this.#svg.appendChild(this.#radio);
 
-    this.casing = nuevo('path');
-    this.casing.setAttribute('class', 'mv-casing');
-    this.svg.appendChild(this.casing);
+    this.#casing = nuevo('path');
+    this.#casing.setAttribute('class', 'mv-casing');
+    this.#svg.appendChild(this.#casing);
 
-    this.activa = nuevo('path');
-    this.activa.setAttribute('class', 'mv-activa');
-    this.svg.appendChild(this.activa);
+    this.#activa = nuevo('path');
+    this.#activa.setAttribute('class', 'mv-activa');
+    this.#svg.appendChild(this.#activa);
 
-    this.terminales = nuevo('g');
-    this.terminales.setAttribute('class', 'mv-terminales');
-    this.svg.appendChild(this.terminales);
+    this.#terminales = nuevo('g');
+    this.#terminales.setAttribute('class', 'mv-terminales');
+    this.#svg.appendChild(this.#terminales);
 
-    this.pin = MapaVivo.hacerPin();
-    this.svg.appendChild(this.pin);
+    this.#pin = MapaVivo.#hacerPin();
+    this.#svg.appendChild(this.#pin);
 
     // Los buses van encima del pin: el pin es una marca fija y lo que hay
     // que ver moverse es el bus.
     for (const placa of BUSES) {
-      const nodo = MapaVivo.hacerBus();
-      this.svg.appendChild(nodo);
-      this.buses.push({ placa, nodo, t: 0, metros: Infinity });
+      const nodo = MapaVivo.#hacerBus();
+      this.#svg.appendChild(nodo);
+      this.#buses.push({ placa, nodo, t: 0, metros: Infinity });
     }
 
-    this.pintarLista();
-    this.setRuta(this.ruta.id);
-    this.medir();
+    this.#pintarLista();
+    this.#setRuta(this.#ruta.id);
+    this.#medir();
 
-    this.svg.addEventListener('pointerdown', e => this.alTocar(e));
-    this.svg.addEventListener('keydown', e => this.alTeclado(e));
-    window.addEventListener('resize', this.alRedimensionar, { passive: true });
+    this.#svg.addEventListener('pointerdown', e => this.#alTocar(e));
+    this.#svg.addEventListener('keydown', e => this.#alTeclado(e));
+    window.addEventListener('resize', this.#alRedimensionar, { passive: true });
 
     // Sin animaciones el mapa se queda como una foto: ruta, punto y buses
     // en su sitio, que es lo que la sección tiene que decir.
     if (sinMovimiento()) {
-      this.dibujarBuses();
-      this.actualizarLectura();
+      this.#dibujarBuses();
+      this.#actualizarLectura();
       return;
     }
 
-    this.vigia = new IntersectionObserver(
-      ([entrada]) => this.correr(entrada?.isIntersecting ?? false),
+    this.#vigia = new IntersectionObserver(
+      ([entrada]) => this.#correr(entrada?.isIntersecting ?? false),
       { threshold: 0.12 }
     );
-    this.vigia.observe(raiz);
+    this.#vigia.observe(raiz);
   }
 
   destroy(): void {
-    window.removeEventListener('resize', this.alRedimensionar);
-    this.vigia?.disconnect();
-    this.vigia = null;
-    if (this.cuadro) cancelAnimationFrame(this.cuadro);
-    this.cuadro = 0;
+    window.removeEventListener('resize', this.#alRedimensionar);
+    this.#vigia?.disconnect();
+    this.#vigia = null;
+    if (this.#cuadro) cancelAnimationFrame(this.#cuadro);
+    this.#cuadro = 0;
   }
 
   /* ---------- Piezas ---------- */
 
-  private static hacerBus(): SVGGElement {
+  static #hacerBus(): SVGGElement {
     const g = nuevo('g');
     g.setAttribute('class', 'mv-bus');
     g.innerHTML = `
@@ -232,7 +232,7 @@ export class MapaVivo {
     return g;
   }
 
-  private static hacerPin(): SVGGElement {
+  static #hacerPin(): SVGGElement {
     const g = nuevo('g');
     g.setAttribute('class', 'mv-pin');
     g.innerHTML = `
@@ -245,11 +245,11 @@ export class MapaVivo {
   }
 
   /** El riel de rutas: las seis de rutas.json, con sus terminales y su largo. */
-  private pintarLista(): void {
+  #pintarLista(): void {
     const marco = document.createDocumentFragment();
     YV_RUTAS.rutas.forEach((ruta, i) => {
       const ficha = fichaDeRuta(ruta);
-      ficha.setAttribute('aria-pressed', String(ruta.id === this.ruta.id));
+      ficha.setAttribute('aria-pressed', String(ruta.id === this.#ruta.id));
       /*
         Entran por turnos al bajar, y el turno se cuenta por columna —de
         ahí el resto de dos, que son las columnas del riel—: con el
@@ -258,25 +258,25 @@ export class MapaVivo {
       */
       ficha.classList.add('reveal');
       ficha.dataset.revealDelay = String((i % 2) * 70);
-      ficha.addEventListener('click', () => this.setRuta(ruta.id));
+      ficha.addEventListener('click', () => this.#setRuta(ruta.id));
       marco.appendChild(ficha);
     });
-    this.lista.replaceChildren(marco);
+    this.#lista.replaceChildren(marco);
   }
 
   /* ---------- Escala ---------- */
 
-  private medir(): void {
-    const caja = this.lienzo.getBoundingClientRect();
+  #medir(): void {
+    const caja = this.#lienzo.getBoundingClientRect();
     const [, , w, h] = YV_RUTAS.ciudad.viewBox;
     if (caja.width > 0 && caja.height > 0) {
       // Con `meet` manda el lado que menos aumento admite.
-      this.unidadesPorPx = Math.max(w / caja.width, h / caja.height);
+      this.#unidadesPorPx = Math.max(w / caja.width, h / caja.height);
     }
-    this.pin.setAttribute('data-escala', String((PIN_PX * this.unidadesPorPx) / PIN_ALTO));
-    this.dibujarPin();
-    this.dibujarBuses();
-    this.dibujarTerminales();
+    this.#pin.setAttribute('data-escala', String((PIN_PX * this.#unidadesPorPx) / PIN_ALTO));
+    this.#dibujarPin();
+    this.#dibujarBuses();
+    this.#dibujarTerminales();
   }
 
   /**
@@ -284,24 +284,24 @@ export class MapaVivo {
    * trae el propio mosaico; deducirla del `km` de la ruta daba un 5 % de
    * más, porque el kilometraje declarado no es lo que mide la polilínea.
    */
-  private get metrosPorUnidad(): number {
+  get #metrosPorUnidad(): number {
     return YV_RUTAS.metrosPorUnidad;
   }
 
   /** Lo que mide el recorrido dibujado, en metros, con esa misma escala. */
-  private get metrosDeRuta(): number {
-    return this.largo * this.metrosPorUnidad;
+  get #metrosDeRuta(): number {
+    return this.#largo * this.#metrosPorUnidad;
   }
 
-  private punto(t: number): Punto {
+  #punto(t: number): Punto {
     const acotado = t < 0 ? 0 : t > 1 ? 1 : t;
-    return this.activa.getPointAtLength(acotado * this.largo);
+    return this.#activa.getPointAtLength(acotado * this.#largo);
   }
 
-  private rumbo(t: number): number {
-    const paso = Math.min(0.004, 12 / Math.max(1, this.largo));
-    const a = this.punto(t);
-    const b = this.punto(Math.min(1, t + paso));
+  #rumbo(t: number): number {
+    const paso = Math.min(0.004, 12 / Math.max(1, this.#largo));
+    const a = this.#punto(t);
+    const b = this.#punto(Math.min(1, t + paso));
     const dx = b.x - a.x;
     const dy = b.y - a.y;
     if (dx === 0 && dy === 0) return 0;
@@ -310,45 +310,45 @@ export class MapaVivo {
 
   /* ---------- Ruta y punto de espera ---------- */
 
-  private setRuta(id: string): void {
+  #setRuta(id: string): void {
     const ruta = YV_RUTAS.rutas.find(r => r.id === id);
     if (!ruta) return;
-    this.ruta = ruta;
+    this.#ruta = ruta;
 
-    this.casing.setAttribute('d', ruta.d);
-    this.activa.setAttribute('d', ruta.d);
-    this.largo = this.activa.getTotalLength();
+    this.#casing.setAttribute('d', ruta.d);
+    this.#activa.setAttribute('d', ruta.d);
+    this.#largo = this.#activa.getTotalLength();
 
-    for (const boton of this.lista.querySelectorAll<HTMLElement>('[data-ruta]')) {
+    for (const boton of this.#lista.querySelectorAll<HTMLElement>('[data-ruta]')) {
       boton.setAttribute('aria-pressed', String(boton.dataset.ruta === id));
     }
 
-    this.dibujarTerminales();
+    this.#dibujarTerminales();
     // Al cambiar de ruta el punto de espera se queda donde estaba, pero su
     // referencia sobre el recorrido cambia: hay que rehacerla.
-    const primera = this.pinPunto.x === 0 && this.pinPunto.y === 0;
-    this.ponerPin(primera ? this.punto(this.tCentral()) : this.pinPunto);
+    const primera = this.#pinPunto.x === 0 && this.#pinPunto.y === 0;
+    this.#ponerPin(primera ? this.#punto(this.#tCentral()) : this.#pinPunto);
   }
 
-  private dibujarTerminales(): void {
-    this.terminales.replaceChildren();
-    for (const [x, y] of this.ruta.extremos) {
+  #dibujarTerminales(): void {
+    this.#terminales.replaceChildren();
+    for (const [x, y] of this.#ruta.extremos) {
       const c = nuevo('circle');
       c.setAttribute('cx', String(x));
       c.setAttribute('cy', String(y));
-      c.setAttribute('r', (7 * this.unidadesPorPx).toFixed(1));
-      this.terminales.appendChild(c);
+      c.setAttribute('r', (7 * this.#unidadesPorPx).toFixed(1));
+      this.#terminales.appendChild(c);
     }
   }
 
   /** El toque del visitante, pasado del espacio de la pantalla al del SVG. */
-  private alTocar(evento: PointerEvent): void {
-    const ctm = this.svg.getScreenCTM();
+  #alTocar(evento: PointerEvent): void {
+    const ctm = this.#svg.getScreenCTM();
     if (!ctm) return;
     const p = new DOMPoint(evento.clientX, evento.clientY).matrixTransform(ctm.inverse());
-    this.ponerPin({ x: p.x, y: p.y });
-    this.raiz.classList.add('es-tocado');
-    this.anunciarPunto();
+    this.#ponerPin({ x: p.x, y: p.y });
+    this.#raiz.classList.add('es-tocado');
+    this.#anunciarPunto();
   }
 
   /**
@@ -364,16 +364,16 @@ export class MapaVivo {
    * el principio. Puesto sobre el trazado el punto queda a cero de la ruta,
    * que es justo el caso en el que el aviso puede saltar.
    */
-  private alTeclado(evento: KeyboardEvent): void {
+  #alTeclado(evento: KeyboardEvent): void {
     const PASO = 0.02;
     let t: number;
-    if (evento.key === 'ArrowRight' || evento.key === 'ArrowUp') t = this.pinT + PASO;
-    else if (evento.key === 'ArrowLeft' || evento.key === 'ArrowDown') t = this.pinT - PASO;
+    if (evento.key === 'ArrowRight' || evento.key === 'ArrowUp') t = this.#pinT + PASO;
+    else if (evento.key === 'ArrowLeft' || evento.key === 'ArrowDown') t = this.#pinT - PASO;
     else return;
     evento.preventDefault();
-    this.ponerPin(this.punto((t + 1) % 1));
-    this.raiz.classList.add('es-tocado');
-    this.anunciarPunto();
+    this.#ponerPin(this.#punto((t + 1) % 1));
+    this.#raiz.classList.add('es-tocado');
+    this.#anunciarPunto();
   }
 
   /**
@@ -382,23 +382,23 @@ export class MapaVivo {
    * la distancia sesenta veces por segundo y ponerla ahí sería un lector de
    * pantalla hablando sin parar.
    */
-  private anunciarPunto(): void {
-    this.voz.textContent =
-      `Punto de espera movido. ${this.lecturaBus.textContent} `
-      + `a ${this.lecturaMetros.textContent}, ${this.lecturaPie.textContent}.`;
+  #anunciarPunto(): void {
+    this.#voz.textContent =
+      `Punto de espera movido. ${this.#lecturaBus.textContent} `
+      + `a ${this.#lecturaMetros.textContent}, ${this.#lecturaPie.textContent}.`;
   }
 
-  private ponerPin(destino: Punto): void {
-    this.pinPunto = destino;
-    this.pinT = this.tMasCercano(destino);
-    const cerca = this.punto(this.pinT);
-    this.aparte =
-      Math.hypot(cerca.x - destino.x, cerca.y - destino.y) * this.metrosPorUnidad;
-    this.avisado = false;
-    this.apagarAviso();
-    this.dibujarPin();
-    this.reponerBuses();
-    this.actualizarLectura();
+  #ponerPin(destino: Punto): void {
+    this.#pinPunto = destino;
+    this.#pinT = this.#tMasCercano(destino);
+    const cerca = this.#punto(this.#pinT);
+    this.#aparte =
+      Math.hypot(cerca.x - destino.x, cerca.y - destino.y) * this.#metrosPorUnidad;
+    this.#avisado = false;
+    this.#apagarAviso();
+    this.#dibujarPin();
+    this.#reponerBuses();
+    this.#actualizarLectura();
   }
 
   /**
@@ -406,18 +406,18 @@ export class MapaVivo {
    * el pin la primera vez: puesto en un extremo se pega al borde de la
    * tarjeta y no se entiende que se puede mover.
    */
-  private tCentral(): number {
+  #tCentral(): number {
     const [vx, vy, w, h] = YV_RUTAS.ciudad.viewBox;
-    return this.tMasCercano({ x: vx + w / 2, y: vy + h / 2 });
+    return this.#tMasCercano({ x: vx + w / 2, y: vy + h / 2 });
   }
 
   /** El punto del recorrido que queda más cerca del punto de espera. */
-  private tMasCercano(p: Punto): number {
+  #tMasCercano(p: Punto): number {
     let mejor = 0;
     let minimo = Infinity;
     for (let i = 0; i <= MUESTRAS; i += 1) {
       const t = i / MUESTRAS;
-      const q = this.punto(t);
+      const q = this.#punto(t);
       const d = (q.x - p.x) ** 2 + (q.y - p.y) ** 2;
       if (d < minimo) {
         minimo = d;
@@ -427,133 +427,133 @@ export class MapaVivo {
     return mejor;
   }
 
-  private dibujarPin(): void {
-    const escala = (PIN_PX * this.unidadesPorPx) / PIN_ALTO;
-    this.pin.setAttribute(
+  #dibujarPin(): void {
+    const escala = (PIN_PX * this.#unidadesPorPx) / PIN_ALTO;
+    this.#pin.setAttribute(
       'transform',
-      `translate(${this.pinPunto.x.toFixed(1)} ${this.pinPunto.y.toFixed(1)}) scale(${escala.toFixed(4)})`
+      `translate(${this.#pinPunto.x.toFixed(1)} ${this.#pinPunto.y.toFixed(1)}) scale(${escala.toFixed(4)})`
     );
-    const mpu = this.metrosPorUnidad;
+    const mpu = this.#metrosPorUnidad;
     if (!mpu) return;
-    this.radio.setAttribute('cx', this.pinPunto.x.toFixed(1));
-    this.radio.setAttribute('cy', this.pinPunto.y.toFixed(1));
-    this.radio.setAttribute('r', (RADIO_AVISO_M / mpu).toFixed(1));
+    this.#radio.setAttribute('cx', this.#pinPunto.x.toFixed(1));
+    this.#radio.setAttribute('cy', this.#pinPunto.y.toFixed(1));
+    this.#radio.setAttribute('r', (RADIO_AVISO_M / mpu).toFixed(1));
   }
 
   /** Los buses vuelven a nacer por detrás del punto, sobre el recorrido. */
-  private reponerBuses(): void {
-    const metros = this.metrosDeRuta;
-    this.buses.forEach((bus, i) => {
+  #reponerBuses(): void {
+    const metros = this.#metrosDeRuta;
+    this.#buses.forEach((bus, i) => {
       const atras = (SALIDA_M[i] ?? 2000) / metros;
-      bus.t = (this.pinT - atras + 1) % 1;
+      bus.t = (this.#pinT - atras + 1) % 1;
     });
-    this.dibujarBuses();
+    this.#dibujarBuses();
   }
 
-  private dibujarBuses(): void {
-    if (!this.largo) return;
-    const escala = (BUS_PX * this.unidadesPorPx) / BUS_ALTO;
-    const mpu = this.metrosPorUnidad;
-    for (const bus of this.buses) {
-      const p = this.punto(bus.t);
+  #dibujarBuses(): void {
+    if (!this.#largo) return;
+    const escala = (BUS_PX * this.#unidadesPorPx) / BUS_ALTO;
+    const mpu = this.#metrosPorUnidad;
+    for (const bus of this.#buses) {
+      const p = this.#punto(bus.t);
       bus.nodo.setAttribute(
         'transform',
-        `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${this.rumbo(bus.t).toFixed(1)}) scale(${escala.toFixed(4)})`
+        `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${this.#rumbo(bus.t).toFixed(1)}) scale(${escala.toFixed(4)})`
       );
-      const dx = p.x - this.pinPunto.x;
-      const dy = p.y - this.pinPunto.y;
+      const dx = p.x - this.#pinPunto.x;
+      const dy = p.y - this.#pinPunto.y;
       bus.metros = Math.sqrt(dx * dx + dy * dy) * mpu;
     }
   }
 
   /* ---------- Movimiento ---------- */
 
-  private correr(encendido: boolean): void {
-    if (encendido === Boolean(this.cuadro)) return;
+  #correr(encendido: boolean): void {
+    if (encendido === Boolean(this.#cuadro)) return;
     if (!encendido) {
-      cancelAnimationFrame(this.cuadro);
-      this.cuadro = 0;
+      cancelAnimationFrame(this.#cuadro);
+      this.#cuadro = 0;
       return;
     }
-    this.ultimo = performance.now();
+    this.#ultimo = performance.now();
     const paso = (ahora: number): void => {
-      const dt = Math.min(0.1, (ahora - this.ultimo) / 1000);
-      this.ultimo = ahora;
-      this.avanzar(dt);
-      this.cuadro = requestAnimationFrame(paso);
+      const dt = Math.min(0.1, (ahora - this.#ultimo) / 1000);
+      this.#ultimo = ahora;
+      this.#avanzar(dt);
+      this.#cuadro = requestAnimationFrame(paso);
     };
-    this.cuadro = requestAnimationFrame(paso);
+    this.#cuadro = requestAnimationFrame(paso);
   }
 
-  private avanzar(dt: number): void {
-    const metros = this.metrosDeRuta;
+  #avanzar(dt: number): void {
+    const metros = this.#metrosDeRuta;
     if (!metros) return;
     const salto = (RITMO_M_S * dt) / metros;
 
     let vuelta = false;
-    for (const bus of this.buses) {
+    for (const bus of this.#buses) {
       bus.t += salto;
       if (bus.t > 1) {
         bus.t -= 1;
         vuelta = true;
       }
     }
-    this.dibujarBuses();
+    this.#dibujarBuses();
 
     // Cuando el último ya dejó atrás el punto de espera, los dos vuelven a
     // nacer: la escena se repite sola sin que nadie tenga que tocar nada.
-    const lejos = this.buses.every(b => b.metros > RADIO_AVISO_M * 2.4);
-    const pasados = this.buses.every(b => this.pasoDeLargo(b));
+    const lejos = this.#buses.every(b => b.metros > RADIO_AVISO_M * 2.4);
+    const pasados = this.#buses.every(b => this.#pasoDeLargo(b));
     if (vuelta || (lejos && pasados)) {
-      this.reponerBuses();
-      this.avisado = false;
-      this.apagarAviso();
+      this.#reponerBuses();
+      this.#avisado = false;
+      this.#apagarAviso();
     }
 
-    this.actualizarLectura();
+    this.#actualizarLectura();
   }
 
   /** Verdadero si el bus ya cruzó el punto de espera en su recorrido. */
-  private pasoDeLargo(bus: Bus): boolean {
-    const delta = (bus.t - this.pinT + 1) % 1;
+  #pasoDeLargo(bus: Bus): boolean {
+    const delta = (bus.t - this.#pinT + 1) % 1;
     return delta > 0 && delta < 0.5;
   }
 
-  private actualizarLectura(): void {
-    const cerca = this.buses.reduce((a, b) => (b.metros < a.metros ? b : a));
-    this.lecturaBus.textContent = `Bus ${cerca.placa}`;
-    this.lecturaMetros.textContent = legible(cerca.metros);
+  #actualizarLectura(): void {
+    const cerca = this.#buses.reduce((a, b) => (b.metros < a.metros ? b : a));
+    this.#lecturaBus.textContent = `Bus ${cerca.placa}`;
+    this.#lecturaMetros.textContent = legible(cerca.metros);
     const dentro = cerca.metros <= RADIO_AVISO_M;
-    this.lectura.classList.toggle('es-cerca', dentro);
+    this.#lectura.classList.toggle('es-cerca', dentro);
 
     // Si el recorrido ni siquiera roza el kilómetro del punto marcado, el
     // aviso no va a saltar nunca: más vale decirlo que dejar al que mira
     // esperando un número que no va a bajar.
-    const fuera = this.aparte > RADIO_AVISO_M;
-    this.lectura.classList.toggle('es-fuera', fuera);
-    this.lecturaPie.textContent = fuera
-      ? `esta ruta no pasa a menos de ${legible(this.aparte)} de tu punto`
+    const fuera = this.#aparte > RADIO_AVISO_M;
+    this.#lectura.classList.toggle('es-fuera', fuera);
+    this.#lecturaPie.textContent = fuera
+      ? `esta ruta no pasa a menos de ${legible(this.#aparte)} de tu punto`
       : 'en línea recta hasta tu punto';
 
-    if (dentro && !this.avisado) {
-      this.avisado = true;
+    if (dentro && !this.#avisado) {
+      this.#avisado = true;
       /*
         Una línea, la misma en los tres sitios donde la página enseña un
         aviso: aquí, en el teléfono del hero y en el paso 3. La distancia
         exacta no se repite en la tarjeta porque ya está a su lado, en el
         número grande de la lectura y en el círculo del mapa.
       */
-      this.avisoTitulo.textContent = 'Tu bus está cerca de ti';
-      this.aviso.classList.add('is-on');
+      this.#avisoTitulo.textContent = 'Tu bus está cerca de ti';
+      this.#aviso.classList.add('is-on');
       // La banda de arriba es una sola: mientras hay aviso, la pista de
       // toque se retira. Nunca se ven las dos, así que no reserva hueco.
-      this.raiz.classList.add('es-avisado');
+      this.#raiz.classList.add('es-avisado');
     }
   }
 
-  private apagarAviso(): void {
-    this.aviso.classList.remove('is-on');
-    this.raiz.classList.remove('es-avisado');
+  #apagarAviso(): void {
+    this.#aviso.classList.remove('is-on');
+    this.#raiz.classList.remove('es-avisado');
   }
 }
 
