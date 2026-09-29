@@ -1680,6 +1680,22 @@
   transition-duration: 0.09s;
 }
 
+/* La autorización del formulario (Ley 1581): letra de nota, en el gris
+   de los textos de apoyo y con el enlace subrayado para que se lea como
+   enlace sin sumar otro color. */
+.form-autoriza {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.form-autoriza a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Un envío que falla lo dice donde el usuario está mirando: justo encima
    del botón que acaba de tocar. */
 .form-error {

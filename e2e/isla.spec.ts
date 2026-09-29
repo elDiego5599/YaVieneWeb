@@ -23,6 +23,24 @@ for (const ruta of ['/', '/empresas.html', '/terminos.html']) {
     await expect(boton).toHaveAttribute('aria-expanded', 'true');
     await expect(enlace).toBeVisible();
 
+    /*
+      Abrirse es una transición: la píldora crece y el botón viaja con
+      ella, con retrasos de hasta 0,12 s en los enlaces. Playwright mide
+      el botón dos cuadros, lo da por quieto y toca donde estaba; con 5
+      hilos, 1 de cada 75 corridas el toque caía en el fondo de la isla
+      y no cerraba nada. Una persona toca donde ve el botón: se espera a
+      que la isla termine de moverse, como haría ella.
+    */
+    // `allSettled` y en vuelta: una transición que otra reemplaza se
+    // cancela y su `finished` se rechaza, y la que la reemplaza también
+    // hay que esperarla.
+    await isla.evaluate(async (n) => {
+      for (;;) {
+        const vivas = n.getAnimations({ subtree: true }).filter((a) => a.playState === 'running');
+        if (vivas.length === 0) return;
+        await Promise.allSettled(vivas.map((a) => a.finished));
+      }
+    });
     await boton.tap();
     await expect(isla, 'el segundo toque no la cerró').not.toHaveClass(/\bis-open\b/);
     await expect(boton).toHaveAttribute('aria-expanded', 'false');

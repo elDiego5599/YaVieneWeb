@@ -194,3 +194,50 @@ describe('la privacidad dice qué pasa con la app cerrada', () => {
     expect(leer('privacidad.html')).toContain('Actualizado el 29 de septiembre de 2026');
   });
 });
+
+/**
+ * Ley 1581 de 2012 y Decreto 1377 de 2013: el formulario de empresas recoge
+ * datos personales (nombre, empresa y teléfono de quien escribe), así que la
+ * política dice quién responde por ellos, para qué se usan, qué derechos hay
+ * y en qué plazos se atienden, y el formulario pide la autorización justo
+ * donde se dan los datos, con un enlace a esa parte de la política.
+ */
+describe('el formulario de empresas cumple lo de la Ley 1581', () => {
+  const texto = (pagina: string): string =>
+    leer(pagina)
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/\s+/g, ' ');
+
+  it('la privacidad dice qué se recoge y para qué', () => {
+    const html = texto('privacidad.html');
+    expect(html).toContain('<h2 id="empresas">Si nos escribes como empresa</h2>');
+    expect(html).toContain('pide tu nombre, el de tu empresa y un teléfono');
+    expect(html).toContain('Esta web no los guarda');
+  });
+
+  it('nombra al responsable con domicilio, correo y teléfono, sin cédula', () => {
+    const html = texto('privacidad.html');
+    expect(html).toContain('Diego Alejandro Angarita Silvera, en Barranquilla, Colombia');
+    expect(html).toContain('href="mailto:diegoangarita930@gmail.com"');
+    expect(html).toContain('WhatsApp 300 443 8626');
+    expect(html).not.toMatch(/c[ée]dula|\b\d{8,10}\b(?![^<]*@)/i);
+  });
+
+  it('cuenta los derechos y los plazos de la ley', () => {
+    const html = texto('privacidad.html');
+    expect(html).toContain('Ley 1581 de 2012');
+    expect(html).toMatch(/corrijamos o los borremos y retirar el permiso/);
+    expect(html).toContain('máximo 10 días hábiles');
+    expect(html).toContain('en máximo 15');
+    expect(html).toContain('Superintendencia de Industria y Comercio');
+  });
+
+  it('el formulario pide la autorización y enlaza a la política', () => {
+    const form = texto('empresas.html').match(/<form id="contact-form"[\s\S]*?<\/form>/)?.[0] ?? '';
+    expect(form, 'ya no está el formulario').toContain('form-submit-btn');
+    const nota = form.match(/<p class="form-autoriza">[\s\S]*?<\/p>/)?.[0] ?? '';
+    expect(nota, 'el formulario no pide la autorización').toContain('autorizas');
+    expect(nota).toContain('href="/privacidad.html#empresas"');
+    expect(form.indexOf('form-autoriza')).toBeGreaterThan(form.indexOf('form-submit-btn'));
+  });
+});

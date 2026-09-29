@@ -89,6 +89,14 @@ test.describe('el foco de las fichas de ruta', () => {
   test('con ratón se enciende al pasar, detrás del texto', async ({ page }, info) => {
     test.skip(info.project.name !== 'escritorio', 'el foco es sólo de puntero fino');
     await page.goto('/');
+    /*
+      El `scroll-behavior: smooth` de `base.css` vuelve animado el scroll
+      con el que Playwright acerca la ficha: el ratón se posaba donde
+      estaba a media bajada y, al terminar, la ficha quedaba 440 px más
+      abajo, sin `:hover` (4 de 15 corridas con 5 hilos). Lo que se prueba
+      es el foco, no el desplazamiento suave: se apaga sólo aquí.
+    */
+    await page.addStyleTag({ content: 'html { scroll-behavior: auto !important; }' });
     const ficha = page.locator('.ruta-ficha').first();
     await ficha.scrollIntoViewIfNeeded();
 
