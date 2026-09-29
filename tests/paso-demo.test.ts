@@ -215,6 +215,9 @@ describe('1. Fija tu punto de espera', () => {
       chip: encendido(raiz, 'chip'),
       pista: !el(raiz, 'chip-sub').hidden,
     }));
+    // Sin esto, si el guion deja de enseñar «Localizando…» con el chip
+    // encendido, el bucle de abajo no afirma nada y la prueba pasa sola.
+    expect(fotos.some((f) => f.chip && f.localizando), 'ningún cuadro con el chip localizando').toBe(true);
     for (const [i, f] of fotos.entries()) {
       if (f.chip && f.localizando) expect(f.pista, `t=${i * 100} ms`).toBe(false);
     }
