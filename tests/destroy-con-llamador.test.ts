@@ -72,7 +72,10 @@ function destroys(): { donde: string; archivo: string; pos: number }[] {
   return hallados;
 }
 
-it('cada destroy() de una pieza de src/ tiene quien lo llame', () => {
+// Arma el programa entero de TypeScript: sola tarda ~2 s, pero junto a la
+// cobertura y al resto de la suite pasó de los 5 s por defecto (5,8 s el
+// 2026-09-30) y la prueba caía sin que nada estuviera mal.
+it('cada destroy() de una pieza de src/ tiene quien lo llame', { timeout: 30_000 }, () => {
   const todos = destroys();
   expect(todos.length, 'no encontró ningún destroy: la búsqueda se rompió').toBeGreaterThan(0);
   const huerfanos = todos

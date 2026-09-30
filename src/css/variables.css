@@ -56,12 +56,14 @@
   --divider: #E5E7EB;
   --app-text-primary: #0F172A;
   --app-text-secondary: #5E6B82;
+  --app-text-body: #475569;
   --app-text-disabled: #94A3B8;
   --app-hairline: rgba(20, 39, 78, 0.078);
   --app-primary-accessible: #047857;
   --app-coral-accessible: #C0392B;
   --app-warn-accessible: #A85206;
   --app-green-deep: #065F46;
+  --app-placa: #F7D117;
 
   /* Color que el mapa toma prestado de la app (ya_viene_core/app_theme.dart):
      el gris del bus que lleva rato sin reportar. La ruta ya no va en el

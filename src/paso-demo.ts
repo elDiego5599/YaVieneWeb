@@ -675,14 +675,10 @@ export class PasoDemo {
     this.#texto('eta-unit', unidad);
 
     // _urgencyColor() de eta_bottom_sheet.dart: coral bajo los 300 metros,
-    // ámbar dentro del kilómetro, verde más allá. Y el color va en los dos
-    // sitios, la barra y el número —en la app `stripColor` pinta ambos—,
-    // porque el número es el dato; teñir solo la barra dejaba el aviso a
-    // medias, con la raya verde encima de un número ámbar.
+    // ámbar dentro del kilómetro, verde más allá. Va en el número, que es
+    // el dato; la franja de encima se fue con el diseño «A» (2026-09-30).
     const cerca = m < RADIO_AVISO_M;
     const muyCerca = m < 300;
-    this.#el('eta-bar')?.classList.toggle('eta-strip--cerca', cerca && !muyCerca);
-    this.#el('eta-bar')?.classList.toggle('eta-strip--muy-cerca', muyCerca);
     this.#el('eta-value')?.classList.toggle('eta-number--cerca', cerca && !muyCerca);
     this.#el('eta-value')?.classList.toggle('eta-number--muy-cerca', muyCerca);
   }

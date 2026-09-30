@@ -532,14 +532,16 @@
 
   La sombra va aquí y no en `.map-bus`, que es quien lleva el transform:
   así sus medidas son las del propio dibujo —el mismo espacio en el que
-  map_markers.dart escribe `Offset(0, 3)` y elevación 7— y encoge con él.
-  En el nodo de fuera eran unidades del mosaico y la sombra se perdía. El
-  color es el del bus, no un gris: `baseColor.withValues(alpha: 0.45)`.
+  map_markers.dart hornea el sprite— y encoge con él. En el nodo de fuera
+  eran unidades del mosaico y la sombra se perdía. Es la de contacto de
+  allá: negro al 24 %, centrada y con σ 2,4, que en CSS se escribe 2σ =
+  4,8. La de antes, del color del bus y 3 hacia abajo, al girar con el
+  rumbo quedaba detrás como una estela (dueño, 2026-09-30).
 */
 .map-bus-art {
   transform-box: fill-box;
   transform-origin: center;
-  filter: drop-shadow(0 3px 4px rgba(232, 106, 94, 0.45));
+  filter: drop-shadow(0 0 4.8px rgba(0, 0, 0, 0.24));
   transition: transform 0.3s var(--ease-spring);
 }
 
@@ -1022,7 +1024,7 @@
   border-radius: 999px;
   background: var(--divider);
   /* 18 del relleno del asa más los 6 que la hoja de distancia pone encima
-     de su barra de color: `EdgeInsets.only(top: 14, bottom: 18)` y luego
+     de su cabecera: `EdgeInsets.only(top: 14, bottom: 18)` y luego
      `fromLTRB(24, 6, 24, 20)`. */
   margin: 0 auto calc(24 * var(--u));
 }
@@ -1372,35 +1374,61 @@
 
 /* ── Hoja de ETA ───────────────────────────────────────────────────── */
 
-.eta-strip {
-  height: calc(4 * var(--u));
-  border-radius: 999px;
-  background: var(--green);
-  transition: background-color var(--transition-smooth);
+/* La tarjeta con marco (eta_bottom_sheet.dart, `hoja-tarjeta`, prueba
+   del dueño 2026-09-30): «BUS», la placa y la distancia juntas, blancas
+   con el filo de las tarjetas del selector y sin sombra. AppRadius.card
+   (24): casi 200 de alto, con 16 se veía recta. 14 arriba y 18 abajo:
+   la unidad no trae aire propio debajo. 12 bajo el asa, donde antes
+   iban la franja de 4 y sus 18. */
+.eta-tarjeta {
+  margin-top: calc(12 * var(--u));
+  padding: calc(14 * var(--u)) 0 calc(18 * var(--u));
+  border: 1px solid var(--app-hairline);
+  border-radius: calc(24 * var(--u));
+  background: #FFFFFF;
 }
 
-/* _urgencyColor() de eta_bottom_sheet.dart: dentro del kilómetro la barra
-   pasa a ámbar, y bajo los 300 metros a coral. A los 640 del tercer
-   momento toca el ámbar. */
-.eta-strip--cerca {
-  background: var(--app-warn-accessible);
+/* La cabecera: «BUS» y la placa. Sin la franja de color que coronaba la
+   hoja: el número ya lleva la urgencia en su color. */
+.eta-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(10 * var(--u));
 }
 
-.eta-strip--muy-cerca {
-  background: var(--app-coral-accessible);
-}
-
-.eta-route {
-  margin-top: calc(18 * var(--u));
-  text-align: center;
-  /* AppTextStyles.subtitulo, como en eta_bottom_sheet.dart: «Bus B-042»
-     encabeza la tarjeta y va en negro y negrita. En la etiqueta gris de 13
-     que llevaba antes se perdía encima del número. */
-  font-size: calc(18 * var(--u));
+/* AppTextStyles.pie en 600 con 1,4 de espaciado: versalitas que rotulan
+   sin competir con la placa. */
+.eta-bus {
+  font-size: calc(12 * var(--u));
+  font-weight: 600;
   line-height: 1.3;
+  letter-spacing: calc(1.4 * var(--u));
+  color: var(--app-text-secondary);
+}
+
+/* `_Placa`: amarillo AppColors.placa, letra y filo de 1,5 en textPrimary,
+   AppRadius.xs (6) y 2×8 de relleno. La letra es `etiqueta` (13) en 700
+   con 1,5 de espaciado, en bloque como en la lámina de la calle. */
+.eta-placa {
+  padding: calc(2 * var(--u)) calc(8 * var(--u));
+  border: calc(1.5 * var(--u)) solid var(--app-text-primary);
+  border-radius: calc(6 * var(--u));
+  background: var(--app-placa);
+  font-size: calc(13 * var(--u));
   font-weight: 700;
-  letter-spacing: calc(-0.3 * var(--u));
+  line-height: 1.2;
+  letter-spacing: calc(1.5 * var(--u));
   color: var(--app-text-primary);
+}
+
+/* El filo que separa quién es de cuánto falta: 1 en AppColors.hairline,
+   de marco a marco de la tarjeta, 10 bajo la placa y 14 hasta el número
+   (que es `.eta-number`, más abajo). */
+.eta-filo {
+  margin-top: calc(10 * var(--u));
+  height: 1px;
+  background: var(--app-hairline);
 }
 
 /*
@@ -1408,12 +1436,12 @@
   el único sitio de la app donde el peso más fino tiene sentido, porque es el
   único texto lo bastante grande para sostenerlo.
 
-  Y no es navy: toma el color de la urgencia, el mismo de la barra de
-  arriba. Es el número que la app existe para dar; que cambie de color al
-  acercarse el bus es medio mensaje.
+  Y no es navy: toma el color de la urgencia. Es el número que la app
+  existe para dar; que cambie de color al acercarse el bus es medio
+  mensaje. 14 sobre él: los del filo en eta_bottom_sheet.dart.
 */
 .eta-number {
-  margin-top: calc(10 * var(--u));
+  margin-top: calc(14 * var(--u));
   text-align: center;
   font-size: calc(64 * var(--u));
   font-weight: 200;
@@ -1477,17 +1505,42 @@
   color: var(--app-text-secondary);
 }
 
-/* El detalle sólo aparece cuando la app tiene algo que decir. */
+/* El detalle sólo aparece cuando la app tiene algo que decir, y lo dice
+   en una nota (`_NotaHoja` de eta_bottom_sheet.dart): blanca sobre la
+   arena con el filo de siempre, AppRadius.lg (16), 10×12 de relleno. */
 .eta-detail {
   margin-top: calc(14 * var(--u));
-  text-align: center;
-  /* AppTextStyles.cuerpoFuerte, el mismo de la unidad. */
-  font-size: calc(15 * var(--u));
-  font-weight: 600;
-  line-height: 1.4;
-  letter-spacing: calc(-0.2 * var(--u));
-  color: var(--app-text-secondary);
-  text-wrap: balance;
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+  padding: calc(10 * var(--u)) calc(12 * var(--u));
+  border: 1px solid var(--app-hairline);
+  border-radius: calc(16 * var(--u));
+  background: #FFFFFF;
+  /* AppTextStyles.pie en textBody: letra chica que se lee a la primera. */
+  font-size: calc(12 * var(--u));
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--app-text-body);
+}
+
+/* La baldosa de 30 con el glifo de 18. La web sólo enseña la nota del
+   aviso puesto (`_Nota.aviso`): primaryTint con el glifo en
+   primaryAccessible. */
+.eta-detail-icono {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: calc(30 * var(--u));
+  height: calc(30 * var(--u));
+  border-radius: calc(8 * var(--u));
+  background: var(--green-tint);
+  color: var(--app-primary-accessible);
+}
+
+.eta-detail-icono svg {
+  width: calc(18 * var(--u));
+  height: calc(18 * var(--u));
 }
 
 .eta-detail[hidden] {

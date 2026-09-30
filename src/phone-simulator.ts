@@ -291,7 +291,8 @@ export class PhoneSimulator {
   #setDetalle(texto: string): void {
     const nodo = this.#el('eta-sub');
     if (!nodo) return;
-    nodo.textContent = texto;
+    // El texto va junto a la baldosa del ícono, no encima de ella.
+    this.#texto('eta-sub-texto', texto);
     nodo.hidden = texto === '';
     this.#ajustarAlto();
   }
@@ -340,9 +341,9 @@ export class PhoneSimulator {
     const metros = crudo < 100 ? Math.max(10, Math.round(crudo)) : Math.round(crudo / 10) * 10;
     const [valor, unidad] = metrica(metros);
 
-    // eta_bottom_sheet.dart (busTitulo): encima de la distancia va "Bus" y
-    // la placa; la ruta ya la nombra la píldora de arriba.
-    this.#texto('eta-route', `Bus ${bus.placa}`);
+    // eta_bottom_sheet.dart (`_Placa`): encima de la distancia va «BUS» y
+    // la placa en amarillo; la ruta ya la nombra la píldora de arriba.
+    this.#texto('eta-placa', bus.placa);
 
     // Con distancia en pantalla y sin aviso puesto, la app no muestra
     // detalle: el número ya lo dice todo.
@@ -352,13 +353,10 @@ export class PhoneSimulator {
     if (cifra) cifraViva(cifra, valor, metros);
     this.#texto('eta-unit', unidad);
     this.#notificacion(metros);
-    // La franja y el número llevan el mismo color: en la app los dos
-    // salen de `stripColor`, no solo la franja.
-    const urgencia = this.#colorUrgencia(metros);
-    const barra = this.#el('eta-bar');
-    if (barra) barra.style.background = urgencia;
+    // El número lleva la urgencia en su color (`colorCifra` en la app);
+    // la franja que la repetía encima ya no existe.
     const numero = this.#el('eta-value');
-    if (numero) numero.style.color = urgencia;
+    if (numero) numero.style.color = this.#colorUrgencia(metros);
   }
 
   /* ---------- Buses quietos sobre la ruta real ---------- */

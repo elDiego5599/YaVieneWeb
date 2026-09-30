@@ -715,11 +715,26 @@
                     hallazgo 12; e2e/hero-telefono.spec.ts).
                   -->
                   <div class="sheet-view" data-view="eta">
-                    <div class="eta-strip" data-el="eta-bar"></div>
-                    <div class="eta-route" data-el="eta-route"></div>
-                    <div class="eta-number" data-el="eta-value">—</div>
-                    <div class="eta-unit" data-el="eta-unit">m de ti</div>
-                    <div class="eta-detail" data-el="eta-sub" hidden></div>
+                    <!-- «BUS» y la placa amarilla, el filo y la distancia, en
+                         la tarjeta con marco: eta_bottom_sheet.dart, diseño
+                         «A» (2026-09-30). -->
+                    <div class="eta-tarjeta">
+                      <div class="eta-cabecera">
+                        <span class="eta-bus">BUS</span>
+                        <span class="eta-placa" data-el="eta-placa"></span>
+                      </div>
+                      <div class="eta-filo"></div>
+                      <div class="eta-number" data-el="eta-value">—</div>
+                      <div class="eta-unit" data-el="eta-unit">m de ti</div>
+                    </div>
+                    <div class="eta-detail" data-el="eta-sub" hidden>
+                      <span class="eta-detail-icono" aria-hidden="true">
+                        <!-- info_outline_rounded de la app: la nota del aviso puesto. -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                          stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></svg>
+                      </span>
+                      <span data-el="eta-sub-texto"></span>
+                    </div>
 
                     <!-- Un div y no un button: es el dibujo de un botón, y un
                          button real quedaría enfocable dentro de una escena
@@ -1304,11 +1319,22 @@
                       </div>
 
                       <span class="sheet-handle"></span>
-                      <div class="eta-strip eta-strip--cerca" data-el="eta-bar"></div>
-                      <div class="eta-route" data-el="eta-route">Bus B-042</div>
-                      <div class="eta-number eta-number--cerca" data-el="eta-value">640</div>
-                      <div class="eta-unit" data-el="eta-unit">m de ti</div>
-                      <div class="eta-detail" data-el="eta-sub">Puedes cambiar de aplicación; no cierres Ya Viene del todo</div>
+                      <div class="eta-tarjeta">
+                        <div class="eta-cabecera">
+                          <span class="eta-bus">BUS</span>
+                          <span class="eta-placa">B-042</span>
+                        </div>
+                        <div class="eta-filo"></div>
+                        <div class="eta-number eta-number--cerca" data-el="eta-value">640</div>
+                        <div class="eta-unit" data-el="eta-unit">m de ti</div>
+                      </div>
+                      <div class="eta-detail" data-el="eta-sub">
+                        <span class="eta-detail-icono" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></svg>
+                        </span>
+                        <span>Puedes cambiar de aplicación; no cierres Ya Viene del todo</span>
+                      </div>
                       <div class="app-cta active" data-el="alert-btn">
                         <svg data-icono="campana" data-grupo="aviso" hidden viewBox="0 0 24 24" fill="none"
                           stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">

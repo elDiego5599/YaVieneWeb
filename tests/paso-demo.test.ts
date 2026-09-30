@@ -338,14 +338,11 @@ describe('3. Te avisamos', () => {
     const { raiz, demo } = montarDemo(3, mapaFalso({ metros: metrosDeRuta }));
     demo.activar(true);
     const valor = el(raiz, 'eta-value');
-    const barra = el(raiz, 'eta-bar');
     const fotos = recorrer(12000, () => ({
       m: metrosEnHoja(raiz),
       texto: valor.textContent ?? '',
       cerca: valor.classList.contains('eta-number--cerca'),
       muyCerca: valor.classList.contains('eta-number--muy-cerca'),
-      barraCerca: barra.classList.contains('eta-strip--cerca'),
-      barraMuyCerca: barra.classList.contains('eta-strip--muy-cerca'),
       armado: el(raiz, 'alert-btn').classList.contains('active'),
       notif: encendido(raiz, 'notif'),
     }));
@@ -356,8 +353,6 @@ describe('3. Te avisamos', () => {
       expect(Number.isFinite(f.m), t).toBe(true);
       expect(f.muyCerca, t).toBe(f.m < 300);
       expect(f.cerca, t).toBe(f.m >= 300 && f.m < 1000);
-      // La barra y el número llevan el mismo color.
-      expect([f.barraCerca, f.barraMuyCerca], t).toEqual([f.cerca, f.muyCerca]);
       if (f.notif) {
         expect(f.armado, t).toBe(true);
         expect(f.m, t).toBeLessThanOrEqual(1000);

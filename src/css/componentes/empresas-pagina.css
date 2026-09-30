@@ -989,17 +989,18 @@
 /*
   «En línea» lleva además el parabrisas, un óvalo blanco al 30 % de
   w × 0,72 por h × 0,26 —radios 6,336 y 4,29— con el centro a h × 0,26
-  por encima del medio, el 24 % del alto, y la única sombra del mapa: su
-  color al 45 %, con la elevación h × 0,12 = 3,96 y el desplazamiento
-  h × 0,05 = 1,65.
+  por encima del medio, el 24 % del alto, y la única sombra del mapa: la
+  de contacto del `_FlatBusPainter`, negro al 24 %, centrada y con σ =
+  h × 0,04 = 1,32, que en CSS es 2σ = 2,64. La de antes, de su color y
+  corrida hacia abajo, al girar quedaba detrás como una estela (dueño,
+  2026-09-30).
 */
 .flota-bus[data-bus-estado='en-linea']::after {
   background:
     radial-gradient(calc(6.336 * var(--u)) calc(4.29 * var(--u)) at 50% 24%,
       rgba(255, 255, 255, 0.3) 96%, transparent 100%),
     linear-gradient(color-mix(in srgb, var(--e) 70%, #fff), var(--e));
-  box-shadow: 0 calc(1.65 * var(--u)) calc(3.96 * var(--u))
-    color-mix(in srgb, var(--e) 45%, transparent);
+  box-shadow: 0 0 calc(2.64 * var(--u)) rgba(0, 0, 0, 0.24);
 }
 
 /* La hueca, la de los que no reportan: «Sin señal» y «Oculto». Blanco al
