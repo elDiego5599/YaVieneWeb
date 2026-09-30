@@ -126,3 +126,127 @@ describe('NavIsland', () => {
     expect(document.activeElement).toBe(fuera);
   });
 });
+
+/**
+ * El foco y la marca de la sección, que la verificación del 2026-09-29
+ * encontró sin probar aquí (el trinquete de cobertura estaba en rojo). En
+ * e2e/isla.spec.ts se prueban con Chromium de verdad; aquí, cada rama con
+ * medidas puestas a mano, que es lo que el navegador no deja forzar.
+ */
+describe('NavIsland: el foco del teclado', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    document.body.innerHTML = '';
+  });
+
+  it('el tabulador la abre; el foco que deja un toque, no', () => {
+    const { isla, enlace } = montar();
+    const matches = Element.prototype.matches;
+    const espia = vi.spyOn(Element.prototype, 'matches').mockImplementation(function (this: Element, s: string) {
+      return s === ':focus-visible' ? false : matches.call(this, s);
+    });
+    enlace.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    expect(abierta(isla), 'el foco de un toque la abrió: el clic de detrás la cerraría').toBe(false);
+    espia.mockRestore();
+    enlace.focus();
+    expect(abierta(isla)).toBe(true);
+  });
+
+  it('moverse dentro la deja abierta; salir del todo la cierra', () => {
+    const { isla, boton, enlace, fuera } = montar();
+    boton.click();
+    boton.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: enlace }));
+    expect(abierta(isla)).toBe(true);
+    enlace.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: fuera }));
+    expect(abierta(isla)).toBe(false);
+    boton.click();
+    // Sin destino: el foco se fue de la ventana, o a nada que se pueda tocar.
+    boton.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }));
+    expect(abierta(isla)).toBe(false);
+  });
+});
+
+describe('NavIsland: dónde estás', () => {
+  const ALTO = 1000; // la línea de lectura cae en el 40 %: 400
+  let scrollY = 0;
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame'] });
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(ALTO);
+    vi.spyOn(window, 'scrollY', 'get').mockImplementation(() => scrollY);
+    scrollY = 0;
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    document.body.innerHTML = '';
+  });
+
+  /** Pone la sección entre `top` y `bottom` respecto a la ventana. */
+  const caja = (el: HTMLElement, top: number, bottom: number): void => {
+    el.getBoundingClientRect = () => ({ top, bottom }) as DOMRect;
+  };
+
+  function montarSecciones(conCabecera: boolean) {
+    const nav = `
+      <nav class="nav-island">
+        <button type="button" class="nav-island-toggle"></button>
+        ${conCabecera ? '<span data-nav-lugar></span>' : ''}
+        <a class="nav-link" href="#uno">Uno</a>
+        <a class="nav-island-cta" href="#dos" data-lugar="La sección dos">Ver la dos</a>
+        <a class="nav-link" href="#sin-seccion">Huérfano</a>
+      </nav>`;
+    document.body.innerHTML = `
+      ${conCabecera ? `<header class="site-header">${nav}</header>` : nav}
+      <section id="uno"></section><section id="dos"></section>`;
+    const uno = document.getElementById('uno')!;
+    const dos = document.getElementById('dos')!;
+    caja(uno, -200, 450);
+    caja(dos, 450, 1400);
+    const isla = document.querySelector<HTMLElement>('.nav-island')!;
+    new NavIsland(isla, isla.querySelector('button')!);
+    const [aUno, aDos] = isla.querySelectorAll<HTMLAnchorElement>('a');
+    return { uno, dos, aUno, aDos, lugar: isla.querySelector<HTMLElement>('[data-nav-lugar]') };
+  }
+
+  const desplazar = (y: number): void => {
+    scrollY = y;
+    // Dos avisos en el mismo cuadro: se lee una sola vez.
+    window.dispatchEvent(new Event('scroll'));
+    window.dispatchEvent(new Event('scroll'));
+    vi.advanceTimersToNextFrame();
+  };
+
+  it('marca la sección que cruza el 40 % y la escribe en la barra plegada', () => {
+    const { uno, dos, aUno, aDos, lugar } = montarSecciones(true);
+    const cabecera = document.querySelector('.site-header')!;
+    expect(aUno.getAttribute('aria-current')).toBe('location');
+    expect(aDos.hasAttribute('aria-current')).toBe(false);
+    expect(lugar!.textContent, 'sin data-lugar va el texto del enlace').toBe('Uno');
+    expect(cabecera.classList.contains('is-arriba')).toBe(true);
+
+    caja(uno, -900, -250);
+    caja(dos, -250, 700);
+    desplazar(700);
+    expect(aUno.hasAttribute('aria-current')).toBe(false);
+    expect(aDos.getAttribute('aria-current')).toBe('location');
+    expect(lugar!.textContent, 'con data-lugar va ese').toBe('La sección dos');
+    expect(cabecera.classList.contains('is-arriba')).toBe(false);
+
+    // En el pie no manda ninguna: la barra se queda sin marca.
+    caja(dos, -1500, 100);
+    desplazar(2200);
+    expect(document.querySelector('[aria-current]')).toBeNull();
+    expect(lugar!.textContent).toBe('');
+  });
+
+  it('sin cabecera ni rótulo también marca: la línea no depende de ellos', () => {
+    const { uno, dos, aUno, aDos } = montarSecciones(false);
+    expect(aUno.getAttribute('aria-current')).toBe('location');
+    caja(uno, -900, -250);
+    caja(dos, -250, 700);
+    window.dispatchEvent(new Event('resize'));
+    vi.advanceTimersToNextFrame();
+    expect(aDos.getAttribute('aria-current')).toBe('location');
+  });
+});

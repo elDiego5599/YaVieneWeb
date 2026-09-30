@@ -202,6 +202,20 @@ describe('la privacidad dice qué pasa con la app cerrada', () => {
  * y en qué plazos se atienden, y el formulario pide la autorización justo
  * donde se dan los datos, con un enlace a esa parte de la política.
  */
+// La cédula del responsable no se publica (decisión del dueño): ni la
+// palabra, ni «C.C.» delante de un número, ni el número en sus formas
+// (seguido, con puntos o con espacios cada tres).
+const SEP = String.raw`(?:\.|\s|&nbsp;)`;
+const CEDULA = new RegExp(
+  [
+    String.raw`c[ée]dula`,
+    String.raw`\bc\.?\s?c\.?\s?(?:n[oº°]\.?\s?)?\d`,
+    String.raw`\b\d{8,10}\b(?![^<]*@)`,
+    String.raw`\b\d{1,3}(?:${SEP}\d{3}){2,3}\b`,
+  ].join('|'),
+  'i',
+);
+
 describe('el formulario de empresas cumple lo de la Ley 1581', () => {
   const texto = (pagina: string): string =>
     leer(pagina)
@@ -220,7 +234,30 @@ describe('el formulario de empresas cumple lo de la Ley 1581', () => {
     expect(html).toContain('Diego Alejandro Angarita Silvera, en Barranquilla, Colombia');
     expect(html).toContain('href="mailto:diegoangarita930@gmail.com"');
     expect(html).toContain('WhatsApp 300 443 8626');
-    expect(html).not.toMatch(/c[ée]dula|\b\d{8,10}\b(?![^<]*@)/i);
+    // Sobre el texto que se lee, no sobre las etiquetas: las coordenadas de
+    // un SVG («0 512 512») tienen la forma de un número con espacios.
+    expect(html.replace(/<[^>]*>/g, ' ')).not.toMatch(CEDULA);
+    expect(html).not.toMatch(/c[ée]dula/i);
+  });
+
+  it('la guarda de la cédula ve las formas en que se escribe', () => {
+    // Verificación 2026-09-29: la guarda solo veía los dígitos seguidos, y
+    // una cédula se escribe casi siempre con puntos. El teléfono y el año
+    // de la política tienen que seguir pasando.
+    for (const colada of [
+      'C.C. 1.045.678.901',
+      'CC 1045678901',
+      'c. c. no. 72.345.678',
+      'identificado con 1 045 678 901',
+      '1&nbsp;045&nbsp;678&nbsp;901',
+      '1045678901',
+      'cédula',
+    ]) {
+      expect(colada, colada).toMatch(CEDULA);
+    }
+    for (const limpia of ['WhatsApp 300 443 8626', 'Ley 1581 de 2012', 'Decreto 1377 de 2013', '29 de septiembre de 2026']) {
+      expect(limpia, limpia).not.toMatch(CEDULA);
+    }
   });
 
   it('cuenta los derechos y los plazos de la ley', () => {
