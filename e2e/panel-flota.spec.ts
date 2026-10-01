@@ -3,7 +3,7 @@ import { test, expect, type Page } from '@playwright/test';
 /**
  * La fila del panel: placa, icono de estado, píldora de ruta, lápiz,
  * interruptor y rótulo. Tres mañas que se veían a ojo: el icono colgaba de
- * la placa (SFA-482 no mide igual que TUH-513); al ocultar un bus la
+ * la placa (SFA482 no mide igual que TUH513); al ocultar un bus la
  * columna del interruptor se encogía («OCULTO» es más corto que
  * «PERMITIDO») y la píldora y el lápiz se movían con ella; y con una ruta
  * de nombre largo la píldora no cedía nada, así que el icono de estado
@@ -82,8 +82,8 @@ test.describe('la fila del panel no se mueve', () => {
     const lapicesAntes = await xs(page, `${FILAS} .flota-fila-editar`);
     const iconosAntes = await xs(page, `${FILAS} .flota-fila-placa svg`);
 
-    await page.locator('.flota-fila[data-bus="SFA-482"] [data-accion="visibilidad"]').click();
-    await expect(page.locator('.flota-fila[data-bus="SFA-482"] .flota-permiso-texto')).toHaveText(
+    await page.locator('.flota-fila[data-bus="SFA482"] [data-accion="visibilidad"]').click();
+    await expect(page.locator('.flota-fila[data-bus="SFA482"] .flota-permiso-texto')).toHaveText(
       'OCULTO'
     );
 

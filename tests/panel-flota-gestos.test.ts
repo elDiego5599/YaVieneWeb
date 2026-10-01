@@ -71,7 +71,7 @@ describe('las pestañas de estado', () => {
     tocar(raiz, '[data-estado="sin-senal"]');
 
     expect(raiz.querySelector<HTMLElement>('.flota-vacio')!.hidden).toBe(true);
-    expect(filasVisibles(raiz)).toEqual(['LMR-826']);
+    expect(filasVisibles(raiz)).toEqual(['LMR826']);
     expect(raiz.querySelector('.flota-cuenta')!.textContent).toBe('1');
   });
 
@@ -103,7 +103,7 @@ describe('las pestañas de estado', () => {
     const raiz = montar();
     tocar(raiz, '[data-estado="linea"]');
     expect(marcadoresVisibles(raiz)).toEqual([...filasVisibles(raiz)].sort());
-    expect(filasVisibles(raiz)).toEqual(['SFA-482', 'TUH-513', 'WNP-659']);
+    expect(filasVisibles(raiz)).toEqual(['SFA482', 'TUH513', 'WNP659']);
   });
 });
 
@@ -122,11 +122,11 @@ describe('la X de la ficha', () => {
   // Riesgo: al cerrar, el foco se va al principio de la página y quien usa teclado pierde el sitio.
   it('el foco pasa a la fila del bus que se estaba viendo', () => {
     const raiz = montar();
-    tocar(raiz, '.flota-fila[data-bus="TUH-513"] .flota-fila-elegir');
+    tocar(raiz, '.flota-fila[data-bus="TUH513"] .flota-fila-elegir');
     tocar(raiz, '[data-accion="cerrar"]');
 
     expect(document.activeElement).toBe(
-      raiz.querySelector('.flota-fila[data-bus="TUH-513"] [data-accion="elegir"]')
+      raiz.querySelector('.flota-fila[data-bus="TUH513"] [data-accion="elegir"]')
     );
   });
 
@@ -144,7 +144,7 @@ describe('la X de la ficha', () => {
     const raiz = montar();
     tocar(raiz, '[data-ruta="vivero"]');
     expect(ficha(raiz).classList.contains('es-cerrada')).toBe(false);
-    expect(ficha(raiz).querySelector('[data-ficha="placa"]')!.textContent).toBe('SFA-482');
+    expect(ficha(raiz).querySelector('[data-ficha="placa"]')!.textContent).toBe('SFA482');
     expect(ficha(raiz).querySelector('[data-ficha="ruta"]')!.textContent).toBe('Tcherassi');
   });
 
@@ -162,11 +162,11 @@ describe('la X de la ficha', () => {
   it('elegir otro bus después de cerrar vuelve a abrir la ficha con ése', () => {
     const raiz = montar();
     tocar(raiz, '[data-accion="cerrar"]');
-    tocar(raiz, '.flota-bus[data-bus="DMV-238"]');
+    tocar(raiz, '.flota-bus[data-bus="DMV238"]');
 
     expect(ficha(raiz).classList.contains('es-cerrada')).toBe(false);
     expect(ficha(raiz).hasAttribute('inert')).toBe(false);
-    expect(ficha(raiz).querySelector('[data-ficha="placa"]')!.textContent).toBe('DMV-238');
+    expect(ficha(raiz).querySelector('[data-ficha="placa"]')!.textContent).toBe('DMV238');
     expect(ficha(raiz).querySelector('[data-ficha="estado"]')!.textContent).toBe('Sin señal');
   });
 });
@@ -177,7 +177,7 @@ describe('ocultar y mostrar', () => {
     const raiz = montar();
     tocar(raiz, '.flota-ocultar');
 
-    const fila = raiz.querySelector<HTMLElement>('.flota-fila[data-bus="SFA-482"]')!;
+    const fila = raiz.querySelector<HTMLElement>('.flota-fila[data-bus="SFA482"]')!;
     expect(fila.querySelector('[data-accion="visibilidad"]')!.getAttribute('aria-checked')).toBe('false');
     expect(fila.querySelector('.flota-permiso-texto')!.textContent).toBe('OCULTO');
     expect(fila.classList.contains('flota-fila--oculta')).toBe(true);
@@ -192,8 +192,8 @@ describe('ocultar y mostrar', () => {
     const sinClaseVacia = (html: string): string => html.replaceAll(' class=""', '');
     const raiz = montar();
     const antes = sinClaseVacia(raiz.outerHTML);
-    tocar(raiz, '.flota-fila[data-bus="TUH-513"] [data-accion="visibilidad"]');
-    tocar(raiz, '.flota-fila[data-bus="TUH-513"] [data-accion="visibilidad"]');
+    tocar(raiz, '.flota-fila[data-bus="TUH513"] [data-accion="visibilidad"]');
+    tocar(raiz, '.flota-fila[data-bus="TUH513"] [data-accion="visibilidad"]');
     expect(sinClaseVacia(raiz.outerHTML)).toBe(antes);
   });
 
@@ -203,12 +203,12 @@ describe('ocultar y mostrar', () => {
     const ojo = raiz.querySelector('[data-todos]')!;
     expect(ojo.getAttribute('href')).toBe('#fi-mostrar');
 
-    tocar(raiz, '.flota-fila[data-bus="WNP-659"] [data-accion="visibilidad"]');
+    tocar(raiz, '.flota-fila[data-bus="WNP659"] [data-accion="visibilidad"]');
     expect(ojo.getAttribute('href')).toBe('#fi-ocultar');
 
     // Ocultar uno de la otra ruta también cuenta: mira la flota, no la ruta.
     tocar(raiz, '[data-ruta="vivero"]');
-    tocar(raiz, '.flota-fila[data-bus="KJT-704"] [data-accion="visibilidad"]');
+    tocar(raiz, '.flota-fila[data-bus="KJT704"] [data-accion="visibilidad"]');
     expect(ojo.getAttribute('href')).toBe('#fi-mostrar');
   });
 
@@ -216,10 +216,10 @@ describe('ocultar y mostrar', () => {
   it('ocultar un bus sube la cifra de «Ocultos» al momento', () => {
     const raiz = montar();
     expect(cifraPestana(raiz, 'ocultos')).toBe('1');
-    tocar(raiz, '.flota-fila[data-bus="DMV-238"] [data-accion="visibilidad"]');
+    tocar(raiz, '.flota-fila[data-bus="DMV238"] [data-accion="visibilidad"]');
     expect(cifraPestana(raiz, 'ocultos')).toBe('2');
     tocar(raiz, '[data-estado="ocultos"]');
-    expect(filasVisibles(raiz)).toEqual(['DMV-238', 'WNP-659']);
+    expect(filasVisibles(raiz)).toEqual(['DMV238', 'WNP659']);
   });
 });
 
@@ -256,6 +256,6 @@ describe('toques que no son gestos', () => {
     Object.defineProperty(evento, 'target', { value: fuera.querySelector('button') });
     raiz.dispatchEvent(evento);
     expect(raiz.querySelector('[data-ruta="tcherassi"]')!.getAttribute('aria-pressed')).toBe('true');
-    expect(filasVisibles(raiz)).toEqual(['SFA-482', 'TUH-513', 'DMV-238', 'WNP-659']);
+    expect(filasVisibles(raiz)).toEqual(['SFA482', 'TUH513', 'DMV238', 'WNP659']);
   });
 });

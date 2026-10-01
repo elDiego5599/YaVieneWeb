@@ -43,8 +43,8 @@ describe('la flota de partida', () => {
     expect(new Set(FLOTA.map(estadoDe))).toEqual(new Set(BUS_ESTADOS));
   });
 
-  it('LMR-826 es el inactivo: sin posición y con el turno abierto', () => {
-    expect(FLOTA.filter((b) => estadoDe(b) === 'inactivo').map((b) => b.placa)).toEqual(['LMR-826']);
+  it('LMR826 es el inactivo: sin posición y con el turno abierto', () => {
+    expect(FLOTA.filter((b) => estadoDe(b) === 'inactivo').map((b) => b.placa)).toEqual(['LMR826']);
   });
 });
 
@@ -97,18 +97,18 @@ describe('BusEstado.de: una sola regla de precedencia', () => {
 
 describe('fleetList: lo que sale en la lista y en el mapa', () => {
   it('sin filtro de estado, sólo la ruta elegida', () => {
-    expect(placas(lista(FLOTA, 'tcherassi', 'todos'))).toEqual(['SFA-482', 'TUH-513', 'DMV-238', 'WNP-659']);
-    expect(placas(lista(FLOTA, 'vivero', 'todos'))).toEqual(['KJT-704', 'BQX-391', 'LMR-826']);
+    expect(placas(lista(FLOTA, 'tcherassi', 'todos'))).toEqual(['SFA482', 'TUH513', 'DMV238', 'WNP659']);
+    expect(placas(lista(FLOTA, 'vivero', 'todos'))).toEqual(['KJT704', 'BQX391', 'LMR826']);
   });
 
   it('«En línea» incluye al oculto que transmite', () => {
-    expect(placas(lista(FLOTA, 'tcherassi', 'linea'))).toEqual(['SFA-482', 'TUH-513', 'WNP-659']);
+    expect(placas(lista(FLOTA, 'tcherassi', 'linea'))).toEqual(['SFA482', 'TUH513', 'WNP659']);
   });
 
   it('«Ocultos» y «Sin señal» por ruta, y el inactivo cae en «Sin señal»', () => {
-    expect(placas(lista(FLOTA, 'tcherassi', 'ocultos'))).toEqual(['WNP-659']);
+    expect(placas(lista(FLOTA, 'tcherassi', 'ocultos'))).toEqual(['WNP659']);
     expect(placas(lista(FLOTA, 'vivero', 'ocultos'))).toEqual([]);
-    expect(placas(lista(FLOTA, 'vivero', 'sin-senal'))).toEqual(['LMR-826']);
+    expect(placas(lista(FLOTA, 'vivero', 'sin-senal'))).toEqual(['LMR826']);
   });
 
   it('el filtro de estado mira la señal, el fantasma y la visibilidad', () => {
@@ -131,7 +131,7 @@ describe('las cifras', () => {
   });
 
   it('un fantasma que manda posiciones sale de «En Línea» y entra en «Sin Señal»', () => {
-    const flota = FLOTA.map((b) => (b.placa === 'KJT-704' ? { ...b, isGhost: true } : b));
+    const flota = FLOTA.map((b) => (b.placa === 'KJT704' ? { ...b, isGhost: true } : b));
     expect(cuentas(flota, 'vivero')).toEqual({ todos: 3, linea: 1, ocultos: 0, 'sin-senal': 2 });
   });
 
@@ -145,13 +145,13 @@ describe('las cifras', () => {
   });
 
   it('ocultar un bus lo pasa de una cifra de la leyenda a otra', () => {
-    const flota = FLOTA.map((b) => (b.placa === 'KJT-704' ? { ...b, visible: false } : b));
+    const flota = FLOTA.map((b) => (b.placa === 'KJT704' ? { ...b, visible: false } : b));
     expect(leyenda(flota, 'vivero')).toEqual({ 'en-linea': 1, inactivo: 1, 'sin-senal': 0, oculto: 1 });
     expect(cuentas(flota, 'vivero').linea).toBe(2);
   });
 
   it('el bus oculto y sin señal se cuenta una vez, no dos', () => {
-    const flota = FLOTA.map((b) => (b.placa === 'DMV-238' ? { ...b, visible: false } : b));
+    const flota = FLOTA.map((b) => (b.placa === 'DMV238' ? { ...b, visible: false } : b));
     expect(leyenda(flota, 'tcherassi')).toEqual({ 'en-linea': 2, inactivo: 0, 'sin-senal': 0, oculto: 2 });
   });
 });
@@ -198,16 +198,16 @@ describe('el panel montado', () => {
     new PanelFlota(raiz);
     tocar(raiz, '[data-ruta="vivero"]');
 
-    const fila = raiz.querySelector<HTMLElement>('.flota-fila[data-bus="LMR-826"]')!;
+    const fila = raiz.querySelector<HTMLElement>('.flota-fila[data-bus="LMR826"]')!;
     expect(fila.hidden).toBe(false);
     expect(fila.dataset.busEstado).toBe('inactivo');
     expect(fila.querySelector('.flota-fila-placa title')!.textContent).toBe(EXPLICACION.inactivo);
     expect(fila.querySelector('.flota-fila-placa use')!.getAttribute('href')).toBe(ICONO.inactivo);
-    expect(fila.querySelector('.flota-fila-elegir')!.getAttribute('aria-label')).toBe('Elegir LMR-826, inactivo');
-    expect(raiz.querySelector<HTMLElement>('.flota-bus[data-bus="LMR-826"]')!.dataset.busEstado).toBe('inactivo');
+    expect(fila.querySelector('.flota-fila-elegir')!.getAttribute('aria-label')).toBe('Elegir LMR826, inactivo');
+    expect(raiz.querySelector<HTMLElement>('.flota-bus[data-bus="LMR826"]')!.dataset.busEstado).toBe('inactivo');
     expect(cifrasLeyenda(raiz)).toEqual({ 'en-linea': '2', inactivo: '1', 'sin-senal': '0', oculto: '0' });
 
-    tocar(raiz, '.flota-fila[data-bus="LMR-826"] .flota-fila-elegir');
+    tocar(raiz, '.flota-fila[data-bus="LMR826"] .flota-fila-elegir');
     const ficha = raiz.querySelector<HTMLElement>('.flota-ficha')!;
     expect(ficha.dataset.busEstado).toBe('inactivo');
     expect(ficha.querySelector('[data-ficha="estado"]')!.textContent).toBe('Inactivo');
@@ -217,21 +217,21 @@ describe('el panel montado', () => {
   it('pulsar el icono de estado de la fila también elige el bus', () => {
     const raiz = montar();
     new PanelFlota(raiz);
-    tocar(raiz, '.flota-fila[data-bus="TUH-513"] .flota-fila-placa use');
-    expect(raiz.querySelector('.flota-fila[data-bus="TUH-513"]')!.classList.contains('es-elegida')).toBe(true);
-    expect(raiz.querySelector('.flota-ficha [data-ficha="placa"]')!.textContent).toBe('TUH-513');
+    tocar(raiz, '.flota-fila[data-bus="TUH513"] .flota-fila-placa use');
+    expect(raiz.querySelector('.flota-fila[data-bus="TUH513"]')!.classList.contains('es-elegida')).toBe(true);
+    expect(raiz.querySelector('.flota-ficha [data-ficha="placa"]')!.textContent).toBe('TUH513');
   });
 
   it('ocultar un bus le cambia el estado en todas partes a la vez', () => {
     const raiz = montar();
     new PanelFlota(raiz);
-    tocar(raiz, '.flota-fila[data-bus="SFA-482"] [data-accion="visibilidad"]');
+    tocar(raiz, '.flota-fila[data-bus="SFA482"] [data-accion="visibilidad"]');
 
-    const fila = raiz.querySelector<HTMLElement>('.flota-fila[data-bus="SFA-482"]')!;
+    const fila = raiz.querySelector<HTMLElement>('.flota-fila[data-bus="SFA482"]')!;
     expect(fila.dataset.busEstado).toBe('oculto');
     expect(fila.querySelector('.flota-fila-placa title')!.textContent).toBe(EXPLICACION.oculto);
-    expect(fila.querySelector('.flota-fila-elegir')!.getAttribute('aria-label')).toBe('Elegir SFA-482, oculto');
-    expect(raiz.querySelector<HTMLElement>('.flota-bus[data-bus="SFA-482"]')!.dataset.busEstado).toBe('oculto');
+    expect(fila.querySelector('.flota-fila-elegir')!.getAttribute('aria-label')).toBe('Elegir SFA482, oculto');
+    expect(raiz.querySelector<HTMLElement>('.flota-bus[data-bus="SFA482"]')!.dataset.busEstado).toBe('oculto');
     expect(cifrasLeyenda(raiz)).toEqual({ 'en-linea': '1', inactivo: '0', 'sin-senal': '1', oculto: '2' });
 
     const ficha = raiz.querySelector<HTMLElement>('.flota-ficha')!;

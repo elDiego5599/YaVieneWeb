@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 /**
  * La hoja del bus con el diseño que eligió el dueño (2026-09-30, «A»),
  * espejo de eta_bottom_sheet.dart: sin la franja de color de arriba,
- * «BUS» y la placa amarilla encabezan, un filo separa quién es de cuánto
+ * «BUS» y la placa blanca encabezan, un filo separa quién es de cuánto
  * falta, y el detalle va en una nota con su ícono. Las dos hojas de la
  * portada —el teléfono del hero y el del paso 3— lo llevan igual.
  */
@@ -80,13 +80,13 @@ describe('la hoja del bus, diseño «A», en la web', () => {
     expect(leer('src/phone-simulator.ts')).toContain("'eta-placa'");
   });
 
-  it('la placa es el amarillo de la app y la letra negra se lee encima', () => {
+  it('la placa es la blanca del servicio público y la letra negra se lee encima', () => {
     const placa = variable(variables, '--app-placa');
-    expect(placa.toUpperCase()).toBe('#F7D117');
+    expect(placa.toUpperCase()).toBe('#FFFFFF');
     expect(contraste(variable(variables, '--app-text-primary'), placa)).toBeGreaterThanOrEqual(4.5);
   });
 
-  it('la placa lleva el filo oscuro: sin él, el amarillo se pierde en la arena', () => {
+  it('la placa lleva el filo oscuro: sin él, el blanco se pierde en la arena', () => {
     const placa = variable(variables, '--app-placa');
     expect(contraste(placa, variable(variables, '--arena'))).toBeLessThan(3);
     const regla = reglas(css, '.eta-placa');

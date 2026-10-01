@@ -722,11 +722,13 @@
    Rejilla de dos columnas en vez de caja flexible: el texto suelto cae
    solo en la primera, de ancho mínimo fijo, y el icono de estado en la
    segunda. Así el icono queda siempre en la misma x aunque las placas
-   midan distinto (SFA-482 no mide igual que TUH-513); con `flex` + `gap`
-   colgaba del texto y cada fila lo ponía en un sitio. El mínimo de 76 es
-   la más ancha de las siete, WNP-659, que mide 73,5, y 2 y medio para lo
-   que cambia el dibujo de la letra de un navegador a otro; con él a la
-   ruta le quedan 82, casi los 88 que le quedan allá con esa placa —los 6
+   midan distinto (SFA482 no mide igual que TUH513); con `flex` + `gap`
+   colgaba del texto y cada fila lo ponía en un sitio. El mínimo de 66,5
+   es la más ancha de las siete, WNP659, que mide 64 desde que las placas
+   van sin guion como las de verdad (2026-09-30; con guion medía 73,5), y
+   2 y medio para lo que cambia el dibujo de la letra de un navegador a
+   otro; con él a la ruta le quedan 91,5, casi los 97,5 que le quedan allá
+   con esa placa —los 6
    de diferencia se los lleva el rótulo «PERMITIDO», que aquí es más ancho
    que el interruptor de la app—, y «Tcherassi» se lee entera. Si un día llega una placa más larga, la primera columna crece
    (`max-content`) en vez de romper el texto. Los 3 de abajo son el
@@ -735,7 +737,7 @@
    vacía porque ningún bus del maquetado lo trae asignado. */
 .flota-fila-placa {
   display: grid;
-  grid-template-columns: minmax(calc(76 * var(--u)), max-content) auto;
+  grid-template-columns: minmax(calc(66.5 * var(--u)), max-content) auto;
   justify-content: start;
   align-items: center;
   column-gap: calc(8 * var(--u));
@@ -1092,11 +1094,11 @@
   entre el punto de dos antes y el de dos después para que un quiebro de
   la calle no lo tuerza.
 
-  Tres suben hacia el norte por la Vía 40 y DMV-238 baja por el otro
-  sentido, que es lo que se ve en un turno. SFA-482, el elegido, queda
+  Tres suben hacia el norte por la Vía 40 y DMV238 baja por el otro
+  sentido, que es lo que se ve en un turno. SFA482, el elegido, queda
   casi en el medio del mapa y no debajo de la ficha que lo describe;
-  WNP-659, el oculto, se para en 766 de ancho, a más de 70 de la ficha, y
-  DMV-238 va arriba, lejos de la leyenda.
+  WNP659, el oculto, se para en 766 de ancho, a más de 70 de la ficha, y
+  DMV238 va arriba, lejos de la leyenda.
 */
 .flota-bus--sfa {
   top: calc(273 * var(--u));
@@ -1125,11 +1127,11 @@
 /*
   Los tres de Vivero Paraíso, sobre su ruta y con la misma cuenta. La
   ruta baja en diagonal desde el centro del plano hacia el suroeste:
-  KJT-704 y LMR-826 van en ese sentido y BQX-391 sube por el otro, que
-  vuelve a ser lo que se ve en un turno. LMR-826, el inactivo, queda
+  KJT704 y LMR826 van en ese sentido y BQX391 sube por el otro, que
+  vuelve a ser lo que se ve en un turno. LMR826, el inactivo, queda
   abajo pero a 39 a la derecha de la leyenda, que termina en 136, y
   ninguno se acerca a la ficha, que empieza en 859: el más cercano es
-  KJT-704, que termina en 598.
+  KJT704, que termina en 598.
 */
 .flota-bus--kjt {
   top: calc(361.8 * var(--u));

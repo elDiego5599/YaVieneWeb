@@ -15,7 +15,8 @@
  *
  * Nada de lo que muestra está inventado: la ruta y sus kilómetros salen de
  * rutas.json (vía PhoneMap), los buses son los dos demo del repo
- * (bus_labels.dart los nombra por su id: B-042 y B-055) y el radio de aviso
+ * (BUS-WGV705 y BUS-WFK042; bus_labels.dart les quita el «BUS-» y
+ * deja la placa: WGV705 y WFK042) y el radio de aviso
  * es el de proximity_alerts_provider.dart.
  */
 
@@ -25,8 +26,8 @@ import type { RutaLanding } from './types';
 
 interface EstadoBus {
   /**
-   * Los dos buses demo del repo. bus_labels.dart los nombra por su id:
-   * "los buses demo (B-042, B-055) ya llevan su placa/interno como id".
+   * Los dos buses demo del repo, por su placa: `busPlaca` (bus_labels.dart)
+   * le quita el «BUS-» al id y deja las tres letras y los tres números.
    */
   placa: string;
   /** Posición sobre el recorrido, de 0 a 1. Quieta: nadie la mueve. */
@@ -83,14 +84,14 @@ export class PhoneSimulator {
   readonly #radioAvisoM = 1000;
 
   /**
-   * Los dos buses, quietos cada uno en su sitio: el B-042 a 940 m del
+   * Los dos buses, quietos cada uno en su sitio: el WGV705 a 940 m del
    * punto de espera —dentro del kilómetro, que es lo que enciende la
-   * tarjeta flotante— y el B-055 más atrás. La hoja le sigue el rastro al
+   * tarjeta flotante— y el WFK042 más atrás. La hoja le sigue el rastro al
    * primero, como si el dedo lo hubiera tocado.
    */
   readonly #buses: EstadoBus[] = [
-    { placa: 'B-042', t: 0 },
-    { placa: 'B-055', t: 0 }
+    { placa: 'WGV705', t: 0 },
+    { placa: 'WFK042', t: 0 }
   ];
 
   /**
@@ -104,7 +105,7 @@ export class PhoneSimulator {
   #avisoActivo = false;
   /**
    * El bus al que la hoja le sigue el rastro, por su sitio en `buses`:
-   * el B-042, como si el dedo lo hubiera tocado.
+   * el WGV705, como si el dedo lo hubiera tocado.
    */
   #busElegido: number | null = null;
   /* Lo que decide si se ve el botón de volver a tu punto, igual que en
@@ -133,7 +134,7 @@ export class PhoneSimulator {
   /**
    * Coloca la escena una sola vez y no vuelve: ruta C16 dibujada, punto de
    * espera puesto, píldora en "Ruta activa", hoja con la distancia del
-   * B-042 y el aviso armado, y las dos tarjetas flotantes encendidas. Sin
+   * WGV705 y el aviso armado, y las dos tarjetas flotantes encendidas. Sin
    * relojes ni cuadros: lo que se ve al cargar es lo que se ve siempre.
    */
   #escenaFija(): void {
@@ -342,7 +343,7 @@ export class PhoneSimulator {
     const [valor, unidad] = metrica(metros);
 
     // eta_bottom_sheet.dart (`_Placa`): encima de la distancia va «BUS» y
-    // la placa en amarillo; la ruta ya la nombra la píldora de arriba.
+    // la placa en blanco; la ruta ya la nombra la píldora de arriba.
     this.#texto('eta-placa', bus.placa);
 
     // Con distancia en pantalla y sin aviso puesto, la app no muestra

@@ -1,7 +1,7 @@
 /**
  * El panel de control de /empresas.html, que ahora se deja tocar.
  *
- * Era una imagen quieta: la ruta Tcherassi con sus cuatro buses y SFA-482
+ * Era una imagen quieta: la ruta Tcherassi con sus cuatro buses y SFA482
  * elegido, siempre igual. Quien decide por una empresa no se cree una
  * captura; se cree lo que prueba. Así que ahora se cambia de ruta, se
  * filtra por estado, se elige un bus en la lista o en el mapa y se oculta
@@ -97,19 +97,19 @@ export const RUTAS: Readonly<Record<string, string>> = {
  * que es como la ordena `fleetList`. Cada ruta tiene uno que no transmite
  * y Tcherassi además uno oculto, para que cada pestaña tenga algo que
  * enseñar y la de «Ocultos» de Vivero Paraíso salga vacía hasta que se
- * oculte uno. El de Vivero Paraíso es el inactivo, LMR-826: así los cuatro
+ * oculte uno. El de Vivero Paraíso es el inactivo, LMR826: así los cuatro
  * estados de la leyenda tienen un bus en el mapa, y la ruta con la que
  * abre la página enseña los tres que se ven a la primera —en línea, sin
  * señal, oculto—.
  */
 export const FLOTA: readonly Bus[] = [
-  { placa: 'SFA-482', ruta: 'tcherassi', online: true, isGhost: false, visible: true },
-  { placa: 'TUH-513', ruta: 'tcherassi', online: true, isGhost: false, visible: true },
-  { placa: 'DMV-238', ruta: 'tcherassi', online: false, isGhost: false, visible: true },
-  { placa: 'WNP-659', ruta: 'tcherassi', online: true, isGhost: false, visible: false },
-  { placa: 'KJT-704', ruta: 'vivero', online: true, isGhost: false, visible: true },
-  { placa: 'BQX-391', ruta: 'vivero', online: true, isGhost: false, visible: true },
-  { placa: 'LMR-826', ruta: 'vivero', online: false, isGhost: true, visible: true },
+  { placa: 'SFA482', ruta: 'tcherassi', online: true, isGhost: false, visible: true },
+  { placa: 'TUH513', ruta: 'tcherassi', online: true, isGhost: false, visible: true },
+  { placa: 'DMV238', ruta: 'tcherassi', online: false, isGhost: false, visible: true },
+  { placa: 'WNP659', ruta: 'tcherassi', online: true, isGhost: false, visible: false },
+  { placa: 'KJT704', ruta: 'vivero', online: true, isGhost: false, visible: true },
+  { placa: 'BQX391', ruta: 'vivero', online: true, isGhost: false, visible: true },
+  { placa: 'LMR826', ruta: 'vivero', online: false, isGhost: true, visible: true },
 ];
 
 /** El `switch (statusFilter)` de `fleetList`. */
@@ -186,7 +186,7 @@ export class PanelFlota {
   readonly #buses: Bus[] = FLOTA.map((b) => ({ ...b }));
   #ruta = 'tcherassi';
   #estado: Estado = 'todos';
-  #elegido: string | null = 'SFA-482';
+  #elegido: string | null = 'SFA482';
 
   readonly #raiz: HTMLElement;
   readonly #pildoras: HTMLElement[];

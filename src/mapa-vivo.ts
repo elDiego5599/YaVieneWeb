@@ -30,7 +30,7 @@ const XLINK = 'http://www.w3.org/1999/xlink';
 const RADIO_AVISO_M = 1000;
 
 /** Los dos buses del piloto, con el identificador que ya llevan en la app. */
-const BUSES = ['B-042', 'B-055'];
+const BUSES = ['WGV705', 'WFK042'];
 
 /** Dónde nacen, por detrás del punto de espera y sobre la ruta, en metros. */
 const SALIDA_M = [1850, 4300];

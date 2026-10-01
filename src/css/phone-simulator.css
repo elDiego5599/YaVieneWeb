@@ -1407,7 +1407,7 @@
   color: var(--app-text-secondary);
 }
 
-/* `_Placa`: amarillo AppColors.placa, letra y filo de 1,5 en textPrimary,
+/* `_Placa`: blanco AppColors.placa (la placa del servicio público), letra y filo de 1,5 en textPrimary,
    AppRadius.xs (6) y 2×8 de relleno. La letra es `etiqueta` (13) en 700
    con 1,5 de espaciado, en bloque como en la lámina de la calle. */
 .eta-placa {
