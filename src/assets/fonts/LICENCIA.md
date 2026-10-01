@@ -9,8 +9,11 @@ servidor, redistribuirlas y usarlas con fines comerciales.
 | Bricolage Grotesque | Mathieu Triay | https://fonts.google.com/specimen/Bricolage+Grotesque |
 | Plus Jakarta Sans | Tokotype | https://fonts.google.com/specimen/Plus+Jakarta+Sans |
 
-Los `.woff2` de esta carpeta son el subconjunto `latin` de cada familia,
-descargado sin modificar desde `fonts.gstatic.com`. Son ficheros
-variables: un solo fichero cubre los grosores 200 a 800.
+Los `.woff2` de esta carpeta salen del subconjunto `latin` de cada
+familia, descargado sin modificar desde `fonts.gstatic.com` y guardado tal
+cual en `scripts/fuentes-origen/`. `scripts/subconjunto_fuentes.py` les
+quita los glifos que el español no usa; los que quedan no cambian (la OFL
+permite subconjuntos). Son ficheros variables: un solo fichero cubre los
+grosores 200 a 800.
 
 Texto completo de la licencia: https://openfontlicense.org

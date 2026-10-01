@@ -113,6 +113,9 @@
       ya arrancado el JS. Sin esta línea su descarga empieza ~16 ms tarde en
       local y bastante más en una red real. Vite reescribe el href al nombre
       con hash durante el build, así que la ruta de origen es la correcta aquí.
+      Sólo desde 768: por debajo el LCP es la descripción del hero, y los
+      29 KB del mapa en alta prioridad se ponían delante de ella y de las
+      fuentes en la red lenta del teléfono (Lighthouse móvil, T7.7).
     -->
     <link
       rel="preload"
@@ -120,6 +123,7 @@
       href="./src/assets/map/barranquilla.webp"
       type="image/webp"
       fetchpriority="high"
+      media="(min-width: 768px)"
     />
     <!--
       Las dos familias ya no vienen de Google: viven en `src/assets/fonts/` y
@@ -229,15 +233,17 @@
         <div class="hero-copy">
           <!-- El titular está desde el primer cuadro: es lo más grande de
                la primera pantalla —lo que el navegador mide como LCP— y
-               no puede esperar a que llegue el JavaScript (R-03). Lo que
-               entra por turnos es lo de debajo, con el mismo `.reveal`
-               del resto de la página: descripción, botones y tiendas,
-               cada uno 80 ms después del anterior. -->
+               no puede esperar a que llegue el JavaScript (R-03). La
+               descripción, tampoco: en el teléfono ocupa más área que el
+               titular y era ella el LCP, en 2,7 s con Lighthouse móvil
+               por esperar su turno (T7.7). Lo que entra por turnos es lo
+               de debajo, con el mismo `.reveal` del resto de la página:
+               botones y tiendas, 80 ms uno después del otro. -->
           <h1 class="hero-title">¿Cuánto falta <span class="highlight">para tu bus?</span></h1>
-          <p class="hero-description reveal" data-reveal-delay="0">Mira el bus moverse en el mapa, con la distancia que le falta para
+          <p class="hero-description">Mira el bus moverse en el mapa, con la distancia que le falta para
             llegar a tu paradero.</p>
 
-          <div class="hero-actions reveal" data-reveal-delay="80">
+          <div class="hero-actions reveal" data-reveal-delay="0">
             <a href="#mapa" class="btn-primary btn-green">Ver el mapa en vivo <span class="btn-flecha" aria-hidden="true">→</span></a>
             <a href="/empresas.html" class="btn-outline">Para empresas</a>
           </div>
@@ -246,7 +252,7 @@
                cualquiera que acaba de leer el titular. Las dos marcas van
                dibujadas, no en una fuente de iconos: trazos de un solo
                camino que heredan el color del texto. -->
-          <p class="hero-subtext reveal" data-reveal-delay="160">
+          <p class="hero-subtext reveal" data-reveal-delay="80">
             <span class="hero-subtext-lead">Ya Viene, disponible en</span>
             <span class="tienda-chips">
               <span class="tienda-chip">

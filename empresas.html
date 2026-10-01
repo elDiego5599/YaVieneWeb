@@ -150,7 +150,10 @@
            monitor mide lo que el titular y la frase de encima, y sus filos
            caen en las mismas líneas. -->
       <div class="panel-inner">
-        <header class="seccion-cabecera seccion-cabecera--partida reveal">
+        <!-- La cabecera está desde el primer cuadro, sin `.reveal`: es la
+             primera pantalla y no espera al JavaScript para verse (T7.7,
+             el mismo criterio que el titular de la portada, R-03). -->
+        <header class="seccion-cabecera seccion-cabecera--partida">
           <span class="seccion-rotulo">Para empresas de transporte</span>
           <h1 class="seccion-titulo">Toda tu flota, <span class="acentuado">en una pantalla.</span></h1>
           <!-- Sin botones: el de «Conecta tu flota» ya está fijo en el menú
@@ -347,8 +350,17 @@
                          de la ciudad de la portada, estirado aquí, salía
                          borroso y demasiado lejos. Ver `.flota-plano`.
                          Sin `lazy`: en pantalla ancha el monitor sale en
-                         la primera vista. -->
-                    <img class="flota-plano" src="./src/assets/map/mapa-panel.webp" alt=""
+                         la primera vista.
+                         En el teléfono es el LCP de la página y ahí se pinta
+                         a 228–265 px: bajarse el de 2x (99 KB) lo dejaba en
+                         2,6 s con Lighthouse móvil (T7.7). Va también a 1x,
+                         1167 px y 32 KB, reducido del de 2x con Lanczos y
+                         WebP 78. `sizes` sale de medirlo: 0,63–0,67 del
+                         ancho hasta 1280, y de ahí en adelante fijo en 782
+                         (`e2e/vitales.spec.ts` lo vuelve a medir). -->
+                    <img class="flota-plano" src="./src/assets/map/mapa-panel-1x.webp" alt=""
+                      srcset="./src/assets/map/mapa-panel-1x.webp 1167w, ./src/assets/map/mapa-panel.webp 2334w"
+                      sizes="(min-width: 1280px) 782px, 67vw"
                       width="2334" height="1402" decoding="async" />
 
                     <!-- Pulsar un bus lo elige, como el `onTap` de cada

@@ -9,9 +9,11 @@
    descubrir los .woff2. Además cada visita quedaba registrada en un
    servidor de terceros, que en la UE ya ha costado multas.
 
-   Ahora los ficheros viven en `src/assets/fonts/`. Son exactamente los
-   mismos woff2 que servía Google —no se ha recomprimido nada, así que
-   las letras se ven idénticas— pero salen de nuestro dominio, se
+   Ahora los ficheros viven en `src/assets/fonts/`. Son los woff2 que
+   servía Google recortados al español con `scripts/subconjunto_fuentes.py`
+   (T7.7): quedan las letras que se escriben aquí y sale el resto del
+   `latin` —las letras nórdicas, la eszett alemana…—, sin tocar el dibujo de ninguna, así que se ven
+   idénticas y pesan un 23 % menos. Salen de nuestro dominio, se
    pueden precargar desde el <head> sin esperar a ningún CSS y el
    empaquetador les pone hash para cachearlos para siempre.
 
@@ -25,7 +27,9 @@
    escrito aunque no haya con quién repartir: le dice al navegador qué
    letras cubre el fichero, así que una que no esté ahí se pinta con la
    tipografía del sistema sin pedir la descarga. Que no haya ninguna lo
-   comprueba `tests/tipografias.test.ts` en cada corrida.
+   comprueba `tests/tipografias.test.ts` en cada corrida, y también que
+   cada letra que la página escribe siga en el fichero recortado: lo lee
+   de su tabla `cmap`.
 
    Licencia: las dos son SIL Open Font License 1.1, que permite
    expresamente alojarlas por cuenta propia. Ver assets/fonts/LICENCIA.

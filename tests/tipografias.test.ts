@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { brotliDecompressSync } from 'node:zlib';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -53,6 +54,88 @@ function ficheros(dir: string): string[] {
   return salida;
 }
 
+/** Lee un entero UIntBase128 del directorio de un WOFF2 (sección 4.1). */
+function base128(buf: Buffer, pos: { at: number }): number {
+  let valor = 0;
+  for (let i = 0; i < 5; i++) {
+    const byte = buf[pos.at++];
+    valor = valor * 128 + (byte & 0x7f);
+    if (!(byte & 0x80)) return valor;
+  }
+  throw new Error('UIntBase128 de más de 5 bytes');
+}
+
+/**
+ * Las letras que un `.woff2` trae de verdad, leídas de su tabla `cmap`.
+ * Sin dependencias: el WOFF2 es un directorio de tablas más un único
+ * bloque Brotli, y la `cmap` nunca va transformada. Se descomprime, se
+ * busca dónde cae y se leen sus subtablas de formato 4 y 12.
+ */
+function letrasDe(ruta: string): Set<number> {
+  const woff = readFileSync(ruta);
+  const numTablas = woff.readUInt16BE(12);
+  const comprimido = woff.readUInt32BE(20);
+  const pos = { at: 48 };
+  let inicio = 0;
+  let cmap: [number, number] | undefined;
+  for (let i = 0; i < numTablas; i++) {
+    const flags = woff[pos.at++];
+    const indice = flags & 0x3f;
+    const tag = indice === 0x3f ? woff.toString('latin1', pos.at, (pos.at += 4)) : '';
+    const largo = base128(woff, pos);
+    const version = flags >> 6;
+    // glyf (10) y loca (11) van transformadas con la versión 0; el resto,
+    // con cualquiera que no sea 0. Transformada, ocupa su `transformLength`.
+    const transformada = indice === 10 || indice === 11 ? version === 0 : version !== 0;
+    const ocupa = transformada ? base128(woff, pos) : largo;
+    if (indice === 0 || tag === 'cmap') cmap = [inicio, largo];
+    inicio += ocupa;
+  }
+  if (!cmap) throw new Error(`${ruta} no trae cmap`);
+  const datos = brotliDecompressSync(woff.subarray(pos.at, pos.at + comprimido));
+  const tabla = datos.subarray(cmap[0], cmap[0] + cmap[1]);
+
+  const letras = new Set<number>();
+  for (let i = 0; i < tabla.readUInt16BE(2); i++) {
+    const sub = tabla.subarray(tabla.readUInt32BE(4 + i * 8 + 4));
+    const formato = sub.readUInt16BE(0);
+    if (formato === 4) {
+      const segmentos = sub.readUInt16BE(6) / 2;
+      const fines = 14;
+      const comienzos = fines + segmentos * 2 + 2;
+      const deltas = comienzos + segmentos * 2;
+      const saltos = deltas + segmentos * 2;
+      for (let s = 0; s < segmentos; s++) {
+        const fin = sub.readUInt16BE(fines + s * 2);
+        const comienzo = sub.readUInt16BE(comienzos + s * 2);
+        const delta = sub.readUInt16BE(deltas + s * 2);
+        const salto = sub.readUInt16BE(saltos + s * 2);
+        for (let c = comienzo; c <= fin && c !== 0xffff; c++) {
+          const glifo = salto === 0
+            ? (c + delta) & 0xffff
+            : sub.readUInt16BE(saltos + s * 2 + salto + (c - comienzo) * 2);
+          if (glifo !== 0) letras.add(c);
+        }
+      }
+    } else if (formato === 12) {
+      for (let g = 0; g < sub.readUInt32BE(12); g++) {
+        const desde = sub.readUInt32BE(16 + g * 12);
+        const hasta = sub.readUInt32BE(20 + g * 12);
+        for (let c = desde; c <= hasta; c++) letras.add(c);
+      }
+    }
+  }
+  return letras;
+}
+
+/** Los rangos de un `unicode-range` de la hoja, como pares [desde, hasta]. */
+function rangos(declaracion: string): [number, number][] {
+  return declaracion.split(',').map((r) => {
+    const [desde, hasta] = r.trim().replace(/^U\+/i, '').split('-');
+    return [parseInt(desde, 16), parseInt(hasta ?? desde, 16)];
+  });
+}
+
 describe('las tipografías que se empaquetan son las que se usan', () => {
   it('no hay una sola letra que pida el subconjunto latin-ext', () => {
     const paginas = ['index.html', 'empresas.html', 'privacidad.html',
@@ -88,5 +171,42 @@ describe('las tipografías que se empaquetan son las que se usan', () => {
     ).sort();
 
     expect(declarados).toEqual(woff2);
+  });
+
+  it('cada letra que la página escribe está en las fuentes recortadas', () => {
+    // `scripts/subconjunto_fuentes.py` deja en cada fuente el español y su
+    // puntuación (T7.7). Una letra que la hoja promete con `unicode-range`
+    // y que el fichero ya no trae se pintaría con la del sistema en mitad
+    // de una palabra. Se lee el `cmap` de lo que se sirve, no la lista del
+    // guion: manda el fichero.
+    const paginas = ['index.html', 'empresas.html', 'privacidad.html',
+      'terminos.html', '404.html'].map((p) => raiz(p));
+    const usadas = new Set<number>();
+    for (const ruta of [...paginas, ...ficheros(raiz('src'))]) {
+      for (const letra of readFileSync(ruta, 'utf8')) usadas.add(letra.codePointAt(0) ?? 0);
+    }
+
+    const hoja = readFileSync(raiz('src/css/fonts.css'), 'utf8');
+    const caras = Array.from(
+      hoja.matchAll(/url\('([^']+)'\)[^;]*;\s*unicode-range:([^;]+);/g),
+      (m) => ({ fichero: m[1].split('/').pop() ?? '', rango: rangos(m[2]) })
+    );
+    expect(caras.map((c) => c.fichero).sort()).toEqual([
+      'bricolage-grotesque-latin.woff2',
+      'plus-jakarta-sans-latin.woff2',
+    ]);
+
+    const faltan: string[] = [];
+    for (const { fichero, rango } of caras) {
+      const tiene = letrasDe(raiz('src/assets/fonts', fichero));
+      for (const punto of usadas) {
+        if (punto < 0x20 || punto === 0xfeff) continue; // saltos y BOM: no se pintan
+        if (!rango.some(([d, h]) => punto >= d && punto <= h)) continue;
+        if (!tiene.has(punto)) {
+          faltan.push(`${fichero}: «${String.fromCodePoint(punto)}» (U+${punto.toString(16).toUpperCase()})`);
+        }
+      }
+    }
+    expect(faltan).toEqual([]);
   });
 });
