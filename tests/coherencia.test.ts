@@ -135,11 +135,16 @@ describe('lo legal no describe una cuenta que la app ya no tiene', () => {
     });
   }
 
-  it('privacidad.html ya no cuenta a Firebase entre los apoyos de la app', () => {
+  it('privacidad.html ya no cuenta a Firebase Authentication entre los apoyos de la app', () => {
+    // Desde el 2 de octubre de 2026 Firebase vuelve a la lista, pero solo
+    // Cloud Messaging (el aviso de Android con la app cerrada): la cuenta
+    // sigue sin existir.
     const apoyos =
       sinComentarios(leer('privacidad.html')).match(/Con quién se apoya la app<\/h2>\s*<ul[\s\S]*?<\/ul>/)?.[0] ?? '';
     expect(apoyos, 'ya no está la lista de apoyos').toContain('OpenStreetMap');
-    expect(apoyos).not.toMatch(/firebase/i);
+    expect(apoyos).not.toMatch(/authentication|google sign/i);
+    expect(apoyos.match(/firebase/gi)).toEqual(['Firebase']);
+    expect(apoyos).toContain('<strong>Firebase Cloud Messaging</strong>');
   });
 });
 
@@ -191,7 +196,38 @@ describe('la privacidad dice qué pasa con la app cerrada', () => {
   it('la fecha del documento acompaña al cambio', () => {
     // Un texto legal que cambia sin cambiar su fecha no se distingue del
     // anterior, y la app usa la misma fecha para decir cuál está leyendo.
-    expect(leer('privacidad.html')).toContain('Actualizado el 29 de septiembre de 2026');
+    expect(leer('privacidad.html')).toContain('Actualizado el 2 de octubre de 2026');
+  });
+});
+
+/**
+ * Los avisos con la app cerrada (D13 del backend, 2 de octubre de 2026). En
+ * Android, mientras hay un aviso armado, el punto de espera redondeado y el
+ * código de Firebase Cloud Messaging van al servidor. Hasta entonces la
+ * política decía que la ubicación no salía nunca del teléfono y que no había
+ * push; las dos frases dejaron de ser ciertas y aquí se vigila que no
+ * vuelvan. La copia de la app la vigila `test/legal_segundo_plano_test.dart`,
+ * que además lee el manifiesto (FCM no arranca solo).
+ */
+describe('la privacidad dice qué sale del teléfono con un aviso de Android', () => {
+  const texto = (): string =>
+    leer('privacidad.html')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/\s+/g, ' ');
+
+  it('dice qué sale, cuándo, redondeado y hasta cuándo', () => {
+    const html = texto();
+    expect(html).toContain('La excepción es el aviso en Android');
+    expect(html).toContain('redondeado a unos 100 metros');
+    expect(html).toContain('como mucho a las tres horas de armarlo');
+    expect(html).toContain('En iPhone tu ubicación no sale del teléfono.');
+  });
+
+  it('ya no promete lo que dejó de ser cierto', () => {
+    const html = texto();
+    expect(html).not.toContain('no usa ningún servicio de mensajería');
+    expect(html).not.toContain('<h2>Tu ubicación no sale del teléfono</h2>');
+    expect(html).not.toContain('tu ubicación se queda en tu teléfono');
   });
 });
 
@@ -255,7 +291,7 @@ describe('el formulario de empresas cumple lo de la Ley 1581', () => {
     ]) {
       expect(colada, colada).toMatch(CEDULA);
     }
-    for (const limpia of ['WhatsApp 300 443 8626', 'Ley 1581 de 2012', 'Decreto 1377 de 2013', '29 de septiembre de 2026']) {
+    for (const limpia of ['WhatsApp 300 443 8626', 'Ley 1581 de 2012', 'Decreto 1377 de 2013', '2 de octubre de 2026']) {
       expect(limpia, limpia).not.toMatch(CEDULA);
     }
   });
