@@ -19,7 +19,7 @@ import { ROTULO, type BusEstado } from "../src/panel-flota";
  * de la landing (sin placa, regla 12) y la cifra de la distancia.
  */
 const HASH_GLOSARIO =
-  "a504203047349505e763090f95f60db4bf595c9f9183dd5ca55463427bfe0b74";
+  "0dd131a5163095d0a970bd26ee4cd17b21b27609c047311ff44fce4c3294cf7b";
 
 const leer = (nombre: string): string =>
   readFileSync(resolve(process.cwd(), nombre), "utf8");
@@ -67,8 +67,10 @@ describe("glosario (T6.8)", () => {
     for (const archivo of ["src/phone-simulator.ts", "src/mapa-vivo.ts"]) {
       expect(leer(archivo), archivo).toContain(`'${landing}'`);
     }
-    // Regla 12: la app dice ruta y placa; la landing, no.
+    // Regla 12: la app nombra la ruta (sin placa ni distancia desde el
+    // 2026-10-02); la landing, no.
     expect(landing).not.toBe(glosario.aviso.app);
+    expect(landing).not.toContain("{ruta}");
     expect(landing).not.toContain("{placa}");
   });
 
