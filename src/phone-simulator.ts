@@ -311,7 +311,7 @@ export class PhoneSimulator {
     }
   }
 
-  /* ---------- Distancia (espeja _urgencyColor; la cifra, metrica()) ---------- */
+  /* ---------- Distancia (espeja colorDeDistancia; la cifra, metrica()) ---------- */
 
   #colorUrgencia(metros: number): string {
     if (metros < 300) return 'var(--app-coral-accessible)';

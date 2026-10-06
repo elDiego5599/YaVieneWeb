@@ -32,11 +32,13 @@ export function cifraViva(el: HTMLElement, texto: string, valor: number): void {
 }
 
 /**
- * `_metricParts` de eta_bottom_sheet.dart: la cifra grande y su unidad.
- * Bajo el kilómetro en metros; por encima en kilómetros con un decimal y
- * coma, como la escribe la app.
+ * `distanciaPartes` de distancia.dart en la app: la cifra grande y su
+ * unidad. Bajo el kilómetro en metros; por encima en kilómetros con un
+ * decimal y coma, como la escribe la app. Se decide con los metros ya
+ * redondeados (`enMetros`): 999,6 m no se escriben «1000 m».
  */
 export function metrica(metros: number): [string, string] {
-  if (metros < 1000) return [String(Math.round(metros)), 'm de ti'];
+  const redondos = Math.round(metros);
+  if (redondos < 1000) return [String(redondos), 'm de ti'];
   return [(metros / 1000).toFixed(1).replace('.', ','), 'km de ti'];
 }

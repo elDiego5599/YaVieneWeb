@@ -196,6 +196,16 @@ describe('encajarEscena', () => {
     expect(factor()).toBe('');
   });
 
+  // Riesgo: franjas que llenan la pantalla justo dejan un hueco de 0 y la escena se aplasta.
+  it('con un hueco de exactamente cero tampoco encoge', () => {
+    const { escena: caja, factor } = escena(
+      { minHeight: '100px', paddingTop: '50px', paddingBottom: '50px' },
+      (k) => 1000 * k
+    );
+    encajar(caja);
+    expect(factor()).toBe('');
+  });
+
   // Riesgo: una escena sin contenido revienta el arranque de toda la página.
   it('una escena vacía no hace nada y se suelta sin fallar', () => {
     const caja = document.createElement('section');

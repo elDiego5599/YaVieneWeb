@@ -240,6 +240,16 @@ describe('NavIsland: dónde estás', () => {
     expect(lugar!.textContent).toBe('');
   });
 
+  // Riesgo: el velo aparece con el primer píxel de rebote (iOS) y la cabecera parpadea arriba del todo.
+  it('hasta 4 px de scroll la cabecera sigue fundida con el hero; a los 5 ya no', () => {
+    montarSecciones(true);
+    const cabecera = document.querySelector('.site-header')!;
+    desplazar(4);
+    expect(cabecera.classList.contains('is-arriba')).toBe(true);
+    desplazar(5);
+    expect(cabecera.classList.contains('is-arriba')).toBe(false);
+  });
+
   it('sin cabecera ni rótulo también marca: la línea no depende de ellos', () => {
     const { uno, dos, aUno, aDos } = montarSecciones(false);
     expect(aUno.getAttribute('aria-current')).toBe('location');

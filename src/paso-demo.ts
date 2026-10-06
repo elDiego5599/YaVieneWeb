@@ -668,13 +668,13 @@ export class PasoDemo {
 
   #setMetros(metros: number): void {
     const m = this.#redondear(metros);
-    // _metricParts(): bajo el kilómetro en metros, por encima en kilómetros.
+    // distanciaPartes() de la app: bajo el kilómetro en metros, por encima en kilómetros.
     const [valor, unidad] = metrica(m);
     const cifra = this.#el('eta-value');
     if (cifra) cifraViva(cifra, valor, m);
     this.#texto('eta-unit', unidad);
 
-    // _urgencyColor() de eta_bottom_sheet.dart: coral bajo los 300 metros,
+    // colorDeDistancia() de eta_bottom_sheet.dart: coral bajo los 300 metros,
     // ámbar dentro del kilómetro, verde más allá. Va en el número, que es
     // el dato; la franja de encima se fue con el diseño «A» (2026-09-30).
     const cerca = m < RADIO_AVISO_M;

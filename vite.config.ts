@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 
 import { defineConfig, type Plugin } from 'vite';
+import { coverageConfigDefaults } from 'vitest/config';
 
 /*
   Las tres piezas que un buscador espera encontrar en la raíz —`robots.txt`,
@@ -217,6 +218,9 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json-summary'],
+      // El trinquete mide el sitio; scripts/ entraría solo porque una prueba
+      // importa la lista de la prueba de fuego.
+      exclude: [...coverageConfigDefaults.exclude, 'scripts/**'],
       thresholds: {
         statements: 98,
         branches: 90,

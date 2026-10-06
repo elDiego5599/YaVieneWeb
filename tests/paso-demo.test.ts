@@ -422,6 +422,88 @@ describe('3. Te avisamos', () => {
   });
 });
 
+describe('el reloj del guion', () => {
+  /**
+   * Cuadros cada `ms` en vez de los 16 del reloj falso: con 16 nunca se
+   * cae justo en los 420 ms del refresco y un `<=` en su lugar pasaría
+   * sin que nadie lo notara.
+   */
+  function cuadrosCada(ms: number): void {
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) =>
+      setTimeout(() => cb(performance.now()), ms)
+    );
+    vi.stubGlobal('cancelAnimationFrame', (id: number) => clearTimeout(id));
+  }
+
+  // Riesgo: los buses del primer teléfono van a otra velocidad, o todos a
+  // la misma y se apelotonan en una sola mancha.
+  it('cada bus avanza a 58 m/s por su factor: 0,85 el primero, 0,22 más cada siguiente', () => {
+    cuadrosCada(20);
+    const largo = 20000;
+    const mapa = mapaFalso({ metros: largo });
+    const posiciones: number[][] = [];
+    mapa.setBuses = (t: number[]) => {
+      posiciones.push([...t]);
+    };
+    const { demo } = montarDemo(1, mapa);
+    demo.activar(true);
+    vi.advanceTimersByTime(4000);
+
+    // Los dos buses salen a los 2,4 s; de ahí en adelante, cuadro a cuadro.
+    const enMarcha = posiciones.filter((p) => p.length === 2);
+    expect(enMarcha.length).toBeGreaterThan(20);
+    for (let i = 2; i < enMarcha.length; i++) {
+      for (const bus of [0, 1]) {
+        const avance = ((enMarcha[i]![bus]! - enMarcha[i - 1]![bus]! + 1) % 1) * largo;
+        expect(avance / 0.02, `bus ${bus}, cuadro ${i}`).toBeCloseTo(58 * (0.85 + bus * 0.22), 6);
+      }
+    }
+  });
+
+  // Riesgo: la cifra se refresca más lento de lo que dice la app (o más rápido y no se lee).
+  it('la cifra de la hoja se refresca justo cada 420 ms mientras el bus se acerca', () => {
+    cuadrosCada(20);
+    const { raiz, demo } = montarDemo(3, mapaFalso({ metros: 20000 }));
+    demo.activar(true);
+    // El bus arranca a los 500 ms a 1250 m y cruza el kilómetro hacia los
+    // 5,6 s; desde ahí la cifra va en metros redondeados a la decena, y
+    // 20 m por refresco la cambian siempre.
+    vi.advanceTimersByTime(6000);
+    const valor = el(raiz, 'eta-value');
+    const cambios: number[] = [];
+    let antes = valor.textContent;
+    for (let t = 0; t < 3000; t += 20) {
+      vi.advanceTimersByTime(20);
+      if (valor.textContent !== antes) {
+        cambios.push(t);
+        antes = valor.textContent;
+      }
+    }
+    const intervalos = cambios.slice(1).map((t, i) => t - cambios[i]!);
+    expect(intervalos.length).toBeGreaterThan(4);
+    expect(new Set(intervalos)).toEqual(new Set([420]));
+  });
+
+  // Riesgo: a 300 m justos la cifra se pinta coral, y la app la pinta ámbar.
+  it('a 300 m justos la cifra va en ámbar, no en coral', () => {
+    cuadrosCada(20);
+    // En una ruta de 950 m, los 1250 m de partida dan la vuelta y el bus
+    // sale a 300 m justos del punto.
+    const { raiz, demo } = montarDemo(3, mapaFalso({ metros: 950 }));
+    demo.activar(true);
+    const valor = el(raiz, 'eta-value');
+    const vistos = new Map<number, string>();
+    for (let t = 0; t < 12000; t += 20) {
+      vi.advanceTimersByTime(20);
+      vistos.set(metrosEnHoja(raiz), valor.className);
+    }
+    const a300 = vistos.get(300);
+    expect(a300, `metros vistos: ${[...vistos.keys()].join(', ')}`).toBeDefined();
+    expect(a300).toContain('eta-number--cerca');
+    expect(a300).not.toContain('eta-number--muy-cerca');
+  });
+});
+
 describe('encender y apagar', () => {
   // Riesgo: al salir de un paso su bucle sigue corriendo y consume aunque no se vea.
   it('al apagarlo se para el bucle y vuelve a la foto de reposo', () => {

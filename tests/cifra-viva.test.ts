@@ -75,7 +75,7 @@ describe('cifraViva', () => {
 });
 
 /**
- * `_metricParts` de eta_bottom_sheet.dart: bajo el kilómetro en metros,
+ * `distanciaPartes` de distancia.dart en la app: bajo el kilómetro en metros,
  * por encima en kilómetros con un decimal y coma —la hoja de la app, la
  * voz, las fichas de ruta y el mapa en vivo ya la escribían así; los dos
  * teléfonos de la landing ponían punto—.
@@ -88,5 +88,12 @@ describe('metrica', () => {
   it('desde el kilómetro, kilómetros con coma decimal', () => {
     expect(metrica(1000)).toEqual(['1,0', 'km de ti']);
     expect(metrica(1250)).toEqual(['1,3', 'km de ti']);
+  });
+
+  // Riesgo: decidir con los metros crudos. 999,6 m se redondean a 1000 y
+  // la cifra decía «1000 m» en vez de «1,0 km».
+  it('decide con los metros ya redondeados', () => {
+    expect(metrica(999.4)).toEqual(['999', 'm de ti']);
+    expect(metrica(999.6)).toEqual(['1,0', 'km de ti']);
   });
 });
