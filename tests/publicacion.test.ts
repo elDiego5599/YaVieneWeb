@@ -124,6 +124,21 @@ describe('la construcción y VITE_SITE_URL', () => {
     );
     expect(paginas['index.html']).toContain('<meta property="og:image" content="https://yaviene.co/og.png" />');
     expect(paginas['index.html']).toContain('"url": "https://yaviene.co/"');
+    // Las cuatro páginas del sitemap se comparten con su tarjeta: título,
+    // dirección e imagen. Privacidad y términos salían en WhatsApp como un
+    // enlace pelado (2026-10-05).
+    for (const [pagina, ruta] of [
+      ['index.html', '/'],
+      ['empresas.html', '/empresas.html'],
+      ['privacidad.html', '/privacidad.html'],
+      ['terminos.html', '/terminos.html'],
+    ] as const) {
+      const html = paginas[pagina];
+      expect(html, pagina).toContain(`<meta property="og:url" content="https://yaviene.co${ruta}" />`);
+      expect(html, pagina).toContain('<meta property="og:image" content="https://yaviene.co/og.png" />');
+      expect(html, pagina).toMatch(/<meta property="og:title" content="[^"]+" \/>/);
+      expect(html, pagina).toContain('<meta name="twitter:card" content="summary_large_image" />');
+    }
     for (const [pagina, html] of Object.entries(paginas)) {
       expect(html, pagina).not.toContain('%VITE_SITE_URL%');
       expect(html, pagina).not.toContain('yaviene.co//');

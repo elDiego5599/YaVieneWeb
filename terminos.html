@@ -11,6 +11,29 @@
   <meta name="theme-color" content="#0B1628" />
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
 
+  <!--
+    La misma tarjeta para compartir que la portada y empresas (og.png), con
+    el título y la descripción de esta página: sin ella, el enlace salía
+    pelado en WhatsApp y en redes (2026-10-05).
+  -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Ya Viene" />
+  <meta property="og:locale" content="es_CO" />
+  <meta property="og:url" content="%VITE_SITE_URL%/terminos.html" />
+  <meta property="og:title" content="Ya Viene Términos" />
+  <meta property="og:description" content="Las condiciones de uso de Ya Viene: qué es, qué no promete y qué se espera de quien la usa." />
+  <meta property="og:image" content="%VITE_SITE_URL%/og.png" />
+  <meta property="og:image:secure_url" content="%VITE_SITE_URL%/og.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt"
+    content="Ya Viene: ¿Cuánto falta para tu bus? Barranquilla, seis rutas reales." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Ya Viene Términos" />
+  <meta name="twitter:description" content="Las condiciones de uso de Ya Viene: qué es, qué no promete y qué se espera de quien la usa." />
+  <meta name="twitter:image" content="%VITE_SITE_URL%/og.png" />
+
     <!--
       Las dos familias ya no vienen de Google: viven en `src/assets/fonts/` y
       se declaran en `src/css/fonts.css`. Se precargan aquí porque el <head>
