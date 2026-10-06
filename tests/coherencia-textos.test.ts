@@ -105,7 +105,11 @@ const FRASES: Record<string, string[]> = {
   'Aviso activado': ['index.html', 'src/phone-simulator.ts'],
   'Toca el mapa para indicar dónde estás': ['index.html'],
   'Ahí ponemos tu punto de espera y medimos desde él': ['index.html'],
-  'Puedes cambiar de aplicación; no cierres Ya Viene del todo': ['index.html'],
+  // La nota del aviso puesto en el iPhone (`_Nota.distancia`), en la
+  // distancia con la que arranca la rueda; los teléfonos de la página son
+  // iPhone, así que la nota de Android no se repite aquí.
+  'Te avisamos a 1,0 km': ['index.html'],
+  'Cambiar': ['index.html'],
   'Localizando tu ubicación…': ['index.html', 'src/paso-demo.ts'],
   'Arrástralo para moverlo': ['index.html', 'src/paso-demo.ts'],
   'Fija tu punto de espera': ['index.html'],

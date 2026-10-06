@@ -26,7 +26,10 @@ import type { Punto, RutaLanding } from './types';
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const XLINK = 'http://www.w3.org/1999/xlink';
 
-/** El radio del aviso automático: `proximity_alerts_provider.dart`. */
+/**
+ * El radio del aviso: el kilómetro con el que arranca la rueda de
+ * rueda_distancia.dart cuando nadie ha guardado otra distancia.
+ */
 const RADIO_AVISO_M = 1000;
 
 /** Los dos buses del piloto, con el identificador que ya llevan en la app. */

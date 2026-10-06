@@ -62,11 +62,14 @@ export const MUTACIONES = [
   { archivo: 'src/selector.ts', de: "filas.forEach((fila, i) => fila.style.setProperty('--i', String(Math.min(i, 5))));", a: "filas.forEach((fila, i) => fila.style.setProperty('--i', String(Math.min(i, 4))));", que: 'tope del escalón de filas' },
   // Los tres teléfonos de «Cómo funciona».
   { archivo: 'src/paso-demo.ts', de: 'const METROS_POR_SEGUNDO = 58;', a: 'const METROS_POR_SEGUNDO = 29;', que: 'velocidad del guion' },
-  { archivo: 'src/paso-demo.ts', de: 'const RADIO_AVISO_M = 1000;', a: 'const RADIO_AVISO_M = 2000;', que: 'radio del aviso (demo)' },
+  { archivo: 'src/paso-demo.ts', de: 'const RADIO_GUARDADO_M = 800;', a: 'const RADIO_GUARDADO_M = 900;', que: 'distancia que guarda el guion' },
+  { archivo: 'src/paso-demo.ts', de: 'const RUEDA_M = Array.from({ length: 26 }, (_, i) => 500 + i * 100);', a: 'const RUEDA_M = Array.from({ length: 25 }, (_, i) => 500 + i * 100);', que: 'la rueda llega a 3 km' },
+  { archivo: 'src/paso-demo.ts', de: '      this.#radioM = RADIO_GUARDADO_M;\n', a: '', que: 'guardar cambia la distancia' },
+  { archivo: 'src/paso-demo.ts', de: "fila.classList.toggle('is-elegida', j === i)", a: "fila.classList.toggle('is-elegida', j === 5)", que: 'la fila elegida sigue a la rueda' },
   { archivo: 'src/paso-demo.ts', de: '(0.85 + i * 0.22)', a: '(0.85 - i * 0.22)', que: 'cada bus a su velocidad' },
   { archivo: 'src/paso-demo.ts', de: 'const dt = Math.min(0.05, (ahora - this.#ultimo) / 1000);', a: 'const dt = (ahora - this.#ultimo) / 1000;', que: 'tope del salto entre cuadros' },
   { archivo: 'src/paso-demo.ts', de: 'if (ahora - this.#refresco < 420) return;', a: 'if (ahora - this.#refresco <= 420) return;', que: 'refresco cada 420 ms' },
-  { archivo: 'src/paso-demo.ts', de: 'this.#avisoPuesto && metros <= RADIO_AVISO_M);', a: 'metros <= RADIO_AVISO_M);', que: 'tarjeta solo con el aviso armado' },
+  { archivo: 'src/paso-demo.ts', de: 'this.#avisoPuesto && metros <= this.#radioM);', a: 'metros <= this.#radioM);', que: 'tarjeta solo con el aviso armado' },
   { archivo: 'src/paso-demo.ts', de: 'return metros < 100 ? Math.max(10, Math.round(metros)) : Math.round(metros / 10) * 10;', a: 'return Math.round(metros / 10) * 10;', que: 'redondeo de la cifra' },
   { archivo: 'src/paso-demo.ts', de: 'const muyCerca = m < 300;', a: 'const muyCerca = m <= 300;', que: 'coral bajo 300 m' },
   // El hero.

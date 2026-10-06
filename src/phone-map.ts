@@ -72,7 +72,8 @@ const HALO_R = ((24 + 2.4) * BUS_ALTO) / BUS_PT;
 /**
  * Radio "cerca de ti" que la app pinta alrededor del punto de espera:
  * `nearbyRadiusMeters` de nearby_buses_provider.dart. No es el radio del
- * aviso (ese es de 1 km, en proximity_alerts_provider.dart).
+ * aviso (ese lo elige quien lo arma, de 500 m a 3 km, en
+ * distancia_aviso_provider.dart).
  */
 const RADIO_CERCA_M = 2000;
 

@@ -5,14 +5,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ya Viene</title>
-  <!-- La promesa es la de la app, con su número: avisa por distancia, no
-       por tiempo ni por parada. «1 km» espeja `alertRadiusMeters = 1000`
-       (app_pasajero/lib/features/notifications/presentation/providers/
-       proximity_alerts_provider.dart). Va igual en la descripción, en las
-       dos tarjetas sociales y en el JSON-LD; si cambia el radio, cambian
-       las cuatro. -->
+  <!-- La promesa es la de la app: avisa por distancia, no por tiempo ni
+       por parada. Desde el 6 de octubre de 2026 la distancia la elige cada
+       quien con una rueda de 500 m a 3 km (`distanciasDeAviso` en
+       app_pasajero/lib/features/notifications/presentation/providers/
+       distancia_aviso_provider.dart); antes era un kilómetro fijo y aquí
+       decía «a menos de 1 km». Va igual en la descripción, en las dos
+       tarjetas sociales y en el JSON-LD; si cambia, cambian las cuatro. -->
   <meta name="description"
-    content="Ya Viene: mira tu bus moverse en el mapa de Barranquilla en tiempo real y te avisamos cuando tu bus esté a menos de 1 km." />
+    content="Ya Viene: mira tu bus moverse en el mapa de Barranquilla en tiempo real y te avisamos cuando tu bus esté a la distancia que elijas." />
   <link rel="canonical" href="%VITE_SITE_URL%/" />
 
   <!-- Open Graph / Meta Social.
@@ -27,7 +28,7 @@
   <meta property="og:url" content="%VITE_SITE_URL%/" />
   <meta property="og:title" content="Ya Viene — Tu bus en tiempo real en Barranquilla" />
   <meta property="og:description"
-    content="Mira el bus moverse en el mapa y te avisamos cuando tu bus esté a menos de 1 km. Seis rutas reales de Barranquilla." />
+    content="Mira el bus moverse en el mapa y te avisamos cuando tu bus esté a la distancia que elijas. Seis rutas reales de Barranquilla." />
   <meta property="og:image" content="%VITE_SITE_URL%/og.png" />
   <meta property="og:image:secure_url" content="%VITE_SITE_URL%/og.png" />
   <meta property="og:image:type" content="image/png" />
@@ -39,7 +40,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Ya Viene — Tu bus en tiempo real en Barranquilla" />
   <meta name="twitter:description"
-    content="Mira el bus moverse en el mapa y te avisamos cuando tu bus esté a menos de 1 km." />
+    content="Mira el bus moverse en el mapa y te avisamos cuando tu bus esté a la distancia que elijas." />
   <meta name="twitter:image" content="%VITE_SITE_URL%/og.png" />
 
   <!--
@@ -70,7 +71,7 @@
           "url": "%VITE_SITE_URL%/",
           "logo": "%VITE_SITE_URL%/logo.svg",
           "image": "%VITE_SITE_URL%/og.png",
-          "description": "Ya Viene muestra el bus moverse en el mapa de Barranquilla en tiempo real y te avisa cuando tu bus esté a menos de 1 km.",
+          "description": "Ya Viene muestra el bus moverse en el mapa de Barranquilla en tiempo real y te avisa cuando tu bus esté a la distancia que elijas.",
           "areaServed": {
             "@type": "City",
             "name": "Barranquilla",
@@ -547,7 +548,8 @@
           <!--
             Teléfono derecho: la demo viva. El mapa real de Barranquilla,
             los buses de la ruta elegida moviéndose encima y el aviso que se
-            enciende cuando el más cercano entra en el kilómetro. Es la
+            enciende cuando el más cercano entra en el kilómetro —la
+            distancia con la que arranca la rueda del aviso en la app—. Es la
             pantalla que hay que ver funcionando, y por eso es la única que
             se anima; las otras dos son fotos fijas de la app.
 
@@ -735,11 +737,15 @@
                     </div>
                     <div class="eta-detail" data-el="eta-sub" hidden>
                       <span class="eta-detail-icono" aria-hidden="true">
-                        <!-- info_outline_rounded de la app: la nota del aviso puesto. -->
+                        <!-- notifications_active_outlined de la app: la nota
+                             del aviso puesto en el iPhone, `_Nota.distancia`. -->
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></svg>
+                          stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7" /><path d="M10.2 20a2 2 0 0 0 3.6 0" /><path d="M3 5.5A9 9 0 0 1 5.5 3M21 5.5A9 9 0 0 0 18.5 3" /></svg>
                       </span>
-                      <span data-el="eta-sub-texto"></span>
+                      <!-- La distancia con la que arranca la rueda sin nada
+                           guardado; phone-simulator.ts la vuelve a escribir. -->
+                      <span data-el="eta-sub-texto">Te avisamos a 1,0 km</span>
+                      <span class="eta-detail-accion">Cambiar</span>
                     </div>
 
                     <!-- Un div y no un button: es el dibujo de un botón, y un
@@ -1334,12 +1340,18 @@
                         <div class="eta-number eta-number--cerca" data-el="eta-value">640</div>
                         <div class="eta-unit" data-el="eta-unit">m de ti</div>
                       </div>
+                      <!-- Con el aviso puesto, la nota del iPhone dice a qué
+                           distancia avisa y se toca para cambiarla
+                           (`_Nota.distancia` de eta_bottom_sheet.dart). Los
+                           800 m son los que el guion guarda en la rueda. -->
                       <div class="eta-detail" data-el="eta-sub">
                         <span class="eta-detail-icono" aria-hidden="true">
+                          <!-- notifications_active_outlined: la campana con sus ondas. -->
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></svg>
+                            stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7" /><path d="M10.2 20a2 2 0 0 0 3.6 0" /><path d="M3 5.5A9 9 0 0 1 5.5 3M21 5.5A9 9 0 0 0 18.5 3" /></svg>
                         </span>
-                        <span>Puedes cambiar de aplicación; no cierres Ya Viene del todo</span>
+                        <span data-el="eta-sub-texto">Te avisamos a 800 m</span>
+                        <span class="eta-detail-accion">Cambiar</span>
                       </div>
                       <div class="app-cta active" data-el="alert-btn">
                         <svg data-icono="campana" data-grupo="aviso" hidden viewBox="0 0 24 24" fill="none"
@@ -1353,6 +1365,26 @@
                           <path d="M8 12.5l2.8 2.8L16 10" />
                         </svg>
                         <span data-el="alert-label">Aviso activado</span>
+                      </div>
+                    </div>
+                    <!-- La primera vez que se arma un aviso, la app pregunta
+                         la distancia en su ventana propia (`Dialogo` con la
+                         rueda de rueda_distancia.dart). Las filas las escribe
+                         paso-demo.ts: de 500 m a 3,0 km de 100 en 100. -->
+                    <div class="phone-dialogo" data-el="dialogo">
+                      <div class="dialogo-bandeja">
+                        <div class="dialogo-ventana">
+                          <span class="dialogo-icono">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                              stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7" /><path d="M10.2 20a2 2 0 0 0 3.6 0" /><path d="M3 5.5A9 9 0 0 1 5.5 3M21 5.5A9 9 0 0 0 18.5 3" /></svg>
+                          </span>
+                          <p class="dialogo-titulo" data-el="dialogo-titulo">¿A qué distancia te avisamos?</p>
+                          <p class="dialogo-mensaje">Te avisamos cuando el bus esté así de cerca. Guárdala y no te
+                            lo volvemos a preguntar; la cambias cuando quieras.</p>
+                          <div class="rueda" data-el="rueda"><div class="rueda-carril"></div></div>
+                          <div class="dialogo-guardar" data-el="dialogo-guardar">Guardar</div>
+                          <div class="dialogo-otra" data-el="dialogo-otra">Solo esta vez</div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1414,7 +1446,7 @@
                   <button type="button" class="paso-boton" data-paso-boton="2">
                     <span class="columna-indice">Paso 3</span>
                     <span class="columna-titulo">Te avisamos</span>
-                    <span class="paso-boton-texto"><span class="columna-texto">Activa el aviso y te notificamos cuando el bus esté a un kilómetro. Sigue con lo tuyo mientras tanto. En iPhone el aviso suena con la app abierta.</span></span>
+                    <span class="paso-boton-texto"><span class="columna-texto">Activa el aviso y te notificamos cuando el bus esté a la distancia que elijas. Sigue con lo tuyo mientras tanto. En iPhone el aviso suena con la app abierta.</span></span>
                   </button>
                 </li>
               </ol>
@@ -1495,7 +1527,7 @@
             <span class="cara cara--ciego">El bus puede tardar tres minutos o treinta, y hasta que dobla la esquina
               no hay forma de saber cuál de las dos. Todo lo demás sale de ahí.</span>
             <span class="cara cara--claro" aria-hidden="true">El bus va en el mapa desde que sale del terminal, y el aviso entra
-              solo cuando está a un kilómetro. La espera deja de ser una apuesta.</span>
+              solo cuando está a la distancia que elijas. La espera deja de ser una apuesta.</span>
           </p>
         </header>
 
@@ -1679,7 +1711,7 @@
                 </div>
                 <div class="cara cara--claro" aria-hidden="true">
                   <h3 class="columna-titulo">Esperas donde te convenga</h3>
-                  <p class="columna-texto">El aviso entra cuando el bus está a un kilómetro, así que la espera se
+                  <p class="columna-texto">El aviso entra cuando el bus está a la distancia que elijas, así que la espera se
                     hace a la sombra, en la tienda o en la casa, y no en el andén.</p>
                 </div>
               </div>
@@ -1711,7 +1743,8 @@
     <!-- ============ LAS SEIS RUTAS, EN VIVO ============
       Esta sección se toca, y es también la que trae los datos: las seis
       rutas reales de Sobusa con su código, sus terminales y su
-      kilometraje, el radio de aviso de un kilómetro y el texto exacto de
+      kilometraje, el radio de aviso con el que arranca la app —un
+      kilómetro, el punto de partida de su rueda— y el texto exacto de
       la notificación. Lo único simulado son los buses, y lo dicen la
       entrada, encima del mapa, y el rótulo «Simulación» dentro de él.
 
@@ -1776,7 +1809,8 @@
               <p class="solo-lectores" data-mapa-voz role="status" aria-live="polite"></p>
               <!--
                 El rótulo «Simulación» (T6.10, decisión D8). Las rutas, los
-                kilómetros y el radio del aviso son los de la app, pero los
+                kilómetros y el radio del aviso (el kilómetro con el que
+                arranca la rueda) son los de la app, pero los
                 dos buses los mueve esta página (src/mapa-vivo.ts), y el mapa
                 se mira sin leer la entrada de la sección, que es donde se
                 decía. Va primero en la pastilla de la atribución, que ya

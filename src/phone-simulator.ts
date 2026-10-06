@@ -16,11 +16,11 @@
  * Nada de lo que muestra está inventado: la ruta y sus kilómetros salen de
  * rutas.json (vía PhoneMap), los buses son los dos demo del repo
  * (BUS-WGV705 y BUS-WFK042; bus_labels.dart les quita el «BUS-» y
- * deja la placa: WGV705 y WFK042) y el radio de aviso
- * es el de proximity_alerts_provider.dart.
+ * deja la placa: WGV705 y WFK042) y el radio de aviso es el kilómetro
+ * con el que arranca la rueda de rueda_distancia.dart.
  */
 
-import { cifraViva, metrica } from './cifra-viva';
+import { cifraViva, distanciaAviso, metrica } from './cifra-viva';
 import type { PhoneMap } from './phone-map';
 import type { RutaLanding } from './types';
 
@@ -80,7 +80,10 @@ export class PhoneSimulator {
   readonly #miraX = 0.5;
   readonly #miraY = 0.44;
 
-  /** proximity_alerts_provider.dart: el aviso salta a 1 km. */
+  /**
+   * La distancia del aviso: la que trae la rueda de rueda_distancia.dart
+   * sin nada guardado. La hoja la dice en su nota, «Te avisamos a 1,0 km».
+   */
   readonly #radioAvisoM = 1000;
 
   /**
@@ -161,7 +164,9 @@ export class PhoneSimulator {
     this.#sheetEl.classList.remove('hidden-sheet');
     this.#mostrarVista('eta');
     this.#setAviso(true);
-    this.#setDetalle('Puedes cambiar de aplicación; no cierres Ya Viene del todo');
+    // `_Nota.distancia` de eta_bottom_sheet.dart: la nota del iPhone con el
+    // aviso puesto, con su «Cambiar» al filo (fijo en el HTML).
+    this.#setDetalle(`Te avisamos a ${distanciaAviso(this.#radioAvisoM)}`);
     this.#actualizarEta();
   }
 
@@ -266,8 +271,8 @@ export class PhoneSimulator {
 
   /**
    * La tarjeta flotante es la notificación de la app. Aparece cuando
-   * aparecería de verdad: con el aviso armado y el bus ya dentro del
-   * kilómetro.
+   * aparecería de verdad: con el aviso armado y el bus ya dentro de su
+   * distancia.
    *
    * Una sola línea y una sola idea: «Tu bus está cerca de ti». Sin
    * placa: el pasajero ya sabe cuál espera —acaba de elegirlo—, y el

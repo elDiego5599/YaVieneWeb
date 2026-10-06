@@ -62,8 +62,9 @@ describe('la copia dice lo mismo que los datos', () => {
 });
 
 /**
- * La app avisa por distancia: cuando el bus entra a 1 km de donde está el
- * pasajero (`alertRadiusMeters = 1000` en app_pasajero). No sabe de paradas
+ * La app avisa por distancia: cuando el bus entra a la distancia que eligió
+ * el pasajero, de 500 m a 3 km (`distanciasDeAviso` en app_pasajero, dueño
+ * 2026-10-06; hasta entonces era un kilómetro fijo). No sabe de paradas
  * ni calcula minutos. La web prometía «antes de que llegue a tu parada», que
  * es otra cosa, y la promesa vive justo donde nadie la relee: la descripción,
  * las tarjetas de compartir y el JSON-LD.
@@ -72,7 +73,6 @@ describe('la copia dice lo mismo que los datos', () => {
  * treinta» describe el problema, y las paradas del mockup son dibujo.
  */
 describe('la web promete lo que la app hace', () => {
-  const RADIO_KM = 1;
   const promesas = (html: string): string[] => [
     ...Array.from(
       html.matchAll(/<meta\s+(?:name|property)="(?:description|og:description|twitter:description)"\s+content="([^"]*)"/g),
@@ -91,12 +91,26 @@ describe('la web promete lo que la app hace', () => {
     });
   }
 
-  it('index.html promete el radio de la app en los cuatro sitios', () => {
+  it('index.html promete la distancia que elige el pasajero en los cuatro sitios', () => {
     const avisos = promesas(leer('index.html')).filter((t) => /avisa/i.test(t));
     expect(avisos).toHaveLength(4);
     for (const texto of avisos) {
-      expect(texto).toContain(`a menos de ${RADIO_KM} km`);
+      expect(texto).toContain('a la distancia que elijas');
+      expect(texto).not.toMatch(/\bkm\b|kilómetro/);
     }
+  });
+
+  /**
+   * El kilómetro fijo vivía también en la copia que se lee: el paso del
+   * aviso, la entrada de «Qué resuelve» y la columna de la espera. Los
+   * comentarios sí pueden nombrarlo —las demos arrancan en el kilómetro, que
+   * es donde arranca la rueda de la app—, el texto que ve la gente no.
+   */
+  it('index.html ya no dice que el aviso suena a un kilómetro', () => {
+    const visible = leer('index.html').replace(/<!--[\s\S]*?-->/g, '');
+    expect(visible).not.toMatch(/a un kilómetro|en el kilómetro|a menos de 1 km/);
+    const paso = visible.match(/data-paso-boton="2"[\s\S]*?<\/button>/)?.[0] ?? '';
+    expect(paso).toContain('a la distancia que elijas');
   });
 
   /**
@@ -196,7 +210,32 @@ describe('la privacidad dice qué pasa con la app cerrada', () => {
   it('la fecha del documento acompaña al cambio', () => {
     // Un texto legal que cambia sin cambiar su fecha no se distingue del
     // anterior, y la app usa la misma fecha para decir cuál está leyendo.
-    expect(leer('privacidad.html')).toContain('Actualizado el 2 de octubre de 2026');
+    expect(leer('privacidad.html')).toContain('Actualizado el 6 de octubre de 2026');
+  });
+});
+
+/**
+ * Desde el 6 de octubre de 2026 el aviso no suena a un kilómetro sino a la
+ * distancia que elige la persona, de 500 m a 3 km, y en Android esa distancia
+ * viaja con el punto al servidor. La política lo dice con las mismas frases
+ * que `legal_docs.dart` de la app, que vigila `legal_segundo_plano_test.dart`.
+ */
+describe('la privacidad dice a qué distancia suena el aviso', () => {
+  const texto = (): string =>
+    leer('privacidad.html')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/\s+/g, ' ');
+
+  it('suena a la distancia que elige la persona', () => {
+    const html = texto();
+    expect(html).toContain('cuando entra a la distancia que elijas (de 500 metros a 3 kilómetros)');
+    expect(html).not.toContain('un kilómetro a la redonda');
+  });
+
+  it('dice que la distancia viaja con el punto', () => {
+    expect(texto()).toContain(
+      'Con él van el bus y la ruta del aviso, la distancia a la que pediste que te avise y el código'
+    );
   });
 });
 

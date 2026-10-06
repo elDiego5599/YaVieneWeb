@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { cifraViva, metrica } from '../src/cifra-viva';
+import { cifraViva, distanciaAviso, metrica } from '../src/cifra-viva';
 
 /**
  * Espejo de `cifra_viva.dart` (app_pasajero): la distancia de la hoja gira
@@ -95,5 +95,20 @@ describe('metrica', () => {
   it('decide con los metros ya redondeados', () => {
     expect(metrica(999.4)).toEqual(['999', 'm de ti']);
     expect(metrica(999.6)).toEqual(['1,0', 'km de ti']);
+  });
+});
+
+/**
+ * `distanciaAviso` de rueda_distancia.dart: la distancia del aviso, de 500 m
+ * a 3 km de 100 en 100, escrita como la cifra de la hoja pero con su unidad
+ * pegada («Te avisamos a 800 m», «1,0 km» en la rueda).
+ */
+describe('distanciaAviso', () => {
+  it('bajo el kilómetro en metros, desde el kilómetro con coma', () => {
+    expect(distanciaAviso(500)).toBe('500 m');
+    expect(distanciaAviso(900)).toBe('900 m');
+    expect(distanciaAviso(1000)).toBe('1,0 km');
+    expect(distanciaAviso(2900)).toBe('2,9 km');
+    expect(distanciaAviso(3000)).toBe('3,0 km');
   });
 });

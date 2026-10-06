@@ -42,3 +42,12 @@ export function metrica(metros: number): [string, string] {
   if (redondos < 1000) return [String(redondos), 'm de ti'];
   return [(metros / 1000).toFixed(1).replace('.', ','), 'km de ti'];
 }
+
+/**
+ * `distanciaAviso` de distancia.dart: la distancia de un aviso con su unidad
+ * pegada, «800 m» o «1,0 km». Es la cifra de [metrica] con la unidad corta.
+ */
+export function distanciaAviso(metros: number): string {
+  const [cifra, unidad] = metrica(metros);
+  return `${cifra} ${unidad.split(' ')[0]}`;
+}

@@ -59,7 +59,11 @@ function mapaFalso({ metros = 20000, rutas = YV_RUTAS.rutas }: { metros?: number
 const toma = (n: number): HTMLElement => document.querySelector<HTMLElement>(`[data-demo="${n}"]`)!;
 const el = (raiz: HTMLElement, nombre: string): HTMLElement =>
   raiz.querySelector<HTMLElement>(`[data-el="${nombre}"]`)!;
-const texto = (raiz: HTMLElement, nombre: string): string => el(raiz, nombre).textContent?.trim() ?? '';
+/** El texto que se lee, con los saltos y sangrías del HTML hechos un espacio. */
+const texto = (raiz: HTMLElement, nombre: string): string =>
+  (el(raiz, nombre).textContent ?? '').replace(/\s+/g, ' ').trim();
+/** La fila de la rueda que queda en medio, la elegida. */
+const elegida = (raiz: HTMLElement): string => raiz.querySelector('.rueda-fila.is-elegida')?.textContent ?? '';
 const encendido = (raiz: HTMLElement, nombre: string): boolean => el(raiz, nombre).classList.contains('is-on');
 /** El ícono que se ve de un grupo que se intercambia. */
 const iconoVisible = (raiz: HTMLElement, grupo: string): string[] =>
@@ -131,7 +135,13 @@ describe('con movimiento reducido', () => {
       cifra: texto(raiz, 'eta-value'),
       aviso: texto(raiz, 'alert-label'),
       notif: raiz.querySelector('[data-el="notif"]')!.className,
+      nota: texto(raiz, 'eta-sub'),
     };
+    // La foto final es la de la app tras guardar 800 m en la rueda: el
+    // aviso puesto y, sobre el botón, la distancia con su «Cambiar».
+    expect(antes.nota).toBe('Te avisamos a 800 m Cambiar');
+    expect(el(raiz, 'eta-sub').hidden).toBe(false);
+    expect(encendido(raiz, 'dialogo')).toBe(false);
     const { mapa, demo } = montarDemo(3);
     demo.activar(true);
 
@@ -142,6 +152,7 @@ describe('con movimiento reducido', () => {
       cifra: texto(raiz, 'eta-value'),
       aviso: texto(raiz, 'alert-label'),
       notif: raiz.querySelector('[data-el="notif"]')!.className,
+      nota: texto(raiz, 'eta-sub'),
     }).toEqual(antes);
     // El mapa sí se enciende, porque eso no se mueve: punto y buses quietos.
     expect(mapa.pin).toBe(true);
@@ -330,15 +341,19 @@ describe('3. Te avisamos', () => {
   /**
    * Lo que tiene que cumplirse en cada cuadro del bucle, sea cual sea el
    * largo del recorrido: el color va con la cifra —coral bajo 300 m, ámbar
-   * dentro del kilómetro, sin color más allá—, la tarjeta del aviso sólo
-   * sale con el aviso armado y el bus dentro del kilómetro, y la cifra no
-   * cambia más de una vez cada 420 ms.
+   * dentro de la distancia del aviso, sin color más allá—, la tarjeta del
+   * aviso sólo sale con el aviso armado y el bus dentro de esa distancia,
+   * y la cifra no cambia más de una vez cada 420 ms.
+   *
+   * La distancia es la de `_radioDe` en eta_bottom_sheet.dart: sin aviso
+   * ni distancia guardada, el kilómetro con el que arranca la rueda; con
+   * el aviso armado, los 800 m que el guion guarda en ella.
    */
   function comprobarBucle(metrosDeRuta: number): { metros: number[]; notif: boolean[] } {
     const { raiz, demo } = montarDemo(3, mapaFalso({ metros: metrosDeRuta }));
     demo.activar(true);
     const valor = el(raiz, 'eta-value');
-    const fotos = recorrer(12000, () => ({
+    const fotos = recorrer(14000, () => ({
       m: metrosEnHoja(raiz),
       texto: valor.textContent ?? '',
       cerca: valor.classList.contains('eta-number--cerca'),
@@ -352,10 +367,11 @@ describe('3. Te avisamos', () => {
       const t = `t=${i * 100} ms, ${f.texto} → ${f.m} m`;
       expect(Number.isFinite(f.m), t).toBe(true);
       expect(f.muyCerca, t).toBe(f.m < 300);
-      expect(f.cerca, t).toBe(f.m >= 300 && f.m < 1000);
+      const radio = f.armado ? 800 : 1000;
+      expect(f.cerca, t).toBe(f.m >= 300 && f.m < radio);
       if (f.notif) {
         expect(f.armado, t).toBe(true);
-        expect(f.m, t).toBeLessThanOrEqual(1000);
+        expect(f.m, t).toBeLessThanOrEqual(800);
       }
       if (i > 0 && f.texto !== fotos[i - 1]!.texto) {
         expect(i * 100 - ultimoCambio, t).toBeGreaterThanOrEqual(400);
@@ -366,15 +382,16 @@ describe('3. Te avisamos', () => {
   }
 
   // Riesgo: el bus se acerca pero la cifra, el color o la tarjeta del aviso cuentan otra cosa.
-  it('el bus se acerca, la cifra baja y el aviso sale al cruzar el kilómetro', () => {
+  it('el bus se acerca, la cifra baja y el aviso sale al cruzar la distancia elegida', () => {
     const { metros, notif } = comprobarBucle(20000);
     expect(metros[0]).toBe(1300);
     const menor = Math.min(...metros);
-    expect(menor).toBeLessThan(1000);
+    expect(menor).toBeLessThan(800);
     expect(menor).toBeGreaterThan(300);
     expect(notif.some(Boolean)).toBe(true);
-    // Antes de armarlo (3,3 s) la tarjeta no sale.
-    expect(notif.slice(0, 33).some(Boolean)).toBe(false);
+    // Antes de guardar la distancia (5,3 s) no hay aviso, y la tarjeta
+    // tarda unos segundos más: no parece disparada por el dedo.
+    expect(notif.slice(0, 80).some(Boolean)).toBe(false);
   });
 
   // Riesgo: una ruta corta deja el bus a pocos metros y los colores o el aviso se tuercen.
@@ -402,22 +419,66 @@ describe('3. Te avisamos', () => {
     expect(mapa.elegido).toBe(0);
     expect(encendido(raiz, 'sheet')).toBe(true);
     expect(el(raiz, 'eta-sub').hidden).toBe(true);
+  });
 
-    vi.advanceTimersByTime(1500);
+  // Riesgo: el aviso se arma sin preguntar la distancia, como antes del 2026-10-06.
+  it('la primera vez el botón abre la rueda, en el kilómetro, sin armar nada', () => {
+    const { raiz, demo } = montarDemo(3);
+    demo.activar(true);
+    vi.advanceTimersByTime(3300);
+    expect(encendido(raiz, 'dialogo')).toBe(false);
+    vi.advanceTimersByTime(100);
+    expect(encendido(raiz, 'dialogo')).toBe(true);
+    // Los textos de rueda_distancia.dart con primeraVez.
+    expect(texto(raiz, 'dialogo-titulo')).toBe('¿A qué distancia te avisamos?');
+    expect(texto(raiz, 'dialogo-guardar')).toBe('Guardar');
+    expect(texto(raiz, 'dialogo-otra')).toBe('Solo esta vez');
+    expect(elegida(raiz)).toBe('1,0 km');
+    expect(texto(raiz, 'alert-label')).toBe('Avisarme cuando esté cerca');
+    expect(el(raiz, 'eta-sub').hidden).toBe(true);
+  });
+
+  // Riesgo: la rueda ofrece distancias que la app no tiene.
+  it('la rueda va de 500 m a 3,0 km de 100 en 100, escrita como en la app', () => {
+    const { raiz } = montarDemo(3);
+    const filas = Array.from(el(raiz, 'rueda').querySelectorAll('.rueda-fila'), (f) => f.textContent);
+    expect(filas).toHaveLength(26);
+    expect(filas.slice(0, 7)).toEqual(['500 m', '600 m', '700 m', '800 m', '900 m', '1,0 km', '1,1 km']);
+    expect(filas.at(-1)).toBe('3,0 km');
+  });
+
+  // Riesgo: la rueda gira pero lo que se guarda, o lo que dice la hoja, es otra distancia.
+  it('se gira a 800 m, se guarda, y la hoja dice «Te avisamos a 800 m» con su «Cambiar»', () => {
+    const { raiz, demo } = montarDemo(3);
+    demo.activar(true);
+    vi.advanceTimersByTime(4500);
+    expect(elegida(raiz)).toBe('800 m');
+    // La rueda se coloca con la fila elegida en medio de las cinco.
+    expect(el(raiz, 'rueda').style.getPropertyValue('--elegida')).toBe('3');
+    expect(texto(raiz, 'alert-label')).toBe('Avisarme cuando esté cerca');
+
+    vi.advanceTimersByTime(900);
+    expect(encendido(raiz, 'dialogo')).toBe(false);
     expect(texto(raiz, 'alert-label')).toBe('Aviso activado');
     expect(iconoVisible(raiz, 'aviso')).toEqual(['visto']);
     expect(el(raiz, 'eta-sub').hidden).toBe(false);
+    expect(texto(raiz, 'eta-sub')).toBe('Te avisamos a 800 m Cambiar');
   });
 
   // Riesgo: al empezar cada vuelta queda el aviso de la anterior puesto.
   it('cada vuelta empieza con el aviso sin armar y la hoja abajo', () => {
     const { raiz, mapa, demo } = montarDemo(3);
     demo.activar(true);
-    vi.advanceTimersByTime(13200);
+    vi.advanceTimersByTime(14000);
+    expect(encendido(raiz, 'notif')).toBe(true);
+    vi.advanceTimersByTime(1000);
     expect(texto(raiz, 'alert-label')).toBe('Avisarme cuando esté cerca');
     expect(iconoVisible(raiz, 'aviso')).toEqual(['campana']);
     expect(encendido(raiz, 'sheet')).toBe(false);
     expect(encendido(raiz, 'notif')).toBe(false);
+    expect(encendido(raiz, 'dialogo')).toBe(false);
+    expect(el(raiz, 'eta-sub').hidden).toBe(true);
+    expect(elegida(raiz)).toBe('1,0 km');
     expect(mapa.elegido).toBeNull();
   });
 });
@@ -465,10 +526,10 @@ describe('el reloj del guion', () => {
     cuadrosCada(20);
     const { raiz, demo } = montarDemo(3, mapaFalso({ metros: 20000 }));
     demo.activar(true);
-    // El bus arranca a los 500 ms a 1250 m y cruza el kilómetro hacia los
-    // 5,6 s; desde ahí la cifra va en metros redondeados a la decena, y
+    // El bus arranca a los 500 ms a 1300 m y cruza el kilómetro hacia los
+    // 6,6 s; desde ahí la cifra va en metros redondeados a la decena, y
     // 20 m por refresco la cambian siempre.
-    vi.advanceTimersByTime(6000);
+    vi.advanceTimersByTime(7000);
     const valor = el(raiz, 'eta-value');
     const cambios: number[] = [];
     let antes = valor.textContent;
@@ -487,9 +548,9 @@ describe('el reloj del guion', () => {
   // Riesgo: a 300 m justos la cifra se pinta coral, y la app la pinta ámbar.
   it('a 300 m justos la cifra va en ámbar, no en coral', () => {
     cuadrosCada(20);
-    // En una ruta de 950 m, los 1250 m de partida dan la vuelta y el bus
+    // En una ruta de 1000 m, los 1300 m de partida dan la vuelta y el bus
     // sale a 300 m justos del punto.
-    const { raiz, demo } = montarDemo(3, mapaFalso({ metros: 950 }));
+    const { raiz, demo } = montarDemo(3, mapaFalso({ metros: 1000 }));
     demo.activar(true);
     const valor = el(raiz, 'eta-value');
     const vistos = new Map<number, string>();

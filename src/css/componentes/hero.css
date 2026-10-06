@@ -506,7 +506,7 @@
    719 px de más arriba: las dos pesan lo mismo —una sola clase—, así que
    manda la que se escribe última. Metido allá arriba, el `position:
    absolute` de la general lo tapaba y el crédito volvía a pintarse
-   encima del «Puedes cambiar de aplicación» de la tarjeta crema. */
+   encima de la nota «Te avisamos a…» de la tarjeta crema. */
 @media (max-width: 719px) {
   .hero-credit {
     position: static;

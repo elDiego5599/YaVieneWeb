@@ -1,4 +1,4 @@
-import { cifraViva, metrica } from './cifra-viva';
+import { cifraViva, distanciaAviso, metrica } from './cifra-viva';
 import { encajeDe } from './encaje';
 import type { PhoneMap } from './phone-map';
 import { sinMovimiento } from './scrolly';
@@ -40,8 +40,13 @@ const RUTA = 'R-106';
  */
 const METROS_POR_SEGUNDO = 58;
 
-/** Radio del aviso de proximity_alerts_provider.dart. */
-const RADIO_AVISO_M = 1000;
+/**
+ * La rueda de rueda_distancia.dart: de 500 m a 3 km de 100 en 100. Sin
+ * distancia guardada arranca en el kilómetro, y el guion guarda 800 m.
+ */
+const RUEDA_M = Array.from({ length: 26 }, (_, i) => 500 + i * 100);
+const RADIO_INICIAL_M = 1000;
+const RADIO_GUARDADO_M = 800;
 
 /** Centro de la franja de pantalla que no tapan la píldora ni la hoja. */
 const MIRA_X = 0.5;
@@ -64,6 +69,10 @@ export class PasoDemo {
   #buses: number[] = [];
   #ultimo = 0;
   #avisoPuesto = false;
+  /** La distancia del aviso: la de la rueda hasta guardar otra. */
+  #radioM = RADIO_INICIAL_M;
+  /** Los últimos metros pintados, para recolorear la cifra al guardar. */
+  #metros = 0;
   #refresco = 0;
 
   /** La ruta que el guion elige, tal como la trae rutas.json. */
@@ -90,6 +99,17 @@ export class PasoDemo {
     // datos que las del hero: nunca están copiadas en el HTML.
     this.#el('company-list')?.replaceChildren(carrilEmpresas());
     this.#el('route-list')?.replaceChildren(carrilRutas(mapa.rutas));
+    // Y las filas de la rueda del tercero, también una sola vez.
+    this.#el('rueda')
+      ?.querySelector('.rueda-carril')
+      ?.replaceChildren(
+        ...RUEDA_M.map((m) => {
+          const fila = document.createElement('span');
+          fila.className = 'rueda-fila';
+          fila.textContent = distanciaAviso(m);
+          return fila;
+        })
+      );
 
     this.#mapa.setRoute(RUTA);
     this.#mapa.showRoute(true);
@@ -324,8 +344,11 @@ export class PasoDemo {
 
     if (this.#guion === 3) {
       this.#mapa.setBusElegido(null);
+      this.#prender('dialogo', false);
+      this.#setRueda(RADIO_INICIAL_M);
+      this.#radioM = RADIO_INICIAL_M;
       this.#setAviso(false);
-      this.#setMetros(1250);
+      this.#setMetros(1300);
       const detalle = this.#el('eta-sub');
       if (detalle) detalle.hidden = true;
     }
@@ -602,7 +625,7 @@ export class PasoDemo {
 
   /**
    * El aviso, con sus pasos a la vista: se toca el bus, sale su hoja, se
-   * arma el aviso y el aviso suena solo cuando toca.
+   * elige a qué distancia avisar, se arma y el aviso suena solo cuando toca.
    *
    * Empezaba con la hoja ya arriba y el dedo tocando el botón al segundo,
    * y de ahí no se movía nada más: nueve segundos de un número bajando.
@@ -610,14 +633,19 @@ export class PasoDemo {
    * que la hoja le siga el rastro, `empty-pick-bus`—, y con ello el motivo
    * por el que la hoja habla de ese bus y no de otro.
    *
+   * Desde el 2026-10-06 la distancia del aviso la pone quien lo arma: el
+   * primer toque al botón abre la rueda en el kilómetro, el dedo la baja a
+   * 800 m y la guarda, y la hoja se queda diciendo «Te avisamos a 800 m»
+   * con su «Cambiar», que es la nota del iPhone.
+   *
    * El resto lo lleva la distancia, no el reloj: la tarjeta del aviso sale
-   * cuando el bus cruza el kilómetro de `proximity_alerts_provider.dart`,
-   * unos segundos después de armarlo, para que no parezca disparada por el
-   * dedo. Sale a 1250 m justo para que ese cruce caiga dentro del bucle.
+   * cuando el bus cruza esos 800 m, unos segundos después de armarlo, para
+   * que no parezca disparada por el dedo. Sale a 1300 m justo para que ese
+   * cruce caiga dentro del bucle.
    */
   #guionAviso(): void {
     this.#a(500, () => {
-      this.#colocarBuses([1250]);
+      this.#colocarBuses([1300]);
       this.#mapa.showBuses(true);
       this.#moverBuses((metros) => this.#alAcercarse(metros));
     });
@@ -629,20 +657,44 @@ export class PasoDemo {
     });
 
     this.#a(3100, () => this.#toqueSobre('alert-btn'));
-    this.#a(3340, () => {
+    this.#a(3340, () => this.#prender('dialogo', true));
+
+    // En el iPhone tocar una fila de la rueda la lleva al medio.
+    this.#a(4000, () => this.#toqueSobre(this.#filaRueda(RADIO_GUARDADO_M)));
+    this.#a(4240, () => this.#setRueda(RADIO_GUARDADO_M));
+
+    this.#a(5100, () => this.#toqueSobre('dialogo-guardar'));
+    this.#a(5340, () => {
+      this.#prender('dialogo', false);
+      this.#radioM = RADIO_GUARDADO_M;
       this.#setAviso(true);
+      this.#setMetros(this.#metros);
+      this.#texto('eta-sub-texto', `Te avisamos a ${distanciaAviso(this.#radioM)}`);
       const detalle = this.#el('eta-sub');
       if (detalle) detalle.hidden = false;
     });
 
-    this.#a(12200, () => {
+    this.#a(14200, () => {
       this.#pararBuses();
       this.#prender('notif', false);
       this.#prender('sheet', false);
       this.#mapa.setBusElegido(null);
       this.#mapa.showBuses(false);
     });
-    this.#a(13100, () => this.#ciclo());
+    this.#a(14900, () => this.#ciclo());
+  }
+
+  #filaRueda(metros: number): HTMLElement | null {
+    return this.#el('rueda')?.querySelectorAll<HTMLElement>('.rueda-fila')[RUEDA_M.indexOf(metros)] ?? null;
+  }
+
+  /** Gira la rueda hasta dejar [metros] en la franja del medio. */
+  #setRueda(metros: number): void {
+    const i = RUEDA_M.indexOf(metros);
+    this.#el('rueda')?.style.setProperty('--elegida', String(i));
+    this.#el('rueda')
+      ?.querySelectorAll('.rueda-fila')
+      .forEach((fila, j) => fila.classList.toggle('is-elegida', j === i));
   }
 
   /**
@@ -659,7 +711,7 @@ export class PasoDemo {
     // La tarjeta no cambia de texto: dice el título de la notificación de
     // la app, «Tu bus está cerca de ti», y el metraje vive en la hoja
     // del teléfono, debajo.
-    this.#prender('notif', this.#avisoPuesto && metros <= RADIO_AVISO_M);
+    this.#prender('notif', this.#avisoPuesto && metros <= this.#radioM);
   }
 
   #redondear(metros: number): number {
@@ -667,6 +719,7 @@ export class PasoDemo {
   }
 
   #setMetros(metros: number): void {
+    this.#metros = metros;
     const m = this.#redondear(metros);
     // distanciaPartes() de la app: bajo el kilómetro en metros, por encima en kilómetros.
     const [valor, unidad] = metrica(m);
@@ -675,9 +728,10 @@ export class PasoDemo {
     this.#texto('eta-unit', unidad);
 
     // colorDeDistancia() de eta_bottom_sheet.dart: coral bajo los 300 metros,
-    // ámbar dentro del kilómetro, verde más allá. Va en el número, que es
-    // el dato; la franja de encima se fue con el diseño «A» (2026-09-30).
-    const cerca = m < RADIO_AVISO_M;
+    // ámbar dentro de la distancia del aviso, verde más allá. Va en el
+    // número, que es el dato; la franja de encima se fue con el diseño «A»
+    // (2026-09-30).
+    const cerca = m < this.#radioM;
     const muyCerca = m < 300;
     this.#el('eta-value')?.classList.toggle('eta-number--cerca', cerca && !muyCerca);
     this.#el('eta-value')?.classList.toggle('eta-number--muy-cerca', muyCerca);
