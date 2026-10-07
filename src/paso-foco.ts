@@ -39,6 +39,28 @@ function topar(v: number, min: number, max: number): number {
   return v < min ? min : v > max ? max : v;
 }
 
+/**
+ * Cuánto de cada tramo del rodillo se queda quieto a cada lado de un paso.
+ * Con un cuarto, la mitad del recorrido de la pista deja la lista parada
+ * en un paso y la otra mitad la lleva al siguiente, pegada al dedo.
+ */
+const PARADA = 0.25;
+
+/**
+ * Dónde va el rodillo para un recorrido `bruto` (de 0 a `total`): sigue al
+ * dedo entre dos pasos y se detiene un trecho en cada uno (dueño,
+ * 2026-10-07). El paso `k` queda en el foco con el recorrido en `k + 0,5`,
+ * su mitad; en el cruce —el entero, donde cambia el teléfono— el rodillo
+ * va a medio camino. Entre una parada y la siguiente acelera y frena con
+ * `smoothstep`, para no arrancar ni llegar de golpe.
+ */
+function giroDe(bruto: number, total: number): number {
+  const x = topar(bruto - 0.5, 0, total - 1);
+  const n = Math.min(Math.floor(x), total - 1);
+  const t = topar((x - n - PARADA) / (1 - 2 * PARADA), 0, 1);
+  return n + t * t * (3 - 2 * t);
+}
+
 interface PasoFocoPiezas {
   /** El bloque alto que se recorre mientras la escena está pegada. */
   pista: HTMLElement;
@@ -56,6 +78,7 @@ export class PasoFoco {
 
   #actual = -1;
   #llenado = -1;
+  #giro = -1;
   #pedido = 0;
   #dentro = false;
 
@@ -111,6 +134,7 @@ export class PasoFoco {
     const indice = Math.min(total - 1, Math.floor(bruto));
 
     this.#llenar(topar(bruto - indice, 0, 1));
+    this.#girar(giroDe(bruto, total));
     this.#aplicar(indice);
   }
 
@@ -131,6 +155,18 @@ export class PasoFoco {
   }
 
   /**
+   * Lleva el rodillo de la lista (pasos.css, escritorio). Como el riel, se
+   * escribe en cada cuadro y se redondea a la milésima: quieto en una
+   * parada no escribe nada.
+   */
+  #girar(giro: number): void {
+    const redondo = Math.round(giro * 1000) / 1000;
+    if (redondo === this.#giro) return;
+    this.#giro = redondo;
+    this.#piezas.riel?.style.setProperty('--paso-giro', String(redondo));
+  }
+
+  /**
    * Enciende el paso que manda: la toma de turno se marca y el CSS hace
    * el relevo por encima de la anterior.
    *
@@ -143,12 +179,6 @@ export class PasoFoco {
     this.#actual = indice;
 
     if (indice >= 0) {
-      // El rodillo de la lista (pasos.css, escritorio) gira por pasos
-      // enteros, a la par del teléfono: dentro de un tramo se queda quieto
-      // y sólo rueda al cruzar al siguiente, con la curva del relevo. Antes
-      // seguía al dedo en continuo y se sentía suelto (dueño, 2026-10-07).
-      this.#piezas.riel?.style.setProperty('--paso-giro', String(indice));
-
       this.#piezas.columnas.forEach((columna, i) => {
         columna.classList.toggle('is-activa', i === indice);
       });

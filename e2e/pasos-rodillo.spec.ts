@@ -9,7 +9,8 @@ import { test, expect, type Page } from '@playwright/test';
  * quiso recto: todo en vertical, nada se corre hacia los lados.
  *
  * Lo que se comprueba es la geometría y no un número de CSS: que los tres
- * van en la misma columna, que se detienen en cada paso, y que
+ * van en la misma columna, que se detienen en cada paso y siguen al
+ * dedo entre uno y otro, y que
  * en el teléfono y sin animaciones la lista sigue plana.
  */
 
@@ -94,18 +95,23 @@ test.describe('los pasos ruedan en vertical', () => {
     expect(c!.opacidad).toBeLessThan(0.7);
   });
 
-  // Se detiene en cada paso (dueño, 2026-10-07): bajar dentro de un tramo
-  // no lo mueve, y al cruzar al siguiente rueda un paso entero.
-  test('se queda quieto dentro de un paso y rueda entero al cruzar', async ({ page }) => {
+  // Sigue al dedo entre dos pasos y se detiene un trecho en cada uno
+  // (dueño, 2026-10-07): ni suelto ni a saltos.
+  test('se queda quieto en un paso y sigue al dedo al cruzar', async ({ page }) => {
     await page.goto('/');
-    await irA(page, 0.4);
+    await irA(page, 0.42);
     const quieto = await pasos(page);
     expect(Math.abs(quieto[1]!.y), 'el segundo en el foco').toBeLessThan(2);
 
-    await irA(page, 0.6);
-    expect(await pasos(page), 'bajar dentro del tramo no lo mueve').toEqual(quieto);
+    await irA(page, 0.58);
+    expect(await pasos(page), 'bajar dentro de la parada no lo mueve').toEqual(quieto);
 
-    await irA(page, 0.72);
+    await irA(page, 2 / 3);
+    const cruce = await pasos(page);
+    expect(cruce[1]!.y, 'en el cruce va a medio camino').toBeLessThan(-20);
+    expect(cruce[2]!.y).toBeGreaterThan(20);
+
+    await irA(page, 0.85);
     const siguiente = await pasos(page);
     expect(Math.abs(siguiente[2]!.y), 'el tercero llega al foco').toBeLessThan(2);
     for (const p of siguiente) expect(Math.abs(p.x - quieto[1]!.x)).toBeLessThan(1);
