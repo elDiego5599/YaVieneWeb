@@ -56,7 +56,6 @@ export class PasoFoco {
 
   #actual = -1;
   #llenado = -1;
-  #giro = -1;
   #pedido = 0;
   #dentro = false;
 
@@ -66,7 +65,7 @@ export class PasoFoco {
     // El riel arranca vacío: hasta que la pista no empieza a correr no
     // hay nada recorrido. El valor por omisión que trae la hoja es el
     // tramo lleno, y ése es para cuando este módulo no llega a cargar.
-    this.#llenar(0, 0);
+    this.#llenar(0);
 
     // Un margen generoso para que el primer paso ya esté encendido cuando
     // la sección asoma, y no arranque el bucle a mitad de gesto.
@@ -111,12 +110,7 @@ export class PasoFoco {
     const bruto = avance * total;
     const indice = Math.min(total - 1, Math.floor(bruto));
 
-    // El giro del rodillo de la lista: en qué paso está su foco, contado
-    // en continuo. Cada paso llega al foco a mitad de su tramo —que es
-    // donde deja la pista su botón, ver `irAPaso` en main.ts— y el relevo
-    // de clases cae a medio camino entre dos, cuando el rodillo va justo
-    // entre ellos. El primero y el último esperan medio tramo quietos.
-    this.#llenar(topar(bruto - indice, 0, 1), topar(bruto - 0.5, 0, total - 1));
+    this.#llenar(topar(bruto - indice, 0, 1));
     this.#aplicar(indice);
   }
 
@@ -128,18 +122,12 @@ export class PasoFoco {
    * Se redondea a la milésima antes de comparar, y así la mitad de los
    * cuadros no escriben nada: en un tramo de 200 px una milésima es un
    * quinto de píxel, o sea que el riel se mueve exactamente igual.
-   *
-   * El giro sale igual, a `--paso-giro`, y lo gasta el rodillo de la lista
-   * en escritorio (pasos.css); en el teléfono nadie lo lee.
    */
-  #llenar(parte: number, giro: number): void {
+  #llenar(parte: number): void {
     const redondo = Math.round(parte * 1000) / 1000;
-    const vuelta = Math.round(giro * 1000) / 1000;
-    if (redondo === this.#llenado && vuelta === this.#giro) return;
+    if (redondo === this.#llenado) return;
     this.#llenado = redondo;
-    this.#giro = vuelta;
     this.#piezas.riel?.style.setProperty('--paso-llenado', String(redondo));
-    this.#piezas.riel?.style.setProperty('--paso-giro', String(vuelta));
   }
 
   /**
@@ -155,6 +143,12 @@ export class PasoFoco {
     this.#actual = indice;
 
     if (indice >= 0) {
+      // El rodillo de la lista (pasos.css, escritorio) gira por pasos
+      // enteros, a la par del teléfono: dentro de un tramo se queda quieto
+      // y sólo rueda al cruzar al siguiente, con la curva del relevo. Antes
+      // seguía al dedo en continuo y se sentía suelto (dueño, 2026-10-07).
+      this.#piezas.riel?.style.setProperty('--paso-giro', String(indice));
+
       this.#piezas.columnas.forEach((columna, i) => {
         columna.classList.toggle('is-activa', i === indice);
       });

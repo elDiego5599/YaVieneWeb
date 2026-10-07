@@ -845,10 +845,10 @@
    hace falta: `paso-foco.ts` escribe un solo número, `--paso-giro`, y lo
    demás es CSS.
 
-   El número va registrado para que pueda tener transición. El scroll lo
-   escribe en cada cuadro y cada cuadro relanza la curva desde donde iba,
-   así que el rodillo sigue al dedo con un cuarto de segundo de inercia en
-   vez de ir pegado a él: la rueda de un tirón pasa suave, no a saltos. */
+   El número va registrado para que pueda tener transición. Es entero: el
+   rodillo se queda quieto en cada paso y al cruzar al siguiente rueda una
+   posición con el mismo viaje y la misma curva que el teléfono de al lado
+   (dueño, 2026-10-07; seguir al dedo en continuo se sentía suelto). */
 @property --paso-giro {
   syntax: '<number>';
   inherits: true;
@@ -875,7 +875,7 @@
          se corta contra una línea, se apaga. 12 % son 58 px, menos que
          lo que dista el borde del vecino. */
       mask-image: linear-gradient(transparent, #000 12%, #000 88%, transparent);
-      transition: --paso-giro 0.8s var(--ease-out-cubic);
+      transition: --paso-giro var(--paso-viaje) var(--paso-curva);
     }
 
     /* El riel, en un pelo: la recta por la que bajan los pasos. Con el

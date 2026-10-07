@@ -9,7 +9,7 @@ import { test, expect, type Page } from '@playwright/test';
  * quiso recto: todo en vertical, nada se corre hacia los lados.
  *
  * Lo que se comprueba es la geometría y no un número de CSS: que los tres
- * van en la misma columna, que se mueven con el dedo y no a saltos, y que
+ * van en la misma columna, que se detienen en cada paso, y que
  * en el teléfono y sin animaciones la lista sigue plana.
  */
 
@@ -94,25 +94,21 @@ test.describe('los pasos ruedan en vertical', () => {
     expect(c!.opacidad).toBeLessThan(0.7);
   });
 
-  test('entre dos pasos los tres siguen en la misma columna, y se mueven con el dedo', async ({ page }) => {
+  // Se detiene en cada paso (dueño, 2026-10-07): bajar dentro de un tramo
+  // no lo mueve, y al cruzar al siguiente rueda un paso entero.
+  test('se queda quieto dentro de un paso y rueda entero al cruzar', async ({ page }) => {
     await page.goto('/');
-    await irA(page, 0.5);
-    const foco = (await pasos(page))[1]!.x;
-
     await irA(page, 0.4);
-    const entre = await pasos(page);
+    const quieto = await pasos(page);
+    expect(Math.abs(quieto[1]!.y), 'el segundo en el foco').toBeLessThan(2);
 
-    // Ninguno está en el foco: el rodillo va a medio camino, sin paso
-    // centrado. Pero ninguno se aparta de la columna.
-    for (const p of entre) {
-      expect(Math.abs(p.y)).toBeGreaterThan(10);
-      expect(Math.abs(p.x - foco)).toBeLessThan(1);
-    }
+    await irA(page, 0.6);
+    expect(await pasos(page), 'bajar dentro del tramo no lo mueve').toEqual(quieto);
 
-    // Un poco más abajo, el mismo paso ya está más arriba.
-    await irA(page, 0.44);
-    const despues = await pasos(page);
-    expect(despues[1]!.y).toBeLessThan(entre[1]!.y - 10);
+    await irA(page, 0.72);
+    const siguiente = await pasos(page);
+    expect(Math.abs(siguiente[2]!.y), 'el tercero llega al foco').toBeLessThan(2);
+    for (const p of siguiente) expect(Math.abs(p.x - quieto[1]!.x)).toBeLessThan(1);
   });
 
   test('tocar un paso lo trae al foco', async ({ page }) => {

@@ -90,6 +90,20 @@ test.describe('la fila del panel no se mueve', () => {
     for (const borde of medida.bordes) expect(borde, 'fila plana').toBe('rgba(0, 0, 0, 0)');
   });
 
+  // Como el panel: el mapa lleva las esquinas de la lista (`AppRadius.lg`,
+  // 16) y su filo, no va a sangre.
+  test('el mapa tiene las esquinas redondeadas de la lista', async ({ page }) => {
+    const radios = await page.evaluate(() =>
+      ['.flota-mapa', '.flota-lista'].map((s) => {
+        const e = getComputedStyle(document.querySelector(s)!);
+        return { radio: e.borderTopLeftRadius, borde: e.borderTopWidth, recorte: e.overflow };
+      })
+    );
+    const [mapa, lista] = radios;
+    expect(parseFloat(mapa!.radio)).toBeGreaterThan(0);
+    expect(mapa).toEqual(lista);
+  });
+
   test('ocultar un bus no mueve el lápiz ni el icono', async ({ page }) => {
     const lapicesAntes = await xs(page, `${FILAS} .flota-fila-editar`);
     const iconosAntes = await xs(page, `${FILAS} .flota-fila-placa svg`);

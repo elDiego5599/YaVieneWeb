@@ -879,9 +879,9 @@
 /* ── ControlMap ── */
 
 /*
-  El mapa va a sangre, sin borde ni esquinas: en el Dart es un
-  `Positioned.fill` sin recorte dentro del `Stack`, así que su borde es el
-  de la ventana.
+  El mapa lleva las esquinas y el filo de la lista: en el Dart va dentro
+  de un `ClipRRect` de `AppRadius.lg` (16) con un borde de `border` encima
+  de las teselas. Iba a sangre y en la maqueta se veía de esquinas rectas.
 
   El plano es propio de este hueco: CARTO Voyager pintado con
   `render_mapa.mjs` a 1167 × 701, el ancho de la columna por el alto del
@@ -912,6 +912,8 @@
   position: relative;
   min-height: 0;
   overflow: hidden;
+  border: 1px solid var(--divider);
+  border-radius: calc(16 * var(--u));
 }
 
 .flota-plano {
