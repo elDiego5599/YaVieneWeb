@@ -201,7 +201,7 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background: var(--arena);
+  background: var(--surface);
   color: var(--f-texto);
   font-family: var(--font-family);
   font-size: calc(14 * var(--u));
@@ -285,7 +285,8 @@
   background: var(--surface);
 }
 
-/* Caja de 36 con 6 de relleno y borde: el logo queda en 22, igual que en
+/* (Allá la raya de abajo es una sombra; aquí se queda en raya: la maqueta
+   no lleva las sombras del panel, dueño, 2026-10-07.) Caja de 36 con 6 de relleno y borde: el logo queda en 22, igual que en
    el Dart, donde el borde de la decoración se suma al relleno. */
 .flota-logo {
   display: grid;
@@ -638,7 +639,7 @@
 .flota-buses {
   display: flex;
   flex-direction: column;
-  gap: calc(8 * var(--u));
+  gap: calc(9 * var(--u));
   margin: calc(8 * var(--u)) calc(12 * var(--u)) 0;
   padding: calc(12 * var(--u)) 0;
   border-top: 1px solid var(--divider);
@@ -651,8 +652,8 @@
   position: relative;
   display: flex;
   align-items: center;
-  padding: calc(12 * var(--u)) calc(10 * var(--u)) calc(10 * var(--u)) calc(14 * var(--u));
-  border: 1px solid var(--divider);
+  padding: calc(10 * var(--u)) calc(10 * var(--u)) calc(8 * var(--u)) calc(12 * var(--u));
+  border: 1px solid transparent;
   border-radius: calc(16 * var(--u));
   background: var(--surface);
   transition:
@@ -664,6 +665,22 @@
 
 /* Las de la otra ruta. El `display: flex` de arriba pisaría el `hidden`
    del navegador, que es sólo un `display: none` de hoja de estilos. */
+/* Plana, como `FleetListTile` desde que la fila dejó de ser tarjeta: solo
+   la elegida lleva marco. Entre dos filas a la vista, el filo del
+   `separatorBuilder` (alto 9: 4 de aire, la raya y 4), centrado a 36 de
+   cada lado de la lista (`_filo`); el borde transparente de la fila ya
+   pone uno. Va en `:not([hidden]) ~`, no en `+`, para que la primera de
+   la otra ruta no lo lleve encima. */
+.flota-fila:not([hidden]) ~ .flota-fila::before {
+  content: '';
+  position: absolute;
+  top: calc(-5 * var(--u) - 1px);
+  right: calc(36 * var(--u) - 1px);
+  left: calc(36 * var(--u) - 1px);
+  height: 1px;
+  background: var(--divider);
+}
+
 .flota-fila[hidden] {
   display: none;
 }
@@ -685,9 +702,10 @@
   background: #F0F4FE;
 }
 
-/* Sin señal la fila entera baja al 70 %, como el `Opacity` que la
-   envuelve cuando `bus.online` es falso. */
-.flota-fila--sin-senal {
+/* Sin señal la fila baja al 70 %, como el `Opacity` que la envuelve
+   cuando `bus.online` es falso; lo que baja es lo de dentro, porque el
+   filo de encima es del separador, que allá no se apaga. */
+.flota-fila--sin-senal > * {
   opacity: 0.7;
 }
 
@@ -704,37 +722,29 @@
 /* El recuadro del bus, en el color de su estado al 12 %. Dice qué es la
    fila; en qué situación está lo dice el icono junto a la placa. */
 .flota-fila-icono {
-  --i: 20;
+  --i: 19;
   display: grid;
   flex: none;
   place-items: center;
-  width: calc(40 * var(--u));
-  height: calc(40 * var(--u));
+  width: calc(36 * var(--u));
+  height: calc(36 * var(--u));
   border-radius: calc(12 * var(--u));
   background: color-mix(in srgb, var(--e) 12%, transparent);
   color: var(--e);
 }
 
-/* La placa ocupa lo que sobra, como el `Expanded` de allá, pero nunca
-   menos de lo que mide: si la fila no alcanza, la que cede es la píldora
-   de la ruta. Antes cedía la placa, y con «Vivero Paraíso», o a 390 con
-   cualquier ruta, el icono de estado quedaba encima de la píldora.
+/* La placa ocupa lo que sobra, como el `Expanded` de allá: sin la
+   píldora de la ruta, el lápiz queda contra el interruptor.
    Rejilla de dos columnas en vez de caja flexible: el texto suelto cae
    solo en la primera, de ancho mínimo fijo, y el icono de estado en la
    segunda. Así el icono queda siempre en la misma x aunque las placas
    midan distinto (SFA482 no mide igual que TUH513); con `flex` + `gap`
    colgaba del texto y cada fila lo ponía en un sitio. El mínimo de 66,5
    es la más ancha de las siete, WNP659, que mide 64 desde que las placas
-   van sin guion como las de verdad (2026-09-30; con guion medía 73,5), y
-   2 y medio para lo que cambia el dibujo de la letra de un navegador a
-   otro; con él a la ruta le quedan 91,5, casi los 97,5 que le quedan allá
-   con esa placa —los 6
-   de diferencia se los lleva el rótulo «PERMITIDO», que aquí es más ancho
-   que el interruptor de la app—, y «Tcherassi» se lee entera. Si un día llega una placa más larga, la primera columna crece
-   (`max-content`) en vez de romper el texto. Los 3 de abajo son el
-   `SizedBox` que la separa de la línea del nombre del conductor
-   (`fleet_list_tile.dart`, `if (bus.driverName != null)`), que aquí va
-   vacía porque ningún bus del maquetado lo trae asignado. */
+   van sin guion como las de verdad (2026-09-30), y 2 y medio para lo que
+   cambia el dibujo de la letra de un navegador a otro. Si un día llega
+   una placa más larga, la primera columna crece (`max-content`) en vez de
+   romper el texto. */
 .flota-fila-placa {
   display: grid;
   grid-template-columns: minmax(calc(66.5 * var(--u)), max-content) auto;
@@ -743,7 +753,6 @@
   column-gap: calc(8 * var(--u));
   flex: 1 0 auto;
   margin-left: calc(12 * var(--u));
-  padding-bottom: calc(3 * var(--u));
   font-size: calc(14.5 * var(--u));
   font-weight: 800;
   letter-spacing: calc(0.4 * var(--u));
@@ -758,26 +767,6 @@
   position: relative;
   color: var(--e);
   cursor: pointer;
-}
-
-/* La píldora de la ruta, la que cede: se corta con puntos suspensivos
-   y la placa sigue entera, como el chip de `FleetListTile`. Allá, en una
-   pantalla angosta, deja de pintarse del todo (`_huecoParaRuta`, 161);
-   aquí la maqueta es siempre la ventana de 1600, donde a la placa y la
-   ruta les quedan 180 en el escritorio y 169 en el teléfono —los bordes
-   de 1 px no encogen con ella—, de sobra para los 161, así que va
-   siempre. `overflow` es también lo que la deja encoger: sin él, una caja
-   flexible no baja de lo que mide su texto. */
-.flota-chip {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding: calc(4 * var(--u)) calc(9 * var(--u));
-  border-radius: 999px;
-  background: rgba(11, 22, 40, 0.06);
-  color: var(--ink);
-  font-size: calc(10.5 * var(--u));
-  font-weight: 700;
-  letter-spacing: calc(0.3 * var(--u));
 }
 
 /* `IconButton` compacto: el de 17 con la densidad recogida mide 33 de

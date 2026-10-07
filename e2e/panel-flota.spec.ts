@@ -1,8 +1,9 @@
 import { test, expect, type Page } from '@playwright/test';
 
 /**
- * La fila del panel: placa, icono de estado, píldora de ruta, lápiz,
- * interruptor y rótulo. Tres mañas que se veían a ojo: el icono colgaba de
+ * La fila del panel: placa, icono de estado, lápiz, interruptor y rótulo
+ * (la píldora de la ruta salió de la app con «sin conductor ni chip de
+ * ruta» y de aquí el 2026-10-07). Tres mañas que se veían a ojo: el icono colgaba de
  * la placa (SFA482 no mide igual que TUH513); al ocultar un bus la
  * columna del interruptor se encogía («OCULTO» es más corto que
  * «PERMITIDO») y la píldora y el lápiz se movían con ella; y con una ruta
@@ -42,43 +43,54 @@ test.describe('la fila del panel no se mueve', () => {
     expect(new Set(iconos.map(Math.round)).size, 'los iconos están en la misma x').toBe(1);
   });
 
-  test('el icono de estado y la píldora no se pisan', async ({ page }) => {
+  test('el icono de estado y el lápiz no se pisan', async ({ page }) => {
     const iconos = await bordes(page, `${FILAS} .flota-fila-placa svg`);
-    const chips = await bordes(page, `${FILAS} .flota-chip`);
     const lapices = await bordes(page, `${FILAS} .flota-fila-editar`);
-    expect(chips, 'cuatro píldoras a la vista').toHaveLength(4);
-
-    chips.forEach((chip, i) => {
-      // El medio píxel es de la coma flotante del navegador: cuando dos
-      // bordes coinciden, uno sale unas milésimas más allá que el otro.
-      expect(iconos[i].der, `fila ${i}: el icono se monta en la píldora`).toBeLessThanOrEqual(
-        chip.izq + 0.5
-      );
-      expect(chip.der, `fila ${i}: la píldora se monta en el lápiz`).toBeLessThanOrEqual(
-        lapices[i].izq + 0.5
+    expect(lapices, 'cuatro lápices a la vista').toHaveLength(4);
+    lapices.forEach((lapiz, i) => {
+      // El medio píxel es de la coma flotante del navegador.
+      expect(iconos[i].der, `fila ${i}: el icono se monta en el lápiz`).toBeLessThanOrEqual(
+        lapiz.izq + 0.5
       );
     });
   });
 
-  // En el teléfono la maqueta se dibuja a menos de un cuarto de tamaño y
-  // la letra queda en 2 px: ahí «Tcherassi» se corta por unas décimas y da
-  // igual, porque no se lee de todos modos.
-  test('en escritorio la ruta de nombre corto se lee entera', async ({ page }, info) => {
-    test.skip(info.project.name !== 'escritorio', 'se mide en la maqueta grande');
-
-    const cortas = await page.$$eval(`${FILAS} .flota-chip`, (els) =>
-      els
-        .filter((el) => el.textContent === 'Tcherassi')
-        .map((el) => ({ pinta: el.scrollWidth, cabe: el.clientWidth }))
+  // Como el tablero del panel (2026-10-07): fondo blanco, filas planas sin
+  // píldora de ruta y entre ellas un filo centrado, a 36 de cada lado.
+  test('fondo blanco y filas planas con el filo centrado', async ({ page }) => {
+    // Al cargar, los colores entran con su transición: se mide al final.
+    await page.waitForFunction(
+      () => !document.getAnimations().some((a) => a instanceof CSSTransition)
     );
-    expect(cortas, 'la ruta elegida es la de las cuatro filas').toHaveLength(4);
-    cortas.forEach((chip, i) => {
-      expect(chip.pinta, `fila ${i}: la ruta salió cortada`).toBeLessThanOrEqual(chip.cabe);
+    const medida = await page.evaluate(() => {
+      const fondo = getComputedStyle(document.querySelector('.flota')!).backgroundColor;
+      const filas = Array.from(
+        document.querySelectorAll<HTMLElement>('.flota-fila:not([hidden])')
+      );
+      const lista = document.querySelector('.flota-buses')!.getBoundingClientRect();
+      const filos = filas.slice(1).map((f) => {
+        const antes = getComputedStyle(f, '::before');
+        const caja = f.getBoundingClientRect();
+        const izq = caja.left + parseFloat(antes.left);
+        const der = caja.right - parseFloat(antes.right);
+        return { izq: izq - lista.left, der: lista.right - der, alto: antes.height };
+      });
+      const bordes = filas
+        .filter((f) => !f.classList.contains('es-elegida'))
+        .map((f) => getComputedStyle(f).borderTopColor);
+      return { fondo, filos, bordes, chips: document.querySelectorAll('.flota-chip').length };
     });
+    expect(medida.fondo).toBe('rgb(255, 255, 255)');
+    expect(medida.chips, 'sin píldora de ruta').toBe(0);
+    expect(medida.filos, 'un filo entre cada dos filas').toHaveLength(3);
+    for (const filo of medida.filos) {
+      expect(filo.alto).toBe('1px');
+      expect(Math.abs(filo.izq - filo.der), 'el filo va centrado').toBeLessThan(0.5);
+    }
+    for (const borde of medida.bordes) expect(borde, 'fila plana').toBe('rgba(0, 0, 0, 0)');
   });
 
-  test('ocultar un bus no mueve la píldora ni el lápiz', async ({ page }) => {
-    const chipsAntes = await xs(page, `${FILAS} .flota-chip`);
+  test('ocultar un bus no mueve el lápiz ni el icono', async ({ page }) => {
     const lapicesAntes = await xs(page, `${FILAS} .flota-fila-editar`);
     const iconosAntes = await xs(page, `${FILAS} .flota-fila-placa svg`);
 
@@ -87,7 +99,6 @@ test.describe('la fila del panel no se mueve', () => {
       'OCULTO'
     );
 
-    expect(await xs(page, `${FILAS} .flota-chip`), 'la píldora no se mueve').toEqual(chipsAntes);
     expect(await xs(page, `${FILAS} .flota-fila-editar`), 'el lápiz no se mueve').toEqual(
       lapicesAntes
     );
