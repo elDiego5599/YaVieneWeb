@@ -1719,16 +1719,20 @@
 
 /*
   La rueda de rueda_distancia.dart, la de la alarma del iPhone: filas de 40
-  y cinco a la vista (200), a 8 del título. La franja del medio es la de
-  CupertinoPicker, con su margen de 9 y radio 8, en primary al 10 %; las
-  filas de fuera bajan a 0,447 y la elegida crece a 1,08, que son el
-  overAndUnderCenterOpacity y el magnification de la rueda. El carril sube
-  hasta dejar la fila `--elegida` en la tercera franja.
+  y cinco a la vista, dos arriba y dos abajo (dueño, 2026-10-06), en el
+  alto de la app: 5 × 40 / 1,45 (el `squeeze` del picker), a 8 del título.
+  Plana, cada fila ocupa lo que el cilindro le deja, 40 / 1,45. La franja
+  del medio es la de CupertinoPicker, de 40 y centrada, con su margen de 9
+  y radio 8, en primary al 10 %; las filas de fuera bajan a 0,447 y la
+  elegida crece a 1,08, que son el overAndUnderCenterOpacity y el
+  magnification de la rueda. El carril sube hasta dejar la fila `--elegida`
+  en la tercera.
 */
 .rueda {
   position: relative;
   width: 100%;
-  height: calc(200 * var(--u));
+  --fila-rueda: calc(40 / 1.45 * var(--u));
+  height: calc(5 * var(--fila-rueda));
   margin-top: calc(8 * var(--u));
   overflow: hidden;
 }
@@ -1736,14 +1740,14 @@
 .rueda::before {
   content: '';
   position: absolute;
-  inset: calc(80 * var(--u)) calc(9 * var(--u)) auto;
+  inset: calc(2.5 * var(--fila-rueda) - 20 * var(--u)) calc(9 * var(--u)) auto;
   height: calc(40 * var(--u));
   border-radius: calc(8 * var(--u));
   background: rgba(0, 168, 89, 0.1);
 }
 
 .rueda-carril {
-  transform: translateY(calc((2 - var(--elegida, 5)) * 40 * var(--u)));
+  transform: translateY(calc((2 - var(--elegida, 5)) * var(--fila-rueda)));
   transition: transform 0.5s var(--ease-out-cubic);
 }
 
@@ -1751,7 +1755,7 @@
 .rueda-fila {
   display: grid;
   place-items: center;
-  height: calc(40 * var(--u));
+  height: var(--fila-rueda);
   font-size: calc(22 * var(--u));
   font-weight: 700;
   line-height: 1.2;
