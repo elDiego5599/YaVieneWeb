@@ -65,6 +65,8 @@ const texto = (raiz: HTMLElement, nombre: string): string =>
 /** La fila de la rueda que queda en medio, la elegida. */
 const elegida = (raiz: HTMLElement): string => raiz.querySelector('.rueda-fila.is-elegida')?.textContent ?? '';
 const encendido = (raiz: HTMLElement, nombre: string): boolean => el(raiz, nombre).classList.contains('is-on');
+/** La tarjeta del bus está preguntando la distancia, con la rueda en su sitio. */
+const preguntando = (raiz: HTMLElement): boolean => el(raiz, 'sheet').classList.contains('is-rueda');
 /** El ícono que se ve de un grupo que se intercambia. */
 const iconoVisible = (raiz: HTMLElement, grupo: string): string[] =>
   Array.from(raiz.querySelectorAll<HTMLElement>(`[data-grupo="${grupo}"]`))
@@ -141,7 +143,7 @@ describe('con movimiento reducido', () => {
     // aviso puesto y, sobre el botón, la distancia con su «Cambiar».
     expect(antes.nota).toBe('Te avisamos a 800 m Cambiar');
     expect(el(raiz, 'eta-sub').hidden).toBe(false);
-    expect(encendido(raiz, 'dialogo')).toBe(false);
+    expect(preguntando(raiz)).toBe(false);
     const { mapa, demo } = montarDemo(3);
     demo.activar(true);
 
@@ -426,13 +428,21 @@ describe('3. Te avisamos', () => {
     const { raiz, demo } = montarDemo(3);
     demo.activar(true);
     vi.advanceTimersByTime(3300);
-    expect(encendido(raiz, 'dialogo')).toBe(false);
+    expect(preguntando(raiz)).toBe(false);
     vi.advanceTimersByTime(100);
-    expect(encendido(raiz, 'dialogo')).toBe(true);
-    // Los textos de rueda_distancia.dart con primeraVez.
-    expect(texto(raiz, 'dialogo-titulo')).toBe('¿A qué distancia te avisamos?');
-    expect(texto(raiz, 'dialogo-guardar')).toBe('Guardar');
-    expect(texto(raiz, 'dialogo-otra')).toBe('Solo esta vez');
+    expect(preguntando(raiz)).toBe(true);
+    // En la misma tarjeta del bus, no en una ventana encima (dueño,
+    // 2026-10-06): la rueda donde iba la cifra y los botones donde iban la
+    // nota y el del aviso. Los textos son los de eta_bottom_sheet.dart con
+    // primeraVez.
+    expect(raiz.querySelector('.phone-dialogo')).toBeNull();
+    const tarjeta = el(raiz, 'sheet').querySelector('.eta-tarjeta')!;
+    expect(tarjeta.contains(el(raiz, 'rueda'))).toBe(true);
+    expect(tarjeta.contains(el(raiz, 'rueda-titulo'))).toBe(true);
+    expect(texto(raiz, 'rueda-titulo')).toBe('¿A qué distancia te avisamos?');
+    expect(el(raiz, 'sheet').contains(el(raiz, 'rueda-guardar'))).toBe(true);
+    expect(texto(raiz, 'rueda-guardar')).toBe('Guardar');
+    expect(texto(raiz, 'rueda-otra')).toBe('Solo esta vez');
     expect(elegida(raiz)).toBe('1,0 km');
     expect(texto(raiz, 'alert-label')).toBe('Avisarme cuando esté cerca');
     expect(el(raiz, 'eta-sub').hidden).toBe(true);
@@ -458,7 +468,7 @@ describe('3. Te avisamos', () => {
     expect(texto(raiz, 'alert-label')).toBe('Avisarme cuando esté cerca');
 
     vi.advanceTimersByTime(900);
-    expect(encendido(raiz, 'dialogo')).toBe(false);
+    expect(preguntando(raiz)).toBe(false);
     expect(texto(raiz, 'alert-label')).toBe('Aviso activado');
     expect(iconoVisible(raiz, 'aviso')).toEqual(['visto']);
     expect(el(raiz, 'eta-sub').hidden).toBe(false);
@@ -476,7 +486,7 @@ describe('3. Te avisamos', () => {
     expect(iconoVisible(raiz, 'aviso')).toEqual(['campana']);
     expect(encendido(raiz, 'sheet')).toBe(false);
     expect(encendido(raiz, 'notif')).toBe(false);
-    expect(encendido(raiz, 'dialogo')).toBe(false);
+    expect(preguntando(raiz)).toBe(false);
     expect(el(raiz, 'eta-sub').hidden).toBe(true);
     expect(elegida(raiz)).toBe('1,0 km');
     expect(mapa.elegido).toBeNull();

@@ -344,7 +344,7 @@ export class PasoDemo {
 
     if (this.#guion === 3) {
       this.#mapa.setBusElegido(null);
-      this.#prender('dialogo', false);
+      this.#preguntar(false);
       this.#setRueda(RADIO_INICIAL_M);
       this.#radioM = RADIO_INICIAL_M;
       this.#setAviso(false);
@@ -634,7 +634,8 @@ export class PasoDemo {
    * por el que la hoja habla de ese bus y no de otro.
    *
    * Desde el 2026-10-06 la distancia del aviso la pone quien lo arma: el
-   * primer toque al botón abre la rueda en el kilómetro, el dedo la baja a
+   * primer toque al botón cambia la distancia de la tarjeta por la rueda,
+   * en el kilómetro y sin ventana encima, el dedo la baja a
    * 800 m y la guarda, y la hoja se queda diciendo «Te avisamos a 800 m»
    * con su «Cambiar», que es la nota del iPhone.
    *
@@ -657,15 +658,15 @@ export class PasoDemo {
     });
 
     this.#a(3100, () => this.#toqueSobre('alert-btn'));
-    this.#a(3340, () => this.#prender('dialogo', true));
+    this.#a(3340, () => this.#preguntar(true));
 
     // En el iPhone tocar una fila de la rueda la lleva al medio.
     this.#a(4000, () => this.#toqueSobre(this.#filaRueda(RADIO_GUARDADO_M)));
     this.#a(4240, () => this.#setRueda(RADIO_GUARDADO_M));
 
-    this.#a(5100, () => this.#toqueSobre('dialogo-guardar'));
+    this.#a(5100, () => this.#toqueSobre('rueda-guardar'));
     this.#a(5340, () => {
-      this.#prender('dialogo', false);
+      this.#preguntar(false);
       this.#radioM = RADIO_GUARDADO_M;
       this.#setAviso(true);
       this.#setMetros(this.#metros);
@@ -682,6 +683,11 @@ export class PasoDemo {
       this.#mapa.showBuses(false);
     });
     this.#a(14900, () => this.#ciclo());
+  }
+
+  /** La tarjeta del bus pregunta la distancia (o deja de preguntarla). */
+  #preguntar(si: boolean): void {
+    this.#el('sheet')?.classList.toggle('is-rueda', si);
   }
 
   #filaRueda(metros: number): HTMLElement | null {

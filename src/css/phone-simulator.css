@@ -1548,16 +1548,23 @@
 }
 
 /* «Te avisamos a 800 m» ocupa lo que queda y «Cambiar» se arrima al filo:
-   el Expanded y el rótulo de `_Nota.distancia`, en AppTextStyles.pie w700
-   y AppColors.acento, el azul de los botones. */
+   el Expanded y `_PildoraCambiar` de eta_bottom_sheet.dart, la cara de
+   «Quitar» en la píldora de la ubicación (gris, filo, 12×7, etiqueta de
+   13 w600) con la letra roja: coralAccessible da 5,0:1 sobre el gris. */
 [data-el='eta-sub-texto'] {
   flex: 1;
 }
 
 .eta-detail-accion {
   flex: none;
-  font-weight: 700;
-  color: var(--azul-boton);
+  padding: calc(7 * var(--u)) calc(12 * var(--u));
+  border: 1px solid var(--app-hairline);
+  border-radius: 999px;
+  background: var(--surface-muted);
+  font-size: calc(13 * var(--u));
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--app-coral-accessible);
 }
 
 /* Botón de aviso: 60 de alto, píldora completa, verde de marca; con el
@@ -1629,84 +1636,56 @@
 }
 
 /*
-  La ventana de la distancia: `mostrarDialogo` de dialogo.dart. El velo es
-  primaryDeep (#14274E) al 62 % y la ventana entra en 280 ms de 0,94 a 1
-  con la curva emphasizedDecelerate (0.05, 0.7, 0.1, 1). Va sobre la hoja
-  (32) y bajo el dedo (60). Sin guion no sale: la foto final ya la guardó.
+  La tarjeta pregunta la distancia en su sitio, sin ventana encima
+  (`_Vaiven` de eta_bottom_sheet.dart, dueño 2026-10-06): en la tarjeta,
+  la distancia cede su lugar al título y la rueda; debajo, la nota y el
+  botón ceden el suyo a «Guardar» y «Solo esta vez». Cada vaivén es una
+  rejilla de dos filas y `.is-rueda` en la hoja pliega una y abre la otra:
+  el alto viaja en 360 ms (AppMotion.pausado) con cubic-bezier(0.2, 0, 0,
+  1), la cúbica más cercana a easeInOutCubicEmphasized, que no cabe en una
+  sola. Lo que se va se apaga en el primer 40 % (144 ms, curvaSalida) y lo
+  que llega entra desde el 30 % (108 + 252 ms, curvaEntrada).
 */
-.phone-dialogo {
-  position: absolute;
-  inset: 0;
-  z-index: 50;
+.eta-vaiven {
   display: grid;
-  place-items: center;
-  padding: 0 calc(24 * var(--u));
-  background: rgba(20, 39, 78, 0.62);
+  grid-template-rows: 1fr 0fr;
+  transition: grid-template-rows 0.36s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.is-rueda .eta-vaiven {
+  grid-template-rows: 0fr 1fr;
+}
+
+/* El `AnimatedSize` de la tarjeta recorta; el de abajo es la hoja misma. */
+.eta-tarjeta .eta-vaiven {
+  overflow: hidden;
+}
+
+.eta-vaiven > * {
+  min-height: 0;
+  transition: opacity 0.252s cubic-bezier(0.05, 0.7, 0.1, 1) 0.108s;
+}
+
+.eta-vaiven-rueda,
+.is-rueda .eta-vaiven-normal {
   opacity: 0;
   visibility: hidden;
   transition:
-    opacity 0.28s var(--ease-out-cubic),
-    visibility 0s 0.28s;
+    opacity 0.144s cubic-bezier(0.3, 0, 0.8, 0.15),
+    visibility 0s 0.144s;
 }
 
-.phone-dialogo.is-on {
+.is-rueda .eta-vaiven-rueda {
   opacity: 1;
   visibility: visible;
-  transition: opacity 0.28s var(--ease-out-cubic);
+  transition: opacity 0.252s cubic-bezier(0.05, 0.7, 0.1, 1) 0.108s;
 }
 
-/* La bandeja de cristal de `Dialogo`: 6 de relleno, blanco al 10 % con
-   filo al 14 %, AppRadius.card (24) y AppShadows.floating. Ancho tope 360. */
-.dialogo-bandeja {
-  width: 100%;
-  max-width: calc(360 * var(--u));
-  padding: calc(6 * var(--u));
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: calc(24 * var(--u));
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 calc(16 * var(--u)) calc(32 * var(--u)) rgba(20, 39, 78, 0.08),
-    0 calc(4 * var(--u)) calc(10 * var(--u)) calc(-2 * var(--u)) rgba(20, 39, 78, 0.04);
-  transform: scale(0.94);
-  transition: transform 0.28s cubic-bezier(0.05, 0.7, 0.1, 1);
-}
-
-.phone-dialogo.is-on .dialogo-bandeja {
-  transform: none;
-}
-
-/* La tarjeta blanca de dentro: AppRadius.lg (16), filo hairline y relleno
-   24 arriba, 20 a los lados y 12 abajo, todo centrado. */
-.dialogo-ventana {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: calc(24 * var(--u)) calc(20 * var(--u)) calc(12 * var(--u));
-  border: 1px solid var(--app-hairline);
-  border-radius: calc(16 * var(--u));
-  background: #FFFFFF;
+/* AppTextStyles.subtitulo (18, w700, 1.3, −0.3), centrado, a los 14 del
+   filo que también tiene la distancia y con los 16 de lado de la tarjeta. */
+.rueda-titulo {
+  margin: calc(14 * var(--u)) calc(16 * var(--u)) 0;
   text-align: center;
-}
-
-/* Baldosa de 48 en AppRadius.md (12), primary al 12 %, glifo de 26. */
-.dialogo-icono {
-  display: grid;
-  place-items: center;
-  width: calc(48 * var(--u));
-  height: calc(48 * var(--u));
-  border-radius: calc(12 * var(--u));
-  background: rgba(0, 168, 89, 0.12);
-  color: var(--green);
-}
-
-.dialogo-icono svg {
-  width: calc(26 * var(--u));
-  height: calc(26 * var(--u));
-}
-
-/* AppTextStyles.subtitulo (18, w700, 1.3, −0.3) a 14 del ícono. */
-.dialogo-titulo {
-  margin: calc(14 * var(--u)) 0 0;
   font-size: calc(18 * var(--u));
   font-weight: 700;
   line-height: 1.3;
@@ -1714,45 +1693,33 @@
   color: var(--app-text-primary);
 }
 
-/* AppTextStyles.cuerpo (15, w400, 1.5, −0.2) en textBody, a 8. */
-.dialogo-mensaje {
-  margin: calc(8 * var(--u)) 0 0;
-  font-size: calc(15 * var(--u));
-  line-height: 1.5;
-  letter-spacing: calc(-0.2 * var(--u));
-  color: var(--app-text-body);
-}
-
-/* Los botones de `Dialogo`: el lleno de 48 en primaryAccessible con
-   AppRadius.lg (16) a 20 de la rueda y el de texto en textSecondary a 4,
-   los dos en AppTextStyles.boton (16, w800, 1.2, −0.2). */
-.dialogo-guardar,
-.dialogo-otra {
+/* `_respuestas`: «Guardar» a 18, en el sitio y con la forma del botón del
+   aviso (60, píldora, primaryAccessible); «Solo esta vez» a 4, de 48 en
+   textSecondary. Los dos en AppTextStyles.boton (16, w800, 1.2, −0.2). */
+.rueda-guardar,
+.rueda-otra {
   display: grid;
   place-items: center;
-  width: 100%;
   height: calc(48 * var(--u));
-  border-radius: calc(16 * var(--u));
+  margin-top: calc(4 * var(--u));
+  border-radius: 999px;
   font-size: calc(16 * var(--u));
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: calc(-0.2 * var(--u));
+  color: var(--app-text-secondary);
 }
 
-.dialogo-guardar {
-  margin-top: calc(20 * var(--u));
+.rueda-guardar {
+  height: calc(60 * var(--u));
+  margin-top: calc(18 * var(--u));
   background: var(--app-primary-accessible);
   color: #FFFFFF;
 }
 
-.dialogo-otra {
-  margin-top: calc(4 * var(--u));
-  color: var(--app-text-secondary);
-}
-
 /*
   La rueda de rueda_distancia.dart, la de la alarma del iPhone: filas de 40
-  y cinco a la vista (200), a 16 del mensaje. La franja del medio es la de
+  y cinco a la vista (200), a 8 del título. La franja del medio es la de
   CupertinoPicker, con su margen de 9 y radio 8, en primary al 10 %; las
   filas de fuera bajan a 0,447 y la elegida crece a 1,08, que son el
   overAndUnderCenterOpacity y el magnification de la rueda. El carril sube
@@ -1762,7 +1729,7 @@
   position: relative;
   width: 100%;
   height: calc(200 * var(--u));
-  margin-top: calc(16 * var(--u));
+  margin-top: calc(8 * var(--u));
   overflow: hidden;
 }
 

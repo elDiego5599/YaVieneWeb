@@ -1337,9 +1337,24 @@
                           <span class="eta-placa">WGV705</span>
                         </div>
                         <div class="eta-filo"></div>
-                        <div class="eta-number eta-number--cerca" data-el="eta-value">640</div>
-                        <div class="eta-unit" data-el="eta-unit">m de ti</div>
+                        <!-- La primera vez que se arma un aviso, la tarjeta
+                             cambia la distancia por la pregunta, sin ventana
+                             encima (`_Vaiven` de eta_bottom_sheet.dart, con la
+                             rueda de rueda_distancia.dart). Las filas las
+                             escribe paso-demo.ts: de 500 m a 3,0 km. -->
+                        <div class="eta-vaiven">
+                          <div class="eta-vaiven-normal">
+                            <div class="eta-number eta-number--cerca" data-el="eta-value">640</div>
+                            <div class="eta-unit" data-el="eta-unit">m de ti</div>
+                          </div>
+                          <div class="eta-vaiven-rueda">
+                            <p class="rueda-titulo" data-el="rueda-titulo">¿A qué distancia te avisamos?</p>
+                            <div class="rueda" data-el="rueda"><div class="rueda-carril"></div></div>
+                          </div>
+                        </div>
                       </div>
+                      <div class="eta-vaiven eta-vaiven--pie">
+                        <div class="eta-vaiven-normal">
                       <!-- Con el aviso puesto, la nota del iPhone dice a qué
                            distancia avisa y se toca para cambiarla
                            (`_Nota.distancia` de eta_bottom_sheet.dart). Los
@@ -1366,24 +1381,12 @@
                         </svg>
                         <span data-el="alert-label">Aviso activado</span>
                       </div>
-                    </div>
-                    <!-- La primera vez que se arma un aviso, la app pregunta
-                         la distancia en su ventana propia (`Dialogo` con la
-                         rueda de rueda_distancia.dart). Las filas las escribe
-                         paso-demo.ts: de 500 m a 3,0 km de 100 en 100. -->
-                    <div class="phone-dialogo" data-el="dialogo">
-                      <div class="dialogo-bandeja">
-                        <div class="dialogo-ventana">
-                          <span class="dialogo-icono">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                              stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7" /><path d="M10.2 20a2 2 0 0 0 3.6 0" /><path d="M3 5.5A9 9 0 0 1 5.5 3M21 5.5A9 9 0 0 0 18.5 3" /></svg>
-                          </span>
-                          <p class="dialogo-titulo" data-el="dialogo-titulo">¿A qué distancia te avisamos?</p>
-                          <p class="dialogo-mensaje">Te avisamos cuando el bus esté así de cerca. Guárdala y no te
-                            lo volvemos a preguntar; la cambias cuando quieras.</p>
-                          <div class="rueda" data-el="rueda"><div class="rueda-carril"></div></div>
-                          <div class="dialogo-guardar" data-el="dialogo-guardar">Guardar</div>
-                          <div class="dialogo-otra" data-el="dialogo-otra">Solo esta vez</div>
+                        </div>
+                        <!-- `_respuestas`: «Guardar» lleno, como el botón del
+                             aviso, y «Solo esta vez» como texto debajo. -->
+                        <div class="eta-vaiven-rueda">
+                          <div class="rueda-guardar" data-el="rueda-guardar">Guardar</div>
+                          <div class="rueda-otra" data-el="rueda-otra">Solo esta vez</div>
                         </div>
                       </div>
                     </div>
