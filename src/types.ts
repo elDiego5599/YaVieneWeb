@@ -1,7 +1,7 @@
 /**
  * Los tipos del material que muestra la landing.
  *
- * Todo esto sale de app_pasajero/assets/data/rutas.json a través de
+ * Todo esto sale de ya_viene_core/assets/data/rutas.json a través de
  * scripts/gen_mapa_landing.py: aquí no se inventa ninguna ruta ni ningún
  * kilometraje, sólo se le pone nombre a la forma que ya tienen los datos.
  */

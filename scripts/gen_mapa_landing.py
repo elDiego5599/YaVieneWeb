@@ -45,7 +45,7 @@ from PIL import Image
 RAIZ = Path(__file__).resolve().parent.parent
 YAVIENE = Path(os.environ.get("YAVIENE_REPO", RAIZ.parent / "YaViene"))
 
-SRC = YAVIENE / "app_pasajero" / "assets" / "data" / "rutas.json"
+SRC = YAVIENE / "ya_viene_core" / "assets" / "data" / "rutas.json"
 OUT_TS = RAIZ / "src" / "data" / "rutas-landing.ts"
 OUT_IMG = RAIZ / "src" / "assets" / "map" / "barranquilla.webp"
 OUT_IMG_CIUDAD = RAIZ / "src" / "assets" / "map" / "barranquilla-ciudad.webp"
@@ -183,7 +183,7 @@ def emitir_ts(body, generado, out_w, out_h):
     """
     lineas = [
         "// GENERADO — no editar a mano.",
-        "// Fuente: app_pasajero/assets/data/rutas.json del repo YaViene (%s)." % generado,
+        "// Fuente: ya_viene_core/assets/data/rutas.json del repo YaViene (%s)." % generado,
         "// Las seis rutas reales de Sobusa proyectadas sobre el mosaico",
         "// src/assets/map/barranquilla.webp (%d x %d, CARTO Voyager" % (out_w, out_h),
         "// vectorial a zoom %s, la vista del pin en la app). Se regenera con" % ZOOM_GL,
