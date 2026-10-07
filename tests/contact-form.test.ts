@@ -109,8 +109,8 @@ describe('ContactForm', () => {
     await enviar(form);
 
     const exito = document.getElementById('form-success') as HTMLElement;
-    expect(exito.querySelector('[data-exito-titulo]')?.textContent).toBe('Te abrimos WhatsApp');
-    expect(exito.querySelector('[data-exito-texto]')?.textContent).toContain('Dale a enviar');
+    expect(exito.querySelector('[data-exito-titulo]')?.textContent).toBe('Le abrimos WhatsApp');
+    expect(exito.querySelector('[data-exito-texto]')?.textContent).toContain('Pulse enviar');
   });
 
   it('con la ventana bloqueada muestra error y no da por enviado nada', async () => {

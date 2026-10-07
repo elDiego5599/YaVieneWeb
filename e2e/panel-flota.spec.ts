@@ -12,8 +12,22 @@ import { test, expect, type Page } from '@playwright/test';
  * mira: se mide con el navegador, en móvil y en escritorio.
  */
 
-/** La x de cada elemento que casa con el selector, en píxeles de pantalla. */
+/**
+ * La x de cada elemento que casa con el selector, en píxeles de pantalla.
+ * Antes de medir espera a que acaben las animaciones con final (la entrada
+ * del monitor, el interruptor): con la máquina cargada la primera medida
+ * caía a mitad de una y la fila parecía moverse sin moverse. Las que no
+ * acaban nunca, como la cinta de logos, no se esperan.
+ */
 async function xs(page: Page, selector: string): Promise<number[]> {
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
+        .map((a) => a.finished.catch(() => null))
+    )
+  );
   return page.$$eval(selector, (els) => els.map((el) => el.getBoundingClientRect().x));
 }
 

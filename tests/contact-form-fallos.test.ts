@@ -305,7 +305,7 @@ describe('ContactForm después de un envío bueno', () => {
     expect(error().hidden).toBe(true);
   });
 
-  // Riesgo: un segundo envío que falla deja a la vez «Te abrimos WhatsApp» y «No pudimos enviar».
+  // Riesgo: un segundo envío que falla deja a la vez «Le abrimos WhatsApp» y «No pudimos enviar».
   it('si el siguiente envío falla se ve sólo el error, con el formulario para reintentar', async () => {
     vi.stubEnv('VITE_CONTACT_ENDPOINT', '');
     vi.stubGlobal(

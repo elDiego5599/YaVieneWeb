@@ -348,7 +348,7 @@ describe('el formulario de empresas cumple lo de la Ley 1581', () => {
     const form = texto('empresas.html').match(/<form id="contact-form"[\s\S]*?<\/form>/)?.[0] ?? '';
     expect(form, 'ya no está el formulario').toContain('form-submit-btn');
     const nota = form.match(/<p class="form-autoriza">[\s\S]*?<\/p>/)?.[0] ?? '';
-    expect(nota, 'el formulario no pide la autorización').toContain('autorizas');
+    expect(nota, 'el formulario no pide la autorización').toContain('usted autoriza');
     expect(nota).toContain('href="/privacidad.html#empresas"');
     expect(form.indexOf('form-autoriza')).toBeGreaterThan(form.indexOf('form-submit-btn'));
   });

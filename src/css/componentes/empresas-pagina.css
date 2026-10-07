@@ -47,7 +47,7 @@
 
 /* La parte en verde siempre en su propia línea. A 1440 ya caía ahí por
    ancho, pero en un teléfono de 390 el «en» subía a la primera y el
-   corte partía la frase: «Toda tu flota, en / una pantalla.». */
+   corte partía la frase: «Toda su flota, en / una pantalla.». */
 #panel .seccion-titulo .acentuado {
   display: block;
 }
@@ -1498,7 +1498,7 @@
   margin-inline: calc(-1 * var(--ficha-aire));
 }
 
-/* El titular de la sección, «Conecta tu flota», al tamaño de los
+/* El titular de la sección, «Conecte su flota», al tamaño de los
    titulares de sección. Fue un `--step-h3` cuando el titular grande
    estaba encima del formulario, y la ficha parecía la nota al pie de la
    otra columna; ahora que es el único, va a su talla. El tope de 22

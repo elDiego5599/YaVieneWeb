@@ -8,26 +8,43 @@ import { PasoFoco } from '../src/paso-foco';
  * dejaba ver el movimiento. Así no se pasa de largo y tampoco cansa.
  */
 
+/** La sección entra o sale de la vista. */
+let verSeccion: (dentro: boolean) => void = () => {};
+
 /** Monta la pista con un alto de tres pantallas y la deja en `avance` (0 a 1). */
-function montar(avance: number) {
+function montarPiezas(avance: number) {
   vi.stubGlobal(
     'IntersectionObserver',
     class {
       constructor(private cb: IntersectionObserverCallback) {}
       observe() {
-        this.cb([{ isIntersecting: true } as IntersectionObserverEntry], this as never);
+        verSeccion = (dentro) =>
+          this.cb([{ isIntersecting: dentro } as IntersectionObserverEntry], this as never);
+        verSeccion(true);
       }
       disconnect() {}
     }
   );
   const recorrido = 3 * innerHeight;
   const pista = document.createElement('div');
+  const lugar = { avance };
   pista.getBoundingClientRect = () =>
-    ({ top: -avance * recorrido, height: recorrido + innerHeight }) as DOMRect;
+    ({ top: -lugar.avance * recorrido, height: recorrido + innerHeight }) as DOMRect;
   const riel = document.createElement('ol');
   const columnas = [0, 1, 2].map(() => document.createElement('div'));
-  new PasoFoco({ pista, columnas, marcas: [], riel, alCambiar: () => {} });
-  return riel;
+  const marcas = [0, 1, 2].map(() => document.createElement('button'));
+  const avisos: number[] = [];
+  new PasoFoco({ pista, columnas, marcas, riel, alCambiar: (i) => avisos.push(i) });
+  return { riel, columnas, marcas, avisos, lugar };
+}
+
+const montar = (avance: number) => montarPiezas(avance).riel;
+
+/** Un desplazamiento y el cuadro que lo sigue. */
+async function bajar(lugar: { avance: number }, avance: number) {
+  lugar.avance = avance;
+  dispatchEvent(new Event('scroll'));
+  await new Promise((listo) => requestAnimationFrame(() => listo(null)));
 }
 
 const giro = (riel: HTMLElement) => riel.style.getPropertyValue('--paso-giro');
@@ -60,5 +77,27 @@ describe('el rodillo de los pasos', () => {
     expect(valores[0]).toBeLessThan(valores[1]!);
     expect(valores[1]).toBeLessThan(valores[2]!);
     expect(valores[2]).toBeLessThan(0.5);
+  });
+
+  it('enciende la toma y el botón del paso que manda', () => {
+    const { columnas, marcas, avisos } = montarPiezas(0.5);
+    expect(columnas.map((c) => c.classList.contains('is-activa'))).toEqual([false, true, false]);
+    expect(marcas.map((m) => m.classList.contains('is-activa'))).toEqual([false, true, false]);
+    expect(avisos).toEqual([1]);
+  });
+
+  it('al bajar vuelve a medir en el cuadro siguiente', async () => {
+    const { riel, lugar } = montarPiezas(0.05);
+    await bajar(lugar, 0.8);
+    expect(giro(riel)).toBe('2');
+  });
+
+  it('fuera de vista apaga los bucles, deja la escena como estaba y no mide', async () => {
+    const { riel, columnas, avisos, lugar } = montarPiezas(0.5);
+    verSeccion(false);
+    expect(avisos).toEqual([1, -1]);
+    expect(columnas[1]!.classList.contains('is-activa')).toBe(true);
+    await bajar(lugar, 0.8);
+    expect(giro(riel)).toBe('1');
   });
 });

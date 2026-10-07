@@ -39,15 +39,41 @@ describe('las páginas hablan como el que las lee', () => {
   it('empresas cuenta qué se revisa de cada posición', () => {
     const texto = textoPintado('empresas.html');
     expect(texto).toContain(
-      'Cada posición que manda el bus se revisa antes de mostrarse: ' +
-        'si llega con la hora corrida, a una velocidad imposible o con un ' +
-        'salto que ningún bus da, no aparece en el mapa.',
+      'Cada posición que envía el bus se verifica antes de mostrarse: ' +
+        'si llega con la hora desfasada, a una velocidad imposible o con un ' +
+        'salto que ningún bus puede dar, no aparece en el mapa.',
     );
-    // La frase del GPS en el bus es regla del dueño y no se toca.
+    // La frase del GPS en el bus es regla del dueño: lo que dice no se
+    // toca. Sólo cambió el trato, de tú a usted, con el resto de la página.
     expect(texto).toContain(
       'El GPS va montado en el bus, no en un teléfono: lo instalamos junto ' +
-        'con tu flota y quedas conectado sin depender de que alguien ' +
-        'recuerde abrir una app.',
+        'con su flota y usted queda conectado sin depender de que alguien ' +
+        'recuerde abrir una aplicación.',
     );
+  });
+
+  /**
+   * Empresas le habla de usted a un gerente (dueño, 2026-10-07); la
+   * portada sigue tuteando al pasajero. Se mira lo que se lee y lo que se
+   * oye o se ve sin leer la página: metadatos, `placeholder` y
+   * `aria-label`. Quedan fuera el panel dibujado, que copia letra por
+   * letra los textos de `app_control`, el lema de la marca en el pie y el
+   * `alt` de la imagen social, que describe lo que pone la imagen.
+   */
+  it('empresas trata de usted', () => {
+    const plantilla = document.createElement('template');
+    plantilla.innerHTML = readFileSync(resolve(process.cwd(), 'empresas.html'), 'utf8');
+    const raiz = plantilla.content;
+    raiz.querySelectorAll('script, style, .footer-intro, meta[property="og:image:alt"]').forEach((n) => n.remove());
+    const panel = raiz.querySelector('.despacho-pantalla')!;
+    const etiquetaPanel = panel.getAttribute('aria-label') ?? '';
+    panel.replaceChildren();
+    const atributos = [...raiz.querySelectorAll('[content], [placeholder], [aria-label]')].map(
+      (n) => `${n.getAttribute('content') ?? ''} ${n.getAttribute('placeholder') ?? ''} ${n.getAttribute('aria-label') ?? ''}`,
+    );
+    const texto = [raiz.textContent ?? '', etiquetaPanel, ...atributos].join(' ').replace(/\s+/g, ' ');
+    const TUTEO =
+      /(?<![\p{L}])(tú|tu|tus|te|ti|tienes|decides|quedas|autorizas|déjanos|escríbenos|mira|conecta|elige|filtra|ocúltalo|muéstralo|vuelve|dale)(?![\p{L}])/giu;
+    expect(texto.match(TUTEO) ?? []).toEqual([]);
   });
 });

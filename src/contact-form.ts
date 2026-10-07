@@ -53,7 +53,7 @@ export class ContactForm {
     this.#enviando = true;
     // Cada intento parte limpio: sin el aviso de error del anterior y sin
     // su éxito. Si no, un fallo después de un envío bueno dejaba a la vez
-    // «Te abrimos WhatsApp» y «No pudimos enviar».
+    // «Le abrimos WhatsApp» y «No pudimos enviar».
     this.#mostrarError('');
     if (this.#exito) this.#exito.hidden = true;
     this.#boton.disabled = true;
@@ -83,7 +83,7 @@ export class ContactForm {
       // El formulario vuelve con los datos escritos, para reintentar.
       this.#form.hidden = false;
       this.#mostrarError(
-        'No pudimos enviar la solicitud. Vuelve a intentarlo o escríbenos por WhatsApp.'
+        'No pudimos enviar la solicitud. Inténtelo de nuevo o escríbanos por WhatsApp.'
       );
     } finally {
       // Pase lo que pase el botón vuelve: si falló hay que poder reintentar
@@ -144,10 +144,10 @@ export class ContactForm {
     if (porWhatsApp) {
       const titulo = this.#exito.querySelector('[data-exito-titulo]');
       const texto = this.#exito.querySelector('[data-exito-texto]');
-      if (titulo) titulo.textContent = 'Te abrimos WhatsApp';
+      if (titulo) titulo.textContent = 'Le abrimos WhatsApp';
       if (texto) {
         texto.textContent =
-          'La conversación va con tus datos ya escritos. Dale a enviar y te respondemos por ahí.';
+          'La conversación lleva sus datos ya escritos. Pulse enviar y le responderemos por ese medio.';
       }
     }
     // El panel sale donde estaba el formulario, y el formulario se va: ya

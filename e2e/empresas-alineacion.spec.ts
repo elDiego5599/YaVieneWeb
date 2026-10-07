@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * «Conecta tu flota» nació como la página entera de empresas, a lo ancho
+ * «Conecte su flota» nació como la página entera de empresas, a lo ancho
  * de la banda de producto (1440). Hoy es la tercera sección, debajo del
  * panel y de las razones, que van a 1160: en escritorio la ficha arrancaba
  * 140 px a la izquierda de todo lo de arriba y el formulario terminaba
