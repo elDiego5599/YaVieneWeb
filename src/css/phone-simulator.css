@@ -855,11 +855,11 @@
 }
 
 /*
-  La acción del chip. Verde cuando propone algo —"Fijar" clava el pin en
-  la posición del GPS—; gris cuando solo deshace.
+  La acción del chip. Verde cuando propone algo —"Usar GPS" con el mapa
+  sin punto—; gris cuando solo deshace.
 
-  "Quitar" estaba en rojo de error. No borra nada: devuelve el mapa al
-  GPS y el punto se vuelve a poner con un toque, así que el rojo prometía
+  "Quitar" estaba en rojo de error. No borra nada grave: deja el mapa sin
+  punto y el punto se vuelve a poner con un toque, así que el rojo prometía
   una consecuencia que no existe, y encima era la única alarma de la
   pantalla de inicio. Es el mismo cambio que hizo la app.
 */
@@ -1691,6 +1691,17 @@
   line-height: 1.3;
   letter-spacing: calc(-0.3 * var(--u));
   color: var(--app-text-primary);
+}
+
+/* «Hasta 1,1 km» (`eleccion.hasta`), a 4 del título: AppTextStyles.pie
+   (12, w500, 1,3) en textSecondary. */
+.rueda-tope {
+  margin-top: calc(4 * var(--u));
+  text-align: center;
+  font-size: calc(12 * var(--u));
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--app-text-secondary);
 }
 
 /* `_respuestas`: «Guardar» a 18, en el sitio y con la forma del botón del

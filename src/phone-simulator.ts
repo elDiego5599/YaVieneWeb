@@ -254,7 +254,7 @@ export class PhoneSimulator {
       accion.textContent = CHIP.accion;
       accion.hidden = false;
       // "Quitar" solo deshace: va en gris. El verde queda para la acción
-      // que propone algo ("Fijar"), como en location_status_chip.dart.
+      // que propone algo ("Usar GPS"), como en location_status_chip.dart.
       accion.classList.toggle('app-chip-action--suave', CHIP.suave);
     }
     // El atributo, no la propiedad: los íconos son SVG y `hidden` es de

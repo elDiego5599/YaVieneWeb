@@ -46,6 +46,16 @@ const METROS_POR_SEGUNDO = 58;
  */
 const RUEDA_M = Array.from({ length: 26 }, (_, i) => 500 + i * 100);
 const RADIO_INICIAL_M = 1000;
+
+/**
+ * La última fila de la rueda que todavía no sonaría al armar: estrictamente
+ * por debajo del bus, y nunca menos de 500 m. Con el bus a más de 3 km no
+ * hay tope (`distanciaAvisoHasta` de distancia_aviso_provider.dart).
+ */
+function distanciaAvisoHasta(metros: number): number | null {
+  if (metros > 3000) return null;
+  return Math.min(3000, Math.max(500, 500 + (Math.ceil((metros - 500) / 100) - 1) * 100));
+}
 const RADIO_GUARDADO_M = 800;
 
 /** Centro de la franja de pantalla que no tapan la píldora ni la hoja. */
@@ -685,9 +695,24 @@ export class PasoDemo {
     this.#a(14900, () => this.#ciclo());
   }
 
-  /** La tarjeta del bus pregunta la distancia (o deja de preguntarla). */
+  /**
+   * La tarjeta del bus pregunta la distancia (o deja de preguntarla). La
+   * rueda no pasa de la distancia del bus: un aviso a más sonaría al
+   * armarlo (`distanciaAvisoHasta` de distancia_aviso_provider.dart; dueño,
+   * 2026-10-07).
+   */
   #preguntar(si: boolean): void {
     this.#el('sheet')?.classList.toggle('is-rueda', si);
+    if (!si) return;
+    const hasta = distanciaAvisoHasta(this.#metros);
+    this.#el('rueda')
+      ?.querySelectorAll<HTMLElement>('.rueda-fila')
+      .forEach((fila, i) => (fila.hidden = hasta !== null && RUEDA_M[i]! > hasta));
+    const tope = this.#el('rueda-tope');
+    if (tope) {
+      tope.hidden = hasta === null;
+      tope.textContent = hasta === null ? '' : `Hasta ${distanciaAviso(hasta)}`;
+    }
   }
 
   #filaRueda(metros: number): HTMLElement | null {

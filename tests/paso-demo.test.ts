@@ -448,6 +448,28 @@ describe('3. Te avisamos', () => {
     expect(el(raiz, 'eta-sub').hidden).toBe(true);
   });
 
+  // Riesgo: la rueda ofrece un aviso que sonaría al armarlo, porque el bus
+  // ya está más cerca (dueño, 2026-10-07).
+  it('la rueda llega hasta el bus y dice su tope', () => {
+    const { raiz, demo } = montarDemo(3);
+    expect(el(raiz, 'rueda-tope').hidden).toBe(true);
+    demo.activar(true);
+    vi.advanceTimersByTime(3400);
+    expect(preguntando(raiz)).toBe(true);
+    // El bus sale a 1300 m y a los 3,4 s la hoja dice 1,2 km: la rueda no
+    // ofrece 1,2 km, que ya sonaría, y llega a 1,1 km, como
+    // `distanciaAvisoHasta` en la app.
+    expect(texto(raiz, 'eta-value')).toBe('1,2');
+    const visibles = Array.from(
+      el(raiz, 'rueda').querySelectorAll<HTMLElement>('.rueda-fila'),
+      (f) => (f.hidden ? null : f.textContent)
+    ).filter((f) => f !== null);
+    expect(visibles.at(-1)).toBe('1,1 km');
+    expect(visibles).toHaveLength(7);
+    expect(el(raiz, 'rueda-tope').hidden).toBe(false);
+    expect(texto(raiz, 'rueda-tope')).toBe('Hasta 1,1 km');
+  });
+
   // Riesgo: la rueda ofrece distancias que la app no tiene.
   it('la rueda va de 500 m a 3,0 km de 100 en 100, escrita como en la app', () => {
     const { raiz } = montarDemo(3);
