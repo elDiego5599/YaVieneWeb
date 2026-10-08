@@ -126,3 +126,51 @@ test('cada ruta marca sus dos terminales en puntas distintas del mapa', async ({
     expect(Math.hypot(ax - bx, ay - by), `${ruta}: las dos terminales encimadas`).toBeGreaterThan(155);
   }
 });
+
+/*
+  Auditoría 2026-09, hallazgo 9. Con el punto en el primer tramo del
+  recorrido, el bus nace por detrás —antes del final— y cruza el final del
+  trazado. Pasar de `t = 1` a `t = 0` se trataba como el fin de la escena:
+  el bus se recolocaba detrás del punto, en bucle, saltando cientos de
+  metros atrás cada ~10 s.
+
+  La escena sí vuelve a empezar cuando los dos buses ya pasaron el punto y
+  están lejos, pero el segundo nace 4,3 km atrás: eso no llega antes de
+  ~60 s, así que en los 25 s que se miran aquí no hay salto legítimo.
+*/
+test('con el punto junto a la salida, el bus llega a él sin saltar atrás', async ({ page }, info) => {
+  test.skip(info.project.name !== 'escritorio', 'el movimiento es el mismo en los dos tamaños');
+  test.setTimeout(60_000);
+  await mapaALaVista(page);
+  const mapa = page.getByRole('slider', { name: /punto de espera/i });
+  await mapa.focus();
+  // Las flechas mueven el punto un 2 % del recorrido: se avanza hasta el
+  // primer 2 %, que en la C16 queda a menos de un kilómetro de la salida.
+  for (let i = 0; i < 50 && Number(await mapa.getAttribute('aria-valuenow')) > 1; i += 1) {
+    await page.keyboard.press('ArrowRight');
+  }
+  expect(Number(await mapa.getAttribute('aria-valuenow'))).toBeLessThanOrEqual(1);
+
+  const { maxSalto, minAlPunto } = await page.evaluate(async () => {
+    const xy = (sel: string): [number, number] => {
+      const m = /translate\(([-\d.]+) ([-\d.]+)\)/.exec(document.querySelector(sel)!.getAttribute('transform')!)!;
+      return [Number(m[1]), Number(m[2])];
+    };
+    const punto = xy('.mv-pin');
+    let antes = xy('.mv-bus');
+    let maxSalto = 0;
+    let minAlPunto = Infinity;
+    for (let ms = 0; ms < 25_000; ms += 100) {
+      await new Promise((r) => setTimeout(r, 100));
+      const ahora = xy('.mv-bus');
+      maxSalto = Math.max(maxSalto, Math.hypot(ahora[0] - antes[0], ahora[1] - antes[1]));
+      minAlPunto = Math.min(minAlPunto, Math.hypot(ahora[0] - punto[0], ahora[1] - punto[1]));
+      antes = ahora;
+    }
+    return { maxSalto, minAlPunto };
+  });
+  // A 110 m/s y 6,45 m por unidad, el bus hace ~1,7 unidades en 100 ms; 30
+  // deja margen para un cuadro perdido. El salto del fallo eran ~95.
+  expect(maxSalto, 'el bus saltó').toBeLessThan(30);
+  expect(minAlPunto, 'el bus nunca llegó al punto').toBeLessThan(15);
+});

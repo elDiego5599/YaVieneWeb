@@ -522,21 +522,18 @@ export class MapaVivo {
     if (!metros) return;
     const salto = (RITMO_M_S * dt) / metros;
 
-    let vuelta = false;
-    for (const bus of this.#buses) {
-      bus.t += salto;
-      if (bus.t > 1) {
-        bus.t -= 1;
-        vuelta = true;
-      }
-    }
+    // El recorrido cierra: pasar del final al principio es seguir por la
+    // calle, no un salto. Tratarlo como fin de la escena recolocaba al bus
+    // detrás del punto, y con el punto en el primer tramo eso era un bucle
+    // que lo hacía saltar atrás cada diez segundos (auditoría 2026-09, 9).
+    for (const bus of this.#buses) bus.t = (bus.t + salto) % 1;
     this.#dibujarBuses();
 
     // Cuando el último ya dejó atrás el punto de espera, los dos vuelven a
     // nacer: la escena se repite sola sin que nadie tenga que tocar nada.
     const lejos = this.#buses.every(b => b.metros > RADIO_AVISO_M * 2.4);
     const pasados = this.#buses.every(b => this.#pasoDeLargo(b));
-    if (vuelta || (lejos && pasados)) {
+    if (lejos && pasados) {
       this.#reponerBuses();
       this.#avisado = false;
       this.#apagarAviso();
