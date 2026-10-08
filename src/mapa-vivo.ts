@@ -382,7 +382,10 @@ export class MapaVivo {
     else if (evento.key === 'ArrowLeft' || evento.key === 'ArrowDown') t = this.#pinT - PASO;
     else return;
     evento.preventDefault();
-    this.#ponerPin(this.#punto((t + 1) % 1));
+    // El avance se pasa tal cual: buscar el punto más cercano lo devolvería
+    // a la otra mano allí donde la ida y la vuelta van por la misma calle.
+    const avance = (t + 1) % 1;
+    this.#ponerPin(this.#punto(avance), avance);
     this.#raiz.classList.add('es-tocado');
     this.#anunciarPunto();
   }
@@ -399,9 +402,10 @@ export class MapaVivo {
       + `a ${this.#lecturaMetros.textContent}, ${this.#lecturaPie.textContent}.`;
   }
 
-  #ponerPin(destino: Punto): void {
+  /** `avance`, cuando ya se sabe por dónde del recorrido va el punto. */
+  #ponerPin(destino: Punto, avance = this.#tMasCercano(destino)): void {
     this.#pinPunto = destino;
-    this.#pinT = this.#tMasCercano(destino);
+    this.#pinT = avance;
     const cerca = this.#punto(this.#pinT);
     this.#aparte =
       Math.hypot(cerca.x - destino.x, cerca.y - destino.y) * this.#metrosPorUnidad;
@@ -518,21 +522,18 @@ export class MapaVivo {
     if (!metros) return;
     const salto = (RITMO_M_S * dt) / metros;
 
-    let vuelta = false;
-    for (const bus of this.#buses) {
-      bus.t += salto;
-      if (bus.t > 1) {
-        bus.t -= 1;
-        vuelta = true;
-      }
-    }
+    // El recorrido cierra: pasar del final al principio es seguir por la
+    // calle, no un salto. Tratarlo como fin de la escena recolocaba al bus
+    // detrás del punto, y con el punto en el primer tramo eso era un bucle
+    // que lo hacía saltar atrás cada diez segundos (auditoría 2026-09, 9).
+    for (const bus of this.#buses) bus.t = (bus.t + salto) % 1;
     this.#dibujarBuses();
 
     // Cuando el último ya dejó atrás el punto de espera, los dos vuelven a
     // nacer: la escena se repite sola sin que nadie tenga que tocar nada.
     const lejos = this.#buses.every(b => b.metros > RADIO_AVISO_M * 2.4);
     const pasados = this.#buses.every(b => this.#pasoDeLargo(b));
-    if (vuelta || (lejos && pasados)) {
+    if (lejos && pasados) {
       this.#reponerBuses();
       this.#avisado = false;
       this.#apagarAviso();
