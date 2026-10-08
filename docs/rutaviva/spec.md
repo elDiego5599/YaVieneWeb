@@ -4,8 +4,22 @@ Librería abierta, en Dart y en TypeScript, que convierte reportes GPS
 escasos y con ruido en un vehículo que avanza **por su ruta**, sin saltos
 hacia atrás y con la distancia que le falta medida **por el recorrido**.
 
-Estado: borrador para el dueño (2026-10-08). Nombre libre en npm y pub.dev
+Estado: **aplazado** (dueño, 2026-10-08). Nombre libre en npm y pub.dev
 (404 en los dos registros el 2026-10-08).
+
+> **Decisión del dueño.** El diagnóstico se queda; el alcance no. Hoy la
+> flota es simulada y va pegada a la ruta, así que el ruido y los saltos de
+> sentido no se ven, y no hay trazas reales con qué probar (el GPS real
+> espera al AMB, D2). Dos librerías, dos registros, página de pruebas y
+> artículo son semanas para algo que hoy no se ve: va contra YAGNI.
+>
+> **Lo que se hace ahora** está en [tickets.md](tickets.md), grupo «Ahora»:
+> 1. Distancia por la ruta en el core de Dart, con proyección por ventana,
+>    para la hoja y el aviso.
+> 2. Hallazgo 9 de la web, con un arreglo pequeño en `mapa-vivo.ts`.
+>
+> El paquete abierto (todo lo de abajo) queda como guía para cuando haya
+> GPS real y trazas que lo justifiquen.
 
 ---
 
@@ -26,19 +40,27 @@ Las librerías de *map matching* (OSRM, Valhalla, Mapbox) resuelven otro
 problema: pegar a la **red vial** desconocida, en un servidor. Aquí la ruta
 ya se conoce y la respuesta tiene que salir en el teléfono, en microsegundos.
 
-### Evidencia en YaViene
+### Evidencia en YaViene (app `main` 9d0f3a0, web `main` ac234af)
 
-- `app_pasajero/.../widgets/map_bus_animator.dart`: interpolación lineal de
-  lat/lon durante 1 s. Corta esquinas y asume reportes cada ~1 s.
+- **La distancia que promete el producto se mide en línea recta** (`haversineMeters`)
+  en `eta_bottom_sheet.dart`, `alert_toggle_provider.dart` y
+  `proximity_alerts_provider.dart`. Si la ruta da una vuelta, «a 400 m»
+  pueden ser 3 km por la calle. Es lo más valioso de este documento.
+- `ya_viene_core/lib/core/models/bus_motion.dart` (`BusMotion`): interpolación
+  lineal de lat/lon durante 1 s. Corta esquinas y asume reportes cada ~1 s.
+  La usan el pasajero (`map_bus_animator.dart`, `map_widget.dart`) **y el
+  panel** (`app_control/.../control_map.dart`).
 - `app_pasajero/.../utils/geo.dart` `projectOntoPolyline`: busca el tramo
   más cercano en **toda** la polilínea, sin pista de avance. En una ruta de
   ida y vuelta por la misma calle, cualquiera de los dos sentidos vale.
 - Web, auditoría 2026-09-29, hallazgo 9: en el mapa en vivo el bus salta
   750 m hacia atrás en bucle porque la vuelta del recorrido (`t: 1 → 0`) se
   trata como fin de escena.
-- Las seis rutas de `rutas.json` son de ida y vuelta: el punto de vuelta cae
-  entre el 47 % y el 54 % del largo (rama `nube/terminales`). Ida y regreso
-  comparten calles en varios tramos.
+- `rutas.json` trae 9 rutas; la web dibuja 6. Las seis de la web son de ida y
+  vuelta: el punto de vuelta cae entre el 47 % y el 54 % del largo (rama
+  `nube/terminales`). Ida y regreso comparten calles en varios tramos.
+- La flota simulada va pegada a la ruta: hoy ni el ruido ni el salto de
+  sentido se ven. Aparecen con el GPS real.
 
 ## 2. Objetivos y no-objetivos
 
@@ -48,7 +70,7 @@ ya se conoce y la respuesta tiene que salir en el teléfono, en microsegundos.
 3. Posición en cualquier instante entre reportes, sobre la ruta, para animar a 60 fps.
 4. Distancia por la ruta hasta un punto (parada o usuario), no ETA.
 5. Estados explícitos: `enVivo`, `senalVieja`, `sinSenal`, `fueraDeRuta`.
-6. Mismo comportamiento, bit a bit dentro de una tolerancia, en Dart y en TS.
+6. Mismo comportamiento en Dart y en TS: los dos pasan los mismos vectores, con la tolerancia en metros que fija cada vector.
 7. Cero dependencias. Sin red. Sin mapa: devuelve números, el mapa lo pone quien lo usa.
 
 **No-objetivos (v1)**
@@ -191,14 +213,12 @@ Además, por implementación:
 
 ## 7. Rendimiento
 
-Objetivo en un Android de gama baja (Moto E o similar) y en Chrome de escritorio:
-- `reportar`: < 20 µs con ruta de 2 000 vértices (ventana, no búsqueda global).
-- `en`: < 2 µs.
-- 500 vehículos a 60 fps: < 2 ms por cuadro en total.
-- TS: < 4 KB gzip, ESM, sin dependencias, `sideEffects: false`.
-
-El banco de medidas vive en el repo y corre en CI. Un cambio que empeore
-más del 10 % falla.
+Lo que se puede probar en CI, no en un teléfono concreto:
+- `reportar` con ventana no recorre la ruta entera: una prueba cuenta los
+  tramos visitados (≤ los de la ventana), no microsegundos.
+- Banco de medidas con línea base guardada; un cambio que empeore más del
+  10 % en la misma máquina de CI falla.
+- TS: < 4 KB gzip (`size-limit`), ESM, sin dependencias, `sideEffects: false`.
 
 ## 8. Entregables
 
@@ -218,19 +238,24 @@ más del 10 % falla.
 
 Va después de publicar la v1 y cambia lo que se ve, así que [DUEÑO] lo aprueba con capturas:
 
-- App: `map_bus_animator.dart` y `projectOntoPolyline` pasan a usar
-  `rutaviva`. `route_reach_provider.dart` usa `ruta.proyectar`.
-- Web: el bus del mapa en vivo avanza con `Seguidor` (cierra el hallazgo 9).
-  Ojo: el presupuesto de JS está al 100 % (65,8/66), así que hay que medir
-  antes y, si no cabe, sacar a cambio.
+- Core: `BusMotion` pasa a mover sobre la ruta; eso cambia **el pasajero y
+  el panel** a la vez, así que las capturas son de los dos.
+- Pasajero: `projectOntoPolyline` y `route_reach_provider.dart` usan
+  `ruta.proyectar`; la hoja y los avisos ya miden por la ruta desde el
+  grupo «Ahora» de los tickets.
+- Web: el bus del mapa en vivo avanza con `Seguidor`. El hallazgo 9 ya se
+  habrá cerrado antes, sin librería. El presupuesto de JS se mide antes de
+  sumar (60,4/66 el 2026-10-08, medido por el dueño).
 - Backend (opcional, v2): calcula el avance en el servidor y lo manda en el
   paquete. Los teléfonos dejan de proyectar.
 
-## 10. Cómo se mide el éxito
+## 10. Cuándo está hecho
 
-- YaViene en producción usándolo, con una prueba que demuestra el arreglo de cada síntoma de §1.
-- A los 3 meses de publicado: un proyecto ajeno lo usa, aunque sea uno.
-- La página de pruebas enlazada desde el artículo y el README.
+- YaViene lo usa en el pasajero, el panel y la web, con una prueba por cada
+  síntoma de §1 que falla sin la librería.
+- Las trazas reales del GPS (cuando existan) pasan como vectores.
+
+La adopción ajena no depende de nosotros y no es criterio de cierre.
 
 ## 11. Preguntas abiertas para el dueño
 

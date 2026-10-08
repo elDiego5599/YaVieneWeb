@@ -4,6 +4,53 @@ Salen de [spec.md](spec.md). Cada ticket se cierra entero, con prueba roja → v
 (vara de calidad de `CLAUDE.md`). Etiquetas como en el plan: `[YA]`, `[DUEÑO]`,
 `[BLOQUEADA: X]`. Tamaño: S ≤ ½ día, M ≈ 1–2 días, L ≈ 3–5 días.
 
+**Decisión del dueño (2026-10-08):** se hace el grupo «Ahora», dentro de
+YaViene y sin librería. El grupo «Después» (el paquete abierto) espera al
+GPS real y a sus trazas.
+
+## Ahora
+
+| # | Ticket | Dónde | Tamaño | Etiqueta |
+|---|---|---|---|---|
+| A1 | Distancia por la ruta, con proyección por ventana | app, `ya_viene_core` | M | [YA] |
+| A2 | La hoja y el aviso miden por la ruta | app, pasajero | M | [DUEÑO: capturas] |
+| W1 | Hallazgo 9: el bus del mapa en vivo no salta atrás | web, `src/mapa-vivo.ts` | S | [DUEÑO: capturas] |
+
+### A1 · Distancia por la ruta en el core
+- En `ya_viene_core`, junto a la geometría: proyección **con pista de
+  avance**. Con avance previo, busca solo en la ventana
+  `[avance − 50 m, avance + 25 m/s·Δt + 100 m]`; sin pista, búsqueda global
+  como hoy. Empate a < 15 m entre ida y vuelta: decide el rumbo del bus.
+- `distanciaPorRuta(bus, punto)`: metros por la ruta entre el bus y el punto,
+  con vuelta en rutas circulares. `null` cuando no se sabe: sin geometría,
+  el bus fuera de la ruta (> 60 m) o el punto a más del radio del aviso.
+- Pruebas que fallan con la proyección actual de `geo.dart`:
+  - ida y vuelta por la misma calle: sin ventana sale el sentido equivocado;
+  - un punto a 400 m en línea recta y a 3 km por la ruta: debe dar unos 3 km;
+  - el paso del final al inicio en una ruta circular no se cuenta como retroceso.
+- Casos borde que se deciden con `/grill-me` antes de codear:
+  - **Bus que ya pasó al usuario:** ¿distancia a la vuelta siguiente o «ya pasó»?
+  - **`null`:** ¿se usa la distancia en línea recta o no se muestra cifra? Hoy `route_reach_provider` falla abierto.
+
+### A2 · La hoja y el aviso miden por la ruta
+- `eta_bottom_sheet.dart`, `alert_toggle_provider.dart` y
+  `proximity_alerts_provider.dart` usan `distanciaPorRuta` en lugar de
+  `haversineMeters`. Ante `null`, lo que se decidió en A1.
+- Una prueba por pantalla donde la línea recta y la ruta dan cifras distintas.
+- Pasajero, `flutter analyze --fatal-infos` limpio, y builds de Android **e** iOS con `BACKEND_URL`.
+- Capturas antes y después con una ruta que dé vuelta. Lo apruebas tú antes de fusionar.
+
+### W1 · Hallazgo 9 de la web
+- `src/mapa-vivo.ts`: `bus.t %= 1` y recolocar solo con `lejos && pasados`
+  (arreglo propuesto en la auditoría).
+- Prueba roja: en Playwright `escritorio`, con el punto en `t = 0.01` de la
+  C16, el `transform` del primer `.mv-bus` no puede saltar más de
+  20 unidades en 500 ms durante 30 s.
+- typecheck, Vitest, cobertura, Playwright entero y presupuesto.
+- Capturas antes y después: el bus cambia de movimiento.
+
+## Después — paquete abierto [BLOQUEADA: GPS real (D2) y sus trazas]
+
 | # | Ticket | Depende de | Tamaño | Etiqueta |
 |---|---|---|---|---|
 | R0 | Decisiones del dueño: repo, licencia, nombre, permiso de trazas (spec §11) | — | S | [DUEÑO] |
@@ -16,14 +63,14 @@ Salen de [spec.md](spec.md). Cada ticket se cierra entero, con prueba roja → v
 | R7 | Estados y `fueraDeRuta` con reenganche | R4 | M | |
 | R8 | `distanciaHasta` | R5 | S | |
 | R9 | Pruebas de propiedades y trinquete de cobertura | R5–R8 | M | |
-| R10 | Trazas reales anonimizadas como vectores | R0, R2 | M | [DUEÑO] |
+| R10 | Trazas reales anonimizadas como vectores | R0, R2, GPS real | M | [BLOQUEADA: D2] |
 | R11 | Banco de rendimiento en CI | R6 | M | |
 | R12 | Página de pruebas | R6, R10 | L | |
 | R13 | Documentación y ejemplos (flutter_map, MapLibre, Leaflet, GTFS-RT) | R8 | M | |
 | R14 | Publicar 0.1.0 en pub.dev y npm | R9, R11, R13 | S | [DUEÑO] |
 | R15 | Artículo técnico (es + en) | R12 | M | |
-| R16 | Integrarlo en la app pasajero | R14 | M | [DUEÑO: capturas] |
-| R17 | Integrarlo en el mapa en vivo de la web | R14 | M | [DUEÑO: capturas] |
+| R16 | Integrarlo en la app: pasajero y panel | R14, A2 | M | [DUEÑO: capturas] |
+| R17 | Integrarlo en el mapa en vivo de la web | R14, W1 | M | [DUEÑO: capturas] |
 
 ---
 
@@ -97,7 +144,10 @@ Distancia por la ruta, con vuelta en circulares. `null` si el punto queda a más
 
 **Hecho cuando:** una mutación que quita la tolerancia de retroceso pone en rojo la prueba de propiedades.
 
-### R10 · Trazas reales [DUEÑO]
+### R10 · Trazas reales [BLOQUEADA: D2]
+Hoy no hay: la flota es simulada y va pegada a la ruta. Cuando el GPS real
+funcione (D2, espera al AMB):
+
 Script en el backend que exporta un día de una ruta:
 - sin placa ni empresa;
 - hora desplazada a un origen 0;
@@ -108,8 +158,9 @@ Revisión del dueño antes de subir.
 **Hecho cuando:** hay al menos 3 trazas como vectores, con lo esperado anotado a mano en 5 puntos difíciles cada una.
 
 ### R11 · Banco de rendimiento
-- Medidas de spec §7 con `tinybench` (TS) y `benchmark_harness` (Dart).
-- Línea base guardada; la CI falla si algo empeora más del 10 %.
+- Medidas de spec §7 con `tinybench` (TS) y `benchmark_harness` (Dart),
+  más la prueba que cuenta tramos visitados por `reportar`.
+- Línea base guardada; la CI falla si algo empeora más del 10 % en la misma máquina.
 - TS < 4 KB gzip, medido con `size-limit`.
 
 **Hecho cuando:** un `for` deliberadamente cuadrático pone la CI en rojo.
@@ -122,7 +173,7 @@ Revisión del dueño antes de subir.
 
 **Hecho cuando:**
 - hay pruebas e2e (Playwright) de que las capas se dibujan y los deslizadores cambian lo pintado, sin `pageerror`;
-- la página corre en un móvil de gama baja a 60 fps.
+- con 500 buses, ningún cuadro pasa de 16 ms en la traza de rendimiento de Playwright.
 
 ### R13 · Documentación
 - README con un GIF de la comparación.
@@ -141,15 +192,18 @@ La publicación de verdad la hace el dueño, con su cuenta.
 ### R15 · Artículo
 «Por qué tu bus salta hacia atrás (y cómo lo arreglamos en Barranquilla)», en español e inglés, con la página de pruebas incrustada. El dueño lo revisa antes de publicar.
 
-### R16 · App pasajero [DUEÑO: capturas]
-- `map_bus_animator.dart` y `projectOntoPolyline` pasan a `rutaviva`.
-- `route_reach_provider.dart` usa `ruta.proyectar`.
+### R16 · App: pasajero y panel [DUEÑO: capturas]
+- `BusMotion` (core) pasa a mover sobre la ruta. Eso cambia el pasajero
+  (`map_bus_animator.dart`, `map_widget.dart`) **y el panel**
+  (`control_map.dart`).
+- La proyección de A1 y `route_reach_provider.dart` pasan a `ruta.proyectar`.
+- Panel: `flutter analyze` limpio y pruebas en verde, incluida la E2E de escritorio (`tool/e2e-panel.sh`).
 - Pruebas actuales en verde, más una prueba nueva por síntoma de spec §1.
 - Build Android **e** iOS con `--dart-define=BACKEND_URL=...`.
-- Capturas antes y después para que el dueño apruebe.
+- Capturas antes y después, del pasajero y del panel, para que el dueño apruebe.
 
 ### R17 · Web, mapa en vivo [DUEÑO: capturas]
-- `src/mapa-vivo.ts` mueve el bus con `Seguidor`, lo que cierra el hallazgo 9.
-- Presupuesto de JS medido antes: está al 100 %, así que si no cabe se decide qué sale.
+- `src/mapa-vivo.ts` mueve el bus con `Seguidor` (el hallazgo 9 ya se cerró en W1).
+- Presupuesto de JS medido antes de sumar (60,4/66 el 2026-10-08).
 - typecheck, Vitest, Playwright entero y presupuesto en verde.
 - Capturas antes y después.
