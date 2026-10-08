@@ -382,7 +382,10 @@ export class MapaVivo {
     else if (evento.key === 'ArrowLeft' || evento.key === 'ArrowDown') t = this.#pinT - PASO;
     else return;
     evento.preventDefault();
-    this.#ponerPin(this.#punto((t + 1) % 1));
+    // El avance se pasa tal cual: buscar el punto más cercano lo devolvería
+    // a la otra mano allí donde la ida y la vuelta van por la misma calle.
+    const avance = (t + 1) % 1;
+    this.#ponerPin(this.#punto(avance), avance);
     this.#raiz.classList.add('es-tocado');
     this.#anunciarPunto();
   }
@@ -399,9 +402,10 @@ export class MapaVivo {
       + `a ${this.#lecturaMetros.textContent}, ${this.#lecturaPie.textContent}.`;
   }
 
-  #ponerPin(destino: Punto): void {
+  /** `avance`, cuando ya se sabe por dónde del recorrido va el punto. */
+  #ponerPin(destino: Punto, avance = this.#tMasCercano(destino)): void {
     this.#pinPunto = destino;
-    this.#pinT = this.#tMasCercano(destino);
+    this.#pinT = avance;
     const cerca = this.#punto(this.#pinT);
     this.#aparte =
       Math.hypot(cerca.x - destino.x, cerca.y - destino.y) * this.#metrosPorUnidad;

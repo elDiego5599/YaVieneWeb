@@ -86,6 +86,28 @@ test('los teléfonos de «Cómo funciona» no se leen con lector de pantalla', a
   expect(arbol).not.toMatch(/7:23|Localizando|Ruta activa|- img/);
 });
 
+/*
+  Las flechas avanzan el punto por el recorrido. Se recolocaba en el punto
+  del trazado más cercano, y en los tramos donde la ida y la vuelta van por
+  la misma calle el más cercano podía ser el de la otra mano: el punto
+  rebotaba entre 23, 25, 72, 74… y el teclado no llegaba a la mayor parte
+  de la ruta.
+*/
+test('las flechas recorren la ruta entera, paso a paso', async ({ page }) => {
+  await mapaALaVista(page);
+  const mapa = page.getByRole('slider', { name: /punto de espera/i });
+  await mapa.focus();
+  let antes = Number(await mapa.getAttribute('aria-valuenow'));
+  for (let i = 0; i < 50; i += 1) {
+    await page.keyboard.press('ArrowRight');
+    const ahora = Number(await mapa.getAttribute('aria-valuenow'));
+    // 2 % por paso; el redondeo a entero deja 1 o 3, y pasado el final se
+    // sigue por el principio.
+    expect([1, 2, 3], `paso ${i}: de ${antes} a ${ahora}`).toContain((ahora - antes + 100) % 100);
+    antes = ahora;
+  }
+});
+
 test('cada ruta marca sus dos terminales en puntas distintas del mapa', async ({ page }) => {
   await mapaALaVista(page);
   const botones = page.locator('[data-mapa-rutas] [data-ruta]');
