@@ -956,9 +956,11 @@
     <hr class="divisor" aria-hidden="true" />
 
     <!--
-      «Cómo funciona» (dueño, 2026-10-12): el texto a la izquierda y, a la
-      derecha, tres tarjetas encimadas que son pedazos de la app del
-      pasajero —el selector, la hoja del bus y el aviso—. Las tarjetas son
+      «Cómo funciona» (dueño, 2026-10-12): el texto grande a la izquierda,
+      sin ceja, y a la derecha un mockup breve de la app del pasajero, como
+      el de incident.io: detrás, el mapa de la C16 con el pin y el bus (el
+      mismo lienzo que los teléfonos, lo pinta `main.ts`), y encima el
+      selector, la hoja del bus y el aviso. Las tarjetas son
       decoración (`aria-hidden`): lo que se lee es la columna de texto. Su
       id no es `solucion`, que se quitó a propósito (sin-como-funciona.test.ts).
       Entran por turnos con el `.reveal` de la página. Los números y su
@@ -967,33 +969,19 @@
     <section class="panel" id="como-funciona">
       <div class="panel-inner cf-grid">
         <div class="cf-texto">
-          <span class="seccion-rotulo cf-ceja">CÓMO FUNCIONA</span>
           <h2 class="seccion-titulo">Sal cuando tu bus esté cerca</h2>
           <p class="seccion-lead">Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso. Te avisamos cuando esté cerca de ti.</p>
         </div>
 
         <div class="cf-tarjetas" aria-hidden="true">
-          <div class="cf-tarjeta cf-tarjeta--selector reveal" data-reveal-delay="0">
-            <div class="sheet-head"><span class="sheet-head-title">Elige tu ruta</span></div>
-            <div class="app-select is-activa">
-              <span class="app-select-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3.5 20.5V9.5l7-3.5" />
-                  <path d="M10.5 20.5V4.6a1.6 1.6 0 0 1 1.6-1.6h6.3A1.6 1.6 0 0 1 20 4.6v15.9" />
-                  <path d="M2 20.5h20" />
-                  <path d="M13.5 7.5h3M13.5 11.5h3M13.5 15.5h3" />
-                </svg>
-              </span>
-              <span class="app-select-body">
-                <span class="app-select-title">Sobusa</span>
-                <span class="app-select-sub">Empresa de transporte masivo</span>
-              </span>
-              <span class="app-select-chevron">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                  stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 5l7 7l-7 7" /></svg>
-              </span>
+          <div class="cf-tarjeta cf-tarjeta--mapa reveal" data-reveal-delay="0">
+            <div class="phone-map" id="cf-mapa">
+              <svg class="routes-svg-layer" id="cf-mapa-rutas"></svg>
             </div>
+          </div>
+
+          <div class="cf-tarjeta cf-tarjeta--selector reveal" data-reveal-delay="120">
+            <div class="sheet-head"><span class="sheet-head-title">Elige tu ruta</span></div>
             <div class="app-select is-activa">
               <span class="app-select-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
@@ -1011,7 +999,7 @@
             </div>
           </div>
 
-          <div class="cf-tarjeta cf-tarjeta--bus reveal" data-reveal-delay="140">
+          <div class="cf-tarjeta cf-tarjeta--bus reveal" data-reveal-delay="240">
             <div class="eta-tarjeta">
               <div class="eta-cabecera">
                 <span class="eta-bus">BUS</span>
@@ -1031,7 +1019,7 @@
             </div>
           </div>
 
-          <div class="cf-tarjeta cf-tarjeta--aviso reveal" data-reveal-delay="280">
+          <div class="cf-tarjeta cf-tarjeta--aviso reveal" data-reveal-delay="360">
             <div class="cf-aviso-icono"><img src="/logo.svg" alt="" width="20" height="20"></div>
             <div class="cf-aviso-texto">
               <span class="cf-aviso-app">Ya Viene · ahora</span>

@@ -1,8 +1,10 @@
 /* ── CÓMO FUNCIONA ────────────────────────────────────────
 
-   La banda entre las dos rayas, justo tras el hero: el texto a un lado y,
-   al otro, tres tarjetas encimadas que son pedazos de la app del pasajero.
-   No dibuja nada que ya esté dibujado: las filas, la hoja del bus, su nota
+   La banda entre las dos rayas: el texto a un lado y, al otro, un mockup
+   breve de la app del pasajero (dueño, 2026-10-12, como el de incident.io):
+   el mapa detrás y tres tarjetas encimadas que son pedazos de la app.
+   No dibuja nada que ya esté dibujado: el mapa es `.phone-map` con su
+   `PhoneMap` (main.ts), y las filas, la hoja del bus, su nota
    y el aviso reutilizan `.app-select*`, `.eta-*`, que
    miden `--u` (un punto lógico de Flutter) en `phone-simulator.css`. Aquí
    solo van la rejilla, el marco de cada tarjeta y cómo se montan.
@@ -31,20 +33,22 @@
   gap: 20px;
 }
 
-/* Escala de titular de la portada, un punto por debajo: la portada llega
-   a 102 px (`.hero-title`), esta banda a 72 (4,9 vw ≈ 68 a 1440). */
+/* Más grande (dueño, 2026-10-12), como el «Built for enterprises» de
+   incident.io, que va en tres renglones de ~45 % de la columna: 6 vw son
+   86 px a 1440 y 61 a 1024, con tope en 88, todavía bajo los 102 px del
+   titular de la portada (`.hero-title`). */
 .cf-texto .seccion-titulo {
   max-width: none;
-  font-size: clamp(2.5rem, 4.9vw, 4.5rem);
+  font-size: clamp(2.75rem, 6vw, 5.5rem);
   line-height: 1.04;
   letter-spacing: -0.04em;
 }
 
-/* El párrafo grande y gris de incident.io: 20–22 px, interlínea 1,45,
-   en la tinta media de la página. */
+/* El párrafo grande y gris de incident.io, que sube con el titular:
+   19–25 px (24 a 1440), interlínea 1,45, en la tinta media de la página. */
 .cf-texto .seccion-lead {
   max-width: 34ch;
-  font-size: clamp(18px, 1.1rem + 0.35vw, 22px);
+  font-size: clamp(19px, 1rem + 0.6vw, 25px);
   line-height: 1.45;
 }
 
@@ -52,28 +56,19 @@
   margin-top: 8px;
 }
 
-/* La ceja como pastilla con filo, la del «Built for enterprises» de
-   incident.io. La letra es la de `.seccion-rotulo` (verde de letra,
-   `--acento`, 11 px, mayúsculas); aquí solo el contorno. */
-.cf-ceja {
-  padding: 5px 12px;
-  border: 1px solid var(--linea-fuerte);
-  border-radius: 9999px;
-  background: var(--surface);
-}
-
-/* El collage (dueño, 2026-10-12: menos vacío, como incident.io): las
-   tarjetas se reparten a lo ancho de la columna, no en pila. El grupo
-   tiene proporción fija y cada tarjeta se coloca en porcentajes; `--u`
-   vale 1/640 del ancho (antes 1/440: ahora las tarjetas miden ~0,8 el
-   tamaño de la app, texto de 12–14 px) con tope en 0,85 px. */
+/* El collage (dueño, 2026-10-12: como incident.io): el mapa grande atrás
+   a la derecha, como su tablero de tareas, y las tres tarjetas montadas
+   por delante a la izquierda y abajo. El grupo tiene proporción fija y
+   cada tarjeta se coloca en porcentajes; `--u` vale 1/640 del ancho (las
+   tarjetas miden ~0,8 el tamaño de la app, texto de 12–14 px) con tope
+   en 0,85 px. */
 .cf-tarjetas {
   container-type: inline-size;
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 620px;
   margin-inline: auto;
-  aspect-ratio: 600 / 340;
+  aspect-ratio: 620 / 460;
 }
 
 .cf-tarjeta {
@@ -90,18 +85,28 @@
   box-shadow: var(--sombra-producto);
 }
 
-/* Atrás: el selector (route_selector_sheet.dart, `_SelectorTile`: 78 de
-   alto, insignia de 44, 12 de radio; ya lo miden `.app-select*`). Las dos
-   filas con 10 de hueco, como las del selector. */
-.cf-tarjeta--selector {
+/* Al fondo: el mapa, sin relleno, recortado al radio de la tarjeta. El
+   `.phone-map` ya va en `inset: 0`; el pin y el bus miden en puntos del
+   teléfono contra el ancho del lienzo (phone-map.ts), así que aquí salen a
+   la escala de esta tarjeta. */
+.cf-tarjeta--mapa {
   top: 0;
+  right: 0;
+  width: 64%;
+  height: 86%;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Arriba a la izquierda, sobre el mapa: el selector (route_selector_sheet.dart, `_SelectorTile`: 78 de
+   alto, insignia de 44, 12 de radio; ya lo miden `.app-select*`), con la
+   fila de la ruta que pinta el mapa. */
+.cf-tarjeta--selector {
+  top: 2%;
   left: 0;
-  width: 56%;
+  width: 52%;
   display: grid;
   gap: calc(10 * var(--u));
-  /* Más abajo que arriba: el aviso se le monta encima y no debe tapar la
-     segunda fila. */
-  padding-bottom: calc(44 * var(--u));
 }
 
 .cf-tarjeta--selector .sheet-head {
@@ -111,27 +116,25 @@
 /* En medio: la hoja del bus (eta_bottom_sheet.dart, diseño «A»). La
    tarjeta de la distancia ya trae su filo; la nota «Te avisamos a… ·
    Cambiar» es `_Nota.distancia` con `_PildoraCambiar`, la píldora
-   gris con letra `coralAccessible` (`--app-coral-accessible`). Sube sobre
-   el selector y se arrima a la derecha. */
+   gris con letra `coralAccessible` (`--app-coral-accessible`). Abajo a la
+   izquierda, como la gráfica de incident.io. */
 .cf-tarjeta--bus {
-  top: 8%;
-  right: 0;
-  width: 46%;
-  /* Alta: la hoja entera, con su nota, ocupa el fondo derecho. */
-  padding-block: calc(26 * var(--u));
+  bottom: 0;
+  left: 6%;
+  width: 40%;
 }
 
 .cf-tarjeta--bus .eta-tarjeta {
   margin-top: 0;
 }
 
-/* Delante, abajo a la izquierda: la notificación (bus_notification_service.dart: «Tu bus de la
+/* Delante, abajo a la derecha: la notificación (bus_notification_service.dart: «Tu bus de la
    ruta $ruta está cerca de ti», con ruta y sin placa ni distancia). Es
    icono de 30 con 9 de radio, la marca en versalitas y el título en 700. */
 .cf-tarjeta--aviso {
-  bottom: 0;
-  left: 12%;
-  width: 66%;
+  bottom: 9%;
+  right: 0;
+  width: 60%;
   display: flex;
   align-items: center;
   gap: calc(12 * var(--u));
@@ -175,26 +178,33 @@
 @media (max-width: 1023px) {
   .cf-tarjetas {
     max-width: 440px;
-    aspect-ratio: 440 / 350;
+    /* Más alto que en escritorio: el aviso baja a su propio piso y deja
+       ver entera la hoja del bus (a 375 px, 74 px de aviso bajo 197 de hoja). */
+    aspect-ratio: 440 / 520;
   }
 
   .cf-tarjeta {
     --u: min(0.85px, calc(100cqw / 500));
   }
 
+  .cf-tarjeta--mapa {
+    width: 70%;
+    height: 80%;
+  }
+
   .cf-tarjeta--selector {
-    top: 10%;
-    width: 60%;
+    width: 64%;
   }
 
   .cf-tarjeta--bus {
-    top: 0;
-    width: 52%;
+    left: 0;
+    bottom: 22%;
+    width: 50%;
   }
 
   .cf-tarjeta--aviso {
-    left: 0;
-    width: 88%;
+    bottom: 0;
+    width: 76%;
   }
 }
 

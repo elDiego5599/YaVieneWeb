@@ -78,6 +78,25 @@ const arrancar = (): void => {
   }
 
   /*
+    «Cómo funciona»: la tarjeta de atrás es el mismo mapa, otra foto fija.
+    La C16 de la tarjeta del selector, el pin abajo a la derecha —fuera de
+    las otras tarjetas, a 375 px y a 1440— y, 1,8 km por
+    detrás —la cifra de la hoja—, el bus que viene.
+  */
+  const svgCf = document.querySelector<SVGSVGElement>('#cf-mapa-rutas');
+  const lienzoCf = document.querySelector<HTMLElement>('#cf-mapa');
+  if (svgCf && lienzoCf) {
+    const mapaCf = new PhoneMap(svgCf, lienzoCf);
+    mapaCf.setRoute('R-106');
+    const pin = mapaCf.tVisible(0.62, 0.62, [1800]);
+    mapaCf.setPin(pin);
+    mapaCf.setBuses([pin - 1800 / mapaCf.metrosDeRuta]);
+    mapaCf.showRoute(true);
+    mapaCf.showPin(true);
+    mapaCf.showBuses(true);
+  }
+
+  /*
     Qué resuelve: la sección de dos caras. Va aquí y no antes porque el
     HTML ya trae puesta la cara del problema —lo que se ve sin
     JavaScript—, así que nada de lo de arriba depende de ella.
