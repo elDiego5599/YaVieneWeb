@@ -56,6 +56,13 @@ const arrancar = (): void => {
   // La escena del hero, que entra sola al cargar.
   entrarEscena();
 
+  // El video del iPhone (experimento): sin `autoplay` en el marcado para
+  // que con movimiento reducido no arranque ni un cuadro y quede el póster.
+  // `play()` rechaza si el navegador no deja (ahorro de datos): se queda
+  // el póster, que es el mismo estado.
+  const video = document.querySelector<HTMLVideoElement>('[data-hero-video]');
+  if (video && !sinMovimiento()) video.play().catch(() => {});
+
   // Y lo contrario: lo que está fuera de pantalla deja de animarse. Es lo
   // primero que se enciende porque sólo mira secciones, no depende de que
   // ninguna otra pieza haya montado lo suyo. Ver reposo.ts.

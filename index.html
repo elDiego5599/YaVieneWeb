@@ -228,7 +228,7 @@
     <!-- ============ HERO ============ -->
     <section class="panel hero-panel" id="hero">
 
-      <div class="panel-inner hero-grid">
+      <div class="panel-inner hero-grid hero-grid--video">
 
         <!-- Columna Izquierda: Mensaje Comercial / Copy -->
         <div class="hero-copy">
@@ -279,6 +279,37 @@
           <p class="hero-credit">Mapa base © <a href="https://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> · © <a href="https://carto.com" target="_blank" rel="noopener">CARTO</a></p>
         </div>
 
+        <!--
+          EXPERIMENTO (rama experimento-hero-video): el teléfono del trío
+          —el mismo marco, isla, botones y sombra, con sus clases— lleva el
+          video de la app en la pantalla y reemplaza al trío. El trío no se borró: va entero
+          dentro del <template> de abajo, que el navegador no pinta ni deja
+          al alcance de main.ts (sus `querySelector` no lo encuentran y
+          sus mapas no arrancan). Volver atrás: quitar este bloque, las
+          dos etiquetas del <template> y la clase `hero-grid--video`.
+
+          El video es decorativo: lo que enseña ya lo dice el párrafo
+          `.solo-lectores` del final del panel.
+        -->
+        <div class="hero-iphone" aria-hidden="true">
+          <div class="hero-phone-wrap escena-entra" data-reveal-delay="0">
+            <div class="phone-shell">
+              <span class="phone-key phone-key--power"></span>
+              <span class="phone-key phone-key--accion"></span>
+              <span class="phone-key phone-key--vol-sube"></span>
+              <span class="phone-key phone-key--vol-baja"></span>
+              <div class="phone-screen">
+                <span class="phone-island"></span>
+                <video class="hero-video" data-hero-video muted loop playsinline preload="metadata"
+                       width="640" height="1138" poster="/video/yaviene-poster.webp">
+                  <source src="/video/yaviene.mp4" type="video/mp4">
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <template data-trio-hero>
         <!--
           Escena: el trío de teléfonos con las superficies reales de la
           app, sin nada flotando alrededor.
@@ -781,6 +812,7 @@
           </div>
 
         </div>
+        </template>
       </div>
 
       <p class="solo-lectores">

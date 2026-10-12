@@ -612,3 +612,86 @@
     font-size: 10.5px;
   }
 }
+
+/* ── EXPERIMENTO: el teléfono del trío, solo y con el video ───────────
+   Rama `experimento-hero-video`. Titular a la izquierda y a la derecha el
+   mismo aparato del trío (`.hero-phone-wrap > .phone-shell`, sin una
+   regla de marco nueva) con el video de la app en la pantalla, como
+   incident.io enseña su producto: el aparato entero y quieto sobre el
+   lienzo de color, con su sombra larga.
+
+   CHOCA con la regla «solape del hero congelado» (CLAUDE.md, producto 8):
+   aquí no hay trío, solape ni sangrado. Las reglas del trío siguen arriba
+   sin tocar y su marcado vive en un <template> de index.html; volver
+   atrás es quitar `.hero-iphone`, el template y `hero-grid--video`.
+   ────────────────────────────────────────────────────────────────── */
+.hero-iphone {
+  /* El ancho del trío: el video mide 640, 1,9x la pantalla (334 px). */
+  --tel: 360px;
+  flex: none;
+}
+
+/* El video es 9:16 y la pantalla 402:874: sobran dos franjas, arriba y
+   abajo, que van del papel del video para que no se vea dónde empieza.
+   #F2F5ED es lo que pinta Chrome en sus filas de arriba y abajo (media de
+   640 px, igual en todo el bucle). */
+.hero-iphone .phone-screen {
+  background: #F2F5ED;
+}
+
+.hero-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Apilado, el aparato va entero: el botón «Avisarme» del video es parte
+   de lo que se enseña, así que el panel ya no lo corta por abajo. */
+.hero-grid--video {
+  padding-bottom: clamp(56px, 7vh, 96px);
+}
+
+@media (max-width: 719px) {
+  /* 360 no cabe en el panel de 351 de un teléfono de 375. */
+  .hero-iphone {
+    --tel: 300px;
+  }
+
+  /* El trío esconde aquí su aparato central; este es el único. */
+  .hero-iphone .hero-phone-wrap {
+    display: flex;
+  }
+
+  .hero-grid--video {
+    padding-bottom: 48px;
+  }
+}
+
+/* Desde 1024: dos columnas, la copia a su filo izquierdo y el aparato a
+   su ancho natural. */
+@media (min-width: 1024px) {
+  .hero-grid--video {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: clamp(48px, 6vw, 112px);
+    max-width: 1240px;
+  }
+
+  .hero-grid--video .hero-copy {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  /* Dos renglones: el más largo, «¿Cuánto falta», mide ~5,6 px por px
+     de letra, así que 12cqw lo deja en ~65 % de la columna. Tope 96. */
+  .hero-grid--video .hero-title {
+    font-size: min(12cqw, 96px);
+  }
+
+  .hero-grid--video .hero-actions,
+  .hero-grid--video .hero-subtext {
+    justify-content: flex-start;
+  }
+}
