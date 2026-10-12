@@ -626,10 +626,10 @@
    atrás es quitar `.hero-iphone`, el template y `hero-grid--video`.
    ────────────────────────────────────────────────────────────────── */
 .hero-iphone {
-  /* Un iPhone de verdad (71,5 × 149,6), algo más ancho que el central
-     del trío: 380 × 795 (dueño, 2026-10-11; a la proporción del video
-     parecía un iPad). */
-  --tel: 380px;
+  /* Un iPhone de verdad (71,5 × 149,6) de 750 de alto, los que pidió
+     el dueño (2026-10-11): 750 × 71,5 / 149,6 = 358. A 380 × 795 quedaba
+     demasiado alto y a la proporción del video parecía un iPad. */
+  --tel: 358px;
   flex: none;
   display: flex;
   flex-direction: column;
@@ -702,7 +702,7 @@
     font-size: min(14cqw, 104px);
   }
 
-  /* Junto al aparato de 380 el texto de al lado sube un punto (dueño,
+  /* Junto al aparato el texto de al lado sube un punto (dueño,
      2026-10-11). */
   .hero-grid--video .hero-description {
     font-size: 23px;
