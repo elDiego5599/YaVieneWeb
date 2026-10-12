@@ -433,13 +433,58 @@
   place-items: center;
   height: 52px;
   border-radius: 10px;
-  background: var(--banda);
-  color: var(--tinta-media);
-  transition: color 0.5s var(--ease-out-cubic);
+  background: var(--ic-ciego-fondo);
+  color: var(--tinta);
+  transition: background-color 0.5s var(--ease-out-cubic);
 }
 
 [data-cara='claro'] .aviso-icono {
-  color: var(--acento);
+  background: var(--ic-claro-fondo);
+}
+
+/* Íconos duotono: el contorno va en tinta y el color entra por dentro
+   (`.r` = relleno, `.b` = el punto blanco del pin). Cada aviso trae su
+   par de colores; el cuadro se tiñe con el tinte suave del mismo color,
+   como las tarjetas de incident.io. Contornos ≥ 3:1 contra relleno y
+   cuadro (no texto, WCAG 1.4.11). */
+.aviso-icono .r {
+  fill: var(--ic-ciego);
+}
+
+.aviso-icono .cara--claro .r {
+  fill: var(--ic-claro);
+}
+
+.aviso-icono .b {
+  fill: #fff;
+}
+
+.aviso:nth-child(1) {
+  --ic-ciego: #ffb74d; /* arena: reloj de arena */
+  --ic-ciego-fondo: #fff1da;
+  --ic-claro: #00a859; /* verde de marca: pin */
+  --ic-claro-fondo: #e1f5ea;
+}
+
+.aviso:nth-child(2) {
+  --ic-ciego: #64b5f6; /* azul: paraguas */
+  --ic-ciego-fondo: #e5f2fd;
+  --ic-claro: #ffc107; /* amarillo del logo: campana */
+  --ic-claro-fondo: #fff4cc;
+}
+
+.aviso:nth-child(3) {
+  --ic-ciego: #ffe680; /* amarillo claro: reloj */
+  --ic-ciego-fondo: #fff8dc;
+  --ic-claro: #a5e3c3; /* verde suave: reloj que vuelve */
+  --ic-claro-fondo: #e1f5ea;
+}
+
+.aviso:nth-child(4) {
+  --ic-ciego: #ffc107; /* amarillo del logo: advertencia */
+  --ic-ciego-fondo: #fff4cc;
+  --ic-claro: #90caf9; /* azul cielo: casa */
+  --ic-claro-fondo: #e5f2fd;
 }
 
 .aviso-icono svg {
