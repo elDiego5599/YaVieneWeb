@@ -10,7 +10,7 @@
    Este fichero no se carga desde `components.css`: lo importa
    `src/empresas.ts`, que es la única entrada que lo usa. Va después del
    índice de componentes, así que en la cascada sigue siendo el último y
-   puede afinar lo que venga de `nav.css` y de `pasos.css`.
+   puede afinar lo que venga de `nav.css` .
    ────────────────────────────────────────────────────────────────── */
 
 /* ── El menú, estando ya en la página ──────────────────────────────── */
@@ -54,7 +54,7 @@
 
 /* Bajo 880 la barra ya dice «Para empresas» (`.nav-lugar`, fijo en esta
    página) y el rótulo, justo debajo, lo repetía: la misma etiqueta dos
-   veces en la primera pantalla. Como en los pasos de la portada, se va el
+   veces en la primera pantalla. Se va el
    de la sección; de 880 para arriba la barra no la lleva y él se queda. */
 @media (max-width: 879px) {
   #panel .seccion-rotulo {
@@ -1415,9 +1415,8 @@
 }
 
 /* La letra de las columnas se fija aquí por lo mismo que en las fichas
-   del problema: `pasos.css` declara `.columna-titulo` a 2,4vh y
-   `.columna-texto` a 1,1vw sin acotarlas a su sección, y en esta página
-   también se cargan. Con la ventana alta el titular crecía a 30 y las
+   del problema: `layout.css` declara `.columna-titulo` a 2,4vh y
+   `.columna-texto` a 1,1vw sin acotarlas a su sección. Con la ventana alta el titular crecía a 30 y las
    tres columnas dejaban de cuadrar entre sí. */
 .empresa-razones .columna-titulo {
   margin-bottom: 8px;
@@ -1483,19 +1482,19 @@
     0 30px 70px -50px rgba(11, 22, 40, 0.55);
 }
 
-/* La cinta de logos llega a los dos lados de la ficha, por encima del
-   relleno: dentro de él quedaba más estrecha que el texto de arriba y
-   parecía encajonada. Sus filos se funden con el blanco de la ficha, así
-   que no se ve dónde termina. La caja de `.empresa-marcas` deja de
-   recortar: la que recorta la pista es la propia cinta. */
-.empresa-ficha .empresa-marcas {
-  overflow: visible;
+/* La línea de cierre de la ficha: dice que se están sumando empresas y
+   lleva al formulario. Misma talla y tinta que los puntos de la lista. */
+.empresa-sumando {
+  font-size: var(--step-body);
+  line-height: 1.5;
+  color: var(--text-secondary);
 }
 
-.empresa-ficha .empresa-marcas-carrusel {
-  width: auto;
-  max-width: none;
-  margin-inline: calc(-1 * var(--ficha-aire));
+.empresa-sumando a {
+  color: var(--green-accessible);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* El titular de la sección, «Conecte su flota», al tamaño de los

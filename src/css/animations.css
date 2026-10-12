@@ -13,30 +13,6 @@
   transform: translateY(0);
 }
 
-/* Aceleración de hardware para los elementos flotantes que quedan */
-.animate-float-delayed {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-font-smoothing: subpixel-antialiased;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: high-quality;
-  will-change: transform;
-}
-
-/* Levitación de las tarjetas flotantes que quedan */
-@keyframes floatDelayed {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-12px);
-  }
-}
-
-.animate-float-delayed {
-  animation: floatDelayed 7s ease-in-out infinite 1.5s;
-}
-
 /* Reduced motion accessibility query */
 @media (prefers-reduced-motion: reduce) {
   /* El suelo. Lo de abajo es una lista escrita a mano, y una lista escrita
@@ -80,22 +56,12 @@
     transition: none !important;
     translate: none !important;
   }
-  .animate-float-delayed {
-    animation: none !important;
-    transform: none !important;
-  }
   /* La respiración del trío del hero anima `translate`, no `transform`:
      hay que apagar esa propiedad y no la otra, que en los laterales
      lleva el desnivel con el que se apoyan bajo el central. */
   .hero-phone-wrap,
   .hero-phone-side {
     animation: none !important;
-    translate: none !important;
-  }
-  /* Por lo mismo: el aviso del tercer momento entra deslizándose con
-     `translate`, así que hay que apagar esa propiedad y no `transform`. */
-  .scene-card--paso {
-    transition: none !important;
     translate: none !important;
   }
   html {

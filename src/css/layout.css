@@ -14,8 +14,7 @@
   position: relative;
   scroll-margin-top: 0;
   background: var(--papel);
-  /* Recorta igual que `hidden` pero sin volverse contenedor de scroll, que
-     dejaría muertas las escenas pegadas. */
+  /* Recorta igual que `hidden` pero sin volverse contenedor de scroll. */
   overflow: clip;
   /* Cada banda es su propio contexto de apilado. */
   isolation: isolate;
@@ -168,99 +167,4 @@
 .columnas {
   display: grid;
   gap: clamp(28px, 4vw, 56px);
-}
-
-/* ── Pista y escena: el andamio del scrollytelling ────────────────────
-   Una pista es un bloque de varias pantallas de alto con una escena
-   pegada dentro. Mientras la pista cruza la ventana la escena se queda
-   quieta y lo que cambia es lo que hay dentro. Queda una sola en la
-   página —el visor de los tres pasos, que va cambiando de pantalla en el
-   teléfono—, y quien lee el recorrido y decide qué paso manda es
-   `paso-foco.ts`.
-
-   `--tramos` dice cuántos momentos tiene y `--paso` cuánto scroll cuesta
-   cada uno. 68 vh por paso: con un teléfono quieto por columna el relevo
-   se lee en menos recorrido que cuando la fila entera tenía que cruzar
-   la ventana.
-
-   Cuidado con `overflow` en cualquier antepasado: `hidden` convierte al
-   padre en contenedor de scroll y el pegado deja de funcionar. Por eso el
-   panel y el body recortan con `clip`. */
-.pista {
-  --tramos: 3;
-  --paso: 68vh;
-  position: relative;
-  height: calc(var(--tramos) * var(--paso) + 100vh);
-}
-
-/* La escena se pega a la ventana entera, pero la ventana entera no está
-   libre: la barra de la cabecera flota sobre los primeros píxeles de
-   toda la página. Sin descontarlos, el contenido se centra en un
-   hueco que no existe y en un teléfono —donde no sobra ni un píxel— el
-   titular acaba debajo de la barra. Con `border-box` el relleno se
-   come el alto, así que la escena sigue midiendo una pantalla justa y el
-   pegado sigue funcionando igual.
-
-   Y abajo pasa lo mismo con la barra de direcciones. En el móvil `100vh`
-   es la ventana SIN barras, pero la barra está puesta y tapa los últimos
-   ochenta píxeles: una escena pegada mete ahí su final, y de una
-   escena pegada no se saca nada bajando, porque no se mueve. */
-.escena {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  /* La caja mide la ventana GRANDE —`lvh`, la de barras retiradas— porque
-     de ella cuelga el fondo de la sección: con la caja medida en `svh` el
-     fondo terminaba antes que la pantalla y en Android quedaba una franja
-     de panel pelado abajo. Y como la barra de direcciones sí tapa esos
-     últimos píxeles mientras está puesta, la caja se los reserva como
-     relleno: el contenido se centra en la ventana chica —la que siempre
-     se ve— y el fondo sigue llegando hasta abajo. La resta la entienden
-     los mismos navegadores que entienden `svh`; los que no, se quedan con
-     el `100vh` de siempre y no pierden nada. */
-  min-height: 100vh;
-  min-height: 100lvh;
-  padding-top: calc(var(--gutter) + var(--nav-alto));
-  padding-bottom: calc(100lvh - 100svh);
-  display: grid;
-  align-content: center;
-}
-
-/* Dentro de la escena el aire vertical lo pone la ventana, no el relleno
-   de siempre del panel: con aquel no cabría la escena en una pantalla.
-
-   Y si aun así no cabe —zoom del navegador, portátil de pantalla baja—,
-   `--encaje` la encoge hasta que quepa. Es `zoom` y no `scale`: vuelve a
-   maquetar en pequeño, así que el texto se sigue leyendo nítido. Quien
-   lo calcula es `encaje.ts`; mientras la escena quepa, vale 1 y aquí no
-   pasa nada. */
-.escena .panel-inner {
-  width: 100%;
-  padding-top: clamp(20px, 3.2vh, 44px);
-  padding-bottom: clamp(20px, 3.2vh, 44px);
-  zoom: var(--encaje, 1);
-}
-
-/*
-  Con las animaciones desactivadas no hay recorrido que valga: la pista se
-  encoge a lo que ocupe su contenido, la escena deja de pegarse y todo lo
-  que estaba apilado en una sola celda pasa a leerse de arriba abajo. Cada
-  módulo se encarga de dejar sus piezas visibles.
-*/
-@media (prefers-reduced-motion: reduce) {
-  .pista {
-    height: auto;
-  }
-
-  .escena {
-    position: static;
-    min-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .escena .panel-inner {
-    padding-top: var(--aire-seccion);
-    padding-bottom: var(--aire-seccion);
-  }
 }

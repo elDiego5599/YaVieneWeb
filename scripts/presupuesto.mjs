@@ -53,7 +53,7 @@ const KB = 1024;
  *  Transmetro). Sin esa banda la portada no tiene prueba social: el claim
  *  «ya en pruebas con Sobusa y sus 6 rutas» quedaba en texto y nadie lo
  *  creía. La alternativa —poner los logos en el hero— lo recargaba y
- *  rompía la escena de los tres teléfonos, que es lo que vende.
+ *  rompía la escena del teléfono, que es lo que vende.
  *
  *  Esa banda pasó por tres versiones el mismo día —carrusel infinito,
  *  logos en negro puro, grilla en gris al 60 %— y cada una fue subiendo el
@@ -77,8 +77,8 @@ const KB = 1024;
  *  secciones que ya no están.
  *
  *  El CSS es el que sube: de 90.9 a 98.1. Lo paga el rediseño, que trae
- *  tres secciones nuevas —«el problema» con sus dos caras, el visor de
- *  los tres pasos y el mapa panorámico— y `critico.css`, que es la hoja
+ *  tres secciones nuevas —«el problema» con sus dos caras, el mapa
+ *  panorámico— y `critico.css`, que es la hoja
  *  de 2 KB que impide el parpadeo del enlace de salto. Se buscó de dónde
  *  sacarlo antes de subir el tope: se fueron el CSS de las secciones
  *  muertas, catorce variables sin usar, dos `@keyframes` huérfanos y las
@@ -156,7 +156,18 @@ const KB = 1024;
  *  dónde sacarlos: las reglas viejas de la lista siguen vivas por debajo
  *  de 1024 px y sin animaciones, y la búsqueda de clases muertas del
  *  18/09 sigue sin encontrar ninguna. 121 es la build de hoy, 117.0, más
- *  el 3 %. */
+ *  el 3 %.
+ *
+ *  El 11/10/2026 se quita la cinta de logos de empresas (portada y
+ *  /empresas.html): ninguna empresa está confirmada. Salen `marcas.css` y los
+ *  siete PNG: dist baja de 781.5 a 736.8 KB y el CSS de 120.2 a 117.2. Los
+ *  topes no se tocan: el CSS de hoy más el 3 % da 120.7, o sea 121, y el
+ *  margen de dist es para las imágenes que faltan.
+ *
+ *  Ese mismo día se quita la sección «Cómo funciona» (el rodillo de arriba
+ *  incluido) con todo lo que solo ella usaba: dist baja de 736.8 a 667.7 KB,
+ *  el JavaScript de 60.4 a 44.9, el CSS de 117.2 a 101.2 y la primera visita
+ *  de 429.7 a 360.9. Los topes tampoco se tocan. */
 const TOPES = {
   'todo dist': 797,
   'JavaScript': 66,

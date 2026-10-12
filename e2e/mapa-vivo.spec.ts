@@ -79,13 +79,6 @@ test('el mapa es un deslizador que dice dónde está el punto', async ({ page })
   await expect.poll(() => mapa.getAttribute('aria-valuenow')).not.toBe(antes);
 });
 
-test('los teléfonos de «Cómo funciona» no se leen con lector de pantalla', async ({ page }) => {
-  await page.goto('/');
-  const arbol = await page.locator('[data-pasos-columnas]').ariaSnapshot();
-  // Ni el reloj de mentira, ni los textos del guion, ni los íconos sin nombre.
-  expect(arbol).not.toMatch(/7:23|Localizando|Ruta activa|- img/);
-});
-
 /*
   Las flechas avanzan el punto por el recorrido. Se recolocaba en el punto
   del trazado más cercano, y en los tramos donde la ida y la vuelta van por

@@ -51,11 +51,11 @@ OUT_IMG = RAIZ / "src" / "assets" / "map" / "barranquilla.webp"
 OUT_IMG_CIUDAD = RAIZ / "src" / "assets" / "map" / "barranquilla-ciudad.webp"
 
 # Dónde cae el pin de espera, y en qué punto de la pantalla. El punto es
-# un tramo norte de la C16, la ruta que el paso 1 deja elegida, a mitad de
+# un tramo norte de la C16, la ruta que enseña el teléfono del hero, a mitad de
 # camino entre dos waypoints de rutas.json (172 y 174): por ahí la ruta
 # baja en diagonal, así que los buses que llegan por detrás vienen desde
 # arriba a la izquierda y no se meten bajo la hoja de distancia. MIRA es
-# MIRA_X/MIRA_Y de paso-demo.ts: el centro de la franja que dejan libre la
+# el centro de la franja que dejan libre la
 # píldora de arriba y la hoja de abajo.
 #
 # Antes el centro estaba en el tronco del sur por el que suben las seis

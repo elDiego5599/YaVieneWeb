@@ -238,11 +238,6 @@
   transition-duration: 0.28s;
 }
 
-.phone-topbar.esta-apartada {
-  opacity: 0;
-  transform: translateY(-40%);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .phone-topbar {
     transition-duration: 0.01ms;
@@ -984,13 +979,6 @@
   height: calc(22 * var(--u));
 }
 
-/* Sin hoja de la que colgar —el primer momento de la solución es el mapa
-   y el pin, nada más—, el botón se apoya donde se apoyaría la hoja. */
-.phone-recentrar--suelto {
-  bottom: calc(26 * var(--u) + var(--alto-inferior));
-  margin-bottom: 0;
-}
-
 /*
   En el teléfono que se mueve el botón aparece y desaparece, como en la
   app: sin punto de espera no hay a dónde volver, y con el selector encima
@@ -1110,21 +1098,6 @@
   margin-bottom: calc(12 * var(--u));
 }
 
-.sheet-back {
-  width: calc(28 * var(--u));
-  height: calc(28 * var(--u));
-  flex: none;
-  display: grid;
-  place-items: center;
-  color: var(--navy);
-}
-
-.sheet-back svg {
-  width: calc(20 * var(--u));
-  height: calc(20 * var(--u));
-  display: block;
-}
-
 /* `maxLines: 1` con `TextOverflow.ellipsis`: en la app el título nunca
    parte, ni siquiera si un día el rótulo se alarga. */
 .sheet-head-title {
@@ -1169,39 +1142,12 @@
     #000 calc(100% - var(--desvanece-abajo)), transparent 100%);
 }
 
-.sheet-lista.hay-arriba {
-  --desvanece-arriba: 13%;
-}
-
-.sheet-lista.hay-abajo {
-  --desvanece-abajo: 18%;
-}
-
 .sheet-lista-inner {
   /* Posicionado para que el `offsetTop` de cada fila se mida contra el
      carril y no contra la hoja entera, que va varias cajas más arriba. */
   position: relative;
   transform: translateY(0);
   transition: transform 0.62s var(--ease-out-cubic);
-}
-
-/*
-  Las dos listas ocupan la tarjeta entera, que es lo que hace la app:
-  _buildListView() las dibuja dentro de un SizedBox con la altura que midió
-  de la tarjeta principal, y la lista va en un Expanded. Así el diálogo no
-  encoge al entrar en la lista y volver a salir —el alto lo manda siempre
-  el selector, lo pone `ajustarAlto()`—, y la ventana de filas es lo que
-  sobra bajo la cabecera en vez de una franja de alto fijo.
-*/
-.sheet-view--lista.active {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.sheet-view--lista .sheet-lista {
-  flex: 1;
-  min-height: 0;
 }
 
 /*
@@ -1228,30 +1174,6 @@
   display: flex;
   align-items: center;
   gap: calc(16 * var(--u));
-}
-
-/*
-  Al abrir la lista las filas entran una detrás de otra (_escalonFila en
-  route_selector_sheet.dart): fundido y 0,12 de fila de subida, 308 ms
-  —el tramo de 0,55 de AppMotion.grupo (560) que les da ScreenEntrance—
-  con curvaEntrada, y 45 ms de turno por fila. La vista pasa de
-  `display: none` a verse, así que la animación arranca cada vez que se abre.
-*/
-.sheet-view--lista.active .app-tile {
-  animation: fila-entra 308ms cubic-bezier(0.05, 0.7, 0.1, 1) calc(var(--i) * 45ms) backwards;
-}
-
-@keyframes fila-entra {
-  from {
-    opacity: 0;
-    transform: translateY(12%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sheet-view--lista.active .app-tile {
-    animation: none;
-  }
 }
 
 /* La fila ya elegida se marca al volver a la lista: el filo pasa a
@@ -1485,14 +1407,6 @@
   }
 }
 
-.eta-number--cerca {
-  color: var(--app-warn-accessible);
-}
-
-.eta-number--muy-cerca {
-  color: var(--app-coral-accessible);
-}
-
 /* AppTextStyles.cuerpoFuerte: la unidad pesa lo mismo que el dato de una
    fila, no menos. */
 .eta-unit {
@@ -1636,99 +1550,6 @@
 }
 
 /*
-  La tarjeta pregunta la distancia en su sitio, sin ventana encima
-  (`_Vaiven` de eta_bottom_sheet.dart, dueño 2026-10-06): en la tarjeta,
-  la distancia cede su lugar al título y la rueda; debajo, la nota y el
-  botón ceden el suyo a «Guardar» y «Solo esta vez». Cada vaivén es una
-  rejilla de dos filas y `.is-rueda` en la hoja pliega una y abre la otra:
-  el alto viaja en 360 ms (AppMotion.pausado) con cubic-bezier(0.2, 0, 0,
-  1), la cúbica más cercana a easeInOutCubicEmphasized, que no cabe en una
-  sola. Lo que se va se apaga en el primer 40 % (144 ms, curvaSalida) y lo
-  que llega entra desde el 30 % (108 + 252 ms, curvaEntrada).
-*/
-.eta-vaiven {
-  display: grid;
-  grid-template-rows: 1fr 0fr;
-  transition: grid-template-rows 0.36s cubic-bezier(0.2, 0, 0, 1);
-}
-
-.is-rueda .eta-vaiven {
-  grid-template-rows: 0fr 1fr;
-}
-
-/* El `AnimatedSize` de la tarjeta recorta; el de abajo es la hoja misma. */
-.eta-tarjeta .eta-vaiven {
-  overflow: hidden;
-}
-
-.eta-vaiven > * {
-  min-height: 0;
-  transition: opacity 0.252s cubic-bezier(0.05, 0.7, 0.1, 1) 0.108s;
-}
-
-.eta-vaiven-rueda,
-.is-rueda .eta-vaiven-normal {
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 0.144s cubic-bezier(0.3, 0, 0.8, 0.15),
-    visibility 0s 0.144s;
-}
-
-.is-rueda .eta-vaiven-rueda {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.252s cubic-bezier(0.05, 0.7, 0.1, 1) 0.108s;
-}
-
-/* AppTextStyles.subtitulo (18, w700, 1.3, −0.3), centrado, a los 14 del
-   filo que también tiene la distancia y con los 16 de lado de la tarjeta. */
-.rueda-titulo {
-  margin: calc(14 * var(--u)) calc(16 * var(--u)) 0;
-  text-align: center;
-  font-size: calc(18 * var(--u));
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: calc(-0.3 * var(--u));
-  color: var(--app-text-primary);
-}
-
-/* «Hasta 1,1 km» (`eleccion.hasta`), a 4 del título: AppTextStyles.pie
-   (12, w500, 1,3) en textSecondary. */
-.rueda-tope {
-  margin-top: calc(4 * var(--u));
-  text-align: center;
-  font-size: calc(12 * var(--u));
-  font-weight: 500;
-  line-height: 1.3;
-  color: var(--app-text-secondary);
-}
-
-/* `_respuestas`: «Guardar» a 18, en el sitio y con la forma del botón del
-   aviso (60, píldora, primaryAccessible); «Solo esta vez» a 4, de 48 en
-   textSecondary. Los dos en AppTextStyles.boton (16, w800, 1.2, −0.2). */
-.rueda-guardar,
-.rueda-otra {
-  display: grid;
-  place-items: center;
-  height: calc(48 * var(--u));
-  margin-top: calc(4 * var(--u));
-  border-radius: 999px;
-  font-size: calc(16 * var(--u));
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: calc(-0.2 * var(--u));
-  color: var(--app-text-secondary);
-}
-
-.rueda-guardar {
-  height: calc(60 * var(--u));
-  margin-top: calc(18 * var(--u));
-  background: var(--app-primary-accessible);
-  color: #FFFFFF;
-}
-
-/*
   La rueda de rueda_distancia.dart, la de la alarma del iPhone: filas de 40
   y cinco a la vista, dos arriba y dos abajo (dueño, 2026-10-06), en el
   alto de la app: 5 × 40 / 1,45 (el `squeeze` del picker), a 8 del título.
@@ -1757,33 +1578,6 @@
   background: rgba(0, 168, 89, 0.1);
 }
 
-.rueda-carril {
-  transform: translateY(calc((2 - var(--elegida, 5)) * var(--fila-rueda)));
-  transition: transform 0.5s var(--ease-out-cubic);
-}
-
-/* AppTextStyles.titulo (22, w700, 1.2, −0.4) en cifras de ancho fijo. */
-.rueda-fila {
-  display: grid;
-  place-items: center;
-  height: var(--fila-rueda);
-  font-size: calc(22 * var(--u));
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: calc(-0.4 * var(--u));
-  font-variant-numeric: tabular-nums;
-  color: var(--app-text-primary);
-  opacity: 0.447;
-  transition:
-    opacity 0.3s,
-    transform 0.3s;
-}
-
-.rueda-fila.is-elegida {
-  opacity: 1;
-  transform: scale(1.08);
-}
-
 /*
   Todas las hojas comparten superficie: la arena de .phone-sheet con el
   patrón de calles del drawer en navy —MapPatternPainter(color: primaryDeep)—.
@@ -1804,16 +1598,6 @@
 }
 
 /*
-  La hoja quieta que guarda vistas no pone relleno lateral: lo pone cada
-  vista, que ya lleva sus 24. Con los dos, el selector se metía 48 por
-  lado y las listas salían más angostas que la tarjeta que las mide.
-*/
-.phone-sheet--fija.tiene-vistas {
-  padding-left: 0;
-  padding-right: 0;
-}
-
-/*
   En el selector el asa lleva 16 arriba y 16 abajo, y debajo empieza el
   relleno de 24 de la tarjeta: 42 en total, no 24. Con 24 el título subía
   demasiado y las dos fichas quedaban descolgadas del asa, que es una de
@@ -1824,24 +1608,6 @@
 */
 .phone-sheet--fija .sheet-handle {
   margin-bottom: calc(40 * var(--u));
-}
-
-/*
-  La hoja de distancia del tercer momento también es fija, pero no es el
-  selector: lleva el aire de eta_bottom_sheet.dart. Arriba, los 14 del asa;
-  del asa a la franja, sus 18 de abajo más los 6 que la tarjeta pone
-  encima del color, 24; y al pie, los 20 de `fromLTRB(24, 6, 24, 20)` más
-  la zona del gesto. Con los 16, 40 y 24 del selector la franja quedaba
-  flotando a media tarjeta, lejos del asa, y la hoja salía 22 puntos más
-  alta que la de la app.
-*/
-.phone-sheet--eta {
-  padding-top: calc(14 * var(--u));
-  padding-bottom: calc(20 * var(--u) + var(--alto-inferior));
-}
-
-.phone-sheet--eta .sheet-handle {
-  margin-bottom: calc(24 * var(--u));
 }
 
 .sheet-selector .sheet-head {
@@ -1914,19 +1680,6 @@
   place-items: center;
   transition: background-color 0.24s var(--ease-out-cubic),
     border-color 0.24s var(--ease-out-cubic);
-}
-
-/* El paso en el que se está: aro verde con un punto dentro. */
-.escalon-nodo.is-actual {
-  border-color: var(--green);
-}
-
-.escalon-nodo.is-actual::before {
-  content: '';
-  width: calc(7 * var(--u));
-  height: calc(7 * var(--u));
-  border-radius: 50%;
-  background: var(--green);
 }
 
 /* El paso ya dado: relleno verde con el visto dentro. */
@@ -2398,119 +2151,6 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
-/* ── El teléfono de cada momento de la solución ──────────────────────
-   Es el mismo aparato del hero, más pequeño porque comparte fila con el
-   texto. Todo lo de dentro cuelga de `--u`, así que basta con cambiarle
-   el ancho: la app se reescala entera y sigue midiendo lo que mide en el
-   teléfono de verdad.
-*/
-.phone-shell--paso {
-  --ancho: clamp(232px, 21vw, 330px);
-}
-
-/* Sin la segunda columna el teléfono va debajo del texto, y a 232 px de
-   ancho no cabrían los dos en la misma pantalla. */
-@media (max-width: 759px) {
-  .phone-shell--paso {
-    --ancho: clamp(128px, 34vw, 180px);
-  }
-}
-
-/*
-  El punto donde cae el dedo. La demo lo coloca sobre lo que va a tocar y
-  lo apoya; entre toque y toque no está en ninguna parte.
-
-  No es una pieza de la app sino el dedo de la demo, así que no copia
-  ningún InkWell: se dibuja como el círculo con que las grabaciones de
-  pantalla marcan los toques. Blanco a medias, con un filo blanco y una
-  sombra corta en tinta, se lee igual encima del mapa, de la hoja crema y
-  del botón verde. Antes eran dos —una onda blanca sobre el mapa y otra en
-  tinta sobre la hoja— y la de tinta, encima del botón y de la crema, se
-  veía como una mancha.
-
-  Mide 44 puntos, el blanco mínimo de toque que pide Apple: lo que ocupa
-  la yema de un dedo en la pantalla que se reproduce.
-*/
-.phone-toque {
-  position: absolute;
-  z-index: 60;
-  width: calc(44 * var(--u));
-  height: calc(44 * var(--u));
-  margin: calc(-22 * var(--u)) 0 0 calc(-22 * var(--u));
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
-  box-shadow:
-    0 0 0 calc(1.5 * var(--u)) rgba(255, 255, 255, 0.95),
-    0 calc(3 * var(--u)) calc(12 * var(--u)) rgba(11, 22, 40, 0.24);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/*
-  Apoyar y soltar, no una onda. El dedo baja en 100 ms, de 1,2 a 0,92 —el
-  16 % de los 0,62 s—, se queda apoyado hasta los 240 ms —el 38 %—, que
-  es lo que dura `is-pulsado` y cuando el guion cambia de vista, y al
-  soltar se abre y se desvanece. El orden es el de iOS: un botón actúa
-  cuando se levanta el dedo, no cuando se apoya.
-*/
-.phone-toque.is-on {
-  animation: paso-toque 0.62s var(--ease-out-cubic);
-}
-
-@keyframes paso-toque {
-  0% {
-    opacity: 0;
-    transform: scale(1.2);
-  }
-  16%,
-  38% {
-    opacity: 1;
-    transform: scale(0.92);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.3);
-  }
-}
-
-/*
-  Estados del guion. Sin JavaScript —o con las animaciones desactivadas—
-  el teléfono se queda en la foto final de su momento, que es la que
-  cuenta el texto de al lado. `es-guion` sólo la pone paso-demo.ts al
-  arrancar —sobre el momento entero, porque el aviso ya vive fuera de la
-  pantalla— y a partir de ahí las piezas entran y salen a su turno.
-*/
-.es-guion .app-chip {
-  opacity: 0;
-  transform: translateY(calc(-10 * var(--u)));
-  transition:
-    opacity 0.32s var(--ease-out-cubic),
-    transform 0.32s var(--ease-out-cubic);
-}
-
-.es-guion .app-chip.is-on {
-  opacity: 1;
-  transform: none;
-}
-
-.es-guion .phone-scrim {
-  opacity: 0;
-  transition: opacity 0.38s var(--ease-out-cubic);
-}
-
-.es-guion .phone-scrim.is-on {
-  opacity: 1;
-}
-
-.es-guion .phone-sheet--fija {
-  transform: translateY(102%);
-  transition: transform 0.46s var(--ease-spring);
-}
-
-.es-guion .phone-sheet--fija.is-on {
-  transform: none;
-}
-
 /* El hundido del dedo: lo que hace un InkWell al recibir el toque. La
    píldora y las fichas del selector entran en la lista porque el guion del
    hero también las toca: sin el hundido, la vista cambiaba sola y el
@@ -2532,13 +2172,4 @@
     border-color 0.24s var(--ease-out-cubic),
     border-width 0.24s var(--ease-out-cubic),
     box-shadow 0.25s var(--ease-out-cubic);
-}
-
-.app-pill.is-pulsado,
-.app-tile.is-pulsado,
-.app-select.is-pulsado,
-.app-launch.is-pulsado,
-.app-cta.is-pulsado {
-  transform: scale(0.965);
-  filter: brightness(0.94);
 }

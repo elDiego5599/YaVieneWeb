@@ -102,24 +102,6 @@
   inset: -5px -4px;
 }
 
-/* ---------- 3. Menos transparencia ----------
-
-   Las píldoras del hero llevan un desenfoque de fondo. Para quien tiene
-   activado «reducir transparencia» en el sistema —normalmente por
-   problemas de vista— el cristal esmerilado hace que el texto de encima
-   cueste de leer. La píldora ya está al 92 % de opacidad, así que
-   cerrarla del todo casi no se nota y ahorra además el coste de pintar
-   un desenfoque. */
-
-@media (prefers-reduced-transparency: reduce) {
-  .scene-card {
-    background: var(--surface);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border-color: var(--divider);
-  }
-}
-
 /* ---------- 4. Más contraste ----------
 
    Con «aumentar contraste» activado, el texto secundario y los bordes

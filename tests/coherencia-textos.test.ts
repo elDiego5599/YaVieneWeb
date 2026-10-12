@@ -90,19 +90,11 @@ const FRASES: Record<string, string[]> = {
   'Toca para buscar tu ruta': ['index.html'],
   'Ruta activa': ['index.html'],
   'Elige tu ruta': ['index.html'],
-  'Elige empresa': ['index.html'],
-  // Estas tres sólo las pinta el guion del paso 2, con el selector vacío.
-  // En index.html vivían en el selector escondido del hero, que no llegaba
-  // a verse y se quitó (auditoría, hallazgo 12).
-  'Elegir empresa': ['src/paso-demo.ts'],
-  'Elige ruta': ['index.html'],
-  'Cuál esperas': ['src/selector.ts'],
-  'Con cuál viajas': ['src/selector.ts'],
-  'Empresa de transporte masivo': ['index.html', 'src/selector.ts'],
+  'Empresa de transporte masivo': ['index.html'],
   'Ver buses en vivo': ['index.html'],
   'Dos pasos y ves los buses moviéndose.': ['index.html'],
-  'Avisarme cuando esté cerca': ['index.html', 'src/paso-demo.ts'],
-  'Aviso activado': ['index.html', 'src/phone-simulator.ts'],
+  'Avisarme cuando esté cerca': ['index.html'],
+  'Aviso activado': ['src/phone-simulator.ts'],
   'Toca el mapa para indicar dónde estás': ['index.html'],
   'Ahí ponemos tu punto de espera y medimos desde él': ['index.html'],
   // La nota del aviso puesto en el iPhone (`_Nota.distancia`), en la
@@ -110,9 +102,7 @@ const FRASES: Record<string, string[]> = {
   // iPhone, así que la nota de Android no se repite aquí.
   'Te avisamos a 1,0 km': ['index.html'],
   'Cambiar': ['index.html'],
-  'Localizando tu ubicación…': ['index.html', 'src/paso-demo.ts'],
-  'Arrástralo para moverlo': ['index.html', 'src/paso-demo.ts'],
-  'Fija tu punto de espera': ['index.html'],
+  'Localizando tu ubicación…': ['index.html'],
   'Tu ciudad en tiempo real.': ['index.html', 'empresas.html'],
 };
 
