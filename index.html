@@ -774,35 +774,22 @@
         </header>
 
         <!--
-          El escenario: la misma espera dibujada dos veces sobre una red de
-          líneas tono sobre tono. Lo que se lee de la sección son los cuatro
+          El escenario: la misma espera dibujada dos veces, con hilos tono
+          sobre tono entre las piezas. Lo que se lee de la sección son los cuatro
           avisos (el titular y la frase de arriba los presentan); la red, los
           rayos, las voces sueltas y los iconos son dibujo y van con
-          `aria-hidden`. Las cuatro tarjetas no cambian de sitio al pasar de
-          cara: el caos se ordena delante de quien mira, no cambia de escena.
+          `aria-hidden`. Al pasar de cara las cuatro tarjetas viajan de su
+          desorden a una fila: el caos se ordena delante de quien mira, no
+          cambia de escena.
         -->
         <div class="escenario reveal" data-reveal-delay="90">
           <!--
-            La red. Pasa por detrás de las tarjetas y sigue de largo hasta el
-            borde, para que se lea como una ciudad de recorridos y no como
-            cuatro conectores; cuatro trazos nacen debajo de la píldora. El
-            lienzo es de 1160×460 —el escenario a 1440 de ancho— y se recorta
-            centrado (`slice`) en vez de estirarse: estirado, las esquinas de
-            16 dejaban de ser redondas en cuanto la ventana cambiaba de forma.
+            Los hilos. Llega vacío: los traza `problema.ts` con las cajas de
+            la píldora y los avisos, para que toquen lo que unen a cualquier
+            ancho —a ciegas una maraña de pieza a pieza; con Ya Viene un
+            árbol que baja de la píldora a cada aviso—.
           -->
-          <svg class="escenario-red" viewBox="0 0 1160 460" preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true" focusable="false">
-            <path d="M580 230H360q-16 0-16-16V96q0-16-16-16H0" />
-            <path d="M580 230H820q16 0 16 16v134q0 16 16 16h308" />
-            <path d="M580 230V40q0-16 16-16h564" />
-            <path d="M580 230v190q0 16-16 16H0" />
-            <path d="M0 160h120q16 0 16 16v284" />
-            <path d="M0 300h240q16 0 16 16v144" />
-            <path d="M220 0v120q0 16 16 16h184q16 0 16-16V0" />
-            <path d="M1160 120H980q-16 0-16 16v164q0 16-16 16H700q-16 0-16 16v128" />
-            <path d="M760 0v150q0 16 16 16h284q16 0 16 16v278" />
-            <path d="M400 460V360q0-16 16-16h104q16 0 16-16v-98" />
-            <path d="M1160 60h-60q-16 0-16-16V0" />
-          </svg>
+          <svg class="escenario-red" fill="none" aria-hidden="true" focusable="false"></svg>
 
           <!-- Cuatro rayitos en el tono de la red: el chisporroteo de la
                espera a ciegas, que se apaga al ordenarse. -->

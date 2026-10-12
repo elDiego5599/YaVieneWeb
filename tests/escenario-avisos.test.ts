@@ -158,6 +158,24 @@ describe('el escenario de «Qué resuelve»', () => {
     for (const chispa of doc.querySelectorAll('.chispa')) expect(chispa.textContent!.trim()).toBe('');
   });
 
+  it('los hilos no son un fondo fijo: el lienzo llega vacío y los traza problema.ts con las cajas', () => {
+    expect(seccion).not.toContain('preserveAspectRatio');
+    const red = doc.querySelector('.escenario > svg.escenario-red')!;
+    expect(red.getAttribute('aria-hidden')).toBe('true');
+    expect(red.hasAttribute('viewBox')).toBe(false);
+    expect(red.children).toHaveLength(0);
+    const ts = leer('src/problema.ts');
+    expect(ts).toMatch(/import \{ trazar \} from '\.\/escenario-red'/);
+    expect(ts).toContain('new ResizeObserver');
+    // A ciegas se ve el enredo; con Ya Viene, el árbol, y el otro recogido.
+    expect(css).toMatch(/\[data-cara='claro'\] \.hilo--enredo[^{]*\{[^}]*stroke-dashoffset:\s*1/);
+    expect(css).toMatch(/\[data-cara='claro'\] \.hilo--arbol[^{]*\{[^}]*stroke-dashoffset:\s*0/);
+  });
+
+  it('con Ya Viene los avisos se ponen en fila, derechos', () => {
+    expect(css).toMatch(/\[data-cara='claro'\] \.aviso\s*\{[^}]*translate:\s*var\(--fila\)[^}]*rotate:\s*0deg/);
+  });
+
   it('los textos largos ya no cuelgan debajo: viven en los avisos', () => {
     expect(doc.querySelector('.columnas, .columna-titulo, .columna-texto')).toBeNull();
   });

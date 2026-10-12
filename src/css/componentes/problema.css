@@ -3,17 +3,20 @@
    Una sección con un interruptor de dos posiciones y un solo escenario
    debajo, que se reordena delante de quien mira.
 
-   «A ciegas» es el problema dibujado: una red de líneas tono sobre tono,
-   cuatro avisos como los de un teléfono contando la espera, unos rayos
-   y en medio una alerta roja que dice que nadie sabe dónde va el bus.
+   «A ciegas» es el problema dibujado: cuatro avisos como los de un
+   teléfono, tirados y ladeados alrededor de una alerta roja que dice que
+   nadie sabe dónde va el bus, unos rayos, unas voces y una maraña de
+   hilos tono sobre tono que los une de cualquier manera.
 
-   «Con Ya Viene» es la misma escena con otro texto: los avisos no se
-   mueven, cambian lo que dicen; la red se pone verde, los rayos se van
-   y la alerta es la marca. Los cuatro avisos son lo que se lee.
+   «Con Ya Viene» es la misma escena ordenada, como el diagrama de
+   incident.io: la píldora arriba con la marca, los avisos en una fila
+   con lo que la app hace con cada cosa y un árbol de hilos verdes que
+   baja de la una a los otros. Los cuatro avisos son lo que se lee.
 
-   Todo el cambio cuelga de un atributo, `data-cara`, en la sección. No
-   hay una clase por pieza que encender ni una animación en JavaScript:
-   las dos caras están escritas aquí y el atributo elige cuál se ve.
+   Todo el cambio cuelga de un atributo, `data-cara`, en la sección: las
+   dos caras están escritas aquí y el atributo elige cuál se ve. Lo único
+   que pone `problema.ts` son medidas —adónde viaja cada pieza y por dónde
+   pasa cada hilo—, porque dependen del ancho.
 
    Lo que no cambia nunca es el alto: el escenario mide lo mismo en las
    dos caras, así que al cambiar de lado la página no da un salto y lo
@@ -230,11 +233,11 @@
 
 /* ── El escenario ──────────────────────────────────────────────────────
 
-   Los dos colores de la red son de aquí y no de `variables.css` porque
+   Los dos colores de los hilos son de aquí y no de `variables.css` porque
    no los usa nada más. `--hilo` es gris verdoso sobre la banda (1,25:1):
-   tiene que verse que hay una ciudad de recorridos detrás y no ganarle
-   nunca a los avisos. `--hilo-claro` es `--acento` al 26 % sobre la
-   banda (1,46:1): la misma red, ya con dueño.
+   tiene que verse que todo está enredado y no ganarle nunca a los avisos.
+   `--hilo-claro` es `--acento` al 26 % sobre la banda (1,46:1): los
+   mismos hilos, ya con dueño.
    ────────────────────────────────────────────────────────────────────── */
 
 .escenario {
@@ -250,44 +253,63 @@
   padding-block: 8px;
 }
 
-/* La red va detrás de todo y sigue de largo bajo las tarjetas. El trazo
-   no se escala con el lienzo (`non-scaling-stroke`), así que mide 2,5 px
-   a cualquier ancho; el color va en el `<svg>` para que los caminos
-   hereden ya interpolado el cambio de cara. */
+/* Los hilos van detrás de todo y los traza `problema.ts` con las cajas
+   de verdad, en un lienzo del tamaño del escenario: cada `d` sale del
+   canto de una pieza y entra en el de otra (`escenario-red.ts`). Sólo con
+   el escenario ancho: apilado en un móvil no hay nada que unir.
+
+   Se dibujan y se recogen con el trazo discontinuo de un solo guion
+   (`pathLength="1"`): con `stroke-dashoffset` en 1 el hilo se ha vuelto
+   entero a su principio, que es la píldora o la pieza más cerca de ella.
+   Así, al ordenarse, la maraña se recoge hacia la píldora y el árbol
+   brota de ella. */
 .escenario-red {
+  display: none;
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Dos píxeles y sin remate, como los de incident.io (4 en su lienzo de
+   2400). El guion mide 1 y el hueco 2 para que, recogido, no quede ni
+   un punto en la punta. */
+.hilo {
+  stroke-width: 2;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 0;
+}
+
+/* La maraña vuelve a salir cuando los avisos ya casi se han desordenado
+   (0,6 s): antes llegaría a sitios donde todavía no hay nada. */
+.hilo--enredo {
   stroke: var(--hilo);
-  /* Se pierde hacia los bordes en vez de cortarse en seco: cortada, la
-     red dibujaba el rectángulo del escenario y dejaba de leerse como
-     algo que sigue de largo. */
-  mask-image:
-    linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent),
-    linear-gradient(transparent, #000 12%, #000 88%, transparent);
-  mask-composite: intersect;
-  transition:
-    stroke 0.6s var(--ease-out-cubic),
-    opacity 0.45s var(--ease-out-cubic);
+  transition: stroke-dashoffset 0.5s var(--ease-out-cubic) 0.6s;
 }
 
-.escenario-red path {
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-[data-cara='claro'] .escenario-red {
+.hilo--arbol {
   stroke: var(--hilo-claro);
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.4s var(--ease-out-cubic);
 }
 
-/* Mientras el logo se lo lleva todo, la red se queda pero se apaga: el
-   escenario se vacía de cosas, no de ciudad. */
-[data-fase='aspira'] .escenario-red,
-[data-fase='carga'] .escenario-red {
-  opacity: 0.4;
+/* Lo primero que se va al ordenarse es la maraña: se recoge mientras el
+   logo aspira, antes de que se mueva nada. */
+[data-cara='claro'] .hilo--enredo,
+[data-fase='aspira'] .hilo--enredo,
+[data-fase='carga'] .hilo--enredo {
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.45s var(--ease-out-cubic);
+}
+
+/* El árbol brota cuando la píldora ya ha subido y los avisos van
+   llegando a la fila: tronco, bus y bajadas, por ese orden, porque las
+   cuatro ramas salen del mismo punto. */
+[data-cara='claro'] .hilo--arbol {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.6s var(--ease-fluida) 0.35s;
 }
 
 /* Los rayos sólo existen con el escenario ancho: apilados en un móvil no
@@ -375,7 +397,7 @@
    taparla con un marco.
 
    Las dos caras de cada aviso no suben ni bajan al cambiar: la tarjeta
-   se queda donde está y cambia lo que dice, como cambia una
+   viaja entera a su sitio y cambia lo que dice, como cambia una
    notificación. Por eso aquí el reposo es cero y el relevo, un fundido.
    ────────────────────────────────────────────────────────────────────── */
 
@@ -455,17 +477,22 @@
 
 /* ── El escenario ancho ────────────────────────────────────────────────
 
-   Con 1024 caben los avisos alrededor de la píldora sin pisarla: salen
-   del flujo y se reparten por las cuatro esquinas a alturas distintas,
-   ladeados un grado como mucho. El ladeo va en `rotate` y no en
-   `transform` para que el viaje de la ceremonia, que es un `transform`,
-   se monte encima sin enderezarlos. La píldora sigue en el flujo,
-   centrada por la rejilla: centrarla con `transform` chocaría con el
-   engorde, que también lo es.
+   Con 1024 los avisos salen del flujo. Miden lo mismo en las dos caras
+   —un cuarto del escenario menos los huecos de 24, el ancho de la fila—
+   y en la del problema se reparten por las cuatro esquinas, ladeados,
+   sin pisar la píldora, las voces ni el borde. Con Ya Viene viajan a la
+   fila: `--fila` es lo que les falta para llegar y lo mide
+   `problema.ts`, porque depende del ancho. El viaje va en `translate` y
+   el ladeo en `rotate`, no en `transform`, para que se enderecen solos
+   por el camino.
 
-   Los números de sitio son proporciones de la caja de 1160×460: lo que
-   importa es que ninguna tarjeta quede alineada con otra ni tape la
-   píldora.
+   El dibujo va arriba y el texto debajo, como las tarjetas de
+   incident.io: en un cuarto de escenario, al lado del dibujo la frase se
+   partía en cuatro renglones.
+
+   La píldora sigue en el flujo, centrada por la rejilla, y sube con
+   `translate` (`--subida`, también de `problema.ts`): centrarla o subirla
+   con `transform` chocaría con el engorde, que también lo es.
    ────────────────────────────────────────────────────────────────────── */
 
 @media (min-width: 1024px) {
@@ -475,6 +502,7 @@
     padding-block: 0;
   }
 
+  .escenario-red,
   .chispas,
   .ruidos {
     display: block;
@@ -488,72 +516,111 @@
 
   .aviso {
     position: absolute;
-    width: clamp(300px, 38%, 420px);
+    width: calc((100% - 3 * 24px) / 4);
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    padding: 18px 20px 20px;
+    rotate: var(--giro);
+    transition:
+      translate 0.62s var(--ease-fluida) var(--turno),
+      rotate 0.62s var(--ease-fluida) var(--turno);
   }
 
+  .aviso-icono {
+    width: 44px;
+    height: 44px;
+  }
+
+  .aviso-texto {
+    font-size: 17px;
+  }
+
+  [data-cara='claro'] .aviso {
+    translate: var(--fila);
+    rotate: 0deg;
+  }
+
+  .escenario-estado {
+    rotate: -1.5deg;
+  }
+
+  [data-cara='claro'] .escenario-estado {
+    translate: 0 var(--subida, 0px);
+    rotate: 0deg;
+  }
+
+  /* El desorden, en tantos por ciento del escenario de 460 de alto: dos
+     arriba y dos abajo, ninguno alineado con otro, y en medio una franja
+     libre para la píldora. Con 1024 los avisos son más estrechos y
+     altos (186 en vez de 159): el segundo va pegado arriba para no
+     rozarla. */
   .aviso:nth-child(1) {
-    top: 7%;
-    left: 2%;
-    rotate: -1deg;
+    top: 2.5%;
+    left: 1%;
+    --giro: -1.6deg;
   }
 
   .aviso:nth-child(2) {
     top: 1%;
-    right: 3%;
-    rotate: 0.8deg;
+    left: 48%;
+    --giro: 1.2deg;
   }
 
   .aviso:nth-child(3) {
     bottom: 3%;
-    left: 8%;
-    rotate: 0.6deg;
+    left: 22%;
+    --giro: 1deg;
   }
 
   .aviso:nth-child(4) {
-    bottom: 13%;
-    right: 1%;
-    rotate: -0.8deg;
+    bottom: 4%;
+    left: 75%;
+    --giro: -1.3deg;
   }
 
+  /* Las voces y los rayos, en los huecos que dejan los avisos: arriba
+     entre los dos primeros y a la derecha del segundo, abajo a la
+     izquierda del tercero y entre los dos de abajo. */
   .ruido:nth-child(1) {
-    top: 40%;
-    left: 3%;
+    top: 9%;
+    left: 28%;
     --giro: -3deg;
   }
 
   .ruido:nth-child(2) {
-    top: 36%;
-    right: 3%;
+    top: 9%;
+    right: 1%;
     --giro: 2.5deg;
   }
 
   .ruido:nth-child(3) {
-    top: 62%;
-    left: 4%;
+    bottom: 7%;
+    left: 2%;
     --giro: 2deg;
   }
 
   .chispa:nth-child(1) {
-    top: 36%;
-    left: 21%;
+    top: 56%;
+    left: 12%;
   }
 
   .chispa:nth-child(2) {
-    top: 12%;
-    left: 47%;
+    top: 25%;
+    left: 40%;
     transform: rotate(12deg);
     transition-delay: 90ms;
   }
 
   .chispa:nth-child(3) {
-    top: 78%;
-    left: 56%;
+    top: 80%;
+    left: 62%;
     transition-delay: 50ms;
   }
 
   .chispa:nth-child(4) {
-    top: 47%;
-    left: 83%;
+    top: 30%;
+    left: 90%;
     transform: rotate(-10deg);
     transition-delay: 130ms;
   }
@@ -595,6 +662,8 @@
     background-color 0.65s var(--ease-out-cubic),
     box-shadow 0.65s var(--ease-out-cubic),
     transform 0.6s var(--ease-fluida),
+    translate 0.6s var(--ease-fluida),
+    rotate 0.6s var(--ease-fluida),
     width 0.52s var(--ease-fluida),
     padding 0.52s var(--ease-fluida);
 }
@@ -642,9 +711,10 @@
 
    La ceremonia de `problema.ts`. Pasar de una cara a la otra no es un
    cambio de estado, es una escena: la alerta roja se encoge hasta ser el
-   logo, se lleva por delante todo lo que hay suelto en el escenario,
-   late, y se vuelve a abrir en verde diciendo «Ya Viene». Lo que se cuenta es que el desorden no se desvanece solo: se lo
-   lleva alguien, y ese alguien tiene nombre.
+   logo, se lleva el ruido y recoge la maraña, late, y se vuelve a abrir
+   en verde diciendo «Ya Viene» mientras los avisos se ponen en fila. Lo
+   que se cuenta es que el desorden no se desvanece solo: lo ordena
+   alguien, y ese alguien tiene nombre.
 
    El reparto: los viajes de cada pieza hasta el centro los calcula el
    TypeScript, porque dependen de dónde esté cada una; el encogido, el
@@ -732,19 +802,19 @@
   cuando se cambia de lado con el interruptor: se ve el cambio. Dentro de
   la ceremonia no: aquí el escenario se vació entero y lo que sale del
   logo tiene que salir ya con lo suyo puesto. Sin este corte se leía
-  «Nadie sabe dónde va el bus» sobre la píldora verde, y los avisos se
-  desplegaban con el texto viejo todavía encima.
+  «Nadie sabe dónde va el bus» sobre la píldora verde, y los avisos
+  viajaban a la fila con el texto viejo todavía encima.
 
-  Va a toda la sección, titular y frase incluidos: desde que también se
-  los traga el logo, tampoco ellos pueden salir despidiéndose de nada.
+  Sólo el escenario: el titular y la frase no se los traga nadie y
+  hacen su relevo de siempre.
 */
-[data-fase='brota'] .cara--ciego {
+[data-fase='brota'] .escenario .cara--ciego {
   opacity: 0;
   visibility: hidden;
   transition: none;
 }
 
-[data-fase='brota'] .cara--claro {
+[data-fase='brota'] .escenario .cara--claro {
   opacity: 1;
   visibility: visible;
   transform: none;
