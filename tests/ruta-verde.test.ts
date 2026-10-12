@@ -6,8 +6,8 @@ import { describe, expect, it } from 'vitest';
  * La ruta del mapa, en todas partes como en «El producto» (2026-09-28).
  *
  * El mapa de la portada (`mapa.css`, `.mv-casing` + `.mv-activa`) pinta la
- * ruta en el verde de la marca sobre una orla blanca; el teléfono de los
- * pasos la pintaba en el azul eléctrico, sola, espejando el azul que
+ * ruta en el verde de la marca sobre una orla blanca; el teléfono la
+ * pintaba en el azul eléctrico, sola, espejando el azul que
  * llevaba map_widget.dart. El dueño pidió una sola ruta: la del producto,
  * en la web y en la app. La app la lleva en `estilo_ruta.dart` y este es su
  * espejo en el teléfono.

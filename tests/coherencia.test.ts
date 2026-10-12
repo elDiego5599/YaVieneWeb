@@ -101,27 +101,14 @@ describe('la web promete lo que la app hace', () => {
   });
 
   /**
-   * El kilómetro fijo vivía también en la copia que se lee: el paso del
-   * aviso, la entrada de «Qué resuelve» y la columna de la espera. Los
+   * El kilómetro fijo vivía también en la copia que se lee: la entrada de
+   * «Qué resuelve» y la columna de la espera. Los
    * comentarios sí pueden nombrarlo —las demos arrancan en el kilómetro, que
    * es donde arranca la rueda de la app—, el texto que ve la gente no.
    */
   it('index.html ya no dice que el aviso suena a un kilómetro', () => {
     const visible = leer('index.html').replace(/<!--[\s\S]*?-->/g, '');
     expect(visible).not.toMatch(/a un kilómetro|en el kilómetro|a menos de 1 km/);
-    const paso = visible.match(/data-paso-boton="2"[\s\S]*?<\/button>/)?.[0] ?? '';
-    expect(paso).toContain('a la distancia que elijas');
-  });
-
-  /**
-   * En iPhone el aviso solo suena con la app abierta: la app no declara
-   * `UIBackgroundModes` y no hay push. La pantalla de avisos de la app lo
-   * dice con esta frase, y el paso del aviso de la web, con la misma.
-   */
-  it('index.html dice en el paso del aviso que en iPhone suena con la app abierta', () => {
-    const paso = leer('index.html').match(/data-paso-boton="2"[\s\S]*?<\/button>/)?.[0] ?? '';
-    expect(paso, 'ya no está el paso del aviso').toContain('Te avisamos');
-    expect(paso).toContain('En iPhone el aviso suena con la app abierta.');
   });
 });
 

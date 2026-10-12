@@ -567,8 +567,8 @@ export class MapaVivo {
     if (dentro && !this.#avisado) {
       this.#avisado = true;
       /*
-        Una línea, la misma en los tres sitios donde la página enseña un
-        aviso: aquí, en el teléfono del hero y en el paso 3. La distancia
+        Una línea, la misma en los dos sitios donde la página enseña un
+        aviso: aquí y en el teléfono del hero. La distancia
         exacta no se repite en la tarjeta porque ya está a su lado, en el
         número grande de la lectura y en el círculo del mapa.
       */

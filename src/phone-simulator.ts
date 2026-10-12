@@ -37,7 +37,7 @@ interface EstadoBus {
 /**
  * El chip de ubicación de la escena, calcado de location_status_chip.dart:
  * punto puesto y buses dentro del radio. Los otros estados de la app
- * (localizando, sin punto) los enseña el teléfono del paso 1.
+ * (localizando, sin punto) no se enseñan en la portada.
  */
 const CHIP = {
   icono: 'pin',
@@ -278,8 +278,8 @@ export class PhoneSimulator {
    * placa: el pasajero ya sabe cuál espera —acaba de elegirlo—, y el
    * nombre entero partía la tarjeta en dos renglones; el metraje
    * tampoco, que la hoja del teléfono lo está dando justo debajo en
-   * grande. Es la misma tarjeta del paso 3 y de la sección del mapa, y
-   * las tres dicen exactamente esto.
+   * grande. Es la misma tarjeta de la sección del mapa, y
+   * las dos dicen exactamente esto.
    */
   #notificacion(metros: number): void {
     const dentro = this.#avisoActivo && metros <= this.#radioAvisoM;

@@ -22,7 +22,6 @@
  * matriz cambia al hacer scroll, los marcadores se iban a la deriva.
  */
 
-import { encajeDe } from './encaje';
 import { YV_RUTAS } from './data/rutas-landing';
 import type { MapaBase, Punto, RutaLanding } from './types';
 
@@ -246,27 +245,7 @@ export class PhoneMap {
     window.addEventListener('resize', this.#onResize, { passive: true });
   }
 
-  destroy(): void {
-    window.removeEventListener('resize', this.#onResize);
-    cancelAnimationFrame(this.#medida);
-    this.#medida = 0;
-  }
-
   /* ---------- Escala ---------- */
-
-  /**
-   * Lo que mide el mapa en píxeles propios, no en los de la pantalla.
-   *
-   * Los dos son lo mismo salvo cuando la escena va encogida para caber
-   * en la ventana; entonces el rectángulo viene ya reducido y hay que
-   * deshacerlo, o el bus y el pin —que se dibujan en píxeles del
-   * teléfono— saldrían del tamaño que tendrían sin encoger.
-   */
-  #caja(): { width: number; height: number } {
-    const rect = this.#host.getBoundingClientRect();
-    const k = encajeDe(this.#host);
-    return { width: rect.width / k, height: rect.height / k };
-  }
 
   /**
    * Cuántas unidades del mosaico ocupa un píxel de pantalla. Con
@@ -274,7 +253,7 @@ export class PhoneMap {
    * que manda el menor de los dos cocientes.
    */
   #medir(): void {
-    const rect = this.#caja();
+    const rect = this.#host.getBoundingClientRect();
     if (rect.width > 0 && rect.height > 0) {
       this.#unitsPerPx = Math.min(this.#lienzo.w / rect.width, this.#lienzo.h / rect.height);
     }
@@ -424,7 +403,7 @@ export class PhoneMap {
    * queda el otro fuera de cuadro.
    */
   tVisible(fx: number, fy: number, atras: number[] = [], muestras = 360): number {
-    const rect = this.#caja();
+    const rect = this.#host.getBoundingClientRect();
     if (!this.#largo || rect.width === 0 || rect.height === 0) return 0.5;
 
     // De fracción de pantalla a unidades del mosaico. Con `slice` el

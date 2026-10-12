@@ -4,10 +4,10 @@ import { expect, test } from '@playwright/test';
  * Un `resize` no mide la maqueta en el acto: lo deja para el cuadro.
  *
  * En el móvil la barra de direcciones dispara `resize` a cada tirón del
- * scroll (src/encaje.ts lo cuenta). Los mapas de los teléfonos —cinco en
- * la portada— y el mapa en vivo leían su caja en el mismo oyente: seis
+ * scroll. El mapa del teléfono y el mapa en vivo leían su caja en el mismo
+ * oyente: varias
  * maquetas forzadas por aviso (auditoría, hallazgo 17). Ahora las piden
- * con `requestAnimationFrame`, como la isla y los pasos, y la lectura cae
+ * con `requestAnimationFrame`, como la isla, y la lectura cae
  * una vez por cuadro, antes de pintar: en pantalla sale lo mismo.
  */
 
@@ -30,6 +30,6 @@ test('un resize no lee cajas en el acto, sino en el cuadro siguiente', async ({ 
     return { enElActo, enElCuadro };
   });
   expect(enElActo, 'cajas leídas dentro del propio resize').toBe(0);
-  // Y se siguen midiendo: los seis mapas, una vez cada uno por los tres avisos.
-  expect(enElCuadro).toBeGreaterThanOrEqual(6);
+  // Y se siguen midiendo: los dos mapas, una vez cada uno por los tres avisos.
+  expect(enElCuadro).toBeGreaterThanOrEqual(2);
 });

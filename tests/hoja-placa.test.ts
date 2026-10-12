@@ -48,15 +48,15 @@ describe('la hoja del bus, diseño «A», en la web', () => {
   const variables = leer('src/css/variables.css');
 
   it('la franja de color de arriba ya no está en ningún lado', () => {
-    for (const nombre of ['index.html', 'src/phone-simulator.ts', 'src/paso-demo.ts']) {
+    for (const nombre of ['index.html', 'src/phone-simulator.ts']) {
       expect(leer(nombre), nombre).not.toMatch(/eta-bar|eta-strip|eta-route/);
     }
     expect(css).not.toMatch(/\.eta-strip|\.eta-route/);
   });
 
-  it('las dos hojas llevan «BUS», la placa y el filo, en ese orden', () => {
+  it('la hoja lleva «BUS», la placa y el filo, en ese orden', () => {
     const encontradas = hojas(html);
-    expect(encontradas).toHaveLength(2);
+    expect(encontradas).toHaveLength(1);
     for (const hoja of encontradas) {
       const bus = hoja.indexOf('<span class="eta-bus">BUS</span>');
       const placa = hoja.indexOf('class="eta-placa"');

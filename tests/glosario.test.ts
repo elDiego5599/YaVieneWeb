@@ -63,7 +63,6 @@ describe("glosario (T6.8)", () => {
 
   it("la landing avisa sin placa, con las palabras del glosario", () => {
     const { landing } = glosario.aviso;
-    expect(leer("index.html")).toContain(`data-el="notif-title">${landing}<`);
     for (const archivo of ["src/phone-simulator.ts", "src/mapa-vivo.ts"]) {
       expect(leer(archivo), archivo).toContain(`'${landing}'`);
     }

@@ -5,10 +5,8 @@ import { describe, expect, it } from 'vitest';
 /**
  * La píldora de búsqueda de los teléfonos espeja `search_pill_bar.dart`.
  * El dueño quitó el punto verde de delante del texto en la app
- * (2026-09-27) y pidió lo mismo aquí: en las cuatro píldoras de
- * index.html (la del simulador y la de cada uno de los tres momentos) el
- * bloque de texto no lleva nada delante. La del segundo momento arranca
- * sin ruta, con la etiqueta escondida, y el guion la enciende al elegir.
+ * (2026-09-27) y pidió lo mismo aquí: en la píldora de index.html (la del
+ * simulador) el bloque de texto no lleva nada delante.
  *
  * Con ruta, la app pone arriba «Ruta activa» en pequeño y debajo el nombre
  * de la ruta (`_rutaActiva`), sin «Toca para cambiar»; la etiqueta lleva un
@@ -41,8 +39,8 @@ describe('la píldora de la landing va como la de la app', () => {
   const textos = Array.from(doc.querySelectorAll('.app-pill-text'));
   const css = leer('src/css/phone-simulator.css');
 
-  it('index.html tiene las cuatro píldoras', () => {
-    expect(textos.length).toBe(4);
+  it('index.html tiene la píldora del simulador', () => {
+    expect(textos.length).toBe(1);
   });
 
   it('con ruta, «Ruta activa» va arriba y el nombre debajo, sin nada delante', () => {

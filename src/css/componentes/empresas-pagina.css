@@ -10,7 +10,7 @@
    Este fichero no se carga desde `components.css`: lo importa
    `src/empresas.ts`, que es la única entrada que lo usa. Va después del
    índice de componentes, así que en la cascada sigue siendo el último y
-   puede afinar lo que venga de `nav.css` y de `pasos.css`.
+   puede afinar lo que venga de `nav.css` .
    ────────────────────────────────────────────────────────────────── */
 
 /* ── El menú, estando ya en la página ──────────────────────────────── */
@@ -54,7 +54,7 @@
 
 /* Bajo 880 la barra ya dice «Para empresas» (`.nav-lugar`, fijo en esta
    página) y el rótulo, justo debajo, lo repetía: la misma etiqueta dos
-   veces en la primera pantalla. Como en los pasos de la portada, se va el
+   veces en la primera pantalla. Se va el
    de la sección; de 880 para arriba la barra no la lleva y él se queda. */
 @media (max-width: 879px) {
   #panel .seccion-rotulo {
@@ -1415,9 +1415,8 @@
 }
 
 /* La letra de las columnas se fija aquí por lo mismo que en las fichas
-   del problema: `pasos.css` declara `.columna-titulo` a 2,4vh y
-   `.columna-texto` a 1,1vw sin acotarlas a su sección, y en esta página
-   también se cargan. Con la ventana alta el titular crecía a 30 y las
+   del problema: `layout.css` declara `.columna-titulo` a 2,4vh y
+   `.columna-texto` a 1,1vw sin acotarlas a su sección. Con la ventana alta el titular crecía a 30 y las
    tres columnas dejaban de cuadrar entre sí. */
 .empresa-razones .columna-titulo {
   margin-bottom: 8px;

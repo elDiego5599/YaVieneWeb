@@ -30,8 +30,7 @@
 .mapa-inner {
   display: flex;
   flex-direction: column;
-  /* El mismo aire que en «Cómo funciona»: el titular y el tablero van
-     igual de pegados que el titular y el visor. */
+  /* Aire entre el titular y el tablero. */
   gap: clamp(18px, 2.8vh, 40px);
 }
 
@@ -46,8 +45,7 @@
   margin-bottom: 0;
 }
 
-/* El titular va a la misma talla que el de «Cómo funciona»: la misma
-   promesa en dos secciones no puede ir en dos tamaños. */
+/* Titular de la sección a la talla de los demás de la portada. */
 .mapa-inner > .seccion-cabecera .seccion-titulo {
   font-size: clamp(34px, 4.3vw, 64px);
   font-weight: 700;
@@ -571,7 +569,7 @@
 
    Se diferencia de todo lo demás sin necesidad de un marco: toma
    prestado el lenguaje de `.scene-card` —la tarjeta de aviso del hero y
-   de los pasos, que ya es la notificación de esta casa—; radio de 16,
+   del teléfono, que ya es la notificación de esta casa—; radio de 16,
    borde blanco de un pelo y la misma sombra de dos capas, una corta que
    la apoya y otra larga que la levanta. Los cuadros de al lado son
    planos y de borde tinta. */
@@ -681,8 +679,7 @@
   }
 }
 
-/* Pantalla estrecha: el titular sigue la misma cuenta que el de
-   «Cómo funciona», que a lo ancho ya no se mide en `vw` de escritorio. */
+/* Pantalla estrecha: el titular ya no se mide en `vw` de escritorio. */
 @media (max-width: 859px) {
   .mapa-inner > .seccion-cabecera .seccion-titulo {
     font-size: clamp(29px, 7.6vw, 44px);
