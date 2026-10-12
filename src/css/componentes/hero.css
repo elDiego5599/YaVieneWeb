@@ -580,15 +580,18 @@
     /* Más aire bajo el nav: con el trío a la derecha, sus tapas quedaban
        pegadas a la barra (dueño, 2026-10-11). */
     padding-top: clamp(96px, 12vh, 144px);
+    /* El mismo contenedor y la misma calle que el nav: la copia arranca
+       donde la marca y el trío acaba donde el botón (dueño, 2026-10-11). */
+    max-width: var(--contenedor);
   }
 
   /* El panel corta solo la franja de abajo del video —216 de sus 2352
      px, el 9,2 % de la pantalla— y el marco: el trío sube lo que hacía
      falta para que se vea todo lo que enseña (dueño, 2026-10-11). */
   .hero-grid--video .hero-scene {
-    /* Junto a la copia el trío de 360 se comía el lienzo: a 300 baja un
-       17 % y deja aire a la izquierda (dueño, 2026-10-11). */
-    --tel: 300px;
+    /* Cabe con la copia dentro del contenedor del nav: a 270 el trío mide
+       ~620 y la copia se queda con ~430 (dueño, 2026-10-11). */
+    --tel: 270px;
     --sangrado: calc(var(--alto-tel) * 0.1);
   }
 
