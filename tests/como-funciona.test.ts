@@ -4,11 +4,13 @@ import { describe, expect, it } from 'vitest';
 
 /**
  * La banda «Cómo funciona» (dueño, 2026-10-12): después de «Problema»
- * (dueño, 2026-10-12, que antes la puso entre el hero y «Problema»). Texto a la izquierda, sin
- * ceja (dueño, 2026-10-12), y a la derecha un mockup breve de la app del
+ * (dueño, 2026-10-12, que antes la puso entre el hero y «Problema»). Texto a la izquierda, con
+ * su ceja (dueño, 2026-10-12, que la quitó y la devolvió), y a la derecha un mockup breve de la app del
  * pasajero, como el de incident.io: el mapa de la C16 detrás y encima el
  * selector, la hoja del bus y el aviso. Las tarjetas son decoración
- * (`aria-hidden`); lo accesible es la columna de texto.
+ * (`aria-hidden`); lo accesible es la columna de texto. Sin raya bajo el
+ * hero ni sobre esta banda (dueño, 2026-10-12): queda solo la de entre la
+ * cinta de logos y «Problema».
  *
  * Su id NO es `solucion`: `sin-como-funciona.test.ts` sigue vigilando
  * que la sección vieja no vuelva.
@@ -21,25 +23,24 @@ const banda = /<section[^>]*id="como-funciona"[^>]*>[\s\S]*?<\/section>/.exec(ht
 const divisor = '<hr class="divisor" aria-hidden="true" />';
 
 describe('banda «Cómo funciona»', () => {
-  it('va tras #problema, con un divisor entre las dos, y es la última banda', () => {
+  it('va tras #problema, sin divisor entre las dos (dueño, 2026-10-12)', () => {
     expect(banda).not.toBe('');
     const ini = html.indexOf(banda);
     const problema = html.indexOf('id="problema"');
     expect(problema).toBeGreaterThan(-1);
     expect(problema).toBeLessThan(ini);
-    expect(html.slice(0, ini).trimEnd().endsWith(divisor)).toBe(true);
-    expect(html.slice(problema, ini).split(divisor)).toHaveLength(2);
+    expect(html.slice(problema, ini)).not.toContain(divisor);
   });
 
-  it('la cinta de siete logos va sola entre los dos divisores tras el hero, sin texto (dueño, 2026-10-12)', () => {
+  it('la cinta de siete logos va tras el hero sin raya y con una antes de «Problema», sin texto (dueño, 2026-10-12)', () => {
     const franja = /<section[^>]*id="marcas"[^>]*>[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
     expect(franja).not.toBe('');
     const ini = html.indexOf(franja);
     const fin = ini + franja.length;
     expect(html.indexOf('id="hero"')).toBeLessThan(ini);
-    expect(html.slice(0, ini).trimEnd().endsWith(divisor)).toBe(true);
+    expect(html.slice(html.indexOf('id="hero"'), ini)).not.toContain(divisor);
     expect(html.slice(fin).trimStart().startsWith(divisor)).toBe(true);
-    expect(html.slice(html.indexOf('id="hero"'), ini).split(divisor)).toHaveLength(2);
+    expect(html.split(divisor)).toHaveLength(2);
     expect(html.indexOf('id="problema"')).toBeGreaterThan(fin);
     expect(franja.match(/empresa-marcas-grupo/g)).toHaveLength(2);
     expect(franja).toMatch(/empresa-marcas-grupo" aria-hidden="true"/);
@@ -50,9 +51,9 @@ describe('banda «Cómo funciona»', () => {
     expect(franja.replace(/<[^>]*>/g, '').trim()).toBe('');
   });
 
-  it('lleva titular y párrafo, sin ceja ni botón', () => {
-    expect(banda).not.toMatch(/seccion-rotulo|cf-ceja|CÓMO FUNCIONA/);
-    expect(css).not.toMatch(/\.cf-ceja/);
+  it('lleva ceja, titular y párrafo, sin botón', () => {
+    expect(banda).toMatch(/<span class="seccion-rotulo cf-ceja">CÓMO FUNCIONA<\/span>\s*<h2/);
+    expect(css).toMatch(/\.cf-ceja \{/);
     expect(banda).toMatch(/<h2[^>]*>\s*Sal cuando tu bus esté cerca\s*<\/h2>/);
     expect(banda).toContain(
       'Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso. Te avisamos cuando esté cerca de ti.'

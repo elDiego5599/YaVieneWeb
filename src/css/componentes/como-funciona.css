@@ -1,6 +1,6 @@
 /* ── CÓMO FUNCIONA ────────────────────────────────────────
 
-   La banda entre las dos rayas: el texto a un lado y, al otro, un mockup
+   La última banda, sin raya encima (dueño, 2026-10-12): el texto a un lado y, al otro, un mockup
    breve de la app del pasajero (dueño, 2026-10-12, como el de incident.io):
    el mapa detrás y tres tarjetas encimadas que son pedazos de la app.
    No dibuja nada que ya esté dibujado: el mapa es `.phone-map` con su
@@ -16,8 +16,8 @@
    ────────────────────────────────────────────────────────────────── */
 
 /* Dueño, 2026-10-12: menos vacío, como incident.io. Aire vertical de ~64
-   arriba y ~56 abajo (antes el de toda sección, 72–128), y las dos rayas
-   pegadas a la banda. El texto arranca en el mismo borde izquierdo que el
+   arriba y ~56 abajo (antes el de toda sección, 72–128), sin raya
+   encima (dueño, 2026-10-12). El texto arranca en el mismo borde izquierdo que el
    resto de la página (`.panel-inner`). */
 .cf-grid {
   display: grid;
@@ -54,6 +54,16 @@
 
 .cf-texto .btn-primary {
   margin-top: 8px;
+}
+
+/* La ceja como pastilla con filo, la del «Built for enterprises» de
+   incident.io. La letra es la de `.seccion-rotulo` (verde de letra,
+   `--acento`, 11 px, mayúsculas); aquí solo el contorno. */
+.cf-ceja {
+  padding: 5px 12px;
+  border: 1px solid var(--linea-fuerte);
+  border-radius: 9999px;
+  background: var(--surface);
 }
 
 /* El collage (dueño, 2026-10-12: como incident.io): el mapa grande atrás
