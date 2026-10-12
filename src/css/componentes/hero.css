@@ -598,10 +598,12 @@
     text-align: left;
   }
 
-  /* Dos renglones: el más largo, «¿Cuánto falta», mide ~5,6 px por px
-     de letra, así que 14cqw lo deja en ~75 % de la columna. Tope 104. */
+  /* Dos renglones: el más largo, «¿Cuánto falta», mide ~5,45 px por px
+     de letra, así que 17,5cqw lo deja en ~95 % de la columna, a la par
+     del párrafo de abajo; a 14cqw el titular quedaba más angosto que el
+     párrafo y el bloque se veía cojo (dueño, 2026-10-11). Tope 104. */
   .hero-grid--video .hero-title {
-    font-size: min(14cqw, 104px);
+    font-size: min(17.5cqw, 104px);
   }
 
   .hero-grid--video .hero-description {
@@ -619,5 +621,24 @@
   .hero-grid--video .hero-actions,
   .hero-grid--video .hero-subtext {
     justify-content: flex-start;
+  }
+}
+
+/* En el teléfono el trío deja un solo aparato: aquí, el del video, que
+   es el que enseña la app andando (dueño, 2026-10-11). */
+@media (max-width: 719px) {
+  .hero-grid--video .hero-phone-wrap {
+    display: flex;
+  }
+
+  .hero-grid--video .hero-phone-side--der {
+    display: none;
+  }
+
+  /* A 375 el aparato mide 335 (20 px de calle por lado) y el panel corta
+     solo la franja vacía de abajo del video, como en escritorio. */
+  .hero-grid--video .hero-scene {
+    --tel: min(360px, calc(100vw - 40px));
+    --sangrado: calc(var(--alto-tel) * 0.1);
   }
 }
