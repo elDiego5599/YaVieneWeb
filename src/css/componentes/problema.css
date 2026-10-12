@@ -3,13 +3,13 @@
    Una sección con un interruptor de dos posiciones y un solo escenario
    debajo, que se reordena delante de quien mira.
 
-   «A ciegas» es el problema dibujado: chispazos, cinco voces
-   sueltas preguntando lo mismo, tres fichas desparramadas y torcidas,
+   «A ciegas» es el problema dibujado: una red de líneas tono sobre tono,
+   cuatro avisos como los de un teléfono contando la espera, unos rayos
    y en medio una alerta roja que dice que nadie sabe dónde va el bus.
 
-   «Con Ya Viene» es lo mismo puesto en su sitio: el ruido se va, la
-   nosotros los que lo resuelven—, y de ella baja un árbol de líneas que
-   endereza las tres fichas y las alinea debajo.
+   «Con Ya Viene» es la misma escena con otro texto: los avisos no se
+   mueven, cambian lo que dicen; la red se pone verde, los rayos se van
+   y la alerta es la marca. Debajo, las tres columnas que se leen.
 
    Todo el cambio cuelga de un atributo, `data-cara`, en la sección. No
    hay una clase por pieza que encender ni una animación en JavaScript:
@@ -17,8 +17,7 @@
 
    Lo que no cambia nunca es el alto: el escenario mide lo mismo en las
    dos caras, así que al cambiar de lado la página no da un salto y lo
-   que hay debajo no se mueve. Es la razón de que el árbol crezca con lo
-   que le sobre en vez de medir un número fijo.
+   que hay debajo no se mueve.
    ================================================================== */
 
 /* ── El interruptor ────────────────────────────────────────────────────
@@ -131,8 +130,8 @@
 
 /* ── Las dos caras ─────────────────────────────────────────────────────
 
-   El mismo mecanismo para el titular, la frase, el estado, el glifo y el
-   texto de cada ficha: las dos versiones ocupan la misma celda de la
+   El mismo mecanismo para el titular, la frase, el estado, los avisos y
+   las columnas: las dos versiones ocupan la misma celda de la
    rejilla, así que el hueco lo mide la más alta y nada salta al cambiar.
 
    El detalle que hace que el relevo se lea como un relevo y no como dos
@@ -143,8 +142,8 @@
    se mueve en el mismo sentido a la vez.
 
    `--turno` escalona ese movimiento pieza por pieza: primero el estado,
-   luego el titular, luego la frase y al final las fichas de izquierda a
-   derecha. Es lo que separa un relevo de un parpadeo.
+   luego el titular, luego la frase, los avisos y al final las columnas
+   de izquierda a derecha. Es lo que separa un relevo de un parpadeo.
 
    `aria-hidden` lo pone el HTML y lo mueve `problema.ts`: sin eso el
    lector de pantalla leería las dos versiones seguidas.
@@ -192,9 +191,9 @@
 /*
   El turno de cada pieza en el relevo. Se lee de arriba abajo y de
   izquierda a derecha, que es como se mira la sección: manda el estado,
-  le sigue el titular, luego la frase y al final las tres fichas. Sin
-  esto las nueve piezas cambiarían a la vez y el relevo sería un
-  parpadeo.
+  le sigue el titular, luego la frase, los cuatro avisos y al final las
+  tres columnas. Sin esto las doce piezas cambiarían a la vez y el
+  relevo sería un parpadeo.
 */
 .escenario-estado {
   --turno: 0ms;
@@ -213,69 +212,100 @@
   font-size: clamp(16.5px, 0.95rem + 0.4vw, 20px);
 }
 
-.ficha:nth-child(1) {
-  --turno: 200ms;
+.aviso:nth-child(1) {
+  --turno: 180ms;
 }
 
-.ficha:nth-child(2) {
+.aviso:nth-child(2) {
+  --turno: 220ms;
+}
+
+.aviso:nth-child(3) {
   --turno: 260ms;
 }
 
-.ficha:nth-child(3) {
-  --turno: 320ms;
+.aviso:nth-child(4) {
+  --turno: 300ms;
+}
+
+.columna:nth-child(1) {
+  --turno: 340ms;
+}
+
+.columna:nth-child(2) {
+  --turno: 400ms;
+}
+
+.columna:nth-child(3) {
+  --turno: 460ms;
 }
 
 /* ── El escenario ──────────────────────────────────────────────────────
 
-   `--hueco` es la separación de la rejilla de fichas, y de ahí sale
-   también dónde caen las bajadas de la red: los tres centros de una
-   rejilla de tres son siempre los mismos, se abra lo que se abra.
-
-   Los tres colores son de aquí y no de `variables.css` porque no los usa
-   nada más: `--hilo` es el verde de `--acento` aclarado hasta poder ser
-   un filo de un píxel sin gritar, `--hilo-alerta` es el rojo de los
-   cables del circuito y `--chispazo` tiene que verse sobre la banda sin
-   llamar la atención antes que las fichas.
+   Los dos colores de la red son de aquí y no de `variables.css` porque
+   no los usa nada más. `--hilo` es gris verdoso sobre la banda (1,25:1):
+   tiene que verse que hay una ciudad de recorridos detrás y no ganarle
+   nunca a los avisos. `--hilo-claro` es `--acento` al 26 % sobre la
+   banda (1,46:1): la misma red, ya con dueño.
    ────────────────────────────────────────────────────────────────────── */
 
 .escenario {
-  --hueco: clamp(16px, 2vw, 28px);
-  --hilo: #9CCDBA;
-  --hilo-alerta: var(--coral-accessible);
-  --chispazo: #C0D1C6;
+  --hilo: #D6E0D9;
+  --hilo-claro: #B5D5CA;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  justify-items: center;
+  gap: 28px;
+  padding-block: 8px;
 }
 
-/* ── El ruido ──────────────────────────────────────────────────────────
-
-   Fondo, no contenido: ninguna de estas piezas dice nada que no esté
-   dicho en las fichas, y por eso van con `aria-hidden`. Lo que aportan
-   es el tono. La espera a ciegas no es silencio: es mucha gente
-   preguntando lo mismo a la vez y nadie con la respuesta.
-
-   Sólo existen en pantalla ancha. Apiladas en un móvil no serían un
-   enredo, serían estorbo encima del texto.
-   ────────────────────────────────────────────────────────────────────── */
-
-.chispas,
-.ruidos {
-  display: none;
+/* La red va detrás de todo y sigue de largo bajo las tarjetas. El trazo
+   no se escala con el lienzo (`non-scaling-stroke`), así que mide 2,5 px
+   a cualquier ancho; el color va en el `<svg>` para que los caminos
+   hereden ya interpolado el cambio de cara. */
+.escenario-red {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: var(--hilo);
+  /* Se pierde hacia los bordes en vez de cortarse en seco: cortada, la
+     red dibujaba el rectángulo del escenario y dejaba de leerse como
+     algo que sigue de largo. */
+  mask-image:
+    linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent),
+    linear-gradient(transparent, #000 12%, #000 88%, transparent);
+  mask-composite: intersect;
+  transition:
+    stroke 0.6s var(--ease-out-cubic),
+    opacity 0.45s var(--ease-out-cubic);
 }
 
+.escenario-red path {
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+[data-cara='claro'] .escenario-red {
+  stroke: var(--hilo-claro);
+}
+
+/* Mientras el logo se lo lleva todo, la red se queda pero se apaga: el
+   escenario se vacía de cosas, no de ciudad. */
+[data-fase='aspira'] .escenario-red,
+[data-fase='carga'] .escenario-red {
+  opacity: 0.4;
+}
+
+/* Los rayos sólo existen con el escenario ancho: apilados en un móvil no
+   caen en ningún hueco y estorban encima de los avisos. */
 .chispas {
+  display: none;
   position: absolute;
   inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.ruidos {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
+  z-index: 3;
   pointer-events: none;
 }
 
@@ -283,7 +313,7 @@
   position: absolute;
   width: 13px;
   height: 19px;
-  background: var(--chispazo);
+  background: var(--hilo);
   /* Un rayo, sin tener que traer un SVG por cada uno. */
   clip-path: polygon(58% 0%, 100% 0%, 62% 38%, 96% 38%, 22% 100%, 44% 52%, 8% 52%);
   transition:
@@ -291,81 +321,206 @@
     transform 0.62s var(--ease-fluida);
 }
 
-/* El ruido no son sólo rayos: también hay preguntas, alertas y relojes.
-   Van en el mismo tono apagado y con el mismo tamaño óptico que el rayo. */
-.chispa--signo {
-  width: auto;
-  height: auto;
-  background: none;
-  clip-path: none;
-  color: var(--chispazo);
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 24px;
-  line-height: 1;
+/* Al ordenarse, los rayos no se desvanecen en el sitio: se encogen hacia
+   arriba. En la otra cara no hay nada que chisporrotee. */
+[data-cara='claro'] .chispa {
+  opacity: 0;
+  transform: translateY(-14px) scale(0.88);
 }
 
-.chispa--reloj {
-  width: 22px;
-  height: 22px;
-  /* Punto central: con las dos agujas ya no hay forma de leer otra
-     cosa que un reloj, aunque sea pequeño y pálido. */
-  background:
-    radial-gradient(circle, var(--chispazo) 0 1.8px, transparent 2.3px);
-  clip-path: none;
-  border: 3px solid var(--chispazo);
-  border-radius: 50%;
+/* ── Los avisos ────────────────────────────────────────────────────────
+
+   Cuatro notificaciones: una baldosa con el dibujo, un dato pequeño y
+   una frase. Nada más, porque lo que se lee de la sección está en las
+   columnas; un párrafo aquí competiría con ellas. La tarjeta no lleva
+   borde: lo que la separa de la banda es el filo de un píxel al 5 % y
+   una sombra larga y pálida, que es lo que la levanta de la red sin
+   taparla con un marco.
+
+   Las dos caras de cada aviso no suben ni bajan al cambiar: la tarjeta
+   se queda donde está y cambia lo que dice, como cambia una
+   notificación. Por eso aquí el reposo es cero y el relevo, un fundido.
+   ────────────────────────────────────────────────────────────────────── */
+
+.avisos {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
+  width: 100%;
 }
 
-.chispa--reloj::before,
-.chispa--reloj::after {
-  content: '';
-  position: absolute;
-  /* Las dos agujas nacen del centro exacto: van de abajo (el centro
-     de la esfera) hacia arriba, y la de los minutos gira sobre su
-     propia base. Antes la minutera pivotaba por encima del centro y
-     se veía suelta. */
-  left: calc(50% - 1.25px);
-  bottom: 50%;
-  width: 2.5px;
-  background: var(--chispazo);
-  border-radius: 1px;
-}
-
-.chispa--reloj::before {
-  height: 32%;
-}
-
-.chispa--reloj::after {
-  height: 25%;
-  transform: rotate(130deg);
-  transform-origin: 50% 100%;
-}
-
-.ruido {
-  position: absolute;
-  display: inline-flex;
+.aviso {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
   align-items: center;
-  padding: 8px 14px;
-  border: 1px solid var(--linea);
-  border-radius: 11px;
+  gap: 16px;
+  padding: 20px 24px 20px 20px;
+  border-radius: 16px;
   background: var(--papel);
-  box-shadow: 0 8px 20px rgba(11, 18, 32, 0.06);
-  font-size: 12.5px;
-  line-height: 1;
+  box-shadow:
+    0 0 0 1px rgba(11, 18, 32, 0.05),
+    0 1px 2px rgba(11, 18, 32, 0.04),
+    0 12px 32px -12px rgba(11, 18, 32, 0.14);
+  text-align: left;
+}
+
+.aviso .cara {
+  --reposo: 0px;
+}
+
+.aviso-icono {
+  place-items: center;
+  height: 52px;
+  border-radius: 10px;
+  background: var(--banda);
   color: var(--tinta-media);
-  white-space: nowrap;
-  transition:
-    opacity 0.5s var(--ease-out-cubic),
-    transform 0.66s var(--ease-fluida);
+  transition: color 0.5s var(--ease-out-cubic);
+}
+
+[data-cara='claro'] .aviso-icono {
+  color: var(--acento);
+}
+
+.aviso-icono svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+/* El dato en tinta tenue (4,90:1 sobre blanco) y la frase en tinta
+   plena: aunque el bloque es decorativo, se lee, y lo que se lee pasa
+   AA (tests/escenario-avisos.test.ts). */
+.aviso-texto {
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  /* El aviso de la app es la frase más larga y a 418 px partía con «ti»
+     solo abajo: repartida, quedan dos renglones parejos. */
+  text-wrap: balance;
+  color: var(--tinta);
+}
+
+.aviso small {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--tinta-tenue);
+}
+
+/* ── Las columnas ──────────────────────────────────────────────────────
+
+   Los tres textos largos, debajo del dibujo y sueltos: sin borde ni
+   sombra, para que lo único con cuerpo de tarjeta sean los avisos.
+   ────────────────────────────────────────────────────────────────────── */
+
+#problema .columnas {
+  margin-top: clamp(40px, 5vw, 64px);
+}
+
+@media (min-width: 860px) {
+  #problema .columnas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ── El escenario ancho ────────────────────────────────────────────────
+
+   Con 1024 caben los avisos alrededor de la píldora sin pisarla: salen
+   del flujo y se reparten por las cuatro esquinas a alturas distintas,
+   ladeados un grado como mucho. El ladeo va en `rotate` y no en
+   `transform` para que el viaje de la ceremonia, que es un `transform`,
+   se monte encima sin enderezarlos. La píldora sigue en el flujo,
+   centrada por la rejilla: centrarla con `transform` chocaría con el
+   engorde, que también lo es.
+
+   Los números de sitio son proporciones de la caja de 1160×460: lo que
+   importa es que ninguna tarjeta quede alineada con otra ni tape la
+   píldora.
+   ────────────────────────────────────────────────────────────────────── */
+
+@media (min-width: 1024px) {
+  .escenario {
+    align-items: center;
+    min-height: 460px;
+    padding-block: 0;
+  }
+
+  .chispas {
+    display: block;
+  }
+
+  .avisos {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+
+  .aviso {
+    position: absolute;
+    width: clamp(300px, 38%, 420px);
+  }
+
+  .aviso:nth-child(1) {
+    top: 7%;
+    left: 2%;
+    rotate: -1deg;
+  }
+
+  .aviso:nth-child(2) {
+    top: 1%;
+    right: 3%;
+    rotate: 0.8deg;
+  }
+
+  .aviso:nth-child(3) {
+    bottom: 3%;
+    left: 8%;
+    rotate: 0.6deg;
+  }
+
+  .aviso:nth-child(4) {
+    bottom: 13%;
+    right: 1%;
+    rotate: -0.8deg;
+  }
+
+  .chispa:nth-child(1) {
+    top: 36%;
+    left: 21%;
+  }
+
+  .chispa:nth-child(2) {
+    top: 12%;
+    left: 47%;
+    transform: rotate(12deg);
+    transition-delay: 90ms;
+  }
+
+  .chispa:nth-child(3) {
+    top: 78%;
+    left: 56%;
+    transition-delay: 50ms;
+  }
+
+  .chispa:nth-child(4) {
+    top: 47%;
+    left: 83%;
+    transform: rotate(-10deg);
+    transition-delay: 130ms;
+  }
 }
 
 /* ── El estado ─────────────────────────────────────────────────────────
 
    La pieza que manda en el escenario: en una cara es la alerta de que no
    hay nada que saber y en la otra es la marca, porque el que lo resuelve
-   tiene nombre. Va sólida y no en tono pálido a propósito —es lo primero
-   que se mira— y el anillo de alrededor la separa de la maraña.
+   tiene nombre. Es lo único saturado del escenario a propósito —es lo
+   primero que se mira— y el anillo de alrededor la separa de la red.
    ────────────────────────────────────────────────────────────────────── */
 
 .escenario-estado {
@@ -380,26 +535,24 @@
      ni comprimido en reposo. */
   min-width: max-content;
   width: var(--ancho-estado, max-content);
-  padding: 9px 24px;
+  padding: 14px 28px;
   border-radius: 999px;
   background: var(--coral-accessible);
   box-shadow:
     0 0 0 6px rgba(206, 45, 29, 0.08),
     0 10px 24px rgba(206, 45, 29, 0.16);
   color: #FFFFFF;
-  font-family: var(--font-mono);
-  font-size: 12.5px;
-  letter-spacing: 0.01em;
+  /* En la letra de los avisos y a 17: en mono de 14 la píldora se
+     quedaba chica entre avisos de 420, y es lo único saturado del
+     escenario (dueño, 2026-10-12). */
+  font-size: 17px;
+  font-weight: 600;
   transition:
     background-color 0.65s var(--ease-out-cubic),
     box-shadow 0.65s var(--ease-out-cubic),
     transform 0.6s var(--ease-fluida),
     width 0.52s var(--ease-fluida),
-    padding 0.52s var(--ease-fluida),
-    /* El viaje entre caras: en una el aire va debajo de las fichas y
-       en la otra encima del estado, y con el margen animado la píldora
-       planea esos 144 en vez de teletransportarse como las tarjetas. */
-    margin-top 0.7s var(--ease-fluida);
+    padding 0.52s var(--ease-fluida);
 }
 
 /*
@@ -416,20 +569,20 @@
 .escenario-estado .cara {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   white-space: nowrap;
 }
 
 .estado-icono {
   flex: none;
-  width: 15px;
-  height: 15px;
+  width: 18px;
+  height: 18px;
 }
 
 .estado-marca {
   flex: none;
-  width: 19px;
-  height: 19px;
+  width: 22px;
+  height: 22px;
 }
 
 /* ── El núcleo ─────────────────────────────────────────────────────────
@@ -437,8 +590,7 @@
    La ceremonia de `problema.ts`. Pasar de una cara a la otra no es un
    cambio de estado, es una escena: la alerta roja se encoge hasta ser el
    logo, se lleva por delante todo lo que hay suelto en el escenario,
-   late, y se vuelve a abrir en verde diciendo «Ya Viene». De ahí baja el
-   árbol. Lo que se cuenta es que el desorden no se desvanece solo: se lo
+   late, y se vuelve a abrir en verde diciendo «Ya Viene». Lo que se cuenta es que el desorden no se desvanece solo: se lo
    lleva alguien, y ese alguien tiene nombre.
 
    El reparto: los viajes de cada pieza hasta el centro los calcula el
@@ -499,9 +651,6 @@
   min-width: 0;
   width: 46px;
   padding-inline: 0;
-  /* Y de paso se endereza: la alerta estaba torcida porque nadie la
-     sostenía; en cuanto hay quien responda, deja de estarlo. */
-  transform: none;
 }
 
 [data-fase='aspira'] .escenario-estado .dos-caras,
@@ -510,8 +659,7 @@
 }
 
 /* Mientras dura el viaje, el logo va por encima de todo lo que se está
-   llevando: las piezas —incluidas las fichas, que comparten capa con
-   él— entran por detrás y ahí se acaban. Pasando por delante se las
+   llevando: las piezas entran por detrás y ahí se acaban. Pasando por delante se las
    vería encogerse encima del logo, que es justo lo contrario de que se
    las trague. */
 [data-fase='aspira'] .escenario-estado,
@@ -531,7 +679,7 @@
   cuando se cambia de lado con el interruptor: se ve el cambio. Dentro de
   la ceremonia no: aquí el escenario se vació entero y lo que sale del
   logo tiene que salir ya con lo suyo puesto. Sin este corte se leía
-  «Nadie sabe dónde va el bus» sobre la píldora verde, y las fichas se
+  «Nadie sabe dónde va el bus» sobre la píldora verde, y los avisos se
   desplegaban con el texto viejo todavía encima.
 
   Va a toda la sección, titular y frase incluidos: desde que también se
@@ -616,508 +764,8 @@
     0 10px 24px rgba(4, 116, 84, 0.16);
 }
 
-/* ── La red ────────────────────────────────────────────────────────────
-
-   La otra cara del circuito. Son los mismos cables —mismo grosor, mismas
-   esquinas redondeadas, mismo remate—, y esa es la idea: las dos caras se
-   dibujan con la misma pieza y lo único que cambia es el trazado. Allí
-   los cables se cruzan, esquivan y se enredan; aquí salen los tres de la
-   píldora y caen cada uno sobre su ficha.
-
-   El lienzo se estira sobre el hueco que queda entre la píldora y las
-   fichas, así que no hay ningún número que cuadrar a mano: el contenedor
-   crece con lo que sobra y las dos caras miden lo mismo.
-
-   Se dibujan solos, del trazo entero escondido al trazo entero a la
-   vista: primero la bajada del centro y luego las dos de los lados, que
-   es el gesto que dice que el orden viene de un sitio.
-   ────────────────────────────────────────────────────────────────────── */
-
-.escenario-circuito,
-.escenario-arbol {
-  display: none;
-}
-
-/* Absoluto y no en el flujo: un `<svg>` con `viewBox` y sin medidas trae
-   su propia proporción, y como elemento flexible la usaba para pedir
-   alto —el escenario crecía 37 px al pasar a esta cara y la página daba
-   el salto que el hueco existe justo para evitar. Sacado del flujo, el
-   hueco vuelve a medir lo que sobra y el lienzo se estira encima. */
-.escenario-red {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.red-cable {
-  stroke: var(--acento);
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-  /* `pathLength="1"` en el marcado: el trazo mide 1 sea cual sea su
-     largo, así que las tres bajadas se dibujan en el mismo tiempo aunque
-     la del centro sea más corta que las de los lados.
-
-     El hueco mide 2 y no 1 para que el final del trazo caiga siempre
-     dentro del hueco: con `1 1` el desfase de 1 deja el final justo en
-     el filo del siguiente trazo y el remate redondo pinta ahí un punto,
-     que era la mota que quedaba flotando sobre cada ficha. */
-  stroke-dasharray: 1 2;
-  stroke-dashoffset: 1;
-  transition: stroke-dashoffset 0.6s var(--ease-out-cubic);
-}
-
-[data-cara='claro'] .red-cable {
-  stroke-dashoffset: 0;
-}
-
-[data-cara='claro'] .red-cable--centro {
-  transition-delay: 0.12s;
-}
-
-[data-cara='claro'] .red-cable--izquierda,
-[data-cara='claro'] .red-cable--derecha {
-  transition-delay: 0.34s;
-}
-
-/* ── Las fichas ────────────────────────────────────────────────────────
-
-   El mismo texto que había en las tres columnas, ahora con su reverso.
-   Lo que cambia con el interruptor no es sólo lo que dicen: desparramadas
-   y con sombra son papeles sueltos encima de una mesa; derechas, con el
-   borde verde y sin levantar, son un tablero.
-
-   El desparrame sólo existe cuando van en fila. Apiladas, tres tarjetas
-   giradas una debajo de otra no se leen como desorden, se leen como un
-   error de maquetación.
-   ────────────────────────────────────────────────────────────────────── */
-
-.escenario-fichas {
-  position: relative;
-  z-index: 10;
-  display: grid;
-  gap: var(--hueco);
-  width: 100%;
-  margin-top: 22px;
-  /* Pareja del viaje del estado: las fichas suben lo mismo que la
-     píldora baja, con el mismo tiempo y la misma curva, así que el
-     alto total no se mueve en ningún cuadro del relevo. */
-  transition:
-    margin-top 0.7s var(--ease-fluida),
-    transform 0.62s var(--ease-fluida);
-}
-
-.ficha {
-  position: relative;
-  z-index: 10;
-  display: grid;
-  gap: 14px;
-  align-content: start;
-  padding: clamp(18px, 2vw, 26px);
-  border: 1px solid var(--linea);
-  border-radius: var(--radio-tarjeta);
-  background: var(--papel);
-  /* Levantadas del fondo: sueltas encima de una mesa, no encajadas en una
-     rejilla. Es la mitad del argumento —la otra mitad es la torcedura—. */
-  box-shadow: 0 14px 32px rgba(11, 18, 32, 0.08), 0 1px 2px rgba(11, 18, 32, 0.05);
-  transition:
-    transform 0.85s var(--ease-fluida),
-    border-color 0.5s var(--ease-out-cubic),
-    box-shadow 0.6s var(--ease-out-cubic);
-}
-
-[data-cara='claro'] .ficha {
-  border-color: var(--hilo);
-  box-shadow: var(--sombra-tarjeta);
-}
-
-/* Una baldosa y no un círculo: el círculo de 26 era un sello para una
-   letra, y un dibujo de 18 pide aire alrededor. 34 con 11 de radio es la
-   misma curva que el icono de la app a su escala. */
-.ficha-glifo {
-  justify-self: start;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 11px;
-  background: var(--coral-light);
-  color: var(--coral-accessible);
-  transition:
-    background-color 0.5s var(--ease-out-cubic),
-    color 0.5s var(--ease-out-cubic);
-}
-
-/* En bloque: en línea, el dibujo se sentaba en la línea base del texto y
-   quedaba 2,5 px por encima del centro de la baldosa. */
-.ficha-glifo svg {
-  display: block;
-}
-
-[data-cara='claro'] .ficha-glifo {
-  background: var(--green-tint);
-  color: var(--acento);
-}
-
-/* La letra de la ficha no crece con la ventana. La estaba midiendo la
-   hoja de los pasos, que declara `.columna-titulo` a 2.4vh y
-   `.columna-texto` a 1.1vw sin acotarlas a su sección, y aquí eso no
-   vale: la ficha mide siempre un tercio del escenario —1096 partidos en
-   tres—, así que agrandar la letra no le da holgura, le añade líneas.
-
-   Y el alto de la ficha no es asunto suyo: el escenario mide 548 fijos y
-   la fila va pegada abajo, así que cada línea de más sube la fila entera
-   y se come el sitio donde viven las voces. Medido: a 1600 de ancho la
-   ficha crecía cuarenta píxeles y su borde de arriba subía hasta tapar
-   «me iré en taxi». Con la letra quieta, el alto de la fila deja de
-   depender del tamaño de la ventana. */
-.ficha .columna-titulo {
-  margin-bottom: 8px;
-  font-size: 21px;
-}
-
-.ficha .columna-texto {
-  padding-top: 6px;
-  font-size: 15px;
-  line-height: 1.55;
-}
-
-/* ── El escenario ancho ────────────────────────────────────────────────
-
-   De aquí para abajo, todo lo que sólo tiene sentido cuando las tres
-   fichas caben en fila: el alto fijo, el árbol, el ruido y el
-   desparrame.
-   ────────────────────────────────────────────────────────────────────── */
-
-@media (min-width: 860px) {
-  .escenario {
-    /* El alto lo manda la cara desordenada, que es la que más sitio pide:
-       la ficha de en medio se sube casi cien píxeles y encima de ella
-       todavía tiene que caber el ruido. Lo que sobre en la cara ordenada
-       se lo reparte el árbol, así que este número también decide cuánto
-       miden el tronco y las ramas: subirlo mucho deja un vacío de líneas
-       finas entre el estado y las fichas. Tiene que pasar del contenido
-       (píldora + fichas + los 160 de aire) para que sobre algo que
-       repartir: sin holgura el tronco y las ramas colapsan a cero y la
-       viga queda pegada a la píldora. */
-    min-height: 548px;
-  }
-
-  .chispas,
-  .ruidos {
-    display: block;
-  }
-
-  /*
-    El padre recorta: las líneas nacen y mueren debajo de las piezas, y
-    lo que asome de más se queda dentro del escenario. El aire compensa
-    el recorte para que ni las sombras ni las fichas desplazadas cambien
-    de sitio ni se corten con filo: el margen negativo lo devuelve y la
-    geometría externa queda idéntica.
-  */
-  .escenario {
-    overflow: hidden;
-    padding: 32px;
-    margin: -32px;
-  }
-
-  /*
-    Menos mientras dura la ceremonia. Los dos anillos salen del borde de
-    la píldora y llegan casi tres veces más lejos: por arriba se pasan de
-    los 32 de aire, y el recorte los cortaba en seco dejando un filo
-    recto justo encima del logo. Aquí el recorte no hace falta —los
-    cables se recogen hacia dentro, el ruido viaja hacia la píldora y lo
-    que brota acaba en su sitio—, así que se levanta y los anillos se
-    abren enteros.
-  */
-  [data-fase='aspira'] .escenario,
-  [data-fase='carga'] .escenario,
-  [data-fase='brota'] .escenario {
-    overflow: visible;
-  }
-
-  .escenario-circuito {
-    display: block;
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 2;
-    opacity: 1;
-    transition: opacity 0.45s var(--ease-out-cubic);
-  }
-
-  /*
-    `pathLength="1"` va en el marcado: el trazo de cada cable mide 1 sea
-    cual sea su largo, así que todos se recogen en el mismo tiempo aunque
-    unos den más vuelta que otros. En reposo el desfase es 0 —el cable
-    entero a la vista— y no hay transición que lo mueva.
-
-    El hueco mide 2 y no 1 por lo mismo que en la red: con `1 1` el final
-    del cable recogido cae en el filo del siguiente trazo y el remate
-    redondo deja ahí un punto.
-  */
-  .circuito-cable {
-    stroke: var(--hilo-alerta);
-    stroke-width: 2.2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    vector-effect: non-scaling-stroke;
-    stroke-dasharray: 1 2;
-    stroke-dashoffset: 0;
-  }
-
-  [data-cara='claro'] .escenario-circuito {
-    opacity: 0;
-  }
-
-  /* El enredo entero cede al remolino: se cierra sobre la píldora, que
-     es el origen que se le pone al encogido —el centro de la marca, no
-     el del cuadro—. Es poco a propósito; el viaje de verdad lo hacen los
-     cables recogiéndose, pero es lo que hace que el fondo acompañe en
-     vez de quedarse quieto viendo cómo se lo llevan. */
-  .escenario-circuito {
-    transform-origin: 50% 11%;
-    transition: transform 0.72s var(--ease-out-cubic);
-  }
-
-  /*
-    Los cables no se apagan: se recogen. Cada trazo se va por su punta
-    más lejana y vuelve hasta donde nace, que en los tres que salen de la
-    alerta es la píldora misma —el desfase positivo borra el trazo por el
-    final, no por el principio—. Apagarlos era lo que hacía que el enredo
-    se desvaneciera en vez de que se lo llevaran, que es lo contrario de
-    lo que cuenta la escena.
-
-    Primero se van los puentes entre fichas, que son los que están más
-    lejos del centro, y detrás las tres bajadas. La curva es la misma de
-    los vuelos de las piezas: sale despacio y entra de golpe.
-  */
-  [data-fase='aspira'] .escenario-circuito,
-  [data-fase='carga'] .escenario-circuito {
-    transform: scale(0.9);
-  }
-
-  [data-fase='aspira'] .circuito-cable,
-  [data-fase='carga'] .circuito-cable {
-    stroke-dashoffset: 1;
-    transition: stroke-dashoffset 0.58s cubic-bezier(0.5, 0, 0.75, 0.15);
-  }
-
-  [data-fase='aspira'] .circuito-cable--inter-1,
-  [data-fase='carga'] .circuito-cable--inter-1,
-  [data-fase='aspira'] .circuito-cable--inter-3,
-  [data-fase='carga'] .circuito-cable--inter-3 {
-    transition-delay: 0.05s;
-  }
-
-  [data-fase='aspira'] .circuito-cable--1,
-  [data-fase='carga'] .circuito-cable--1,
-  [data-fase='aspira'] .circuito-cable--3,
-  [data-fase='carga'] .circuito-cable--3 {
-    transition-delay: 0.18s;
-  }
-
-  [data-fase='aspira'] .circuito-cable--2,
-  [data-fase='carga'] .circuito-cable--2 {
-    transition-delay: 0.24s;
-  }
-
-  .escenario-arbol {
-    display: block;
-    position: relative;
-    flex: 1;
-    width: 100%;
-  }
-
-  .escenario-fichas {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-top: 0;
-  }
-
-  /* Dónde cae cada cosa del enredo. Los números están escogidos a ojo
-     sobre la caja de 1160×468: lo que importa es que nada quede alineado
-     con nada. */
-  .chispa:nth-child(1) {
-    left: 16%;
-    top: 22%;
-    transition-delay: 0ms;
-  }
-
-  .chispa:nth-child(2) {
-    left: 32%;
-    top: 6%;
-    transition-delay: 90ms;
-  }
-
-  .chispa:nth-child(3) {
-    left: 79%;
-    top: 19%;
-    transition-delay: 50ms;
-  }
-
-  .chispa:nth-child(4) {
-    left: 89%;
-    top: 9%;
-    transform: rotate(12deg);
-    transition-delay: 130ms;
-  }
-
-  .chispa:nth-child(5) {
-    left: 27%;
-    top: 31%;
-    transition-delay: 30ms;
-  }
-
-  .ruido:nth-child(1) {
-    left: 0%;
-    top: 9%;
-    --giro: -3.2deg;
-    transition-delay: 20ms;
-  }
-
-  .ruido:nth-child(2) {
-    left: 69%;
-    top: 3%;
-    --giro: 2.6deg;
-    transition-delay: 100ms;
-  }
-
-  .ruido:nth-child(3) {
-    left: 2%;
-    top: 25%;
-    --giro: -1.6deg;
-    transition-delay: 0ms;
-  }
-
-  .ruido:nth-child(4) {
-    left: 52%;
-    top: 16%;
-    --giro: 3.4deg;
-    transition-delay: 140ms;
-  }
-
-  /* Ésta se coloca contra dos cosas, no a ojo. Por debajo, el borde de
-     arriba de la tercera ficha, que está en 241 de 548: en 35% la voz
-     acababa en 224 y se leía pegada a la tarjeta —y con una ficha más
-     alta, tapada por ella—. Por la izquierda, la bajada del cable 3, que
-     pasa por 933 de 1160: la voz arranca pasado ese punto para que el
-     cable llegue a la ficha por delante y no se meta por detrás del
-     papel. */
-  .ruido:nth-child(5) {
-    left: 83.5%;
-    top: 30%;
-    --giro: -2.2deg;
-    transition-delay: 70ms;
-  }
-
-  /* La inclinación vive en la variable para que el relevo no la
-     enderece a la fuerza: cada voz se va torcida como estaba. */
-  [data-cara='ciego'] .ruido {
-    transform: rotate(var(--giro, 0deg));
-  }
-
-  /* Al ordenarse, el ruido no se desvanece en el sitio: se encoge y se
-     va hacia el estado, que es de donde sale la respuesta. */
-  [data-cara='claro'] .ruido,
-  [data-cara='claro'] .chispa {
-    opacity: 0;
-    transform: translateY(-14px) rotate(var(--giro, 0deg)) scale(0.88);
-  }
-
-  [data-cara='claro'] .chispa:nth-child(4) {
-    transform: translateY(-14px) rotate(12deg) scale(0.88);
-  }
-
-  [data-cara='ciego'] .escenario-estado {
-    transform: rotate(-0.8deg);
-  }
-
-  /* Mientras se las lleva, las voces y los chispazos pasan por encima de
-     las fichas. Por debajo el viaje se pierde detrás de las tarjetas y
-     lo que se ve es que desaparecen, que es justo lo contrario. */
-  [data-fase='aspira'] .chispas,
-  [data-fase='aspira'] .ruidos {
-    z-index: 11;
-  }
-
-  /* Los 48 de la otra cara, aquí arriba: el estado baja y el árbol
-     (que reparte lo que sobra) recupera su alto y conecta el estado
-     con cada ficha. Sin esto la viga quedaba pegada a la píldora con
-     las ramas en cero. */
-  [data-cara='claro'] .escenario-estado {
-    margin-top: 48px;
-  }
-
-  /* El desparrame. Cada ficha sale de su sitio en la fila por un lado
-     distinto y a una altura distinta; la de en medio es la que más se
-     escapa, para que la fila no se lea nunca como una fila. */
-  [data-cara='ciego'] .ficha:nth-child(1) {
-    transform: translate(-12px, -46px) rotate(-3.1deg);
-  }
-
-  [data-cara='ciego'] .ficha:nth-child(2) {
-    transform: translate(30px, -96px) rotate(2.4deg);
-    transition-delay: 0.05s;
-  }
-
-  [data-cara='ciego'] .ficha:nth-child(3) {
-    transform: translate(-22px, -20px) rotate(-1.7deg);
-    transition-delay: 0.1s;
-  }
-
-  /* La fila entera baja: desparramadas, las fichas se le montaban
-     encima a la píldora y al ruido. Sólo en la desordenada: en la
-     ordenada esos mismos 48 van encima del estado (regla de abajo),
-     así que el alto total cuadra en las dos caras y nada salta, y el
-     árbol conserva su sitio y llega hasta las fichas. */
-  [data-cara='ciego'] .escenario-fichas {
-    margin-top: 48px;
-  }
-
-  [data-cara='claro'] .ficha:nth-child(2) {
-    transition-delay: 0.06s;
-  }
-
-  [data-cara='claro'] .ficha:nth-child(3) {
-    transition-delay: 0.12s;
-  }
-}
-
-/* ── El despliegue ─────────────────────────────────────────────────────
-
-   El último tramo de la ceremonia. Aquí ya no se está deshaciendo nada:
-   se está montando, y tiene que notarse. El árbol baja más rápido que en
-   un cambio normal y con curva de muelle, y las fichas caen en su sitio
-   con un punto de rebote en vez de posarse. Es la diferencia entre que
-   la respuesta aparezca y que la respuesta se plante.
-   ────────────────────────────────────────────────────────────────────── */
-
-[data-fase='brota'] .red-cable {
-  transition: stroke-dashoffset 0.52s var(--ease-out-cubic);
-}
-
-[data-fase='brota'] .red-cable--centro {
-  transition-delay: 0.08s;
-}
-
-[data-fase='brota'] .red-cable--izquierda,
-[data-fase='brota'] .red-cable--derecha {
-  transition-delay: 0.3s;
-}
-
-[data-fase='brota'] .ficha {
-  transition:
-    transform 0.72s var(--ease-spring),
-    border-color 0.5s var(--ease-out-cubic),
-    box-shadow 0.6s var(--ease-out-cubic);
-}
-
 /* El suelo de `animations.css` deja las transiciones en 0.01ms, pero no
-   toca los retardos: sin esto el árbol seguiría apareciendo medio
+   toca los retardos: sin esto los avisos seguirían cambiando medio
    segundo tarde para quien pidió que nada se mueva. */
 @media (prefers-reduced-motion: reduce) {
 

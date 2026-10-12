@@ -74,6 +74,8 @@ describe('el azul de los botones de la app, en la web', () => {
     expect(variables).not.toMatch(/--azul-boton-claro/);
     expect(reglas(css, '.escenario-estado')).toMatch(/background:\s*var\(--coral-accessible\)/);
     expect(reglas(css, '#problema .cara--ciego .apagado')).toMatch(/var\(--coral-accessible\)/);
-    expect(reglas(css, '.ficha-glifo')).toMatch(/background:\s*var\(--coral-light\)/);
+    // Las baldosas de las fichas llevaban su tinte coral; desde que el
+    // escenario son avisos (2026-10-12) el rojo es sólo de la píldora:
+    // lo vigila tests/escenario-avisos.test.ts.
   });
 });

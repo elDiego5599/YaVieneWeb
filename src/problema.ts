@@ -13,8 +13,8 @@
  *   reposo → aspira → carga → brota → reposo
  *
  * En `aspira` la alerta roja se encoge hasta ser el logo y la sección
- * entera se va hacia él: primero se apaga el circuito, luego se van los
- * chispazos, luego las voces del paradero, después las tres fichas y al
+ * entera se va hacia él: primero se apaga la red, luego se van los
+ * chispazos, luego los cuatro avisos, después las tres columnas y al
  * final el titular y la frase que los presentan. El orden es el del
  * tamaño, de lo más pequeño a lo más grande, que es como se vacía algo
  * de verdad —lo ligero se va enseguida y lo pesado cuesta— y de paso
@@ -30,15 +30,15 @@
  * sitio donde las cosas se apagan y uno donde alguien se las lleva: lo
  * que se lleva tiene que notarse en quien se lo lleva. En `carga` ese
  * bulto late y cambia de color. En `brota` se vuelve a abrir como «Ya
- * Viene» soltando de golpe todo lo que había engordado, baja el árbol y
- * salen del logo el titular, la frase y las tres fichas hasta plantarse
- * en su sitio. Contado así, no es que el desorden desaparezca: es que
+ * Viene» soltando de golpe todo lo que había engordado, la red se pone
+ * verde y salen del logo el titular, la frase, los avisos y las columnas
+ * hasta plantarse en su sitio. Contado así, no es que el desorden desaparezca: es que
  * alguien se lo lleva y devuelve otra cosa en su lugar.
  *
  * El viaje de cada pieza hasta el logo se calcula aquí y no en el CSS
  * porque depende de dónde esté cada una en ese momento y de dónde esté el
  * logo, y eso cambia con el ancho de la ventana. Lo demás —el encogido de
- * la píldora, el latido, el árbol— es CSS colgando de `data-fase`.
+ * la píldora, el latido, la red— es CSS colgando de `data-fase`.
  *
  * La vuelta no tiene ceremonia: volver a «A ciegas» es rebobinar, y
  * repetir el ritual al revés lo abarataría.
@@ -77,7 +77,7 @@ const PANTALLA = 0.6;
 /**
  * El viaje de una pieza hasta el logo y el relevo entre la primera que
  * sale y la última. El relevo es largo porque no es un desfase de
- * adorno: es el orden de tamaño, y tiene que verse que las fichas se van
+ * adorno: es el orden de tamaño, y tiene que verse que las columnas se van
  * cuando ya no queda nada más que llevarse.
  */
 const VIAJE_MS = 520;
@@ -87,24 +87,26 @@ const RELEVO_MS = 600;
  * Los tres tramos de la ceremonia. El primero es el más largo porque
  * dentro tiene que caber el escenario entero, y eso no es un gesto sino
  * un relevo; el segundo es corto a propósito, que un latido largo se
- * vuelve un pulso de espera; el tercero dura lo que tarda el árbol en
- * llegar a los puntos de las ramas y la última ficha en plantarse.
+ * vuelve un pulso de espera; el tercero dura lo que tarda la última
+ * pieza en plantarse.
  */
 // El último viaje acaba en RELEVO_MS + VIAJE_MS + 90; los 60 que
 // sobran son el escenario vacío, que es la mitad de lo que se cuenta.
 const ASPIRA_MS = VIAJE_MS + RELEVO_MS + 150;
 const CARGA_MS = 460;
-// Cinco piezas vuelven ahora, no tres, y salen despacio: la última
-// arranca a los 610 y tarda otros 940 en plantarse.
-const BROTA_MS = 1620;
+// Vuelven nueve piezas —los dos textos, los cuatro avisos y las tres
+// columnas—: la última arranca a los 150 + 8 × 70 = 710 y tarda otros
+// 940 en plantarse.
+const BROTA_MS = 1650;
 
 /**
- * El despliegue de las fichas: cuánto espera la primera a que el árbol
- * arranque, cuánto va de una a la siguiente y lo que tarda cada una en
- * plantarse.
+ * El despliegue: cuánto espera la primera pieza a que el logo se abra,
+ * cuánto va de una a la siguiente y lo que tarda cada una en plantarse.
+ * El relevo es corto porque son nueve: con más hueco, la última llega
+ * cuando el resto ya lleva rato quieto.
  */
 const ESPERA_FICHA_MS = 150;
-const RELEVO_FICHA_MS = 115;
+const RELEVO_FICHA_MS = 70;
 const DESPLIEGUE_MS = 940;
 
 /**
@@ -164,13 +166,13 @@ export class Problema {
   /** Lo que está volando hacia el logo ahora mismo. */
   #vuelos: Animation[] = [];
   /**
-   * Las fichas van aparte porque son las únicas que vuelven: lo demás se
-   * lo queda el logo, pero ellas salen otra vez en el despliegue y hay
-   * que poder cortarles el viaje sin cortar el de las voces.
+   * Lo que vuelve va aparte: los chispazos se los queda el logo, pero
+   * los textos, los avisos y las columnas salen otra vez en el despliegue
+   * y hay que poder cortarles el viaje sin cortar el de los chispazos.
    */
   #vuelosFicha: Animation[] = [];
-  /** Adónde se fue cada ficha, para saber de dónde tiene que volver. */
-  #idas: { ficha: HTMLElement; dx: number; dy: number }[] = [];
+  /** Adónde se fue cada pieza, para saber de dónde tiene que volver. */
+  #idas: { pieza: HTMLElement; dx: number; dy: number }[] = [];
 
   constructor(seccion: HTMLElement) {
     this.#seccion = seccion;
@@ -302,10 +304,9 @@ export class Problema {
     // «claro» aunque el atributo todavía diga otra cosa: la cara sólo se
     // cambia a mitad de la escena. Pedir esa misma cara no es un cambio y
     // no se rehace nada. Sin esto, volver a pulsar el botón ya pulsado
-    // mientras el árbol acababa de brotar relanzaba la ceremonia con
-    // `data-cara` ya en «claro», y el tramo del enredo —los cables rojos,
-    // las voces, las fichas desparramadas— se representaba con los textos
-    // y las fichas de «Con Ya Viene».
+    // mientras la red acababa de ponerse verde relanzaba la ceremonia
+    // con `data-cara` ya en «claro», y el tramo del enredo se
+    // representaba con los textos y los avisos de «Con Ya Viene».
     const destino = this.#tramos.length ? 'claro' : this.#seccion.dataset.cara;
     if (destino === cara) return;
 
@@ -363,14 +364,14 @@ export class Problema {
   }
 
   /**
-   * Se lo lleva todo. No queda nada en el escenario: los chispazos, las
-   * voces y las tres fichas se van al logo, y el circuito se apaga con
-   * ellas desde el CSS.
+   * Se lo lleva todo. No queda nada en el escenario: los chispazos, los
+   * avisos y las tres columnas se van al logo, y la red se apaga con
+   * ellos desde el CSS.
    *
    * El turno lo reparte el tamaño, de lo más pequeño a lo más grande.
    * Es lo que separa «desaparece el ruido» de «se vacía el escenario»:
-   * si todo sale a la vez es un fundido, y si salen antes las fichas —lo
-   * único que se lee— parece que se ha borrado el argumento. Saliendo al
+   * si todo sale a la vez es un fundido, y si salen antes las columnas
+   * —lo que se lee— parece que se ha borrado el argumento. Saliendo al
    * final, lo último que cruza la pantalla es el problema entero.
    *
    * El pequeño tirón hacia atrás del principio es lo que separa «se lo
@@ -388,7 +389,7 @@ export class Problema {
 
     const piezas = Array.from(
       this.#seccion.querySelectorAll<HTMLElement>(
-        '.chispa, .ruido, .ficha, .seccion-titulo, .seccion-lead'
+        '.chispa, .aviso, .columna, .seccion-titulo, .seccion-lead'
       )
     )
       .map((pieza) => {
@@ -400,8 +401,8 @@ export class Problema {
           bulto: caja.width * caja.height,
         };
       })
-      // Lo que no se dibuja no viaja: por debajo de 860 px no hay ni
-      // ruido ni chispazos en el escenario.
+      // Lo que no se dibuja no viaja: por debajo de 1024 px no hay
+      // chispazos en el escenario.
       .filter((v) => v.bulto > 0)
       .sort((a, b) => a.bulto - b.bulto);
 
@@ -410,12 +411,9 @@ export class Problema {
     const llegadas: number[] = [];
 
     piezas.forEach(({ pieza, dx, dy }, turno) => {
-      // Lo que vuelve: las fichas y los dos textos de arriba. El ruido y
-      // los chispazos se los queda el logo, que para eso se los llevó.
-      const vuelve =
-        pieza.classList.contains('ficha') ||
-        pieza.classList.contains('seccion-titulo') ||
-        pieza.classList.contains('seccion-lead');
+      // Vuelve todo menos los chispazos, que se los queda el logo: para
+      // eso se los llevó.
+      const vuelve = !pieza.classList.contains('chispa');
       const tarjeta = vuelve;
       const espera = (turno / ultima) * RELEVO_MS;
 
@@ -427,31 +425,31 @@ export class Problema {
       const desvioY = dx * REMOLINO;
 
       // Un papel puede girar de lado y seguir leyéndose; un chispazo no
-      // tiene arriba ni abajo, así que da la vuelta entera. Una ficha
+      // tiene arriba ni abajo, así que da la vuelta entera. Un aviso
       // pesa: se ladea y poco más.
-      const vuelta = tarjeta ? 12 : pieza.classList.contains('chispa') ? 200 : 42;
-      // La postura con la que estaba en la mesa, para que viaje como
-      // estaba en vez de enderezarse de un salto al arrancar.
-      const raiz = this.#reposoDe(pieza);
+      // El ladeo de reposo de cada aviso va en `rotate`, no en
+      // `transform`: se suma a éste solo y el viaje sale con la postura
+      // que tenía, sin enderezarse de un salto al arrancar.
+      const vuelta = tarjeta ? 12 : 200;
       // Lo pesado se resiste menos a moverse hacia atrás: el tirón de
-      // una ficha es la mitad del de una voz.
+      // un aviso es la mitad del de un chispazo.
       const tiron = tarjeta ? 0.03 : 0.06;
 
       const vuelo = pieza.animate(
         [
-          { transform: `translate(0px, 0px) scale(1)${raiz}`, opacity: 1 },
+          { transform: `translate(0px, 0px) scale(1)`, opacity: 1 },
           {
             offset: 0.2,
-            transform: `translate(${(-dx * tiron).toFixed(1)}px, ${(-dy * tiron).toFixed(1)}px) scale(1.04)${raiz}`,
+            transform: `translate(${(-dx * tiron).toFixed(1)}px, ${(-dy * tiron).toFixed(1)}px) scale(1.04)`,
             opacity: 1,
           },
           {
             offset: 0.62,
-            transform: `translate(${(dx * 0.42 + desvioX * 0.58).toFixed(1)}px, ${(dy * 0.42 + desvioY * 0.58).toFixed(1)}px) scale(0.58) rotate(${(vuelta * 0.35).toFixed(0)}deg)${raiz}`,
+            transform: `translate(${(dx * 0.42 + desvioX * 0.58).toFixed(1)}px, ${(dy * 0.42 + desvioY * 0.58).toFixed(1)}px) scale(0.58) rotate(${(vuelta * 0.35).toFixed(0)}deg)`,
             opacity: tarjeta ? 0.9 : 0.85,
           },
           {
-            transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(0.04) rotate(${vuelta}deg)${raiz}`,
+            transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(0.04) rotate(${vuelta}deg)`,
             opacity: 0,
           },
         ],
@@ -469,7 +467,7 @@ export class Problema {
 
       if (vuelve) {
         this.#vuelosFicha.push(vuelo);
-        this.#idas.push({ ficha: pieza, dx, dy });
+        this.#idas.push({ pieza, dx, dy });
       } else {
         this.#vuelos.push(vuelo);
       }
@@ -480,7 +478,7 @@ export class Problema {
     // El orden de la vuelta es el de la fila, no el del viaje: la de la
     // izquierda se planta primero aunque se haya ido la última.
     this.#idas.sort((a, b) =>
-      a.ficha.compareDocumentPosition(b.ficha) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
+      a.pieza.compareDocumentPosition(b.pieza) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
     );
 
   }
@@ -566,11 +564,11 @@ export class Problema {
    *
    * Nada aparece en su sitio. Cada pieza sale disparada del logo, abierta
    * hacia un lado y girada, se pasa de largo de donde tiene que quedarse
-   * y sólo entonces se cuadra: primero el titular, luego la frase y
-   * después las tres fichas, escalonadas y de arriba abajo, que es el
-   * orden en que se lee la sección. Se sueltan tan seguidas que los
-   * primeros fotogramas son un chorro y no cinco viajes, y los últimos
-   * son cinco piezas colocándose. Ahí está lo que se cuenta: no es que
+   * y sólo entonces se cuadra: primero el titular, luego la frase,
+   * después los avisos y al final las columnas, escalonados y de arriba
+   * abajo, que es el orden en que se lee la sección. Se sueltan tan
+   * seguidas que los primeros fotogramas son un chorro y no nueve viajes,
+   * y los últimos son nueve piezas colocándose. Ahí está lo que se cuenta: no es que
    * salga otra cosa, es que sale lo mismo puesto en orden.
    *
    * El vuelo no se queda pegado al final —`fill` de ida y no de vuelta—:
@@ -581,7 +579,7 @@ export class Problema {
     for (const vuelo of this.#vuelosFicha) vuelo.cancel();
     this.#vuelosFicha = [];
 
-    this.#idas.forEach(({ ficha, dx, dy }, turno) => {
+    this.#idas.forEach(({ pieza, dx, dy }, turno) => {
       // El chorro es el remolino de la entrada con el signo cambiado:
       // lo que se tragó girando hacia un lado sale girando hacia el
       // otro. Se abre poco: lo justo para que el camino sea una curva y
@@ -589,15 +587,15 @@ export class Problema {
       const abreX = dy * CHORRO;
       const abreY = -dx * CHORRO;
 
-      // Alternando el giro no salen cinco piezas iguales en fila: sale
+      // Alternando el giro no salen nueve piezas iguales en fila: sale
       // un puñado. Poca cosa, porque una frase ladeada se deja de leer
       // antes que una tarjeta y aquí lo que importa es que se coloque,
       // no que dé volteretas.
       const lado = turno % 2 === 0 ? 1 : -1;
-      const giro = lado * (ficha.classList.contains('ficha') ? 7 : 3.5);
+      const giro = lado * (pieza.classList.contains('aviso') ? 7 : 3.5);
 
       this.#vuelosFicha.push(
-        ficha.animate(
+        pieza.animate(
           [
             {
               // No sale de la nada: sale ya con cuerpo, que es lo que
@@ -632,17 +630,6 @@ export class Problema {
         )
       );
     });
-  }
-
-  /**
-   * La postura de reposo de una pieza, tal cual la dejó el CSS: la
-   * torcedura de una voz, el ladeo de una ficha desparramada. Va al
-   * final de la lista —o sea, se aplica primero— para que el viaje se
-   * monte encima en vez de enderezarla de golpe al arrancar.
-   */
-  #reposoDe(pieza: HTMLElement): string {
-    const base = getComputedStyle(pieza).transform;
-    return !base || base === 'none' ? '' : ` ${base}`;
   }
 
   #cortarCeremonia(): void {
