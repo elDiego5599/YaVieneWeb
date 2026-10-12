@@ -813,3 +813,35 @@
     gap: clamp(18px, 2.2vw, 32px);
   }
 }
+
+/* El mismo nav en todas las páginas (dueño, 2026-10-12). Se alinea con
+   el hero de la portada (dueño, 2026-10-11): la
+   marca arranca donde la copia, el botón acaba donde el trío y los dos
+   enlaces van a la derecha, junto al botón; la letra sube un punto para
+   ir con el hero agrandado. Copia y trío viven en `.hero-grid` (1440 de
+   contenido + una calle por lado) dentro del panel (otra calle por
+   lado): de ahí el tope de 1440 + 4 calles y el relleno de 2 calles. Los dos envoltorios del
+   pliegue no pintan nada desde 880, así que se disuelven y enlaces y
+   botón entran a la rejilla de tres del nav. `body .site-header` delante sube la
+   especificidad sobre las reglas base de arriba (`.site-header .wordmark`,
+   `.nav-island-inner .nav-link`). */
+@media (min-width: 1024px) {
+  body .site-header .nav-island {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    column-gap: clamp(24px, 2.4vw, 40px);
+    max-width: calc(1440px + 4 * var(--calle));
+    padding-inline: calc(2 * var(--calle));
+  }
+
+  body .site-header .nav-island-reveal,
+  body .site-header .nav-island-inner {
+    display: contents;
+  }
+
+  body .site-header .nav-island-links { gap: clamp(24px, 2.4vw, 40px); }
+  body .site-header .nav-link { font-size: 21px; }
+  body .site-header .wordmark { font-size: 24px; }
+  body .site-header .nav-island-logo { width: 34px; height: 34px; }
+  body .site-header .nav-island .nav-island-cta { height: 50px; padding-inline: 30px; font-size: 19px; }
+}

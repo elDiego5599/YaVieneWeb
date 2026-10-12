@@ -644,35 +644,6 @@
   }
 }
 
-/* El nav se alinea con lo que tiene debajo (dueño, 2026-10-11): la
-   marca arranca donde la copia, el botón acaba donde el trío y los dos
-   enlaces van a la derecha, junto al botón; la letra sube un punto para
-   ir con el hero agrandado. Copia y trío viven en `.hero-grid` (1440 de
-   contenido + una calle por lado) dentro del panel (otra calle por
-   lado): de ahí el tope de 1440 + 4 calles y el relleno de 2 calles. Los dos envoltorios del
-   pliegue no pintan nada desde 880, así que se disuelven y enlaces y
-   botón entran a la rejilla de tres del nav. */
-@media (min-width: 1024px) {
-  body:has(.hero-grid--video) .nav-island {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    column-gap: clamp(24px, 2.4vw, 40px);
-    max-width: calc(1440px + 4 * var(--calle));
-    padding-inline: calc(2 * var(--calle));
-  }
-
-  body:has(.hero-grid--video) .nav-island-reveal,
-  body:has(.hero-grid--video) .nav-island-inner {
-    display: contents;
-  }
-
-  body:has(.hero-grid--video) .nav-island-links { gap: clamp(24px, 2.4vw, 40px); }
-  body:has(.hero-grid--video) .nav-link { font-size: 21px; }
-  body:has(.hero-grid--video) .wordmark { font-size: 24px; }
-  body:has(.hero-grid--video) .nav-island-logo { width: 34px; height: 34px; }
-  body:has(.hero-grid--video) .nav-island .nav-island-cta { height: 50px; padding-inline: 30px; font-size: 19px; }
-}
-
 /* En el teléfono el trío deja un solo aparato: aquí, el del video, que
    es el que enseña la app andando (dueño, 2026-10-11). */
 @media (max-width: 719px) {
