@@ -569,84 +569,11 @@
   object-fit: cover;
 }
 
-/* Desde 1024 el lienzo del degradado ocupa la primera pantalla entera,
-   con cualquier zoom: «Qué resuelve» no asoma hasta que se baja (dueño,
-   2026-10-11). De ancho se queda a medio camino entre 1240 y la cuneta
-   de siempre: a 1440 mide ~1308 en vez de 1376. */
-@media (min-width: 1024px) {
-  .hero-panel:has(.hero-grid--video) {
-    display: flex;
-    flex-direction: column;
-    width: min(100% - 2 * var(--calle), (100% - 2 * var(--calle) + 1240px) / 2);
-    margin-inline: auto;
-    min-height: 100svh;
-  }
-
-  .hero-panel:has(.hero-grid--video) .hero-grid--video {
-    flex: 1;
-  }
-}
-
-/* Desde 1024 el trío va a la derecha y la copia a la izquierda (dueño,
-   2026-10-11), con los tamaños de letra que ya tenía junto al video. */
-@media (min-width: 1024px) {
-  .hero-grid--video {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
-    column-gap: clamp(24px, 3vw, 56px);
-    /* Más aire bajo el nav: con el trío a la derecha, sus tapas quedaban
-       pegadas a la barra (dueño, 2026-10-11). */
-    padding-top: clamp(96px, 12vh, 144px);
-    /* El mismo contenedor y la misma calle que el nav: la copia arranca
-       donde la marca y el trío acaba donde el botón (dueño, 2026-10-11). */
-    max-width: var(--contenedor);
-  }
-
-  /* El panel corta solo la franja de abajo del video —216 de sus 2352
-     px, el 9,2 % de la pantalla— y el marco: el trío sube lo que hacía
-     falta para que se vea todo lo que enseña (dueño, 2026-10-11). */
-  .hero-grid--video .hero-scene {
-    /* Cabe con la copia dentro del contenedor del nav: a 270 el trío mide
-       ~620 y la copia se queda con ~430, lo justo para los dos botones
-       en un renglón (a 290 se partían) (dueño, 2026-10-11). */
-    --tel: 270px;
-    --sangrado: calc(var(--alto-tel) * 0.1);
-  }
-
-  /* La copia se centra con lo que se ve del trío, no con el lienzo: el
-     trío va abajo y se hunde, así que su centro visible cae más bajo. */
-  .hero-grid--video .hero-copy {
-    align-self: end;
-    margin-bottom: clamp(48px, 8vh, 96px);
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  /* Dos renglones: el más largo, «¿Cuánto falta», mide ~5,45 px por px
-     de letra, así que 17,5cqw lo deja en ~95 % de la columna, a la par
-     del párrafo de abajo; a 14cqw el titular quedaba más angosto que el
-     párrafo y el bloque se veía cojo (dueño, 2026-10-11). Tope 104. */
-  .hero-grid--video .hero-title {
-    font-size: min(17.5cqw, 104px);
-  }
-
-  .hero-grid--video .hero-description {
-    font-size: 23px;
-  }
-
-  .hero-grid--video .hero-subtext {
-    font-size: 15px;
-  }
-
-  .hero-grid--video .hero-actions a {
-    font-size: 16px;
-  }
-
-  .hero-grid--video .hero-actions,
-  .hero-grid--video .hero-subtext {
-    justify-content: flex-start;
-  }
+/* El panel corta solo la franja de abajo del video —216 de sus 2352 px,
+   el 9,2 % de la pantalla— y el marco: con el sangrado de siempre (0,14)
+   se perdía parte de lo que enseña (dueño, 2026-10-11). */
+.hero-grid--video .hero-scene {
+  --sangrado: calc(var(--alto-tel) * 0.1);
 }
 
 /* En el teléfono el trío deja un solo aparato: aquí, el del video, que
@@ -664,6 +591,5 @@
      solo la franja vacía de abajo del video, como en escritorio. */
   .hero-grid--video .hero-scene {
     --tel: min(360px, calc(100vw - 40px));
-    --sangrado: calc(var(--alto-tel) * 0.1);
   }
 }
