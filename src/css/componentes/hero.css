@@ -626,13 +626,27 @@
    atrás es quitar `.hero-iphone`, el template y `hero-grid--video`.
    ────────────────────────────────────────────────────────────────── */
 .hero-iphone {
-  /* El ancho del trío: el video mide 640, 1,9x la pantalla (334 px). */
-  --tel: 360px;
+  /* Del porte de un 15 Pro en pantalla (dueño, 2026-10-11): el aparato
+     ocupa el 80 % del alto de la ventana. Su alto es 1,722 veces el
+     ancho (pantalla 1080:1920 + bisel de 3,6 % por lado), de ahí el
+     divisor. Piso 360 (el trío) y tope 480: a 900 de alto mide 418 ×
+     720; el video de 1080 sigue siendo 2x hasta el tope. */
+  --tel: clamp(360px, calc(80svh / 1.722), 480px);
   flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* El crédito del mapa, pegado debajo del aparato y centrado con él. */
+.hero-iphone .hero-credit {
+  position: static;
+  margin-top: 14px;
+  text-align: center;
 }
 
 /* El aparato toma el alto del video, no el del iPhone 17: la pantalla
-   mide 640:1138 como el video y la carcasa crece con ella (sale de
+   mide 1080:1920 como el video y la carcasa crece con ella (sale de
    `aspect-ratio` y la pinta su relleno, el bisel). Así el video llena la
    pantalla entera, sin franjas arriba ni abajo y sin recortar nada. */
 .hero-iphone .phone-shell {
@@ -641,7 +655,7 @@
 
 .hero-iphone .phone-screen {
   height: auto;
-  aspect-ratio: 640 / 1138;
+  aspect-ratio: 1080 / 1920;
 }
 
 .hero-video {

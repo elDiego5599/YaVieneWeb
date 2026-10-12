@@ -276,7 +276,6 @@
                —el bloque que la contiene tiene el mismo filo que el panel—,
                y en un teléfono, donde esa esquina la tapa el aparato, cae
                en el flujo justo encima de él. -->
-          <p class="hero-credit">Mapa base © <a href="https://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> · © <a href="https://carto.com" target="_blank" rel="noopener">CARTO</a></p>
         </div>
 
         <!--
@@ -291,8 +290,8 @@
           El video es decorativo: lo que enseña ya lo dice el párrafo
           `.solo-lectores` del final del panel.
         -->
-        <div class="hero-iphone" aria-hidden="true">
-          <div class="hero-phone-wrap escena-entra" data-reveal-delay="0">
+        <div class="hero-iphone">
+          <div class="hero-phone-wrap escena-entra" data-reveal-delay="0" aria-hidden="true">
             <div class="phone-shell">
               <span class="phone-key phone-key--power"></span>
               <span class="phone-key phone-key--accion"></span>
@@ -300,13 +299,20 @@
               <span class="phone-key phone-key--vol-baja"></span>
               <div class="phone-screen">
                 <span class="phone-island"></span>
+                <!-- 1080×1920 a 60 fps desde el original 4K: el doble de los
+                     ~420 px de pantalla en una pantalla 2x (y 3x en móvil),
+                     para que se vea nítido. AV1 primero (3,3 MB); H.264 para
+                     quien no lo decodifica (5,5 MB). -->
                 <video class="hero-video" data-hero-video muted loop playsinline preload="metadata"
-                       width="640" height="1138" poster="/video/yaviene-poster.webp">
+                       width="1080" height="1920" poster="/video/yaviene-poster.webp">
+                  <source src="/video/yaviene-av1.mp4" type='video/mp4; codecs="av01.0.09M.08"'>
                   <source src="/video/yaviene.mp4" type="video/mp4">
                 </video>
               </div>
             </div>
           </div>
+          <!-- El crédito del mapa, justo debajo del aparato (dueño, 2026-10-11). -->
+          <p class="hero-credit">Mapa base © <a href="https://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> · © <a href="https://carto.com" target="_blank" rel="noopener">CARTO</a></p>
         </div>
 
         <template data-trio-hero>
