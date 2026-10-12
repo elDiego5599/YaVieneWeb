@@ -583,6 +583,9 @@
      px, el 9,2 % de la pantalla— y el marco: el trío sube lo que hacía
      falta para que se vea todo lo que enseña (dueño, 2026-10-11). */
   .hero-grid--video .hero-scene {
+    /* Junto a la copia el trío de 360 se comía el lienzo: a 320 baja un
+       11 % y deja aire a la izquierda (dueño, 2026-10-11). */
+    --tel: 320px;
     --sangrado: calc(var(--alto-tel) * 0.1);
   }
 
