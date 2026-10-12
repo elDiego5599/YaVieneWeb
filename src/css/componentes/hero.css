@@ -628,7 +628,7 @@
 .hero-iphone {
   /* El mismo ancho que el aparato central del trío (360) y algo menos
      alto, porque toma la proporción del video (dueño, 2026-10-11):
-     360 × 620 contra los 360 × 753 del trío. */
+     360 × 750 contra los 360 × 753 del trío. */
   --tel: 360px;
   flex: none;
   display: flex;
@@ -643,17 +643,11 @@
   text-align: center;
 }
 
-/* El aparato toma el alto del video, no el del iPhone 17: la pantalla
-   mide 1080:1920 como el video y la carcasa crece con ella (sale de
-   `aspect-ratio` y la pinta su relleno, el bisel). Así el video llena la
-   pantalla entera, sin franjas arriba ni abajo y sin recortar nada. */
+/* El aparato mide 360 × 750 (dueño, 2026-10-11: casi los 753 del trío).
+   La pantalla vuelve a llenar la carcasa y el video la cubre entero, sin
+   franjas: a 9:16 en una pantalla más angosta, recorta un poco los lados. */
 .hero-iphone .phone-shell {
-  aspect-ratio: auto;
-}
-
-.hero-iphone .phone-screen {
-  height: auto;
-  aspect-ratio: 1080 / 1920;
+  aspect-ratio: 360 / 750;
 }
 
 .hero-video {
