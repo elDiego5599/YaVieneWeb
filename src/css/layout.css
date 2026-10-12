@@ -173,3 +173,10 @@
   border: 0;
   background: var(--linea-fuerte);
 }
+
+/* La de los logos mide lo que el cuadro grande de «Cómo funciona»
+   (`.cf-grid`): su tope de 1192 px y, más angosto, la misma calle. */
+#marcas + .divisor {
+  width: min(1192px, 100% - 2 * var(--calle));
+  margin-inline: auto;
+}
