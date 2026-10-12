@@ -631,19 +631,24 @@
   flex: none;
 }
 
-/* El video es 9:16 y la pantalla 402:874: sobran dos franjas, arriba y
-   abajo, que van del papel del video para que no se vea dónde empieza.
-   #F2F5ED es lo que pinta Chrome en sus filas de arriba y abajo (media de
-   640 px, igual en todo el bucle). */
+/* El aparato toma el alto del video, no el del iPhone 17: la pantalla
+   mide 640:1138 como el video y la carcasa crece con ella (sale de
+   `aspect-ratio` y la pinta su relleno, el bisel). Así el video llena la
+   pantalla entera, sin franjas arriba ni abajo y sin recortar nada. */
+.hero-iphone .phone-shell {
+  aspect-ratio: auto;
+}
+
 .hero-iphone .phone-screen {
-  background: #F2F5ED;
+  height: auto;
+  aspect-ratio: 640 / 1138;
 }
 
 .hero-video {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 /* Apilado, el aparato va entero: el botón «Avisarme» del video es parte
