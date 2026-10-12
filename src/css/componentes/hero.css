@@ -626,10 +626,10 @@
    atrás es quitar `.hero-iphone`, el template y `hero-grid--video`.
    ────────────────────────────────────────────────────────────────── */
 .hero-iphone {
-  /* Un iPhone de verdad (71,5 × 149,6) de 750 de alto, los que pidió
-     el dueño (2026-10-11): 750 × 71,5 / 149,6 = 358. A 380 × 795 quedaba
+  /* Un iPhone de verdad (71,5 × 149,6) de 740 de alto, lo que pidió
+     el dueño (2026-10-11): 740 × 71,5 / 149,6 = 353,6. A 380 × 795 quedaba
      demasiado alto y a la proporción del video parecía un iPad. */
-  --tel: 358px;
+  --tel: 353.6px;
   flex: none;
   display: flex;
   flex-direction: column;
