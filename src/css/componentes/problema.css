@@ -23,22 +23,29 @@
 
 /* ── El interruptor ────────────────────────────────────────────────────
 
-   Va en la fila del rótulo, a la derecha, donde no compite con el
-   titular. Debajo lleva una pastilla que se desliza de un lado a otro:
-   es la que dice cuál está puesto, y el color del texto la sigue.
+   La cabecera va centrada, sin línea de separación: el rótulo, el
+   interruptor grande encima del titular y la frase debajo (dueño,
+   2026-10-11). Debajo de las opciones se desliza una pastilla blanca:
+   es la que dice cuál está puesto.
    ────────────────────────────────────────────────────────────────────── */
 
 .cabecera-fila {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px 24px;
+  gap: 16px;
 }
 
 /* «Qué resuelve» va sobre blanco, no sobre la banda (dueño, 2026-10-11). */
 #problema.panel--banda {
   background: #fff;
+  border-block: 0;
+}
+
+#problema .seccion-cabecera {
+  align-items: center;
+  gap: 24px;
+  text-align: center;
 }
 
 #problema .seccion-rotulo {
@@ -60,36 +67,27 @@
   color: var(--acento);
 }
 
-@media (min-width: 900px) {
-
-  /* En la cabecera partida ocupa la fila entera, la que antes era del
-     rótulo solo. */
-  .seccion-cabecera--partida .cabecera-fila {
-    grid-column: 1 / -1;
-  }
-}
-
 .interruptor {
   position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  padding: 3px;
-  border: 1px solid var(--linea);
+  padding: 6px;
   border-radius: 999px;
-  background: var(--papel);
+  background: #F0F0EA;
 }
 
 .interruptor-marca {
   position: absolute;
   z-index: 0;
-  top: 3px;
-  bottom: 3px;
-  left: 3px;
+  top: 6px;
+  bottom: 6px;
+  left: 6px;
   /* La mitad menos el relleno: al correrse un ancho entero queda pegada
      al borde de la derecha con el mismo aire que tenía a la izquierda. */
-  width: calc(50% - 3px);
+  width: calc(50% - 6px);
   border-radius: 999px;
-  background: var(--tinta);
+  background: #fff;
+  box-shadow: 0 2px 8px -2px rgba(11, 18, 32, 0.14);
   transition:
     transform 0.52s var(--ease-fluida),
     background-color 0.4s var(--ease-out-cubic);
@@ -98,14 +96,13 @@
 .interruptor-opcion {
   position: relative;
   z-index: 1;
-  padding: 7px 16px;
+  padding: 12px 26px;
   border: 0;
   border-radius: 999px;
   background: transparent;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  font-family: var(--font-family);
+  font-size: 17px;
+  font-weight: 600;
   color: var(--tinta-media);
   white-space: nowrap;
   cursor: pointer;
@@ -113,7 +110,7 @@
 }
 
 .interruptor-opcion[aria-pressed='true'] {
-  color: var(--papel);
+  color: var(--tinta);
 }
 
 /* La mitad apagada es la que se puede pulsar y no lo decía: las dos
@@ -128,7 +125,6 @@
 
 [data-cara='claro'] .interruptor-marca {
   transform: translateX(100%);
-  background: var(--acento);
 }
 
 /* El verde de la promesa. En la cara del problema la segunda mitad del
@@ -217,10 +213,14 @@
 
 #problema .seccion-titulo {
   --turno: 80ms;
+  max-width: none;
+  font-size: clamp(2.2rem, 1rem + 3.6vw, 4.4rem);
 }
 
 #problema .seccion-lead {
   --turno: 140ms;
+  max-width: 54ch;
+  font-size: clamp(16.5px, 0.95rem + 0.4vw, 20px);
 }
 
 .ficha:nth-child(1) {
