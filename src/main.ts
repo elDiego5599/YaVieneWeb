@@ -19,6 +19,7 @@ import './css/phone-simulator.css';
 import './css/animations.css';
 import './css/accesibilidad.css';
 
+import { Pasos } from './como-funciona';
 import { NavIsland } from './nav-island';
 import { PhoneMap } from './phone-map';
 import { PhoneSimulator } from './phone-simulator';
@@ -78,23 +79,25 @@ const arrancar = (): void => {
   }
 
   /*
-    «Cómo funciona»: la tarjeta de atrás es el mismo mapa, otra foto fija.
-    La C16 de la tarjeta del selector, el pin abajo a la derecha —fuera de
-    las otras tarjetas, a 375 px y a 1440— y, 1,8 km por
-    detrás —la cifra de la hoja—, el bus que viene.
+    «Cómo funciona»: el teléfono de los tres pasos lleva el mismo mapa,
+    otra foto fija: la C16 del selector, el pin en el hueco entre la
+    notificación de arriba y la hoja de abajo y, 1,8 km por detrás —la
+    cifra de la hoja—, el bus que viene. Las pestañas cambian lo de encima.
   */
   const svgCf = document.querySelector<SVGSVGElement>('#cf-mapa-rutas');
   const lienzoCf = document.querySelector<HTMLElement>('#cf-mapa');
   if (svgCf && lienzoCf) {
     const mapaCf = new PhoneMap(svgCf, lienzoCf);
     mapaCf.setRoute('R-106');
-    const pin = mapaCf.tVisible(0.62, 0.62, [1800]);
+    const pin = mapaCf.tVisible(0.55, 0.36, [1800]);
     mapaCf.setPin(pin);
     mapaCf.setBuses([pin - 1800 / mapaCf.metrosDeRuta]);
     mapaCf.showRoute(true);
     mapaCf.showPin(true);
     mapaCf.showBuses(true);
   }
+  const demo = document.querySelector<HTMLElement>('.cf-demo');
+  if (demo) new Pasos(demo);
 
   /*
     Qué resuelve: la sección de dos caras. Va aquí y no antes porque el

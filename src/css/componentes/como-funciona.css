@@ -1,18 +1,19 @@
 /* ── CÓMO FUNCIONA ────────────────────────────────────────
 
    La última banda, sin raya encima (dueño, 2026-10-12): el texto a un lado y, al otro, un mockup
-   breve de la app del pasajero (dueño, 2026-10-12, como el de incident.io):
-   el mapa detrás y tres tarjetas encimadas que son pedazos de la app.
-   No dibuja nada que ya esté dibujado: el mapa es `.phone-map` con su
-   `PhoneMap` (main.ts), y las filas, la hoja del bus, su nota
-   y el aviso reutilizan `.app-select*`, `.eta-*`, que
+   breve de la app del pasajero, como el bloque de On-call de incident.io
+   (dueño, 2026-10-12) sin su cuadro grande: sobre el blanco, un cuadro en
+   la banda de «Problema» con el teléfono y, debajo, los tres pasos como
+   pestañas que cambian lo que enseña la pantalla (`como-funciona.ts`).
+   No dibuja nada que ya esté dibujado: el teléfono es `.phone-shell`, el
+   mapa `.phone-map` con su `PhoneMap` (main.ts), y el selector, la hoja
+   del bus y su nota reutilizan `.app-select*`, `.eta-*`, que
    miden `--u` (un punto lógico de Flutter) en `phone-simulator.css`. Aquí
-   solo van la rejilla, el marco de cada tarjeta y cómo se montan.
+   solo van la rejilla, el marco de cada pieza y dónde cae.
 
-   Las tarjetas entran por turnos con el `.reveal` de la página; con
-   `prefers-reduced-motion` ese mismo `.reveal` se queda en un fundido
-   (`animations.css`). Por eso el desplazamiento de cada una va en
-   `translate` y no en `transform`: `.reveal` ya usa `transform`.
+   La demo entra con el `.reveal` de la página. Las capas de cada paso se
+   mueven con `translate` y no con `transform`, que es de las piezas del
+   teléfono; con `prefers-reduced-motion` se quedan en un fundido.
    ────────────────────────────────────────────────────────────────── */
 
 /* Como «Pre-built integrations» de incident.io (dueño, 2026-10-12): la
@@ -68,88 +69,171 @@
   background: var(--surface);
 }
 
-/* El collage (dueño, 2026-10-12: como incident.io): el mapa grande atrás
-   a la derecha, como su tablero de tareas, y las tres tarjetas montadas
-   por delante a la izquierda y abajo. El grupo tiene proporción fija y
-   cada tarjeta se coloca en porcentajes; `--u` vale 1/640 del ancho (las
-   tarjetas miden ~0,8 el tamaño de la app, texto de 12–14 px) con tope
-   en 0,85 px. */
-.cf-tarjetas {
+/* El cuadro de incident.io, en la banda de «Problema» (`--banda`, dueño,
+   2026-10-12) y con su radio a la escala de este (32 allá, a 1440 de
+   ancho; 24 aquí). Proporción fija, y todo dentro en porcentajes. */
+.cf-demo {
+  min-width: 0;
+}
+
+.cf-escena {
   container-type: inline-size;
   position: relative;
-  width: 100%;
-  aspect-ratio: 620 / 460;
-}
-
-.cf-tarjeta {
-  --u: min(1px, calc(100cqw / 640));
-  position: absolute;
-  padding: calc(20 * var(--u));
-  background: var(--surface);
-  border: 1px solid var(--app-hairline);
-  /* 24 es el radio de la tarjeta de la distancia (`.eta-tarjeta`,
-     eta_bottom_sheet.dart): la hoja de la app lleva 32 (AppRadius.xl,
-     app_theme.dart) pero va pegada al borde; esta flota, y con 32 se
-     redondeaba más que lo que lleva dentro. */
-  border-radius: calc(24 * var(--u));
-  box-shadow: var(--sombra-producto);
-}
-
-/* Al fondo: el mapa, sin relleno, recortado al radio de la tarjeta. El
-   `.phone-map` ya va en `inset: 0`; el pin y el bus miden en puntos del
-   teléfono contra el ancho del lienzo (phone-map.ts), así que aquí salen a
-   la escala de esta tarjeta. */
-.cf-tarjeta--mapa {
-  top: 0;
-  right: 0;
-  width: 62%;
-  height: 82%;
-  padding: 0;
   overflow: hidden;
+  aspect-ratio: 690 / 560;
+  border-radius: 24px;
+  background: var(--banda);
 }
 
-/* Arriba a la izquierda, sobre el mapa: el selector (route_selector_sheet.dart, `_SelectorTile`: 78 de
-   alto, insignia de 44, 12 de radio; ya lo miden `.app-select*`), con la
-   fila de la ruta que pinta el mapa. */
-.cf-tarjeta--selector {
-  top: 5%;
-  left: 0;
-  width: 50%;
-  display: grid;
-  gap: calc(10 * var(--u));
+/* El teléfono a la derecha, cortado por el borde de abajo como el de
+   incident.io: el corte se lleva solo la rayita de inicio y el aire de
+   debajo de la hoja. 38 cqw son 262 px a 1440, y la app sale a ~0,6 de su
+   tamaño, la misma escala que los teléfonos de los lados del hero. */
+.cf-telefono .phone-shell {
+  --ancho: 38cqw;
+  position: absolute;
+  top: 7%;
+  right: 10%;
 }
 
-.cf-tarjeta--selector .sheet-head {
-  margin-bottom: calc(4 * var(--u));
-}
-
-/* En medio: la hoja del bus (eta_bottom_sheet.dart, diseño «A»). La
-   tarjeta de la distancia ya trae su filo; la nota «Te avisamos a… ·
-   Cambiar» es `_Nota.distancia` con `_PildoraCambiar`, la píldora
-   gris con letra `coralAccessible` (`--app-coral-accessible`). Abajo a la
-   izquierda, como la gráfica de incident.io. */
-.cf-tarjeta--bus {
-  bottom: 0;
+/* Los dos chips de lo que hace la app en cada paso, como «Checking
+   schedule» y «Paging on-call engineer»: blancos, con filo y sombra
+   corta, el segundo un poco ladeado. */
+.cf-chips {
+  position: absolute;
+  top: 20%;
   left: 6%;
-  width: 46%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  opacity: 0;
+  translate: 0 8px;
+  transition:
+    opacity 0.3s var(--ease-out-cubic),
+    translate 0.4s var(--ease-out-cubic);
 }
 
-.cf-tarjeta--bus .eta-tarjeta {
-  margin-top: 0;
+.cf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--app-hairline);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(20, 39, 78, 0.06);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--tinta-media);
+  white-space: nowrap;
 }
 
-/* Delante, abajo a la derecha: la notificación (bus_notification_service.dart: «Tu bus de la
-   ruta $ruta está cerca de ti», con ruta y sin placa ni distancia). Es
-   icono de 30 con 9 de radio, la marca en versalitas y el título en 700. */
-.cf-tarjeta--aviso {
-  bottom: 10%;
-  right: 0;
-  width: 42%;
+.cf-chip:nth-child(2) {
+  rotate: -3deg;
+  margin-left: 4px;
+}
+
+.cf-chip svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+/* La flecha que baja de los chips al teléfono, en trazo fino. */
+.cf-flecha {
+  position: absolute;
+  top: 37%;
+  left: 15%;
+  width: 18%;
+  color: var(--tinta-tenue);
+  opacity: 0.45;
+}
+
+.cf-escena[data-paso="ruta"] .cf-chips[data-paso="ruta"],
+.cf-escena[data-paso="bus"] .cf-chips[data-paso="bus"],
+.cf-escena[data-paso="aviso"] .cf-chips[data-paso="aviso"] {
+  opacity: 1;
+  translate: none;
+}
+
+/* Lo de encima del mapa, por paso: el selector con su barrera (1), la
+   hoja del bus (2 y 3) y la notificación (3). La hoja sube desde abajo y
+   la notificación baja desde arriba, cada una por donde entra en la app. */
+.cf-capa {
+  opacity: 0;
+  translate: 0 18%;
+  transition:
+    opacity 0.3s var(--ease-out-cubic),
+    translate 0.45s var(--ease-out-cubic);
+}
+
+.cf-capa.phone-scrim {
+  translate: none;
+}
+
+.cf-capa--aviso {
+  translate: 0 -40%;
+}
+
+.cf-escena[data-paso="ruta"] .cf-capa--ruta,
+.cf-escena[data-paso="bus"] .cf-capa--bus,
+.cf-escena[data-paso="aviso"] .cf-capa--bus,
+.cf-escena[data-paso="aviso"] .cf-capa--aviso {
+  opacity: 1;
+  translate: none;
+}
+
+.cf-capa--ruta .sheet-head {
+  margin-bottom: calc(12 * var(--u));
+}
+
+/* La hoja del bus (eta_bottom_sheet.dart, diseño «A»). La tarjeta de la
+   distancia ya trae su filo; la nota «Te avisamos a… · Cambiar» es
+   `_Nota.distancia` con `_PildoraCambiar`, la píldora gris con letra
+   `coralAccessible` (`--app-coral-accessible`). */
+.cf-capa--bus .eta-tarjeta {
+  margin-top: calc(8 * var(--u));
+}
+
+/* La notificación de iOS (bus_notification_service.dart: «Tu bus de la
+   ruta $ruta está cerca de ti», con ruta y sin placa ni distancia): bajo
+   la isla, a 10 de los bordes, material claro con desenfoque, radio 22,
+   ícono de 38 con 9 de radio, la marca en versalitas y el título en 700.
+   Va por encima de la hoja y por debajo de la isla (40). */
+.cf-banner {
+  position: absolute;
+  top: calc(58 * var(--u));
+  left: calc(10 * var(--u));
+  right: calc(10 * var(--u));
+  z-index: 36;
   display: flex;
   align-items: center;
-  gap: calc(12 * var(--u));
-  padding: calc(14 * var(--u)) calc(16 * var(--u));
-  border-radius: calc(20 * var(--u));
+  gap: calc(10 * var(--u));
+  padding: calc(12 * var(--u)) calc(14 * var(--u));
+  border-radius: calc(22 * var(--u));
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 calc(6 * var(--u)) calc(24 * var(--u)) rgba(20, 39, 78, 0.18);
+}
+
+.cf-banner .cf-aviso-icono {
+  width: calc(38 * var(--u));
+  height: calc(38 * var(--u));
+  border-radius: calc(9 * var(--u));
+}
+
+.cf-banner .cf-aviso-icono img {
+  width: 66%;
+  height: auto;
+}
+
+.cf-banner .cf-aviso-app {
+  font-size: calc(12 * var(--u));
+}
+
+.cf-banner .cf-aviso-titulo {
+  font-size: calc(15 * var(--u));
 }
 
 .cf-aviso-icono {
@@ -184,43 +268,109 @@
   color: var(--app-text-primary);
 }
 
-/* En móvil el grupo se compacta: más apretado y sin pasar de ~360 de alto. */
-@media (max-width: 1023px) {
-  .cf-tarjetas {
-    max-width: 440px;
-    margin-inline: auto;
-    /* Más alto que en escritorio: el aviso baja a su propio piso y deja
-       ver entera la hoja del bus (a 375 px, 74 px de aviso bajo 197 de hoja). */
-    aspect-ratio: 440 / 520;
-  }
+/* Las pestañas de los pasos, como las de incident.io: ícono y nombre en
+   la tinta tenue sobre una raya, y la elegida en tinta con la raya y el
+   ícono en el verde de letra (`--acento`, 6,1:1 sobre blanco). La tinta
+   tenue da 4,9:1, que pasa AA para texto normal. */
+.cf-pasos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
 
-  .cf-tarjeta {
-    --u: min(0.85px, calc(100cqw / 500));
-  }
+.cf-paso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 2px;
+  border: 0;
+  border-bottom: 2px solid var(--linea);
+  background: none;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--tinta-tenue);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color 0.2s var(--ease-out-cubic),
+    border-color 0.2s var(--ease-out-cubic);
+}
 
-  .cf-tarjeta--mapa {
-    width: 70%;
-    height: 80%;
-  }
+.cf-paso svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
 
-  .cf-tarjeta--selector {
-    width: 64%;
-  }
+.cf-paso:hover {
+  color: var(--tinta-media);
+}
 
-  .cf-tarjeta--bus {
-    left: 0;
-    bottom: 22%;
-    width: 50%;
-  }
+.cf-paso[aria-selected="true"] {
+  color: var(--tinta);
+  border-bottom-color: var(--acento);
+}
 
-  .cf-tarjeta--aviso {
-    bottom: 0;
-    width: 76%;
+.cf-paso[aria-selected="true"] svg {
+  color: var(--acento);
+}
+
+.cf-paso:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-chips,
+  .cf-capa {
+    translate: none;
+    transition: opacity 0.2s linear;
   }
 }
 
+/* En móvil, el cuadro más alto, el teléfono al centro y sin chips ni
+   flecha (no caben al lado); las pestañas, con el ícono encima. A 343/455
+   el corte cae bajo la nota «Te avisamos a…» (a 375 de ancho, 10 px). */
+@media (max-width: 1023px) {
+  .cf-escena {
+    aspect-ratio: 343 / 455;
+  }
+
+  .cf-telefono .phone-shell {
+    --ancho: 62cqw;
+    top: 8%;
+    right: auto;
+    left: 19%;
+  }
+
+  .cf-chips,
+  .cf-flecha {
+    display: none;
+  }
+
+  .cf-pasos {
+    gap: 8px;
+  }
+
+  .cf-paso {
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    text-align: center;
+  }
+}
+
+/* Como incident.io, el texto angosto arriba y la demo ancha. */
 @media (min-width: 1024px) {
   .cf-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: start;
+  }
+
+  .cf-texto {
+    padding-top: 24px;
   }
 }

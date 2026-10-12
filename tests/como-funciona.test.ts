@@ -6,11 +6,13 @@ import { describe, expect, it } from 'vitest';
  * La banda «Cómo funciona» (dueño, 2026-10-12): después de «Problema»
  * (dueño, 2026-10-12, que antes la puso entre el hero y «Problema»). Texto a la izquierda, con
  * su ceja (dueño, 2026-10-12, que la quitó y la devolvió), y a la derecha un mockup breve de la app del
- * pasajero, como el de incident.io: el mapa de la C16 detrás y encima el
- * selector, la hoja del bus y el aviso. Las tarjetas son decoración
- * (`aria-hidden`); lo accesible es la columna de texto. Sin raya bajo el
- * hero ni sobre esta banda (dueño, 2026-10-12): queda solo la de entre la
- * cinta de logos y «Problema».
+ * pasajero, como el bloque de On-call de incident.io (dueño, 2026-10-12)
+ * pero sin su cuadro grande, sobre el fondo blanco: un cuadro en el verde de «Problema» con el
+ * teléfono (el mismo mapa que los del hero) y, debajo, los tres pasos como
+ * pestañas que cambian lo que enseña la pantalla. El teléfono es
+ * decoración (`aria-hidden`); cada paso lleva su descripción para el
+ * lector de pantalla. Sin raya bajo el hero ni sobre esta banda (dueño,
+ * 2026-10-12): queda solo la de entre la cinta de logos y «Problema».
  *
  * Su id NO es `solucion`: `sin-como-funciona.test.ts` sigue vigilando
  * que la sección vieja no vuelva.
@@ -58,26 +60,46 @@ describe('banda «Cómo funciona»', () => {
     expect(banda).toContain(
       'Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso. Te avisamos cuando esté cerca de ti.'
     );
-    expect(banda.slice(0, banda.indexOf('cf-tarjetas'))).not.toMatch(/<a\b|btn-primary/);
+    expect(banda.slice(0, banda.indexOf('cf-demo'))).not.toMatch(/<a\b|btn-primary/);
   });
 
   it('la columna de texto no lleva logos ni botón', () => {
     expect(banda).not.toMatch(/empresa-marcas|logos-empresas/);
   });
 
-  it('las tarjetas son decoración y el aviso lleva ruta, sin placa ni distancia', () => {
-    expect(banda).toMatch(/class="cf-tarjetas"[^>]*aria-hidden="true"/);
-    expect(banda.match(/class="cf-tarjeta /g)).toHaveLength(4);
-    // Detrás, el mapa de verdad: el mismo lienzo que los teléfonos.
-    expect(banda).toMatch(/cf-tarjeta--mapa[\s\S]*?class="phone-map" id="cf-mapa"[\s\S]*?<svg class="routes-svg-layer" id="cf-mapa-rutas">/);
-    expect(leer('src/main.ts')).toMatch(/#cf-mapa-rutas[\s\S]*?setRoute\('R-106'\)/);
-    // Las del selector y la hoja nombran lo que la app nombra.
+  it('los tres pasos son pestañas que gobiernan la escena', () => {
+    const pestanas = banda.match(/<button[^>]*role="tab"[^>]*>[\s\S]*?<\/button>/g) ?? [];
+    expect(banda).toMatch(/role="tablist"/);
+    expect(pestanas.map((p) => p.replace(/<[^>]*>/g, '').trim())).toEqual([
+      'Elige tu ruta',
+      'Mira el bus',
+      'Deja un aviso',
+    ]);
+    expect(pestanas.map((p) => /data-paso="(\w+)"/.exec(p)?.[1])).toEqual(['ruta', 'bus', 'aviso']);
+    expect(pestanas.every((p) => p.includes('aria-controls="cf-escena"'))).toBe(true);
+    expect(pestanas[0]).toMatch(/aria-selected="true"/);
+    expect(pestanas.slice(1).every((p) => /aria-selected="false"[^>]*tabindex="-1"/.test(p))).toBe(true);
+    expect(banda).toMatch(
+      /id="cf-escena" role="tabpanel" aria-labelledby="cf-paso-ruta" data-paso="ruta"/
+    );
+    // Una descripción por paso; sin JavaScript se lee la del primero.
+    expect(banda.match(/class="solo-lectores" data-paso="\w+"/g)).toHaveLength(3);
+    expect(banda.match(/class="solo-lectores" data-paso="\w+" hidden/g)).toHaveLength(2);
+  });
+
+  it('el teléfono es decoración, con el mapa de los del hero', () => {
+    expect(banda).toMatch(/class="cf-telefono"[^>]*aria-hidden="true"/);
+    expect(banda).toMatch(/class="phone-shell"/);
+    expect(banda).toMatch(/class="phone-map" id="cf-mapa"/);
+    expect(leer('src/main.ts')).toMatch(/#cf-mapa/);
+    // Lo que nombra la app, con sus palabras.
     expect(banda).toContain('Elige tu ruta');
     expect(banda).toMatch(/Te avisamos a 1,0 km/);
     expect(banda).toMatch(/eta-detail-accion">Cambiar</);
-    // El aviso es la última tarjeta: de ahí al final de la banda.
-    const aviso = banda.slice(banda.indexOf('cf-tarjeta--aviso'));
-    expect(aviso).not.toBe('');
+    // El aviso, con ruta y sin placa ni distancia: de su capa al cierre.
+    const ini = banda.indexOf('cf-capa--aviso');
+    expect(ini).toBeGreaterThan(-1);
+    const aviso = banda.slice(ini, banda.indexOf('</div>', banda.indexOf('cf-aviso-titulo')));
     expect(aviso).toContain('Tu bus de la ruta C16 está cerca de ti');
     expect(aviso).not.toMatch(/[A-Z]{3}\d{3}/);
     expect(aviso).not.toMatch(/\d\s?(m|km)\b/);
@@ -86,7 +108,7 @@ describe('banda «Cómo funciona»', () => {
   it('espeja Dart con su comentario y entra con el .reveal de la página', () => {
     expect(css).toMatch(/eta_bottom_sheet\.dart/);
     expect(css).toMatch(/bus_notification_service\.dart/);
-    expect(banda.match(/class="cf-tarjeta [^"]*\breveal\b/g)).toHaveLength(4);
+    expect(banda).toMatch(/class="cf-demo reveal"/);
     expect(leer('src/css/components.css')).toContain("./componentes/como-funciona.css");
   });
 });

@@ -1,0 +1,60 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { Pasos } from '../src/como-funciona';
+
+/**
+ * Las pestañas de «Cómo funciona»: el patrón de pestañas de WAI-ARIA. Un
+ * toque o las flechas cambian el paso; la escena cuelga de `data-paso` (el
+ * CSS cambia la pantalla) y nombra la pestaña que la gobierna.
+ */
+
+const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
+const banda = /<section[^>]*id="como-funciona"[^>]*>[\s\S]*?<\/section>/.exec(html)![0];
+
+const pestana = (paso: string): HTMLButtonElement =>
+  document.querySelector<HTMLButtonElement>(`[role="tab"][data-paso="${paso}"]`)!;
+const escena = (): HTMLElement => document.querySelector<HTMLElement>('#cf-escena')!;
+const tecla = (paso: string, key: string): void => {
+  pestana(paso).dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+};
+const descripcionVisible = (): string[] =>
+  Array.from(document.querySelectorAll<HTMLElement>('.solo-lectores[data-paso]'))
+    .filter((p) => !p.hidden)
+    .map((p) => p.dataset.paso!);
+
+beforeEach(() => {
+  document.body.innerHTML = banda;
+  new Pasos(document.querySelector<HTMLElement>('.cf-demo')!);
+});
+
+describe('pestañas de los tres pasos', () => {
+  it('un toque cambia el paso, la escena y lo que oye el lector', () => {
+    pestana('bus').click();
+    expect(pestana('bus').getAttribute('aria-selected')).toBe('true');
+    expect(pestana('bus').tabIndex).toBe(0);
+    expect(pestana('ruta').getAttribute('aria-selected')).toBe('false');
+    expect(pestana('ruta').tabIndex).toBe(-1);
+    expect(escena().dataset.paso).toBe('bus');
+    expect(escena().getAttribute('aria-labelledby')).toBe('cf-paso-bus');
+    expect(descripcionVisible()).toEqual(['bus']);
+  });
+
+  it('las flechas recorren en círculo, Inicio y Fin van a los extremos, y el foco sigue', () => {
+    tecla('ruta', 'ArrowLeft');
+    expect(escena().dataset.paso).toBe('aviso');
+    expect(document.activeElement).toBe(pestana('aviso'));
+    tecla('aviso', 'ArrowRight');
+    expect(escena().dataset.paso).toBe('ruta');
+    tecla('ruta', 'End');
+    expect(escena().dataset.paso).toBe('aviso');
+    tecla('aviso', 'Home');
+    expect(escena().dataset.paso).toBe('ruta');
+    expect(document.activeElement).toBe(pestana('ruta'));
+  });
+
+  it('otra tecla no cambia nada', () => {
+    tecla('ruta', 'Enter');
+    expect(escena().dataset.paso).toBe('ruta');
+  });
+});
