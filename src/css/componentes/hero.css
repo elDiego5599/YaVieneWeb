@@ -564,18 +564,33 @@
   text-align: center;
 }
 
-/* El video (9:16) es más ancho que la pantalla del iPhone: va entero,
-   sin recortar sus globos, y el sobrante de arriba y abajo lleva su
-   mismo fondo, #F4F5EE (medido en sus esquinas), así que no se ve. */
+/* El video ya trae la proporción de la pantalla: sus franjas de arriba y
+   abajo las pinta ffmpeg con el color medio del filo de cada cuadro, así
+   que siguen al fondo del video cuando cambia. */
 .hero-iphone .phone-screen {
   background: #f4f5ee;
+}
+
+/* El filo del vidrio va encima del video: el `inset` de la pantalla queda
+   debajo de sus hijos y el video lo tapaba, y se veía montado sobre el
+   marco negro. El radio heredado lo recorta en Safari, que con el video en
+   su propia capa ignora el `overflow` del padre. */
+.hero-iphone .phone-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 41;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
 }
 
 .hero-video {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  border-radius: inherit;
+  object-fit: cover;
 }
 
 /* Apilado, el aparato va entero: el botón «Avisarme» del video es parte

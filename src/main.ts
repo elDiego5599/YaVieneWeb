@@ -29,6 +29,7 @@ import { reboteDelPie } from './rebote';
 import { dormirLoQueNoSeVe } from './reposo';
 import { encenderScrollSuave } from './scroll-suave';
 import { entrarEscena, ScrollEffects } from './scroll-effects';
+import { sinMovimiento } from './scrolly';
 
 const arrancar = (): void => {
   /*
