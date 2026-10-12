@@ -626,10 +626,11 @@
    atrás es quitar `.hero-iphone`, el template y `hero-grid--video`.
    ────────────────────────────────────────────────────────────────── */
 .hero-iphone {
-  /* El mismo ancho que el aparato central del trío (360) y algo menos
-     alto, porque toma la proporción del video (dueño, 2026-10-11):
-     360 × 750 contra los 360 × 753 del trío. */
-  --tel: 360px;
+  /* 750 de alto, casi los 753 del trío, y el ancho justo para que la
+     pantalla tenga la proporción del video (dueño, 2026-10-11): el alto
+     es 1,7218 × el ancho (pantalla 0,928 × 16/9 + biseles 0,072), así
+     que 750 / 1,7218 = 435,6. */
+  --tel: 435.6px;
   flex: none;
   display: flex;
   flex-direction: column;
@@ -643,11 +644,16 @@
   text-align: center;
 }
 
-/* El aparato mide 360 × 750 (dueño, 2026-10-11: casi los 753 del trío).
-   La pantalla vuelve a llenar la carcasa y el video la cubre entero, sin
-   franjas: a 9:16 en una pantalla más angosta, recorta un poco los lados. */
+/* La pantalla mide 1080:1920 como el video y la carcasa crece con ella
+   (sale de `aspect-ratio` y la pinta su relleno, el bisel): el video la
+   llena entera, sin franjas y sin recortar nada. */
 .hero-iphone .phone-shell {
-  aspect-ratio: 360 / 750;
+  aspect-ratio: auto;
+}
+
+.hero-iphone .phone-screen {
+  height: auto;
+  aspect-ratio: 1080 / 1920;
 }
 
 .hero-video {
@@ -697,9 +703,23 @@
   }
 
   /* Dos renglones: el más largo, «¿Cuánto falta», mide ~5,6 px por px
-     de letra, así que 12cqw lo deja en ~65 % de la columna. Tope 96. */
+     de letra, así que 14cqw lo deja en ~75 % de la columna. Tope 104. */
   .hero-grid--video .hero-title {
-    font-size: min(12cqw, 96px);
+    font-size: min(14cqw, 104px);
+  }
+
+  /* Junto al aparato de 435 el texto de al lado sube un punto (dueño,
+     2026-10-11). */
+  .hero-grid--video .hero-description {
+    font-size: 23px;
+  }
+
+  .hero-grid--video .hero-subtext {
+    font-size: 15px;
+  }
+
+  .hero-grid--video .hero-actions a {
+    font-size: 16px;
   }
 
   .hero-grid--video .hero-actions,
