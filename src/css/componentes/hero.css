@@ -534,48 +534,22 @@
   color: inherit;
 }
 
-/* ── EXPERIMENTO: el teléfono del trío, solo y con el video ───────────
-   Rama `experimento-hero-video`. Titular a la izquierda y a la derecha el
-   mismo aparato del trío (`.hero-phone-wrap > .phone-shell`, sin una
-   regla de marco nueva) con el video de la app en la pantalla, como
-   incident.io enseña su producto: el aparato entero y quieto sobre el
-   lienzo de color, con su sombra larga.
-
-   CHOCA con la regla «solape del hero congelado» (CLAUDE.md, producto 8):
-   aquí no hay trío, solape ni sangrado. Las reglas del trío siguen arriba
-   sin tocar y su marcado vive en un <template> de index.html; volver
-   atrás es quitar `.hero-iphone`, el template y `hero-grid--video`.
+/* ── EXPERIMENTO: el video de la app en el teléfono del medio ─────────
+   Rama `experimento-hero-video`. El trío, el solape y el sangrado siguen
+   como estaban; solo cambia lo que enseña la pantalla del centro: el
+   video en lugar del splash. Volver atrás es devolver el splash a
+   index.html y quitar este bloque.
    ────────────────────────────────────────────────────────────────── */
-.hero-iphone {
-  /* Un iPhone de verdad (71,5 × 149,6) de 710 de alto, lo que pidió
-     el dueño (2026-10-11): 710 × 71,5 / 149,6 = 339,3. A 380 × 795 quedaba
-     demasiado alto y a la proporción del video parecía un iPad. */
-  --tel: 339.3px;
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* El crédito del mapa, pegado debajo del aparato y centrado con él. */
-.hero-iphone .hero-credit {
-  position: static;
-  margin-top: 14px;
-  text-align: center;
-}
-
-/* El video ya trae la proporción de la pantalla: sus franjas de arriba y
-   abajo las pinta ffmpeg con el color medio del filo de cada cuadro, así
-   que siguen al fondo del video cuando cambia. */
-.hero-iphone .phone-screen {
-  background: #f4f5ee;
-}
 
 /* El filo del vidrio va encima del video: el `inset` de la pantalla queda
    debajo de sus hijos y el video lo tapaba, y se veía montado sobre el
    marco negro. El radio heredado lo recorta en Safari, que con el video en
    su propia capa ignora el `overflow` del padre. */
-.hero-iphone .phone-screen::after {
+.hero-phone-wrap .phone-screen:has(.hero-video) {
+  background: #f4f5ee;
+}
+
+.hero-phone-wrap .phone-screen:has(.hero-video)::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -585,6 +559,8 @@
   pointer-events: none;
 }
 
+/* 1080 × 2352 es la proporción de la pantalla de 360 (0,4596): `cover`
+   no recorta nada a ese ancho y apenas unos px en los otros. */
 .hero-video {
   display: block;
   width: 100%;
@@ -593,41 +569,25 @@
   object-fit: cover;
 }
 
-/* Apilado, el aparato va entero: el botón «Avisarme» del video es parte
-   de lo que se enseña, así que el panel ya no lo corta por abajo. */
-.hero-grid--video {
-  padding-bottom: clamp(56px, 7vh, 96px);
-}
-
-@media (max-width: 719px) {
-  /* En el teléfono, el ancho de la pantalla menos 20 px por lado (a 375
-     mide 335); tope 360. */
-  .hero-iphone {
-    --tel: min(360px, calc(100vw - 40px));
-  }
-
-  /* El trío esconde aquí su aparato central; este es el único. */
-  .hero-iphone .hero-phone-wrap {
-    display: flex;
-  }
-
-  .hero-grid--video {
-    padding-bottom: 48px;
-  }
-}
-
-/* Desde 1024: dos columnas, la copia a su filo izquierdo y el aparato a
-   su ancho natural. */
+/* Desde 1024 el trío va a la derecha y la copia a la izquierda (dueño,
+   2026-10-11), con los tamaños de letra que ya tenía junto al video. */
 @media (min-width: 1024px) {
   .hero-grid--video {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    column-gap: clamp(48px, 6vw, 112px);
-    max-width: 1240px;
+    align-items: end;
+    column-gap: clamp(24px, 3vw, 56px);
+  }
+
+  /* El panel corta solo la franja de abajo del video —216 de sus 2352
+     px, el 9,2 % de la pantalla— y el marco: el trío sube lo que hacía
+     falta para que se vea todo lo que enseña (dueño, 2026-10-11). */
+  .hero-grid--video .hero-scene {
+    --sangrado: calc(var(--alto-tel) * 0.1);
   }
 
   .hero-grid--video .hero-copy {
+    align-self: center;
     align-items: flex-start;
     text-align: left;
   }
@@ -638,8 +598,6 @@
     font-size: min(14cqw, 104px);
   }
 
-  /* Junto al aparato el texto de al lado sube un punto (dueño,
-     2026-10-11). */
   .hero-grid--video .hero-description {
     font-size: 23px;
   }
