@@ -626,12 +626,12 @@
    atrás es quitar `.hero-iphone`, el template y `hero-grid--video`.
    ────────────────────────────────────────────────────────────────── */
 .hero-iphone {
-  /* Del porte de un 15 Pro en pantalla (dueño, 2026-10-11): el aparato
-     ocupa el 80 % del alto de la ventana. Su alto es 1,722 veces el
-     ancho (pantalla 1080:1920 + bisel de 3,6 % por lado), de ahí el
-     divisor. Piso 360 (el trío) y tope 480: a 900 de alto mide 418 ×
-     720; el video de 1080 sigue siendo 2x hasta el tope. */
-  --tel: clamp(360px, calc(80svh / 1.722), 480px);
+  /* Grande, como el producto en incident.io (dueño, 2026-10-11: a 80 %
+     del alto «se ve enano»): el ancho es 2/3 del alto de la ventana, así
+     que el aparato (alto = 1,722 × ancho) pasa del pliegue y se sigue
+     al bajar. Piso 440, tope 640: a 1440 × 900 mide 600 × 1033. El
+     video de 1080 queda a 1,8x de la pantalla. */
+  --tel: clamp(440px, calc(100svh / 1.5), 640px);
   flex: none;
   display: flex;
   flex-direction: column;
@@ -672,9 +672,10 @@
 }
 
 @media (max-width: 719px) {
-  /* 360 no cabe en el panel de 351 de un teléfono de 375. */
+  /* En el teléfono, el ancho de la pantalla menos 20 px por lado (a 375
+     mide 335); tope 360. */
   .hero-iphone {
-    --tel: 300px;
+    --tel: min(360px, calc(100vw - 40px));
   }
 
   /* El trío esconde aquí su aparato central; este es el único. */
