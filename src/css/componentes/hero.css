@@ -569,19 +569,17 @@
   object-fit: cover;
 }
 
-/* Desde 1024 el lienzo del degradado es más alto y más angosto (dueño,
-   2026-10-11): llena la primera pantalla menos una cuneta de 32 abajo
-   —tope 900, para que en un monitor alto no quede un cajón vacío— y se
-   recoge a 1240, 72 px más ancho por lado que el contenedor del nav, así
-   que la marca y el botón siguen dentro con aire. */
+/* Desde 1024 el lienzo del degradado ocupa la primera pantalla entera,
+   con cualquier zoom: «Qué resuelve» no asoma hasta que se baja (dueño,
+   2026-10-11). De ancho se queda a medio camino entre 1240 y la cuneta
+   de siempre: a 1440 mide ~1308 en vez de 1376. */
 @media (min-width: 1024px) {
   .hero-panel:has(.hero-grid--video) {
     display: flex;
     flex-direction: column;
-    width: calc(100% - 2 * var(--calle));
-    max-width: 1240px;
+    width: min(100% - 2 * var(--calle), (100% - 2 * var(--calle) + 1240px) / 2);
     margin-inline: auto;
-    min-height: min(800px, calc(100svh - 100px));
+    min-height: 100svh;
   }
 
   .hero-panel:has(.hero-grid--video) .hero-grid--video {
