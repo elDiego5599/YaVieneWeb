@@ -580,6 +580,9 @@
     /* Más aire bajo el nav: con el trío a la derecha, sus tapas quedaban
        pegadas a la barra (dueño, 2026-10-11). */
     padding-top: clamp(96px, 12vh, 144px);
+    /* Copia y trío más juntos: con 1550 la copia se estiraba y quedaba
+       lejos de los teléfonos (dueño, 2026-10-11). 1200 de contenido. */
+    max-width: calc(1200px + 2 * var(--calle));
   }
 
   /* El panel corta solo la franja de abajo del video —216 de sus 2352
@@ -603,19 +606,19 @@
      del párrafo de abajo; a 14cqw el titular quedaba más angosto que el
      párrafo y el bloque se veía cojo (dueño, 2026-10-11). Tope 104. */
   .hero-grid--video .hero-title {
-    font-size: min(17.5cqw, 104px);
+    font-size: min(17.5cqw, 72px);
   }
 
   .hero-grid--video .hero-description {
-    font-size: 23px;
+    font-size: 19px;
   }
 
   .hero-grid--video .hero-subtext {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .hero-grid--video .hero-actions a {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .hero-grid--video .hero-actions,
@@ -626,16 +629,16 @@
 
 /* El nav se alinea con lo que tiene debajo (dueño, 2026-10-11): la
    marca arranca donde la copia, el botón acaba donde el trío y los dos
-   enlaces van al centro. Copia y trío viven en `.hero-grid` (tope 1550,
-   calle por lado) dentro del panel (otra calle por lado): de ahí el tope
-   de 1550 + 2 calles y el relleno de 2 calles. Los dos envoltorios del
+   enlaces van al centro. Copia y trío viven en `.hero-grid` (1200 de
+   contenido + una calle por lado) dentro del panel (otra calle por
+   lado): de ahí el tope de 1200 + 4 calles y el relleno de 2 calles. Los dos envoltorios del
    pliegue no pintan nada desde 880, así que se disuelven y enlaces y
    botón entran a la rejilla de tres del nav. */
 @media (min-width: 1024px) {
   body:has(.hero-grid--video) .nav-island {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    max-width: calc(1550px + 2 * var(--calle));
+    max-width: calc(1200px + 4 * var(--calle));
     padding-inline: calc(2 * var(--calle));
   }
 

@@ -36,6 +36,11 @@
   gap: 16px 24px;
 }
 
+/* «Qué resuelve» va sobre blanco, no sobre la banda (dueño, 2026-10-11). */
+#problema.panel--banda {
+  background: #fff;
+}
+
 #problema .seccion-rotulo {
   transition: color 0.5s var(--ease-out-cubic);
 }
