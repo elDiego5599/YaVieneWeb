@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { rutaOrtogonal, trazar, type Caja } from '../src/escenario-red';
+import { rutaOrtogonal, tramos, trazar, type Caja } from '../src/escenario-red';
 
 /**
  * Los hilos del escenario de «Qué resuelve» (2026-10-12). Antes eran once
@@ -136,5 +136,43 @@ describe('trazar', () => {
     }
     expect(plano.enredo.length).toBeGreaterThanOrEqual(6);
     expect([...tocadas].sort()).toEqual([0, 1, 2, 3, 4]);
+  });
+});
+
+describe('el árbol crece por piezas', () => {
+  const escena = { ancho: 1096, alto: 460 };
+  const pildora: Caja = { x: 383, y: 200, w: 330, h: 48 };
+  const tarjetas: Caja[] = [11, 526, 241, 822].map((x, i) => ({ x, y: [14, 18, 306, 302][i], w: 256, h: 140 }));
+  const plano = trazar(escena, pildora, tarjetas);
+
+  it('cada aviso tiene su orden desde la píldora: los de dentro 0, los de fuera 1', () => {
+    expect(plano.orden).toEqual([1, 0, 0, 1]);
+  });
+
+  it('dos avisos simétricos llegan a la vez aunque la píldora no caiga en el píxel justo', () => {
+    // A 1440 `offset*` da la píldora en 387 con 321 de ancho: su centro,
+    // en 547,5, deja los avisos de dentro a 139,5 y 140,5 y los de fuera a
+    // 419,5 y 420,5. Medio píxel no es otro turno.
+    const descentrada = trazar(escena, { x: 387, y: 200, w: 321, h: 48 }, tarjetas);
+    expect(descentrada.orden).toEqual([1, 0, 0, 1]);
+  });
+
+  it('cada rama se parte en tronco, codo, viga, codo y bajada, cosidas punta con punta', () => {
+    for (const d of plano.arbol) {
+      const piezas = tramos(d);
+      expect(piezas.map((t) => t.pieza)).toEqual(['tronco', 'codo', 'viga', 'codo', 'bajada']);
+      // Cada pieza empieza donde acabó la anterior, y juntas dibujan la rama entera.
+      expect(piezas[0].d.startsWith(d.match(/^M[^LA]*/)![0])).toBe(true);
+      expect(piezas.map((t) => t.d.replace(/^M[^LA]*/, '')).join('')).toBe(d.replace(/^M[^LA]*/, ''));
+      for (let i = 1; i < piezas.length; i++) {
+        const fin = piezas[i - 1].d.trim().split(/[\s,A-Z]+/).filter(Boolean).slice(-2).join(' ');
+        expect(piezas[i].d.startsWith(`M${fin}`)).toBe(true);
+      }
+    }
+  });
+
+  it('la viga crece desde la píldora: hacia la izquierda en los avisos de la izquierda', () => {
+    const vigas = plano.arbol.map((d) => tramos(d).find((t) => t.pieza === 'viga')!);
+    expect(vigas.map((v) => v.izq)).toEqual([true, true, false, false]);
   });
 });

@@ -289,13 +289,6 @@
   touch-action: manipulation;
 }
 
-/* Las calles del mosaico CARTO salían muy tenues sobre el crema del
-   panel (dueño, 2026-10-12): un punto de contraste las oscurece sin
-   tocar el fondo, que casi no cambia a 1,18 sobre un gris tan claro. */
-.mv-mosaico {
-  filter: contrast(1.18) saturate(1.05);
-}
-
 /* Los trazos van en píxeles de pantalla, no en unidades del mosaico: así
    la ruta se ve del mismo grosor con el mapa grande y con el mapa
    pequeño, que es como se dibuja un mapa de verdad. */

@@ -6,7 +6,9 @@ import { describe, expect, it } from 'vitest';
  * La sección «Cómo funciona» se quitó entera (dueño, 2026-10-11). Si vuelve
  * `id="solucion"` o un enlace a `#solucion`, que sea porque el dueño la
  * pidió y este archivo se cambia a propósito, no porque alguien restauró
- * un commit viejo.
+ * un commit viejo. La franja `#como-funciona` de la portada (dueño,
+ * 2026-10-12) es otra cosa: tres tarjetas quietas, sin los pasos que
+ * rodaban; `como-funciona.test.ts` la fija.
  */
 const leer = (ruta: string) => readFileSync(resolve(process.cwd(), ruta), 'utf8');
 const sinComentarios = (html: string) => html.replace(/<!--[\s\S]*?-->/g, '');

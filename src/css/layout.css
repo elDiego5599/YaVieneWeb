@@ -168,3 +168,14 @@
   display: grid;
   gap: clamp(28px, 4vw, 56px);
 }
+
+/* La raya entre el hero y «Problema» (dueño, 2026-10-12): los dos son
+   lienzos crema con cuneta y sin ella se leían como uno solo. Entra
+   32 px por lado, lo que mide el redondeo de los lienzos, para no
+   asomar más allá de sus esquinas. */
+.divisor {
+  height: 1px;
+  margin: 16px calc(var(--calle) + 32px) 0;
+  border: 0;
+  background: var(--linea-fuerte);
+}

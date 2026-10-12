@@ -145,7 +145,7 @@ describe('el escenario de «Qué resuelve»', () => {
     // Ocultas por defecto: sólo el escenario ancho las enseña.
     expect(reglas('.ruidos')).toMatch(/display:\s*none/);
     expect(css).toMatch(/@media \(min-width: 1024px\)\s*\{[\s\S]*?\.ruidos\s*\{\s*display:\s*block/);
-    // En la otra cara se van hacia la píldora.
+    // En la otra cara se apagan donde están.
     expect(css).toMatch(/\[data-cara='claro'\] \.ruido[^{]*\{[^}]*opacity:\s*0/);
   });
 
@@ -165,11 +165,12 @@ describe('el escenario de «Qué resuelve»', () => {
     expect(red.hasAttribute('viewBox')).toBe(false);
     expect(red.children).toHaveLength(0);
     const ts = leer('src/problema.ts');
-    expect(ts).toMatch(/import \{ trazar \} from '\.\/escenario-red'/);
+    expect(ts).toMatch(/import \{[^}]*\btrazar\b[^}]*\} from '\.\/escenario-red'/);
     expect(ts).toContain('new ResizeObserver');
-    // A ciegas se ve el enredo; con Ya Viene, el árbol, y el otro recogido.
-    expect(css).toMatch(/\[data-cara='claro'\] \.hilo--enredo[^{]*\{[^}]*stroke-dashoffset:\s*1/);
-    expect(css).toMatch(/\[data-cara='claro'\] \.hilo--arbol[^{]*\{[^}]*stroke-dashoffset:\s*0/);
+    // A ciegas se ve el enredo; con Ya Viene, el árbol entero, y el otro apagado.
+    expect(css).toMatch(/\[data-cara='claro'\] \.hilo--enredo\s*\{[^}]*opacity:\s*0/);
+    expect(css).toMatch(/\[data-cara='claro'\] \.tramo--tronco,[^{]*\{[^}]*scale:\s*1/);
+    expect(css).toMatch(/\[data-cara='claro'\] \.tramo--codo\s*\{[^}]*opacity:\s*1/);
   });
 
   it('con Ya Viene los avisos se ponen en fila, derechos', () => {

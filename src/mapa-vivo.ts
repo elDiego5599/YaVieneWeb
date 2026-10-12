@@ -172,7 +172,6 @@ export class MapaVivo {
     this.#svg.appendChild(defs);
 
     const img = nuevo('image');
-    img.setAttribute('class', 'mv-mosaico');
     img.setAttribute('href', YV_RUTAS.ciudad.mapa.src);
     img.setAttributeNS(XLINK, 'xlink:href', YV_RUTAS.ciudad.mapa.src);
     img.setAttribute('x', String(vx));

@@ -80,8 +80,11 @@ export const MUTACIONES = [
   { archivo: 'src/scroll-effects.ts', de: "if (ev.target !== el || ev.propertyName !== 'opacity') return;", a: 'if (ev.target !== el) return;', que: 'retirar al terminar la opacidad' },
   { archivo: 'src/reposo.ts', de: "entrada.target.classList.toggle('en-reposo', !entrada.isIntersecting);", a: "entrada.target.classList.toggle('en-reposo', entrada.isIntersecting);", que: 'reposo fuera de vista' },
   { archivo: 'src/problema.ts', de: 'else if (entrada.intersectionRatio <= ASOMO_SALE) this.#rebobinar();', a: 'else if (entrada.intersectionRatio < 0) this.#rebobinar();', que: 'rebobinar al salir' },
-  { archivo: 'src/problema.ts', de: 'if (aMedias || !escena || sinMovimiento() || this.#seccion.dataset.cara === cara) this.#cambiar(cara);', a: 'if (aMedias || !escena || this.#seccion.dataset.cara === cara) this.#cambiar(cara);', que: 'sin ceremonia con movimiento reducido' },
-  { archivo: 'src/problema.ts', de: 'const aMedias = this.#tramos.length > 0;', a: 'const aMedias = false;', que: 'un corte a medias no encadena otra escena' },
+  { archivo: 'src/problema.ts', de: 'if (!sinMovimiento()) this.#esperarAQueAsome();', a: 'this.#esperarAQueAsome();', que: 'sin cambio solo con movimiento reducido' },
+  { archivo: 'src/problema.ts', de: "this.#estado.style.setProperty('--recorte', `${Math.max(0, sobra / 2)}px`);", a: "this.#estado.style.setProperty('--recorte', `${Math.max(0, sobra)}px`);", que: 'el recorte de la píldora, la mitad a cada lado' },
+  { archivo: 'src/problema.ts', de: 'x: e.offsetLeft + (celda?.offsetLeft ?? 0),', a: 'x: e.offsetLeft,', que: 'la píldora se mide desde el escenario, no desde su celda' },
+  { archivo: 'src/escenario-red.ts', de: "pieza = recta === 1 ? 'tronco' : recta === rectas ? 'bajada' : 'viga';", a: "pieza = recta === 0 ? 'tronco' : recta === rectas ? 'bajada' : 'viga';", que: 'el árbol crece por piezas: la primera recta es el tronco' },
+  { archivo: 'src/escenario-red.ts', de: 'l - o[i - 1] > MISMO_PUESTO', a: 'l - o[i - 1] > 0', que: 'dos avisos simétricos llegan a la vez aunque la píldora caiga en medio píxel' },
   // Las cifras de rutas.
   { archivo: 'src/rutas.ts', de: 'const km = rutas.reduce((suma, r) => suma + r.km, 0);', a: 'const km = rutas.reduce((suma, r) => Math.max(suma, r.km), 0);', que: 'kilómetros totales' },
   { archivo: 'src/rutas.ts', de: 'const terminales = new Set(rutas.flatMap(r => [r.terminalA, r.terminalB]));', a: 'const terminales = new Set(rutas.flatMap(r => [r.terminalA]));', que: 'terminales distintos' },

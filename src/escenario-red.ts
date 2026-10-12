@@ -9,6 +9,10 @@
  * aviso. Todo en tramos rectos con los codos redondeados.
  *
  * Aquí no se mide nada: `problema.ts` lee las cajas y pinta los `d`.
+ *
+ * El árbol no se dibuja de un trazo: crece por piezas al paso de los
+ * avisos (tronco, viga, bajada; `tramos`), y cada aviso tiene su `orden`
+ * desde la píldora, que es lo que escalona su llegada en el CSS.
  */
 
 export type Punto = [x: number, y: number];
@@ -25,6 +29,13 @@ const DENTRO = 4;
 
 /** Lo que baja el árbol de la píldora a los avisos; el bus va a la mitad. */
 const BAJADA = 104;
+
+/**
+ * Lo que pueden distar dos avisos de la píldora y llegar a la vez: 2 px,
+ * el doble del píxel que mete el redondeo de la píldora, y muy por
+ * debajo de lo que separa dos puestos de la fila: un aviso y su hueco.
+ */
+const MISMO_PUESTO = 2;
 
 /**
  * El enredo, de la píldora hacia fuera: cada hilo empieza en la pieza más
@@ -111,7 +122,7 @@ export function trazar(
   escena: { ancho: number; alto: number },
   pildora: Caja,
   tarjetas: Caja[]
-): { pildoraClara: Caja; fila: Caja[]; arbol: string[]; enredo: string[] } {
+): { pildoraClara: Caja; fila: Caja[]; arbol: string[]; enredo: string[]; orden: number[] } {
   const alto = Math.max(...tarjetas.map((t) => t.h));
   const arriba = Math.round((escena.alto - (pildora.h + BAJADA + alto)) / 2);
   const pildoraClara = { ...pildora, y: arriba };
@@ -128,5 +139,43 @@ export function trazar(
     rutaOrtogonal(unir([ancla(piezas[pa], la, da), la], [ancla(piezas[pb], lb, db), lb]), RADIO)
   );
 
-  return { pildoraClara, fila, arbol, enredo };
+  // Lo lejos que queda cada aviso de la píldora en la fila, por puestos:
+  // los de dentro 0, los de fuera 1. Por puestos y no por píxeles para
+  // que dos avisos simétricos lleguen a la vez, y con `MISMO_PUESTO` de
+  // holgura porque la píldora cae en medio píxel y los separa en uno.
+  const lejos = fila.map((t) => Math.abs(t.x + t.w / 2 - (pildoraClara.x + pildoraClara.w / 2)));
+  const cortes = [...lejos].sort((a, b) => a - b).filter((l, i, o) => i > 0 && l - o[i - 1] > MISMO_PUESTO);
+  const puesto = (l: number): number => cortes.filter((c) => c <= l).length;
+  const orden = lejos.map((l) => (cortes.length > 0 ? puesto(l) / cortes.length : 0));
+
+  return { pildoraClara, fila, arbol, enredo, orden };
+}
+
+export type Tramo = { d: string; pieza: 'tronco' | 'codo' | 'viga' | 'bajada'; izq: boolean };
+
+/**
+ * Parte una rama del árbol (lo que da `rutaOrtogonal`: M, rectas y arcos)
+ * en sus piezas, cada una un camino suelto que empieza donde acabó la
+ * anterior. La primera recta es el tronco, la última la bajada, las de
+ * en medio la viga y los arcos los codos. `izq` dice hacia dónde va la
+ * viga, que es el lado desde el que crece: desde la píldora.
+ */
+export function tramos(d: string): Tramo[] {
+  const ordenes = d.match(/[MLA][^MLA]*/g) ?? [];
+  const rectas = ordenes.filter((o) => o[0] === 'L').length;
+  const fin = (o: string): string => o.trim().split(/[\s,]+/).slice(-2).join(' ');
+  const piezas: Tramo[] = [];
+  let desde = fin((ordenes[0] ?? 'M0 0').slice(1));
+  let recta = 0;
+  for (const o of ordenes.slice(1)) {
+    const hasta = fin(o.slice(1));
+    let pieza: Tramo['pieza'] = 'codo';
+    if (o[0] === 'L') {
+      recta += 1;
+      pieza = recta === 1 ? 'tronco' : recta === rectas ? 'bajada' : 'viga';
+    }
+    piezas.push({ d: `M${desde}${o.trim()}`, pieza, izq: Number(hasta.split(' ')[0]) < Number(desde.split(' ')[0]) });
+    desde = hasta;
+  }
+  return piezas;
 }

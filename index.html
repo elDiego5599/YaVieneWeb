@@ -743,6 +743,98 @@
       sección y el `aria-hidden` de las caras que no tocan. Todo el
       dibujo está en `componentes/problema.css`.
     -->
+    <hr class="divisor" aria-hidden="true" />
+
+    <!--
+      «Cómo funciona» (dueño, 2026-10-12): el texto a la izquierda y, a la
+      derecha, tres tarjetas encimadas que son pedazos de la app del
+      pasajero —el selector, la hoja del bus y el aviso—. Las tarjetas son
+      decoración (`aria-hidden`): lo que se lee es la columna de texto. Su
+      id no es `solucion`, que se quitó a propósito (sin-como-funciona.test.ts).
+      Entran por turnos con el `.reveal` de la página. Los números y su
+      origen en Dart están en `componentes/como-funciona.css`.
+    -->
+    <section class="panel" id="como-funciona">
+      <div class="panel-inner cf-grid">
+        <div class="cf-texto">
+          <span class="seccion-rotulo cf-ceja">CÓMO FUNCIONA</span>
+          <h2 class="seccion-titulo">Sal cuando tu bus esté cerca</h2>
+          <p class="seccion-lead">Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso. Te avisamos cuando esté cerca de ti.</p>
+          <a href="#mapa" class="btn-primary btn-green">Ver el mapa en vivo <span class="btn-flecha" aria-hidden="true">→</span></a>
+        </div>
+
+        <div class="cf-tarjetas" aria-hidden="true">
+          <div class="cf-tarjeta cf-tarjeta--selector reveal" data-reveal-delay="0">
+            <div class="sheet-head"><span class="sheet-head-title">Elige tu ruta</span></div>
+            <div class="app-select is-activa">
+              <span class="app-select-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3.5 20.5V9.5l7-3.5" />
+                  <path d="M10.5 20.5V4.6a1.6 1.6 0 0 1 1.6-1.6h6.3A1.6 1.6 0 0 1 20 4.6v15.9" />
+                  <path d="M2 20.5h20" />
+                  <path d="M13.5 7.5h3M13.5 11.5h3M13.5 15.5h3" />
+                </svg>
+              </span>
+              <span class="app-select-body">
+                <span class="app-select-title">Sobusa</span>
+                <span class="app-select-sub">Empresa de transporte masivo</span>
+              </span>
+              <span class="app-select-chevron">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 5l7 7l-7 7" /></svg>
+              </span>
+            </div>
+            <div class="app-select is-activa">
+              <span class="app-select-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                  <path d="M9.78 11.16l-1.42 1.42c-.68-.69-1.34-1.58-1.79-2.94l1.94-.49c.3.89.75 1.5 1.27 2.01zM11 6L7 2 3 6h3.02c.02.81.08 1.54.19 2.17l1.94-.49C8.08 7.2 8.03 6.63 8.02 6H11zm10 0l-4-4-4 4h2.99c-.1 3.68-1.28 4.75-2.54 5.88-.5.44-1.01.92-1.45 1.55-.34-.49-.73-.88-1.13-1.24L9.46 13.6c.93.85 1.54 1.54 1.54 3.4v5h2v-5c0-2.02.71-2.66 1.79-3.63 1.38-1.24 3.08-2.78 3.2-7.37H21z" />
+                </svg>
+              </span>
+              <span class="app-select-body">
+                <span class="app-select-title">C16 Calle 72 Uninorte</span>
+                <span class="app-select-sub">Granabastos ↔ Uninorte</span>
+              </span>
+              <span class="app-select-chevron">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 5l7 7l-7 7" /></svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="cf-tarjeta cf-tarjeta--bus reveal" data-reveal-delay="140">
+            <div class="eta-tarjeta">
+              <div class="eta-cabecera">
+                <span class="eta-bus">BUS</span>
+                <span class="eta-placa">ABC123</span>
+              </div>
+              <div class="eta-filo"></div>
+              <div class="eta-number">1,8</div>
+              <div class="eta-unit">km de ti</div>
+            </div>
+            <div class="eta-detail">
+              <span class="eta-detail-icono">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7" /><path d="M10.2 20a2 2 0 0 0 3.6 0" /><path d="M3 5.5A9 9 0 0 1 5.5 3M21 5.5A9 9 0 0 0 18.5 3" /></svg>
+              </span>
+              <span>Te avisamos a 1,0 km</span>
+              <span class="eta-detail-accion">Cambiar</span>
+            </div>
+          </div>
+
+          <div class="cf-tarjeta cf-tarjeta--aviso reveal" data-reveal-delay="280">
+            <div class="mapa-aviso-icono"><img src="/logo.svg" alt="" width="20" height="20"></div>
+            <div class="mapa-aviso-texto">
+              <span class="mapa-aviso-app">Ya Viene · ahora</span>
+              <strong class="mapa-aviso-titulo">Tu bus de la ruta C16 está cerca de ti</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divisor" aria-hidden="true" />
+
     <section class="panel panel--banda" id="problema" data-problema data-cara="ciego">
       <div class="panel-inner">
         <header class="seccion-cabecera reveal">
@@ -802,40 +894,18 @@
 
           <!-- Las voces de la espera a ciegas: tres, no más, y sólo con el
                escenario ancho (apiladas en un móvil estorbarían). Con Ya
-               Viene se encogen hacia la píldora. -->
+               Viene se apagan donde están. -->
           <div class="ruidos" aria-hidden="true">
             <span class="ruido">¿ya pasó el bus?</span>
             <span class="ruido">llevo 30 minutos esperando</span>
             <span class="ruido">me iré en taxi</span>
           </div>
 
-          <!-- La celda de la píldora: ella y su halo, uno encima del otro,
-               para que el halo mida lo que ella y no lo que el escenario. -->
+          <!-- La celda de la píldora lleva su sombra: puesta en la
+               píldora, el recorte con el que la alerta toma su forma se
+               la comería (`problema.css`). -->
           <div class="estado-celda">
             <p class="escenario-estado">
-              <!--
-                El núcleo. Mientras dura la ceremonia la píldora se recorta
-                hasta este círculo y todo lo suelto del escenario se va
-                hacia él; en reposo no se ve. Es decorativo: lo que dice
-                está en las dos caras de al lado.
-              -->
-              <span class="estado-nucleo" aria-hidden="true">
-                <svg viewBox="0 0 512 512" aria-hidden="true" focusable="false">
-                  <circle cx="256" cy="256" r="256" fill="#00A859" />
-                  <path d="M 120 130 A 200 200 0 0 1 392 130" fill="none" stroke="#FFFFFF" stroke-width="32"
-                  stroke-linecap="round" opacity="0.5" />
-                  <path d="M 176 190 A 130 130 0 0 1 336 190" fill="none" stroke="#FFFFFF" stroke-width="32"
-                  stroke-linecap="round" />
-                  <rect x="136" y="240" width="240" height="180" rx="36" fill="#14274E" />
-                  <rect x="166" y="270" width="180" height="72" rx="16" fill="#FFFFFF" />
-                  <rect x="290" y="270" width="30" height="72" fill="#14274E" opacity="0.1" />
-                  <circle cx="180" cy="375" r="16" fill="#FFC107" />
-                  <circle cx="332" cy="375" r="16" fill="#FFC107" />
-                  <rect x="160" y="410" width="32" height="24" rx="8" fill="#0A1428" />
-                  <rect x="320" y="410" width="32" height="24" rx="8" fill="#0A1428" />
-                </svg>
-              </span>
-
               <span class="dos-caras">
                 <span class="cara cara--ciego">
                   <svg class="estado-icono" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
@@ -864,11 +934,6 @@
                 </span>
               </span>
             </p>
-
-            <!-- El halo del círculo: sombra, remolino y anillos de la
-                 ceremonia, fuera de la píldora para que su recorte no se los
-                 coma (`problema.css`). Decorativo. -->
-            <span class="estado-halo" aria-hidden="true"></span>
           </div>
 
           <!--
