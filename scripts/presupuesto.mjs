@@ -156,7 +156,13 @@ const KB = 1024;
  *  dónde sacarlos: las reglas viejas de la lista siguen vivas por debajo
  *  de 1024 px y sin animaciones, y la búsqueda de clases muertas del
  *  18/09 sigue sin encontrar ninguna. 121 es la build de hoy, 117.0, más
- *  el 3 %. */
+ *  el 3 %.
+ *
+ *  El 11/10/2026 se quita la cinta de logos de empresas (portada y
+ *  /empresas.html): ninguna empresa está confirmada. Salen `marcas.css` y los
+ *  siete PNG: dist baja de 781.5 a 736.8 KB y el CSS de 120.2 a 117.2. Los
+ *  topes no se tocan: el CSS de hoy más el 3 % da 120.7, o sea 121, y el
+ *  margen de dist es para las imágenes que faltan. */
 const TOPES = {
   'todo dist': 797,
   'JavaScript': 66,

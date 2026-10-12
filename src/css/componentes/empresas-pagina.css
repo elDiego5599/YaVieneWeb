@@ -1483,19 +1483,19 @@
     0 30px 70px -50px rgba(11, 22, 40, 0.55);
 }
 
-/* La cinta de logos llega a los dos lados de la ficha, por encima del
-   relleno: dentro de él quedaba más estrecha que el texto de arriba y
-   parecía encajonada. Sus filos se funden con el blanco de la ficha, así
-   que no se ve dónde termina. La caja de `.empresa-marcas` deja de
-   recortar: la que recorta la pista es la propia cinta. */
-.empresa-ficha .empresa-marcas {
-  overflow: visible;
+/* La línea de cierre de la ficha: dice que se están sumando empresas y
+   lleva al formulario. Misma talla y tinta que los puntos de la lista. */
+.empresa-sumando {
+  font-size: var(--step-body);
+  line-height: 1.5;
+  color: var(--text-secondary);
 }
 
-.empresa-ficha .empresa-marcas-carrusel {
-  width: auto;
-  max-width: none;
-  margin-inline: calc(-1 * var(--ficha-aire));
+.empresa-sumando a {
+  color: var(--green-accessible);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* El titular de la sección, «Conecte su flota», al tamaño de los
