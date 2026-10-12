@@ -23,8 +23,8 @@
 
 /* ── El interruptor ────────────────────────────────────────────────────
 
-   La cabecera va centrada, sin línea de separación: el rótulo, el
-   interruptor grande encima del titular y la frase debajo (dueño,
+   La cabecera va centrada, sin línea de separación ni rótulo: el
+   interruptor encima del titular y la frase debajo (dueño,
    2026-10-11). Debajo de las opciones se desliza una pastilla blanca:
    es la que dice cuál está puesto.
    ────────────────────────────────────────────────────────────────────── */
@@ -44,33 +44,15 @@
 
 #problema .seccion-cabecera {
   align-items: center;
-  gap: 24px;
+  gap: 14px;
   text-align: center;
-}
-
-#problema .seccion-rotulo {
-  transition: color 0.5s var(--ease-out-cubic);
-}
-
-#problema[data-cara='ciego'] .seccion-rotulo {
-  /* El rojo oscuro del rótulo, solo aquí: la variable que usan los
-     números grandes y las alertas no se toca. Se oscureció porque
-     e2e/contraste.spec.ts medía el rótulo sobre un «rosa»
-     rgb(202,165,158), y ese rosa era la propia letra a medio fundirse
-     (transición de 0,5 s): el fondo de verdad es la banda #F3F7F4, donde
-     #7F180D da 9,5:1 y el coral accesible 4,8:1. Se queda el oscuro
-     porque es el rojo que el dueño aprobó y pidió de vuelta (2026-09-28). */
-  color: #7F180D;
-}
-
-#problema[data-cara='claro'] .seccion-rotulo {
-  color: var(--acento);
 }
 
 .interruptor {
   position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 18px;
   padding: 6px;
   border-radius: 999px;
   background: #F0F0EA;
@@ -213,8 +195,9 @@
 
 #problema .seccion-titulo {
   --turno: 80ms;
+  /* Del ancho de la frase de abajo, como la referencia (dueño). */
   max-width: none;
-  font-size: clamp(2.2rem, 1rem + 3.6vw, 4.4rem);
+  font-size: clamp(2rem, 1rem + 2.4vw, 3.3rem);
 }
 
 #problema .seccion-lead {
