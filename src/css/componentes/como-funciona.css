@@ -1,6 +1,6 @@
 /* ── CÓMO FUNCIONA ────────────────────────────────────────
 
-   La última banda, sin raya encima (dueño, 2026-10-12): el texto a un lado y, al otro, un mockup
+   La banda antes de «Problema» (dueño, 2026-10-12): el texto a un lado y, al otro, un mockup
    breve de la app del pasajero, como el bloque de On-call de incident.io
    (dueño, 2026-10-12) con su cuadro grande en la banda de «Problema»,
    otro un punto más hondo con el teléfono y, debajo, los tres pasos como
@@ -57,14 +57,16 @@
 
 /* El cuadro grande del On-call de incident.io: el texto del paso, la demo
    y las pestañas dentro de una caja en la banda de «Problema» (`--banda`),
-   con su aire: 75 px a 1440 como allá (5,2 vw), 20 en un teléfono. Radio
-   32 a 1440 (2,2 vw), 20 en un teléfono. */
+   con su aire: 48 px a 1440, 20 en un teléfono. Radio
+   8 px a 1440 como la referencia, y 20 en un teléfono. */
 .cf-grid {
   display: grid;
-  padding: clamp(20px, 5.2vw, 75px);
-  border-radius: clamp(20px, 2.2vw, 32px);
+  max-width: 1192px;
+  margin-inline: auto;
+  padding: clamp(20px, 3.34vw, 48px);
+  border-radius: clamp(8px, 0.56vw, 20px);
   background: var(--banda);
-  gap: clamp(32px, 5vw, 72px);
+  gap: clamp(32px, 6.67vw, 96px);
 }
 
 /* Lo que dice el paso elegido, donde allá van «On-call gets the right
@@ -105,7 +107,7 @@
 
 /* 28–40 px: 36 a 1440, el subtítulo de allá; un escalón bajo el titular. */
 .cf-explica-titulo {
-  font-size: clamp(1.75rem, 1.2rem + 1.2vw, 2.5rem);
+  font-size: clamp(1.75rem, 1.2rem + 1.2vw, 2.25rem);
   font-weight: 500;
   color: var(--tinta);
   letter-spacing: -0.02em;
@@ -141,23 +143,20 @@
   container-type: inline-size;
   position: relative;
   overflow: hidden;
-  /* 690 / 710 deja entero el CTA inferior de eta_bottom_sheet.dart. */
-  aspect-ratio: 690 / 710;
+  /* 600 / 455 da la escena apaisada de referencia y deja aire al teléfono. */
+  aspect-ratio: 600 / 455;
   border-radius: 16px;
   background: color-mix(in srgb, var(--banda), var(--acento) 5%);
 }
 
-/* El teléfono a la derecha, cortado por el borde de abajo como el de
-   incident.io: el corte se lleva solo la rayita de inicio y el aire de
-   debajo de la hoja. 38 cqw son 262 px a 1440, y la app sale a ~0,6 de su
-   tamaño, la misma escala que los teléfonos de los lados del hero. */
+/* El teléfono queda entero y centrado verticalmente; su alto sale de la
+   proporción 71.5 / 149.6 de `.phone-shell`. */
 .cf-telefono .phone-shell {
-  /* 46 cqw hace legibles las capas de la app en escritorio. */
-  --ancho: 46cqw;
+  /* 33 cqw da un alto de 414 px en 600×455 y deja 20 px arriba y abajo. */
+  --ancho: 33cqw;
   position: absolute;
-  top: 7%;
-  /* 5 % deja al chip más largo («Cargando las rutas de Sobusa») 14 px
-     antes del teléfono a 1440. */
+  top: 4.5%;
+  /* 5 % reserva borde y mantiene los chips fuera del teléfono. */
   right: 5%;
 }
 
@@ -444,14 +443,14 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
-  margin-top: 20px;
+  margin-top: 40px;
 }
 
 .cf-paso {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 2px;
+  padding: 12px 2px;
   border: 0;
   border-bottom: 2px solid var(--linea);
   background: none;
@@ -574,7 +573,7 @@
 /* Como incident.io, el texto angosto arriba y la demo ancha. */
 @media (min-width: 1024px) {
   .cf-grid {
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
     /* El titular arriba, a la altura del borde del cuadro de dentro. */
     align-items: start;
   }

@@ -233,4 +233,9 @@ describe('contraste del texto secundario', () => {
     const bajo = Array.from(pie.matchAll(/\.footer-bottom\s*\{([^}]*)\}/g)).map((m) => m[1]).join('');
     expect(bajo).not.toMatch(/border-top/);
   });
+
+  it('el pie arranca sin raya bajo «Problema» (dueño, 2026-10-12)', () => {
+    const pieRaiz = Array.from(pie.matchAll(/\.site-footer\s*\{([^}]*)\}/g)).map((m) => m[1]).join('');
+    expect(pieRaiz).not.toMatch(/border-top/);
+  });
 });

@@ -198,8 +198,8 @@
       <div class="nav-island-reveal" id="nav-island-menu">
         <div class="nav-island-inner">
           <nav class="nav-island-links" aria-label="Navegación principal">
-            <a href="#problema" class="nav-link">Problema</a>
             <a href="#como-funciona" class="nav-link">Cómo funciona</a>
+            <a href="#problema" class="nav-link">Problema</a>
           </nav>
           <a href="/empresas.html" class="nav-island-cta">Para empresas</a>
         </div>
@@ -794,172 +794,13 @@
 
     <hr class="divisor" aria-hidden="true" />
 
-    <section class="panel panel--banda" id="problema" data-problema data-cara="ciego">
-      <div class="panel-inner">
-        <header class="seccion-cabecera reveal">
-          <div class="cabecera-fila">
-            <!--
-              El interruptor no es una pestaña de navegación: no lleva a
-              otro sitio, cambia el estado de lo que ya se está mirando.
-              Por eso son dos botones con `aria-pressed` dentro de un
-              grupo, y no enlaces ni un `role="tablist"`.
-            -->
-            <div class="interruptor" role="group" aria-label="Cómo se vive la espera">
-              <span class="interruptor-marca" aria-hidden="true"></span>
-              <button type="button" class="interruptor-opcion" data-cara="ciego" aria-pressed="true">A ciegas</button>
-              <button type="button" class="interruptor-opcion" data-cara="claro" aria-pressed="false">Con Ya Viene</button>
-            </div>
-          </div>
-
-          <h2 class="seccion-titulo dos-caras">
-            <span class="cara cara--ciego">Esperar el bus <span class="apagado">es esperar a ciegas.</span></span>
-            <span class="cara cara--claro" aria-hidden="true">Esperar el bus <span class="acentuado">es ver por dónde viene.</span></span>
-          </h2>
-
-          <p class="seccion-lead dos-caras">
-            <span class="cara cara--ciego">El bus puede tardar tres minutos o treinta, y hasta que dobla la esquina
-              no hay forma de saber cuál de las dos. Todo lo demás sale de ahí.</span>
-            <span class="cara cara--claro" aria-hidden="true">El bus va en el mapa desde que sale del terminal, y el aviso entra
-              solo cuando está a la distancia que elijas. La espera deja de ser una apuesta.</span>
-          </p>
-        </header>
-
-        <!--
-          El escenario: la misma espera dibujada dos veces, con hilos tono
-          sobre tono entre las piezas. Lo que se lee de la sección son los cuatro
-          avisos (el titular y la frase de arriba los presentan); la red, los
-          rayos, las voces sueltas y los iconos son dibujo y van con
-          `aria-hidden`. Al pasar de cara las cuatro tarjetas viajan de su
-          desorden a una fila: el caos se ordena delante de quien mira, no
-          cambia de escena.
-        -->
-        <div class="escenario reveal" data-reveal-delay="90">
-          <!--
-            Los hilos. Llega vacío: los traza `problema.ts` con las cajas de
-            la píldora y los avisos, para que toquen lo que unen a cualquier
-            ancho —a ciegas una maraña de pieza a pieza; con Ya Viene un
-            árbol que baja de la píldora a cada aviso—.
-          -->
-          <svg class="escenario-red" fill="none" aria-hidden="true" focusable="false"></svg>
-
-          <!-- Cuatro rayitos en el tono de la red: el chisporroteo de la
-               espera a ciegas, que se apaga al ordenarse. -->
-          <div class="chispas" aria-hidden="true">
-            <span class="chispa"></span>
-            <span class="chispa"></span>
-            <span class="chispa"></span>
-            <span class="chispa"></span>
-          </div>
-
-          <!-- Las voces de la espera a ciegas: tres, no más, y sólo con el
-               escenario ancho (apiladas en un móvil estorbarían). Con Ya
-               Viene se apagan donde están. -->
-          <div class="ruidos" aria-hidden="true">
-            <span class="ruido">¿ya pasó el bus?</span>
-            <span class="ruido">llevo 30 minutos esperando</span>
-            <span class="ruido">me iré en taxi</span>
-          </div>
-
-          <!-- La celda de la píldora lleva su sombra: puesta en la
-               píldora, el recorte con el que la alerta toma su forma se
-               la comería (`problema.css`). -->
-          <div class="estado-celda">
-            <p class="escenario-estado">
-              <span class="dos-caras">
-                <span class="cara cara--ciego">
-                  <svg class="estado-icono" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                    <path d="M8 1.9 15 14H1z" />
-                    <path d="M8 6.4v3.1" />
-                    <path d="M8 11.6h.01" />
-                  </svg>
-                  Nadie sabe dónde va el bus
-                </span>
-                <span class="cara cara--claro" aria-hidden="true">
-                  <svg class="estado-marca" viewBox="0 0 512 512" aria-hidden="true" focusable="false">
-                    <circle cx="256" cy="256" r="256" fill="#00A859" />
-                    <path d="M 120 130 A 200 200 0 0 1 392 130" fill="none" stroke="#FFFFFF" stroke-width="32"
-                    stroke-linecap="round" opacity="0.5" />
-                    <path d="M 176 190 A 130 130 0 0 1 336 190" fill="none" stroke="#FFFFFF" stroke-width="32"
-                    stroke-linecap="round" />
-                    <rect x="136" y="240" width="240" height="180" rx="36" fill="#14274E" />
-                    <rect x="166" y="270" width="180" height="72" rx="16" fill="#FFFFFF" />
-                    <rect x="290" y="270" width="30" height="72" fill="#14274E" opacity="0.1" />
-                    <circle cx="180" cy="375" r="16" fill="#FFC107" />
-                    <circle cx="332" cy="375" r="16" fill="#FFC107" />
-                    <rect x="160" y="410" width="32" height="24" rx="8" fill="#0A1428" />
-                    <rect x="320" y="410" width="32" height="24" rx="8" fill="#0A1428" />
-                  </svg>
-                  Ya Viene
-                </span>
-              </span>
-            </p>
-          </div>
-
-          <!--
-            Los cuatro avisos son el contenido de la sección: uno por cosa
-            que cuesta esperar a ciegas (el tiempo, el sol, la tarde que se
-            pierde, la calle) y, en la otra cara, lo que la app hace con
-            esa misma cosa. Un título pequeño y una frase cada uno, como una
-            notificación. El de la ruta es el texto del aviso de la app tal
-            cual (`aviso.app` del glosario): con ruta, sin placa ni
-            distancia. Las distancias van en kilómetros con coma, nunca en
-            minutos. Sólo el dibujo es decorativo; la cara que no se ve
-            lleva `aria-hidden`, que mueve `problema.ts`.
-          -->
-          <div class="avisos">
-            <div class="aviso">
-              <span class="aviso-icono dos-caras" aria-hidden="true">
-                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M6 2.5h12M6 21.5h12M7 2.5v3.7a2 2 0 0 0 .6 1.4L12 12l4.4-4.4a2 2 0 0 0 .6-1.4V2.5M7 21.5v-3.7a2 2 0 0 1 .6-1.4L12 12l4.4 4.4a2 2 0 0 1 .6 1.4v3.7"/></svg></span>
-                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle class="b" cx="12" cy="10" r="2.4"/></svg></span>
-              </span>
-              <div class="aviso-texto dos-caras">
-                <div class="cara cara--ciego"><h3 class="aviso-titulo">Esperar una eternidad</h3><p class="aviso-frase">Ni tablero ni horario que se cumpla</p></div>
-                <div class="cara cara--claro" aria-hidden="true"><h3 class="aviso-titulo">Sabes cuál viene y por dónde</h3><p class="aviso-frase">Ves tu bus en el mapa, a 1,2 km</p></div>
-              </div>
-            </div>
-            <div class="aviso">
-              <span class="aviso-icono dos-caras" aria-hidden="true">
-                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M12 3.5a8.5 8.5 0 0 1 8.5 8.5h-17A8.5 8.5 0 0 1 12 3.5z"/><path d="M12 2v1.5M12 12v6.5a2 2 0 0 1-4 0"/></svg></span>
-                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></span>
-              </span>
-              <div class="aviso-texto dos-caras">
-                <div class="cara cara--ciego"><h3 class="aviso-titulo">Bajo el sol o la lluvia</h3><p class="aviso-frase">Se espera igual, sin sombra y mojándose</p></div>
-                <div class="cara cara--claro" aria-hidden="true"><h3 class="aviso-titulo">Esperas donde te convenga</h3><p class="aviso-frase">Tu bus de la ruta C14 está cerca de ti</p></div>
-              </div>
-            </div>
-            <div class="aviso">
-              <span class="aviso-icono dos-caras" aria-hidden="true">
-                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle class="r" cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
-                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7z" stroke="none"/><path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7M4 4.5v4.2h4.2M12 8v4l2.8 1.8"/></svg></span>
-              </span>
-              <div class="aviso-texto dos-caras">
-                <div class="cara cara--ciego"><h3 class="aviso-titulo">Ese tiempo suma</h3><p class="aviso-frase">Media hora perdida en el paradero</p></div>
-                <div class="cara cara--claro" aria-hidden="true"><h3 class="aviso-titulo">Ese tiempo vuelve</h3><p class="aviso-frase">La media hora vuelve a tu día</p></div>
-              </div>
-            </div>
-            <div class="aviso">
-              <span class="aviso-icono dos-caras" aria-hidden="true">
-                <span class="cara cara--ciego"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M8 1.9 15 14H1z"/><path d="M8 6.4v3.1"/><path d="M8 11.6h.01"/></svg></span>
-                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M6 8.9 12 4l6 4.9v10.6H6z" stroke="none"/><path d="M4 10.5 12 4l8 6.5M6 9v10.5h12V9M10 19.5v-5h4v5"/></svg></span>
-              </span>
-              <div class="aviso-texto dos-caras">
-                <div class="cara cara--ciego"><h3 class="aviso-titulo">Expuesto a robos</h3><p class="aviso-frase">Mucho rato en la calle, celular en mano</p></div>
-                <div class="cara cara--claro" aria-hidden="true"><h3 class="aviso-titulo">Menos rato en la calle</h3><p class="aviso-frase">Sales de casa cuando el bus está cerca</p></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-
     <!--
       «Cómo funciona», como el bloque de On-call de incident.io: ceja,
       titular y párrafo centrados arriba; debajo, un cuadro en el color de
       «Problema» (`--banda`) con el texto del paso elegido a la izquierda y,
       a la derecha, una escena un punto más honda, con el teléfono
       reutilizado y el mapa de
-      `PhoneMap`, cortado abajo por el cuadro, dos chips y una flecha. Debajo,
+      `PhoneMap`, entero dentro del cuadro, dos chips y una flecha. Debajo,
       tres pestañas WAI-ARIA cambian la pantalla con `data-paso`; cada paso
       tiene su párrafo para lectores de pantalla. El selector vive en
       `src/como-funciona.ts` y el mapa se monta desde `main.ts`.
@@ -1197,6 +1038,169 @@
         </div>
       </div>
     </section>
+
+    <hr class="divisor" aria-hidden="true" />
+
+    <section class="panel panel--banda" id="problema" data-problema data-cara="ciego">
+      <div class="panel-inner">
+        <header class="seccion-cabecera reveal">
+          <div class="cabecera-fila">
+            <!--
+              El interruptor no es una pestaña de navegación: no lleva a
+              otro sitio, cambia el estado de lo que ya se está mirando.
+              Por eso son dos botones con `aria-pressed` dentro de un
+              grupo, y no enlaces ni un `role="tablist"`.
+            -->
+            <div class="interruptor" role="group" aria-label="Cómo se vive la espera">
+              <span class="interruptor-marca" aria-hidden="true"></span>
+              <button type="button" class="interruptor-opcion" data-cara="ciego" aria-pressed="true">A ciegas</button>
+              <button type="button" class="interruptor-opcion" data-cara="claro" aria-pressed="false">Con Ya Viene</button>
+            </div>
+          </div>
+
+          <h2 class="seccion-titulo dos-caras">
+            <span class="cara cara--ciego">Esperar el bus <span class="apagado">es esperar a ciegas.</span></span>
+            <span class="cara cara--claro" aria-hidden="true">Esperar el bus <span class="acentuado">es ver por dónde viene.</span></span>
+          </h2>
+
+          <p class="seccion-lead dos-caras">
+            <span class="cara cara--ciego">El bus puede tardar tres minutos o treinta, y hasta que dobla la esquina
+              no hay forma de saber cuál de las dos. Todo lo demás sale de ahí.</span>
+            <span class="cara cara--claro" aria-hidden="true">El bus va en el mapa desde que sale del terminal, y el aviso entra
+              solo cuando está a la distancia que elijas. La espera deja de ser una apuesta.</span>
+          </p>
+        </header>
+
+        <!--
+          El escenario: la misma espera dibujada dos veces, con hilos tono
+          sobre tono entre las piezas. Lo que se lee de la sección son los cuatro
+          avisos (el titular y la frase de arriba los presentan); la red, los
+          rayos, las voces sueltas y los iconos son dibujo y van con
+          `aria-hidden`. Al pasar de cara las cuatro tarjetas viajan de su
+          desorden a una fila: el caos se ordena delante de quien mira, no
+          cambia de escena.
+        -->
+        <div class="escenario reveal" data-reveal-delay="90">
+          <!--
+            Los hilos. Llega vacío: los traza `problema.ts` con las cajas de
+            la píldora y los avisos, para que toquen lo que unen a cualquier
+            ancho —a ciegas una maraña de pieza a pieza; con Ya Viene un
+            árbol que baja de la píldora a cada aviso—.
+          -->
+          <svg class="escenario-red" fill="none" aria-hidden="true" focusable="false"></svg>
+
+          <!-- Cuatro rayitos en el tono de la red: el chisporroteo de la
+               espera a ciegas, que se apaga al ordenarse. -->
+          <div class="chispas" aria-hidden="true">
+            <span class="chispa"></span>
+            <span class="chispa"></span>
+            <span class="chispa"></span>
+            <span class="chispa"></span>
+          </div>
+
+          <!-- Las voces de la espera a ciegas: tres, no más, y sólo con el
+               escenario ancho (apiladas en un móvil estorbarían). Con Ya
+               Viene se apagan donde están. -->
+          <div class="ruidos" aria-hidden="true">
+            <span class="ruido">¿ya pasó el bus?</span>
+            <span class="ruido">llevo 30 minutos esperando</span>
+            <span class="ruido">me iré en taxi</span>
+          </div>
+
+          <!-- La celda de la píldora lleva su sombra: puesta en la
+               píldora, el recorte con el que la alerta toma su forma se
+               la comería (`problema.css`). -->
+          <div class="estado-celda">
+            <p class="escenario-estado">
+              <span class="dos-caras">
+                <span class="cara cara--ciego">
+                  <svg class="estado-icono" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <path d="M8 1.9 15 14H1z" />
+                    <path d="M8 6.4v3.1" />
+                    <path d="M8 11.6h.01" />
+                  </svg>
+                  Nadie sabe dónde va el bus
+                </span>
+                <span class="cara cara--claro" aria-hidden="true">
+                  <svg class="estado-marca" viewBox="0 0 512 512" aria-hidden="true" focusable="false">
+                    <circle cx="256" cy="256" r="256" fill="#00A859" />
+                    <path d="M 120 130 A 200 200 0 0 1 392 130" fill="none" stroke="#FFFFFF" stroke-width="32"
+                    stroke-linecap="round" opacity="0.5" />
+                    <path d="M 176 190 A 130 130 0 0 1 336 190" fill="none" stroke="#FFFFFF" stroke-width="32"
+                    stroke-linecap="round" />
+                    <rect x="136" y="240" width="240" height="180" rx="36" fill="#14274E" />
+                    <rect x="166" y="270" width="180" height="72" rx="16" fill="#FFFFFF" />
+                    <rect x="290" y="270" width="30" height="72" fill="#14274E" opacity="0.1" />
+                    <circle cx="180" cy="375" r="16" fill="#FFC107" />
+                    <circle cx="332" cy="375" r="16" fill="#FFC107" />
+                    <rect x="160" y="410" width="32" height="24" rx="8" fill="#0A1428" />
+                    <rect x="320" y="410" width="32" height="24" rx="8" fill="#0A1428" />
+                  </svg>
+                  Ya Viene
+                </span>
+              </span>
+            </p>
+          </div>
+
+          <!--
+            Los cuatro avisos son el contenido de la sección: uno por cosa
+            que cuesta esperar a ciegas (el tiempo, el sol, la tarde que se
+            pierde, la calle) y, en la otra cara, lo que la app hace con
+            esa misma cosa. Un título pequeño y una frase cada uno, como una
+            notificación. El de la ruta es el texto del aviso de la app tal
+            cual (`aviso.app` del glosario): con ruta, sin placa ni
+            distancia. Las distancias van en kilómetros con coma, nunca en
+            minutos. Sólo el dibujo es decorativo; la cara que no se ve
+            lleva `aria-hidden`, que mueve `problema.ts`.
+          -->
+          <div class="avisos">
+            <div class="aviso">
+              <span class="aviso-icono dos-caras" aria-hidden="true">
+                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M6 2.5h12M6 21.5h12M7 2.5v3.7a2 2 0 0 0 .6 1.4L12 12l4.4-4.4a2 2 0 0 0 .6-1.4V2.5M7 21.5v-3.7a2 2 0 0 1 .6-1.4L12 12l4.4 4.4a2 2 0 0 1 .6 1.4v3.7"/></svg></span>
+                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle class="b" cx="12" cy="10" r="2.4"/></svg></span>
+              </span>
+              <div class="aviso-texto dos-caras">
+                <div class="cara cara--ciego"><h3 class="aviso-titulo">Esperar una eternidad</h3><p class="aviso-frase">Ni tablero ni horario que se cumpla</p></div>
+                <div class="cara cara--claro" aria-hidden="true"><h3 class="aviso-titulo">Sabes cuál viene y por dónde</h3><p class="aviso-frase">Ves tu bus en el mapa, a 1,2 km</p></div>
+              </div>
+            </div>
+            <div class="aviso">
+              <span class="aviso-icono dos-caras" aria-hidden="true">
+                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M12 3.5a8.5 8.5 0 0 1 8.5 8.5h-17A8.5 8.5 0 0 1 12 3.5z"/><path d="M12 2v1.5M12 12v6.5a2 2 0 0 1-4 0"/></svg></span>
+                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></span>
+              </span>
+              <div class="aviso-texto dos-caras">
+                <div class="cara cara--ciego"><h3 class="aviso-titulo">Bajo el sol o la lluvia</h3><p class="aviso-frase">Se espera igual, sin sombra y mojándose</p></div>
+                <div class="cara cara--claro" aria-hidden="true"><h3 class="aviso-titulo">Esperas donde te convenga</h3><p class="aviso-frase">Tu bus de la ruta C14 está cerca de ti</p></div>
+              </div>
+            </div>
+            <div class="aviso">
+              <span class="aviso-icono dos-caras" aria-hidden="true">
+                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle class="r" cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7z" stroke="none"/><path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7M4 4.5v4.2h4.2M12 8v4l2.8 1.8"/></svg></span>
+              </span>
+              <div class="aviso-texto dos-caras">
+                <div class="cara cara--ciego"><h3 class="aviso-titulo">Ese tiempo suma</h3><p class="aviso-frase">Media hora perdida en el paradero</p></div>
+                <div class="cara cara--claro" aria-hidden="true"><h3 class="aviso-titulo">Ese tiempo vuelve</h3><p class="aviso-frase">La media hora vuelve a tu día</p></div>
+              </div>
+            </div>
+            <div class="aviso">
+              <span class="aviso-icono dos-caras" aria-hidden="true">
+                <span class="cara cara--ciego"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M8 1.9 15 14H1z"/><path d="M8 6.4v3.1"/><path d="M8 11.6h.01"/></svg></span>
+                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path class="r" d="M6 8.9 12 4l6 4.9v10.6H6z" stroke="none"/><path d="M4 10.5 12 4l8 6.5M6 9v10.5h12V9M10 19.5v-5h4v5"/></svg></span>
+              </span>
+              <div class="aviso-texto dos-caras">
+                <div class="cara cara--ciego"><h3 class="aviso-titulo">Expuesto a robos</h3><p class="aviso-frase">Mucho rato en la calle, celular en mano</p></div>
+                <div class="cara cara--claro" aria-hidden="true"><h3 class="aviso-titulo">Menos rato en la calle</h3><p class="aviso-frase">Sales de casa cuando el bus está cerca</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
   </main>
 
   <footer class="site-footer" id="pie">
@@ -1222,8 +1226,8 @@
       <nav class="footer-nav" aria-label="Navegación del pie de página">
         <div class="footer-nav-group">
           <span>Explora</span>
-          <a href="#problema">El problema</a>
           <a href="#como-funciona">Cómo funciona</a>
+          <a href="#problema">El problema</a>
         </div>
         <div class="footer-nav-group">
           <span>Conecta</span>

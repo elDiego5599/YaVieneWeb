@@ -272,7 +272,7 @@
 
 .site-footer {
   padding: 0;
-  border-top: 1px solid var(--linea);
+  /* Sin raya: «Problema» ya cierra con su banda (dueño, 2026-10-12). */
   color: var(--tinta);
 }
 
