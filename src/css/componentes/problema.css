@@ -857,16 +857,18 @@
   «Nadie sabe dónde va el bus» sobre la píldora verde, y los avisos
   viajaban a la fila con el texto viejo todavía encima.
 
-  Sólo el escenario: el titular y la frase no se los traga nadie y
-  hacen su relevo de siempre.
+  Escenario y cabecera: el titular y la frase también se los traga la
+  píldora (`problema.ts`) y salen de ella ya con la cara nueva.
 */
-[data-fase='brota'] .escenario .cara--ciego {
+[data-fase='brota'] .escenario .cara--ciego,
+[data-fase='brota'] .seccion-cabecera .cara--ciego {
   opacity: 0;
   visibility: hidden;
   transition: none;
 }
 
-[data-fase='brota'] .escenario .cara--claro {
+[data-fase='brota'] .escenario .cara--claro,
+[data-fase='brota'] .seccion-cabecera .cara--claro {
   opacity: 1;
   visibility: visible;
   transform: none;

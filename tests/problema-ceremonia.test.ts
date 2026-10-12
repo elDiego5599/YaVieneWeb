@@ -38,6 +38,12 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 const avisos = (): Vuelo[] => vuelos.filter((v) => v.el.classList.contains('aviso'));
+const cabeza = (): Vuelo[] => vuelos.filter((v) => v.el.matches('.seccion-cabecera .dos-caras'));
+const seccionEl = (): HTMLElement => document.querySelector<HTMLElement>('#problema')!;
+/** Avanza el reloj hasta que la ceremonia llega a `fase` (no ata el test a los milisegundos). */
+const hasta = (fase: string): void => {
+  for (let i = 0; i < 400 && seccionEl().dataset.fase !== fase; i++) vi.advanceTimersByTime(10);
+};
 
 describe('la ceremonia de «Qué resuelve»', () => {
   it('en aspira los cuatro avisos vuelan al núcleo y acaban sin tamaño ni opacidad', () => {
@@ -52,7 +58,7 @@ describe('la ceremonia de «Qué resuelve»', () => {
 
   it('en brota los cuatro avisos salen de la píldora, escalonados, y acaban a tamaño completo', () => {
     vuelos = [];
-    vi.advanceTimersByTime(600 + 240 + 1);
+    hasta('brota');
     const v = avisos();
     expect(v).toHaveLength(4);
     const retardos = v.map((x) => Number(x.opciones.delay));
@@ -63,5 +69,49 @@ describe('la ceremonia de «Qué resuelve»', () => {
       expect(keyframes[0].opacity).toBe(0);
       expect(keyframes[keyframes.length - 1].opacity).toBe(1);
     }
+  });
+
+  it('en aspira el titular y el párrafo vuelan al núcleo y acaban sin tamaño ni opacidad', () => {
+    const v = cabeza();
+    expect(v.map((x) => x.el.tagName).sort()).toEqual(['H2', 'P']);
+    for (const { keyframes } of v) {
+      const ultimo = keyframes[keyframes.length - 1];
+      expect(String(ultimo.transform)).toMatch(/scale\(0\.0/);
+      expect(ultimo.opacity).toBe(0);
+    }
+  });
+
+  it('el interruptor no se traga', () => {
+    expect(vuelos.some((v) => v.el.closest('.interruptor'))).toBe(false);
+  });
+
+  it('en brota el titular y el párrafo salen de la píldora, antes que los avisos, y acaban enteros', () => {
+    vuelos = [];
+    hasta('brota');
+    const v = cabeza();
+    expect(v).toHaveLength(2);
+    for (const { keyframes } of v) {
+      expect(String(keyframes[0].transform)).toMatch(/scale\(0\.0/);
+      expect(keyframes[0].opacity).toBe(0);
+      expect(keyframes[keyframes.length - 1].opacity).toBe(1);
+    }
+    const primerAviso = Math.min(...avisos().map((x) => Number(x.opciones.delay)));
+    expect(Math.max(...v.map((x) => Number(x.opciones.delay)))).toBeLessThan(primerAviso);
+  });
+
+  it('el tragar es suave: viajes largos, aceleración progresiva y el fundido al final del viaje', () => {
+    for (const { keyframes, opciones } of [...avisos(), ...cabeza()]) {
+      expect(Number(opciones.duration)).toBeGreaterThanOrEqual(700);
+      expect(opciones.easing).not.toBe('linear');
+      // Antes del último cuadro la pieza sigue visible y con tamaño.
+      const previo = keyframes[keyframes.length - 2];
+      expect(Number(previo.opacity)).toBeGreaterThanOrEqual(0.5);
+      expect(String(previo.transform)).not.toMatch(/scale\(0\.0/);
+    }
+  });
+
+  it('la ceremonia entera dura a lo sumo 2,8 s y acaba en reposo', () => {
+    vi.advanceTimersByTime(2800);
+    expect(seccionEl().dataset.fase).toBe('reposo');
   });
 });

@@ -14,14 +14,18 @@
  *
  * En `aspira` la alerta roja se encoge hasta ser el logo, la maraña de
  * hilos se recoge hacia él y se traga los rayos y las voces, que son el
- * ruido. Y engorda con lo que se traga: cada llegada le da un tirón y de
+ * ruido, y también el titular y la frase de la cabecera (el interruptor
+ * se queda): durante la escena sólo queda la píldora que cambia. Y engorda con lo que se traga: cada llegada le da un tirón y de
  * una a otra queda un poco más grande. En `carga` ese bulto late y cambia
  * de color. En `brota` se vuelve a abrir como «Ya Viene», sube, los
- * cuatro avisos salen de ella, ya arriba, y crecen hasta su fila mientras
- * brota el árbol de hilos verdes que baja a cada uno. Los avisos también
+ * titular y la frase nuevos salen de ella, vuelven a su sitio y tras ellos
+ * los cuatro avisos, ya arriba, crecen hasta su fila mientras brota el
+ * árbol de hilos verdes que baja a cada uno (todo con transform y opacity:
+ * el alto de la cabecera no se mueve). Los avisos también
  * se los traga —lo caótico entra por el centro y sale ordenado, como en
  * el diagrama de incident.io—, con el mismo remolino que los rayos y las
- * voces; al acabar quedan en su sitio, enteros y sin transformación.
+ * voces, largo y suave (ease-in, la escala baja a lo largo del viaje y la
+ * opacidad sólo cae al llegar); al acabar quedan en su sitio, enteros y sin transformación.
  *
  * Aquí se calculan las medidas que dependen del ancho: el vuelo de cada
  * pieza hasta el logo, adónde viaja cada aviso y por dónde pasa cada hilo
@@ -66,29 +70,41 @@ const PANTALLA = 0.6;
 
 /**
  * El viaje de una pieza hasta el logo y el relevo entre la primera que
- * sale y la última. Viajan los rayos, las voces y los avisos (los grandes
- * salen los últimos: se ordenan de menor a mayor bulto): un relevo largo
- * se leería como espera.
+ * sale y la última. Viajan los rayos, las voces, los avisos y el texto de
+ * la cabecera (los grandes salen los últimos: se ordenan de menor a mayor
+ * bulto). 760 ms es lo que hace falta para seguir con el ojo una pieza
+ * que cruza la sección (con 380 se leía como un tirón); el relevo de
+ * 260 ms reparte las salidas sin que la escena se lea como espera.
  */
-const VIAJE_MS = 380;
-const RELEVO_MS = 160;
+const VIAJE_MS = 760;
+const RELEVO_MS = 260;
 
 /**
- * Los tres tramos de la ceremonia, 1,8 s entre todos (tope 2,2). El
- * primero dura el último viaje —avisos incluidos— y un respiro con el
- * escenario limpio; el segundo es corto a propósito, que un latido largo
- * se vuelve un pulso de espera; el tercero es lo que tarda el último
- * aviso en salir de la píldora: `SALE_MS` más su turno (`TURNO_SALIDA_MS`
- * por aviso), con el árbol terminando a los 0,95 s (`problema.css`).
+ * Los tres tramos de la ceremonia, 2,6 s entre todos (tope 2,8). El
+ * primero dura el último viaje —texto y avisos incluidos— y 80 ms de
+ * respiro con el escenario limpio; el segundo es corto a propósito, que un
+ * latido largo se vuelve un pulso de espera; el tercero es lo que tarda el
+ * último aviso en salir de la píldora: su espera (`ESPERA_AVISOS_MS`, tras
+ * el texto) más `SALE_MS` y su turno (`TURNO_SALIDA_MS` por aviso), con el
+ * árbol terminando a los 0,95 s (`problema.css`).
  */
-const ASPIRA_MS = VIAJE_MS + RELEVO_MS + 60;
-const CARGA_MS = 240;
-const BROTA_MS = 960;
+const ASPIRA_MS = VIAJE_MS + RELEVO_MS + 80;
+const CARGA_MS = 320;
+const BROTA_MS = 1200;
 
-/** Lo que tarda un aviso en crecer desde la píldora hasta su sitio. */
-const SALE_MS = 620;
-/** El escalón entre un aviso y el siguiente: 3 × 80 + 620 = 860 < BROTA_MS. */
-const TURNO_SALIDA_MS = 80;
+/** Lo que tarda una pieza en crecer desde la píldora hasta su sitio. */
+const SALE_MS = 700;
+/** El escalón entre una pieza y la siguiente: el texto sale primero. */
+const TURNO_SALIDA_MS = 90;
+/** Los avisos esperan a que titular y párrafo (2 turnos) hayan salido: 180 + 3 × 90 + 700 = 1150 < BROTA_MS. */
+const ESPERA_AVISOS_MS = 2 * TURNO_SALIDA_MS;
+
+/**
+ * Cuánto gira el texto de la cabecera en el remolino, respecto a las
+ * piezas pequeñas: un bloque de texto de ancho completo dando 200° se lee
+ * como un error de maquetación, no como un remolino.
+ */
+const GIRO_TEXTO = 0.2;
 
 /**
  * Cuánto se desvía cada pieza del camino recto al centro, en tanto por
@@ -97,6 +113,9 @@ const TURNO_SALIDA_MS = 80;
  * no como siete cosas cayendo a un agujero.
  */
 const REMOLINO = 0.3;
+
+/** El texto de la cabecera que cambia de cara: titular y párrafo (el interruptor no). */
+const CABEZA = '.seccion-cabecera .dos-caras';
 
 /** Lo que mide la píldora una vez encogida: un círculo con el logo dentro. */
 const NUCLEO_PX = 46;
@@ -109,18 +128,18 @@ const NUCLEO_PX = 46;
  * para lo que aquí se está contando: tiene que verse sin mirarlo.
  */
 const GORDO = 1.34;
-const TRAGO = 0.1;
-const REVIENTA = 1.46;
+const TRAGO = 0.05;
+const REVIENTA = 1.4;
 
 /**
  * Dos llegadas más juntas que esto se cuentan como un solo trago. Sin
  * esto son siete tirones de 46 ms encabalgados, que no es engordar: es
  * vibrar.
  */
-const TRAGO_MINIMO_MS = 150;
+const TRAGO_MINIMO_MS = 220;
 
 /** Lo que tarda el logo en soltar el bulto al abrirse. */
-const SUELTA_MS = 340;
+const SUELTA_MS = 400;
 
 export class Problema {
   readonly #seccion: HTMLElement;
@@ -401,9 +420,9 @@ export class Problema {
     };
 
     const escenarioAncho = this.#ancho();
-    const piezas = Array.from(this.#seccion.querySelectorAll<HTMLElement>('.chispa, .ruido, .aviso'))
-      // Los avisos sólo vuelan con el escenario ancho: debajo van apilados.
-      .filter((pieza) => escenarioAncho || !pieza.classList.contains('aviso'))
+    const piezas = Array.from(this.#seccion.querySelectorAll<HTMLElement>(`.chispa, .ruido, .aviso, ${CABEZA}`))
+      // Avisos y texto sólo vuelan con el escenario ancho: debajo van apilados.
+      .filter((pieza) => escenarioAncho || !pieza.matches(`.aviso, ${CABEZA}`))
       .map((pieza) => {
         const caja = pieza.getBoundingClientRect();
         return {
@@ -424,8 +443,8 @@ export class Problema {
     piezas.forEach(({ pieza, dx, dy }, turno) => {
       const espera = (turno / ultima) * RELEVO_MS;
 
-      const vuelo = this.#volar(pieza, dx, dy, espera);
-      (pieza.classList.contains('aviso') ? this.#cartas : this.#vuelos).push(vuelo);
+      const vuelo = this.#volar(pieza, dx, dy, espera, pieza.matches(CABEZA) ? GIRO_TEXTO : 1);
+      (pieza.matches(`.aviso, ${CABEZA}`) ? this.#cartas : this.#vuelos).push(vuelo);
       llegadas.push(espera + VIAJE_MS);
     });
 
@@ -442,37 +461,46 @@ export class Problema {
    * El vuelo de una pieza (dx, dy es lo que le falta hasta el centro del
    * logo). Compartido por rayos, voces y avisos: el mismo remolino.
    */
-  #volar(pieza: HTMLElement, dx: number, dy: number, espera: number): Animation {
+  #volar(pieza: HTMLElement, dx: number, dy: number, espera: number, giro = 1): Animation {
     // El desvío es perpendicular al camino recto y del mismo signo
     // para todas, que es lo que convierte siete viajes en un remolino:
     // en vez de caer al centro en línea, todas lo rodean por el mismo
     // lado antes de entrar.
     const desvioX = -dy * REMOLINO;
     const desvioY = dx * REMOLINO;
+    const gira = (grados: number) => `rotate(${(grados * giro).toFixed(0)}deg)`;
+    // La escala baja a lo largo de todo el viaje y no llega a casi 0
+    // hasta el último cuadro; la opacidad se mantiene entera hasta tres
+    // cuartos y cae sólo al llegar: la pieza se ve entrar, no se apaga.
     return pieza.animate(
       [
         { transform: `translate(0px, 0px) scale(1)`, opacity: 1 },
         {
-          offset: 0.2,
-          transform: `translate(${(-dx * 0.06).toFixed(1)}px, ${(-dy * 0.06).toFixed(1)}px) scale(1.04)`,
+          offset: 0.18,
+          transform: `translate(${(-dx * 0.04).toFixed(1)}px, ${(-dy * 0.04).toFixed(1)}px) scale(1.03)`,
           opacity: 1,
         },
         {
-          offset: 0.62,
-          transform: `translate(${(dx * 0.42 + desvioX * 0.58).toFixed(1)}px, ${(dy * 0.42 + desvioY * 0.58).toFixed(1)}px) scale(0.58) rotate(70deg)`,
-          opacity: 0.85,
+          offset: 0.55,
+          transform: `translate(${(dx * 0.4 + desvioX * 0.6).toFixed(1)}px, ${(dy * 0.4 + desvioY * 0.6).toFixed(1)}px) scale(0.66) ${gira(70)}`,
+          opacity: 1,
         },
         {
-          transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(0.04) rotate(200deg)`,
+          offset: 0.85,
+          transform: `translate(${(dx * 0.86).toFixed(1)}px, ${(dy * 0.86).toFixed(1)}px) scale(0.3) ${gira(150)}`,
+          opacity: 0.75,
+        },
+        {
+          transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(0.04) ${gira(200)}`,
           opacity: 0,
         },
       ],
       {
         duration: VIAJE_MS,
         delay: espera,
-        // Sale despacio y llega disparada: es la curva de algo que
-        // tira, no de algo que se va.
-        easing: 'cubic-bezier(0.5, 0, 0.75, 0.15)',
+        // Aceleración progresiva (ease-in suave): sale con calma, coge
+        // velocidad y entra sin el latigazo de la curva anterior.
+        easing: 'cubic-bezier(0.42, 0, 0.8, 0.55)',
         fill: 'forwards',
       }
     );
@@ -495,7 +523,12 @@ export class Problema {
     const subida = parseFloat(this.#estado.style.getPropertyValue('--subida')) || 0;
     const destino = { x: n.x + n.width / 2, y: n.y + n.height / 2 + subida };
 
-    this.#seccion.querySelectorAll<HTMLElement>('.aviso').forEach((aviso, i) => {
+    // Primero el texto (titular, párrafo) y tras él los avisos.
+    const salidas = [
+      ...Array.from(this.#seccion.querySelectorAll<HTMLElement>(CABEZA), (el) => ({ el, extra: 0 })),
+      ...Array.from(this.#seccion.querySelectorAll<HTMLElement>('.aviso'), (el) => ({ el, extra: ESPERA_AVISOS_MS })),
+    ];
+    salidas.forEach(({ el: aviso, extra }, i) => {
       const caja = aviso.getBoundingClientRect();
       if (caja.width * caja.height === 0) return;
       const dx = destino.x - (caja.x + caja.width / 2);
@@ -508,7 +541,7 @@ export class Problema {
           ],
           {
             duration: SALE_MS,
-            delay: i * TURNO_SALIDA_MS,
+            delay: extra + (extra ? i - 2 : i) * TURNO_SALIDA_MS,
             // Sale con empuje y se posa: la salida del trago.
             easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
             // `both`: encogido y sin verse mientras espera su turno.
@@ -572,18 +605,18 @@ export class Problema {
 
       // Se encoge un punto justo antes de recibir: es lo que hace que
       // el tirón siguiente se lea como un golpe y no como un escalón.
-      marcar(cuando - 60, antes * 0.98, 'cubic-bezier(0.5, 0, 0.75, 0.15)');
+      marcar(cuando - 90, antes * 0.99, 'cubic-bezier(0.42, 0, 0.8, 0.55)');
       // El tirón.
-      marcar(cuando, luego + TRAGO, 'cubic-bezier(0.16, 1, 0.3, 1)');
-      // Y se recompone en su tamaño nuevo.
-      marcar(cuando + 130, luego, 'cubic-bezier(0.34, 1.56, 0.64, 1)');
+      marcar(cuando, luego + TRAGO, 'cubic-bezier(0.22, 1, 0.36, 1)');
+      // Y se recompone en su tamaño nuevo, con un muelle corto.
+      marcar(cuando + 220, luego, 'cubic-bezier(0.34, 1.2, 0.64, 1)');
     });
 
     // Lleno. Durante la carga el bulto se tensa hacia dentro y en el
     // último instante revienta: ahí es donde la píldora se abre.
-    marcar(ASPIRA_MS, GORDO, 'cubic-bezier(0.34, 1.56, 0.64, 1)');
-    marcar(ASPIRA_MS + CARGA_MS * 0.45, GORDO * 0.97, 'cubic-bezier(0.5, 0, 0.75, 0.15)');
-    marcar(ASPIRA_MS + CARGA_MS, REVIENTA, 'cubic-bezier(0.16, 1, 0.3, 1)');
+    marcar(ASPIRA_MS, GORDO, 'cubic-bezier(0.34, 1.2, 0.64, 1)');
+    marcar(ASPIRA_MS + CARGA_MS * 0.45, GORDO * 0.98, 'cubic-bezier(0.42, 0, 0.8, 0.55)');
+    marcar(ASPIRA_MS + CARGA_MS, REVIENTA, 'cubic-bezier(0.22, 1, 0.36, 1)');
     cuadros.push({ offset: 1, transform: 'scale(1)' });
 
     this.#vuelos.push(
