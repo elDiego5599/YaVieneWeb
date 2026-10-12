@@ -453,3 +453,33 @@
   border-top: 1px solid var(--linea);
   color: var(--tinta-tenue);
 }
+
+/* ── Preguntas de la portada ─────────────────────────────────────────
+   <details> nativo; solo el filo, el espacio y el marcador. */
+.faq {
+  max-width: 760px;
+  border-top: 1px solid var(--linea-fuerte);
+}
+.faq details {
+  border-bottom: 1px solid var(--linea-fuerte);
+}
+.faq summary {
+  padding: 18px 0;
+  color: var(--tinta);
+  font-weight: 600;
+  cursor: pointer;
+}
+.faq details p {
+  padding-bottom: 18px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.faq a,
+.faq-confianza a {
+  color: var(--tinta);
+  text-decoration: underline;
+}
+.faq-confianza {
+  margin-top: 28px;
+  color: var(--text-secondary);
+}
