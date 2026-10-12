@@ -626,12 +626,10 @@
    atrás es quitar `.hero-iphone`, el template y `hero-grid--video`.
    ────────────────────────────────────────────────────────────────── */
 .hero-iphone {
-  /* Grande, como el producto en incident.io (dueño, 2026-10-11: a 80 %
-     del alto «se ve enano»): el ancho es 2/3 del alto de la ventana, así
-     que el aparato (alto = 1,722 × ancho) pasa del pliegue y se sigue
-     al bajar. Piso 440, tope 640: a 1440 × 900 mide 600 × 1033. El
-     video de 1080 queda a 1,8x de la pantalla. */
-  --tel: clamp(440px, calc(100svh / 1.5), 640px);
+  /* El mismo ancho que el aparato central del trío (360) y algo menos
+     alto, porque toma la proporción del video (dueño, 2026-10-11):
+     360 × 620 contra los 360 × 753 del trío. */
+  --tel: 360px;
   flex: none;
   display: flex;
   flex-direction: column;
