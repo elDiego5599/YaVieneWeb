@@ -581,17 +581,32 @@
        pegadas a la barra (dueño, 2026-10-11). */
     padding-top: clamp(112px, 15vh, 168px);
     /* Copia y trío juntos: con 1550 la copia se estiraba y quedaba
-       lejos de los teléfonos (dueño, 2026-10-11). 1280 de contenido. */
-    max-width: calc(1280px + 2 * var(--calle));
+       lejos de los teléfonos (dueño, 2026-10-11). 1440 de contenido:
+       con el trío a 400 la copia aún tiene ~470. */
+    max-width: calc(1440px + 2 * var(--calle));
+  }
+
+  /* Con el 100 % de zoom solo se ve el hero (dueño, 2026-10-11): el
+     lienzo mide al menos la ventana y el sobrante va arriba, porque el
+     trío se apoya en el filo de abajo. */
+  .hero-panel:has(.hero-grid--video) {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+  }
+
+  .hero-panel:has(.hero-grid--video) .hero-grid--video {
+    flex: 1;
   }
 
   /* El panel corta solo la franja de abajo del video —216 de sus 2352
      px, el 9,2 % de la pantalla— y el marco: el trío sube lo que hacía
      falta para que se vea todo lo que enseña (dueño, 2026-10-11). */
   .hero-grid--video .hero-scene {
-    /* Junto a la copia el trío de 360 se comía el lienzo; a 300 se veía
-       chico (dueño, 2026-10-11): 330. */
-    --tel: 330px;
+    /* Crece con el alto de la ventana para llenar el lienzo: a 300 y a
+       330 se veía chico (dueño, 2026-10-11). La escena mide ~1,88 × tel,
+       así que (alto − 200) × 0,53 deja ~200 px para el nav y el aire. */
+    --tel: clamp(330px, (100svh - 200px) * 0.53, 400px);
     --sangrado: calc(var(--alto-tel) * 0.1);
   }
 
@@ -610,7 +625,7 @@
   }
 
   .hero-grid--video .hero-description {
-    font-size: 21px;
+    font-size: 22px;
   }
 
   .hero-grid--video .hero-subtext {
@@ -629,16 +644,16 @@
 
 /* El nav se alinea con lo que tiene debajo (dueño, 2026-10-11): la
    marca arranca donde la copia, el botón acaba donde el trío y los dos
-   enlaces van al centro. Copia y trío viven en `.hero-grid` (1280 de
+   enlaces van al centro. Copia y trío viven en `.hero-grid` (1440 de
    contenido + una calle por lado) dentro del panel (otra calle por
-   lado): de ahí el tope de 1280 + 4 calles y el relleno de 2 calles. Los dos envoltorios del
+   lado): de ahí el tope de 1440 + 4 calles y el relleno de 2 calles. Los dos envoltorios del
    pliegue no pintan nada desde 880, así que se disuelven y enlaces y
    botón entran a la rejilla de tres del nav. */
 @media (min-width: 1024px) {
   body:has(.hero-grid--video) .nav-island {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    max-width: calc(1280px + 4 * var(--calle));
+    max-width: calc(1440px + 4 * var(--calle));
     padding-inline: calc(2 * var(--calle));
   }
 
