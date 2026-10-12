@@ -17,10 +17,11 @@
  * ruido. Y engorda con lo que se traga: cada llegada le da un tirón y de
  * una a otra queda un poco más grande. En `carga` ese bulto late y cambia
  * de color. En `brota` se vuelve a abrir como «Ya Viene», sube, los
- * cuatro avisos viajan a su fila y se enderezan, y de la píldora brota el
- * árbol de hilos verdes que baja a cada uno. Los avisos no se los traga:
- * son lo que se lee, y lo que se cuenta es que lo mismo se pone en orden
- * (como el diagrama de incident.io), no que desaparezca y salga otra cosa.
+ * cuatro avisos salen de ella, ya arriba, y crecen hasta su fila mientras
+ * brota el árbol de hilos verdes que baja a cada uno. Los avisos también
+ * se los traga —lo caótico entra por el centro y sale ordenado, como en
+ * el diagrama de incident.io—, con el mismo remolino que los rayos y las
+ * voces; al acabar quedan en su sitio, enteros y sin transformación.
  *
  * Aquí se calculan las medidas que dependen del ancho: el vuelo de cada
  * pieza hasta el logo, adónde viaja cada aviso y por dónde pasa cada hilo
@@ -65,22 +66,29 @@ const PANTALLA = 0.6;
 
 /**
  * El viaje de una pieza hasta el logo y el relevo entre la primera que
- * sale y la última. Sólo viajan los rayos y las voces, cosas pequeñas:
- * un relevo largo se leería como espera.
+ * sale y la última. Viajan los rayos, las voces y los avisos (los grandes
+ * salen los últimos: se ordenan de menor a mayor bulto): un relevo largo
+ * se leería como espera.
  */
 const VIAJE_MS = 380;
 const RELEVO_MS = 160;
 
 /**
- * Los tres tramos de la ceremonia, 1,8 s entre todos. El primero dura el
- * último viaje y un respiro con el escenario limpio; el segundo es corto
- * a propósito, que un latido largo se vuelve un pulso de espera; el
- * tercero es lo que tarda el último aviso en llegar a la fila (0,62 s
- * con 0,3 s de turno, `problema.css`).
+ * Los tres tramos de la ceremonia, 1,8 s entre todos (tope 2,2). El
+ * primero dura el último viaje —avisos incluidos— y un respiro con el
+ * escenario limpio; el segundo es corto a propósito, que un latido largo
+ * se vuelve un pulso de espera; el tercero es lo que tarda el último
+ * aviso en salir de la píldora: `SALE_MS` más su turno (`TURNO_SALIDA_MS`
+ * por aviso), con el árbol terminando a los 0,95 s (`problema.css`).
  */
 const ASPIRA_MS = VIAJE_MS + RELEVO_MS + 60;
 const CARGA_MS = 240;
 const BROTA_MS = 960;
+
+/** Lo que tarda un aviso en crecer desde la píldora hasta su sitio. */
+const SALE_MS = 620;
+/** El escalón entre un aviso y el siguiente: 3 × 80 + 620 = 860 < BROTA_MS. */
+const TURNO_SALIDA_MS = 80;
 
 /**
  * Cuánto se desvía cada pieza del camino recto al centro, en tanto por
@@ -126,6 +134,8 @@ export class Problema {
   #tramos: number[] = [];
   /** Lo que está volando hacia el logo ahora mismo. */
   #vuelos: Animation[] = [];
+  /** Lo mismo, pero de los avisos: `brota` los cancela para medirlos. */
+  #cartas: Animation[] = [];
   /** Los hilos, creados una vez; `#trazar` sólo les cambia el `d`. */
   #enredo: SVGPathElement[] = [];
   #arbol: SVGPathElement[] = [];
@@ -361,6 +371,7 @@ export class Problema {
         this.#seccion.dataset.fase = 'brota';
         this.#cambiar('claro');
         this.#seccion.dataset.fase = 'brota';
+        this.#brotar();
       }, ASPIRA_MS + CARGA_MS),
 
       window.setTimeout(() => {
@@ -372,9 +383,9 @@ export class Problema {
   }
 
   /**
-   * Se lleva el ruido: los rayos y las voces van al logo, de lo más
-   * pequeño a lo más grande, y la maraña se recoge con ellos desde el CSS.
-   * Los avisos se quedan: son lo que se lee, y se ordenan en `brota`.
+   * Se lo lleva todo: los rayos, las voces y los avisos van al logo, de
+   * lo más pequeño a lo más grande, y la maraña se recoge con ellos desde
+   * el CSS. Los avisos vuelven a salir de él en `brota`.
    *
    * El pequeño tirón hacia atrás del principio es lo que separa «se lo
    * llevan» de «se apaga»: sin ese impulso, entrar en el logo se lee
@@ -389,7 +400,10 @@ export class Problema {
       y: nucleo.y + nucleo.height / 2,
     };
 
-    const piezas = Array.from(this.#seccion.querySelectorAll<HTMLElement>('.chispa, .ruido'))
+    const escenarioAncho = this.#ancho();
+    const piezas = Array.from(this.#seccion.querySelectorAll<HTMLElement>('.chispa, .ruido, .aviso'))
+      // Los avisos sólo vuelan con el escenario ancho: debajo van apilados.
+      .filter((pieza) => escenarioAncho || !pieza.classList.contains('aviso'))
       .map((pieza) => {
         const caja = pieza.getBoundingClientRect();
         return {
@@ -400,7 +414,7 @@ export class Problema {
         };
       })
       // Lo que no se dibuja no viaja: por debajo de 1024 px no hay
-      // chispazos ni voces en el escenario.
+      // chispazos ni voces, y los avisos están apilados sin ceremonia que romper.
       .filter((v) => v.bulto > 0)
       .sort((a, b) => a.bulto - b.bulto);
 
@@ -410,46 +424,99 @@ export class Problema {
     piezas.forEach(({ pieza, dx, dy }, turno) => {
       const espera = (turno / ultima) * RELEVO_MS;
 
-      // El desvío es perpendicular al camino recto y del mismo signo
-      // para todas, que es lo que convierte siete viajes en un remolino:
-      // en vez de caer al centro en línea, todas lo rodean por el mismo
-      // lado antes de entrar.
-      const desvioX = -dy * REMOLINO;
-      const desvioY = dx * REMOLINO;
-
-      this.#vuelos.push(
-        pieza.animate(
-          [
-            { transform: `translate(0px, 0px) scale(1)`, opacity: 1 },
-            {
-              offset: 0.2,
-              transform: `translate(${(-dx * 0.06).toFixed(1)}px, ${(-dy * 0.06).toFixed(1)}px) scale(1.04)`,
-              opacity: 1,
-            },
-            {
-              offset: 0.62,
-              transform: `translate(${(dx * 0.42 + desvioX * 0.58).toFixed(1)}px, ${(dy * 0.42 + desvioY * 0.58).toFixed(1)}px) scale(0.58) rotate(70deg)`,
-              opacity: 0.85,
-            },
-            {
-              transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(0.04) rotate(200deg)`,
-              opacity: 0,
-            },
-          ],
-          {
-            duration: VIAJE_MS,
-            delay: espera,
-            // Sale despacio y llega disparada: es la curva de algo que
-            // tira, no de algo que se va.
-            easing: 'cubic-bezier(0.5, 0, 0.75, 0.15)',
-            fill: 'forwards',
-          }
-        )
-      );
+      const vuelo = this.#volar(pieza, dx, dy, espera);
+      (pieza.classList.contains('aviso') ? this.#cartas : this.#vuelos).push(vuelo);
       llegadas.push(espera + VIAJE_MS);
     });
 
     this.#engordar(llegadas);
+  }
+
+  /** ¿Se dibuja el lienzo de hilos? Es lo que dice que los avisos están sueltos (≥ 1024 px). */
+  #ancho(): boolean {
+    const red = this.#seccion.querySelector('.escenario-red');
+    return !!red && getComputedStyle(red).display !== 'none';
+  }
+
+  /**
+   * El vuelo de una pieza (dx, dy es lo que le falta hasta el centro del
+   * logo). Compartido por rayos, voces y avisos: el mismo remolino.
+   */
+  #volar(pieza: HTMLElement, dx: number, dy: number, espera: number): Animation {
+    // El desvío es perpendicular al camino recto y del mismo signo
+    // para todas, que es lo que convierte siete viajes en un remolino:
+    // en vez de caer al centro en línea, todas lo rodean por el mismo
+    // lado antes de entrar.
+    const desvioX = -dy * REMOLINO;
+    const desvioY = dx * REMOLINO;
+    return pieza.animate(
+      [
+        { transform: `translate(0px, 0px) scale(1)`, opacity: 1 },
+        {
+          offset: 0.2,
+          transform: `translate(${(-dx * 0.06).toFixed(1)}px, ${(-dy * 0.06).toFixed(1)}px) scale(1.04)`,
+          opacity: 1,
+        },
+        {
+          offset: 0.62,
+          transform: `translate(${(dx * 0.42 + desvioX * 0.58).toFixed(1)}px, ${(dy * 0.42 + desvioY * 0.58).toFixed(1)}px) scale(0.58) rotate(70deg)`,
+          opacity: 0.85,
+        },
+        {
+          transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(0.04) rotate(200deg)`,
+          opacity: 0,
+        },
+      ],
+      {
+        duration: VIAJE_MS,
+        delay: espera,
+        // Sale despacio y llega disparada: es la curva de algo que
+        // tira, no de algo que se va.
+        easing: 'cubic-bezier(0.5, 0, 0.75, 0.15)',
+        fill: 'forwards',
+      }
+    );
+  }
+
+  /**
+   * Los avisos salen de la píldora, ya arriba, y crecen hasta su fila,
+   * uno detrás de otro. Se parte de que el CSS de `brota` los deja ya en
+   * su sitio (sin transición): aquí sólo se les resta el camino a la
+   * píldora y se les devuelve creciendo. Al acabar, la animación se
+   * cancela con la ceremonia y no queda transformación alguna.
+   */
+  #brotar(): void {
+    if (!this.#estado || !this.#ancho()) return;
+    // Las animaciones de `aspira` los tienen encogidos: fuera, para medirlos.
+    for (const vuelo of this.#cartas) vuelo.cancel();
+    this.#cartas = [];
+
+    const n = this.#estado.getBoundingClientRect();
+    const subida = parseFloat(this.#estado.style.getPropertyValue('--subida')) || 0;
+    const destino = { x: n.x + n.width / 2, y: n.y + n.height / 2 + subida };
+
+    this.#seccion.querySelectorAll<HTMLElement>('.aviso').forEach((aviso, i) => {
+      const caja = aviso.getBoundingClientRect();
+      if (caja.width * caja.height === 0) return;
+      const dx = destino.x - (caja.x + caja.width / 2);
+      const dy = destino.y - (caja.y + caja.height / 2);
+      this.#vuelos.push(
+        aviso.animate(
+          [
+            { transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(0.04)`, opacity: 0 },
+            { transform: 'translate(0px, 0px) scale(1)', opacity: 1 },
+          ],
+          {
+            duration: SALE_MS,
+            delay: i * TURNO_SALIDA_MS,
+            // Sale con empuje y se posa: la salida del trago.
+            easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            // `both`: encogido y sin verse mientras espera su turno.
+            fill: 'both',
+          }
+        )
+      );
+    });
   }
 
   /**
@@ -531,7 +598,8 @@ export class Problema {
   #cortarCeremonia(): void {
     for (const reloj of this.#tramos) window.clearTimeout(reloj);
     this.#tramos = [];
-    for (const vuelo of this.#vuelos) vuelo.cancel();
+    for (const vuelo of [...this.#vuelos, ...this.#cartas]) vuelo.cancel();
     this.#vuelos = [];
+    this.#cartas = [];
   }
 }

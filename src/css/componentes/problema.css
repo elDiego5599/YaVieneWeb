@@ -586,6 +586,13 @@
     rotate: 0deg;
   }
 
+  /* En `brota` los avisos ya están en su fila y derechos: crecer desde la
+     píldora lo hace `problema.ts` (`#brotar`), y una transición de
+     `translate` por debajo los haría llegar dos veces. */
+  [data-fase='brota'] .aviso {
+    transition: none;
+  }
+
   .escenario-estado {
     rotate: -1.5deg;
   }
