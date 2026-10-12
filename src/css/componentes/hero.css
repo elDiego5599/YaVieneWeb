@@ -576,7 +576,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: end;
-    column-gap: clamp(24px, 3vw, 56px);
+    column-gap: clamp(20px, 2vw, 40px);
     /* Más aire bajo el nav: con el trío a la derecha, sus tapas quedaban
        pegadas a la barra (dueño, 2026-10-11). */
     padding-top: clamp(112px, 15vh, 168px);
@@ -605,8 +605,10 @@
   .hero-grid--video .hero-scene {
     /* Crece con el alto de la ventana para llenar el lienzo: a 300 y a
        330 se veía chico (dueño, 2026-10-11). La escena mide ~1,88 × tel,
-       así que (alto − 200) × 0,53 deja ~200 px para el nav y el aire. */
-    --tel: clamp(330px, (100svh - 200px) * 0.53, 400px);
+       así que (alto − 200) × 0,5 deja ~200 px para el nav y el aire; de
+       0,53 a 0,5 le cede a la copia el ancho para su letra más grande
+       (dueño, 2026-10-12). */
+    --tel: clamp(330px, (100svh - 200px) * 0.5, 400px);
     --sangrado: calc(var(--alto-tel) * 0.1);
   }
 
@@ -621,19 +623,19 @@
      del párrafo de abajo; a 14cqw el titular quedaba más angosto que el
      párrafo y el bloque se veía cojo (dueño, 2026-10-11). Tope 104. */
   .hero-grid--video .hero-title {
-    font-size: min(17.5cqw, 84px);
+    font-size: min(17.5cqw, 96px);
   }
 
   .hero-grid--video .hero-description {
-    font-size: 22px;
+    font-size: 24px;
   }
 
   .hero-grid--video .hero-subtext {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .hero-grid--video .hero-actions a {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .hero-grid--video .hero-actions,

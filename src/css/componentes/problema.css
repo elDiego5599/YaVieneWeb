@@ -36,10 +36,17 @@
   gap: 16px;
 }
 
-/* «Qué resuelve» va sobre blanco, no sobre la banda (dueño, 2026-10-11). */
+/* Segunda tarjeta del recorrido, como el hero: misma calle y mismo
+   radio, con la banda de fondo, para que se lea como el paso siguiente
+   y no como otra página (dueño, 2026-10-12, a partir de incident.io). */
 #problema.panel--banda {
-  background: #fff;
-  border-block: 0;
+  margin: 16px var(--calle) 0;
+  border: 0;
+  border-radius: 32px;
+}
+
+#problema .panel-inner {
+  padding-top: clamp(48px, 6vh, 80px);
 }
 
 #problema .seccion-cabecera {
@@ -55,7 +62,7 @@
   margin-bottom: 18px;
   padding: 6px;
   border-radius: 999px;
-  background: #F0F0EA;
+  background: #E3EAE5;
 }
 
 .interruptor-marca {
