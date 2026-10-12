@@ -86,6 +86,7 @@ const arrancar = (): void => {
   */
   const svgCf = document.querySelector<SVGSVGElement>('#cf-mapa-rutas');
   const lienzoCf = document.querySelector<HTMLElement>('#cf-mapa');
+  let llevarBus: ((metros: number) => void) | undefined;
   if (svgCf && lienzoCf) {
     const mapaCf = new PhoneMap(svgCf, lienzoCf);
     mapaCf.setRoute('R-106');
@@ -95,9 +96,34 @@ const arrancar = (): void => {
     mapaCf.showRoute(true);
     mapaCf.showPin(true);
     mapaCf.showBuses(true);
+    const distancia = document.querySelector<HTMLElement>('.cf-capa--bus .eta-number');
+    llevarBus = (metros: number): void => {
+      mapaCf.setBuses([pin - metros / mapaCf.metrosDeRuta]);
+      if (distancia) distancia.textContent = (metros / 1000).toFixed(1).replace('.', ',');
+    };
   }
   const demo = document.querySelector<HTMLElement>('.cf-demo');
-  if (demo) new Pasos(demo);
+  const animarLlegada = (): void => {
+    if (!llevarBus) return;
+    const desde = 2600;
+    const hasta = 1800;
+    if (sinMovimiento()) {
+      llevarBus(hasta);
+      return;
+    }
+    const inicio = performance.now();
+    const actualizar = (ahora: number): void => {
+      const progreso = Math.min(1, (ahora - inicio) / 1600);
+      const suavizado = 1 - (1 - progreso) ** 3;
+      llevarBus(desde - (desde - hasta) * suavizado);
+      if (progreso < 1) requestAnimationFrame(actualizar);
+    };
+    llevarBus(desde);
+    requestAnimationFrame(actualizar);
+  };
+  if (demo) new Pasos(demo, { intervalo: 5000, alCambiar: paso => {
+    if (paso === 'bus') animarLlegada();
+  } });
 
   /*
     Qué resuelve: la sección de dos caras. Va aquí y no antes porque el

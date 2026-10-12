@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Pasos } from '../src/como-funciona';
 
 /**
@@ -26,6 +26,11 @@ const descripcionVisible = (): string[] =>
 beforeEach(() => {
   document.body.innerHTML = banda;
   new Pasos(document.querySelector<HTMLElement>('.cf-demo')!);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
 });
 
 describe('pestañas de los tres pasos', () => {
@@ -56,5 +61,65 @@ describe('pestañas de los tres pasos', () => {
   it('otra tecla no cambia nada', () => {
     tecla('ruta', 'Enter');
     expect(escena().dataset.paso).toBe('ruta');
+  });
+});
+
+describe('avance automático de los pasos', () => {
+  // La demo a la vista: el observador avisa al empezar a observarla.
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(readonly avisar: (e: { isIntersecting: boolean }[]) => void) {}
+        observe(): void {
+          this.avisar([{ isIntersecting: true }]);
+        }
+        disconnect(): void {}
+      }
+    );
+  });
+
+  it('avanza en orden y vuelve a la ruta', () => {
+    new Pasos(document.querySelector<HTMLElement>('.cf-demo')!, { intervalo: 5000 });
+    const lista = document.querySelector<HTMLElement>('[role="tablist"]')!;
+    expect(lista.hasAttribute('data-auto')).toBe(true);
+    vi.advanceTimersByTime(15000);
+    expect(escena().dataset.paso).toBe('ruta');
+    vi.advanceTimersByTime(5000);
+    expect(escena().dataset.paso).toBe('bus');
+  });
+
+  it('un clic detiene el avance y quita data-auto', () => {
+    new Pasos(document.querySelector<HTMLElement>('.cf-demo')!, { intervalo: 5000 });
+    pestana('aviso').click();
+    vi.advanceTimersByTime(20000);
+    expect(escena().dataset.paso).toBe('aviso');
+    expect(document.querySelector('[role="tablist"]')!.hasAttribute('data-auto')).toBe(false);
+  });
+
+  it('con movimiento reducido no arranca el avance', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    new Pasos(document.querySelector<HTMLElement>('.cf-demo')!, { intervalo: 5000 });
+    vi.advanceTimersByTime(10000);
+    expect(escena().dataset.paso).toBe('ruta');
+    expect(document.querySelector('[role="tablist"]')!.hasAttribute('data-auto')).toBe(false);
+  });
+
+  it('avisa cada cambio manual y automático', () => {
+    const alCambiar = vi.fn();
+    new Pasos(document.querySelector<HTMLElement>('.cf-demo')!, { intervalo: 5000, alCambiar });
+    vi.advanceTimersByTime(5000);
+    pestana('aviso').click();
+    expect(alCambiar.mock.calls).toEqual([['bus'], ['aviso']]);
+  });
+
+  it('sin intervalo conserva el modo manual', () => {
+    vi.useRealTimers();
+    new Pasos(document.querySelector<HTMLElement>('.cf-demo')!);
+    vi.useFakeTimers();
+    vi.advanceTimersByTime(20000);
+    expect(escena().dataset.paso).toBe('ruta');
+    expect(document.querySelector('[role="tablist"]')!.hasAttribute('data-auto')).toBe(false);
   });
 });

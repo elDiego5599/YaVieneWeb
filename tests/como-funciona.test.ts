@@ -105,6 +105,24 @@ describe('banda «Cómo funciona»', () => {
     expect(aviso).not.toMatch(/\d\s?(m|km)\b/);
   });
 
+  it('muestra las tres pantallas de la app y no duplica ids del hero', () => {
+    expect(banda).toContain('Ver buses en vivo');
+    expect(banda).toContain('Avisarme cuando esté cerca');
+    expect(banda).toContain('Aviso activado');
+    const idsHero = [...(html.matchAll(/\bid="([^"]+)"/g))].map((match) => match[1]);
+    expect(new Set(idsHero).size).toBe(idsHero.length);
+  });
+
+  it('pone las capas de los tres pasos dentro de la pantalla y las pestañas en la demo', () => {
+    // Un </div> de más las saca: la hoja queda sin estilos y las pestañas
+    // fuera de `Pasos`.
+    document.body.innerHTML = banda;
+    for (const capa of ['ruta', 'aviso', 'bus']) {
+      expect(document.querySelector(`.cf-capa--${capa}`)!.closest('.phone-screen')).not.toBeNull();
+    }
+    expect(document.querySelector('[role="tablist"]')!.closest('.cf-demo')).not.toBeNull();
+  });
+
   it('espeja Dart con su comentario y entra con el .reveal de la página', () => {
     expect(css).toMatch(/eta_bottom_sheet\.dart/);
     expect(css).toMatch(/bus_notification_service\.dart/);

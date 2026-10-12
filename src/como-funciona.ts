@@ -13,6 +13,13 @@
  * lo único que dice en palabras lo que el teléfono enseña.
  */
 
+import { sinMovimiento } from './scrolly';
+
+export type OpcionesPasos = {
+  intervalo?: number;
+  alCambiar?: (paso: string) => void;
+};
+
 const TECLAS: Record<string, (i: number, n: number) => number> = {
   ArrowRight: (i, n) => (i + 1) % n,
   ArrowLeft: (i, n) => (i - 1 + n) % n,
@@ -24,17 +31,28 @@ export class Pasos {
   readonly #pestanas: HTMLButtonElement[];
   readonly #escena: HTMLElement;
   readonly #descripciones: HTMLElement[];
+  readonly #lista: HTMLElement | null;
+  readonly #alCambiar: ((paso: string) => void) | undefined;
+  #temporizador = 0;
+  #observador?: IntersectionObserver;
+  #activo = true;
 
-  constructor(raiz: HTMLElement) {
+  constructor(raiz: HTMLElement, opciones: OpcionesPasos = {}) {
     this.#pestanas = Array.from(raiz.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
     this.#escena = raiz.querySelector<HTMLElement>('[role="tabpanel"]')!;
     this.#descripciones = Array.from(
       this.#escena.querySelectorAll<HTMLElement>('.solo-lectores[data-paso]')
     );
+    this.#lista = raiz.querySelector<HTMLElement>('[role="tablist"]');
+    this.#alCambiar = opciones.alCambiar;
 
     this.#pestanas.forEach((pestana, i) => {
-      pestana.addEventListener('click', () => this.#elegir(i));
+      pestana.addEventListener('click', () => {
+        this.#detener();
+        this.#elegir(i);
+      });
       pestana.addEventListener('keydown', (ev) => {
+        this.#detener();
         const ir = TECLAS[ev.key];
         if (!ir) return;
         ev.preventDefault();
@@ -43,6 +61,36 @@ export class Pasos {
         this.#pestanas[j].focus();
       });
     });
+
+    if (opciones.intervalo && opciones.intervalo > 0 && !sinMovimiento()) {
+      this.#lista?.setAttribute('data-auto', '');
+      const arrancar = (): void => {
+        if (this.#temporizador || !this.#activo) return;
+        this.#temporizador = window.setInterval(() => {
+          const actual = this.#pestanas.findIndex(p => p.getAttribute('aria-selected') === 'true');
+          this.#elegir((actual + 1) % this.#pestanas.length);
+        }, opciones.intervalo);
+      };
+      if ('IntersectionObserver' in window) {
+        this.#observador = new IntersectionObserver(([entrada]) => {
+          if (entrada.isIntersecting) arrancar();
+          else {
+            window.clearInterval(this.#temporizador);
+            this.#temporizador = 0;
+          }
+        });
+        this.#observador.observe(raiz);
+      } else arrancar();
+    }
+  }
+
+  #detener(): void {
+    if (!this.#activo) return;
+    this.#activo = false;
+    window.clearInterval(this.#temporizador);
+    this.#temporizador = 0;
+    this.#observador?.disconnect();
+    this.#lista?.removeAttribute('data-auto');
   }
 
   #elegir(indice: number): void {
@@ -56,5 +104,6 @@ export class Pasos {
     this.#escena.dataset.paso = paso;
     this.#escena.setAttribute('aria-labelledby', elegida.id);
     for (const p of this.#descripciones) p.hidden = p.dataset.paso !== paso;
+    this.#alCambiar?.(paso);
   }
 }

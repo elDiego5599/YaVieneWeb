@@ -2,8 +2,8 @@
 
    La última banda, sin raya encima (dueño, 2026-10-12): el texto a un lado y, al otro, un mockup
    breve de la app del pasajero, como el bloque de On-call de incident.io
-   (dueño, 2026-10-12) sin su cuadro grande: sobre el blanco, un cuadro en
-   la banda de «Problema» con el teléfono y, debajo, los tres pasos como
+   (dueño, 2026-10-12) con su cuadro grande en la banda de «Problema»,
+   otro un punto más hondo con el teléfono y, debajo, los tres pasos como
    pestañas que cambian lo que enseña la pantalla (`como-funciona.ts`).
    No dibuja nada que ya esté dibujado: el teléfono es `.phone-shell`, el
    mapa `.phone-map` con su `PhoneMap` (main.ts), y el selector, la hoja
@@ -16,47 +16,107 @@
    teléfono; con `prefers-reduced-motion` se quedan en un fundido.
    ────────────────────────────────────────────────────────────────── */
 
-/* Como «Pre-built integrations» de incident.io (dueño, 2026-10-12): la
-   banda más ancha que el contenedor de la página (1280 contra 1160) para
-   que el mockup ocupe su mitad, y aire de sobra arriba y abajo, que es lo
-   que la hace verse sosegada. Sin raya encima. */
-.cf-grid {
-  display: grid;
-  max-width: 1280px;
-  gap: clamp(32px, 5vw, 72px);
-  align-items: center;
-  padding-block: clamp(56px, 10vh, 120px);
+/* Como el «Move fast when you break things» de incident.io (dueño,
+   2026-10-12): el titular de la banda va centrado y fuera del cuadro, para
+   que arriba no quede vacío. La banda es más ancha que el contenedor de la
+   página (1280 contra 1160), como la de allá. */
+.cf-bloque {
+  max-width: calc(1280px + 2 * var(--calle));
 }
 
-.cf-texto {
+.cf-cabeza {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 20px;
+  align-items: center;
+  gap: 16px;
+  /* 64 px a 1440 entre el lead y el cuadro, 40 en un teléfono. */
+  margin-bottom: clamp(40px, 4.4vw, 64px);
+  text-align: center;
 }
 
-/* En dos renglones parejos, como el de incident.io: 4,6 vw son 66 px a
-   1440 y 47 a 1024, con tope en 72, bajo los 102 px del titular de la
-   portada (`.hero-title`). Interlínea apretada y tracking negativo, que es
-   lo que pide la letra grande. */
-.cf-texto .seccion-titulo {
+/* 40–64 px: 63 a 1440, el tamaño del titular de allá, bajo los 102 del
+   de la portada (`.hero-title`). Interlínea apretada y tracking negativo,
+   que es lo que pide la letra grande. */
+.cf-cabeza .seccion-titulo {
   max-width: none;
-  font-size: clamp(2.5rem, 4.6vw, 4.5rem);
-  line-height: 1.04;
-  letter-spacing: -0.04em;
+  font-size: clamp(2.5rem, 1.4rem + 2.8vw, 4rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
   text-wrap: balance;
 }
 
-/* El párrafo grande y gris de incident.io, que sube con el titular:
-   19–25 px (24 a 1440), interlínea 1,45, en la tinta media de la página. */
-.cf-texto .seccion-lead {
-  max-width: 34ch;
-  font-size: clamp(19px, 1rem + 0.6vw, 25px);
+/* 17–19 px en la tinta media, dos renglones a 1440 como el de allá. */
+.cf-cabeza .seccion-lead {
+  max-width: 46ch;
+  font-size: clamp(17px, 1rem + 0.2vw, 19px);
+  color: var(--tinta-media);
   line-height: 1.45;
+  text-wrap: balance;
 }
 
-.cf-texto .btn-primary {
-  margin-top: 8px;
+/* El cuadro grande del On-call de incident.io: el texto del paso, la demo
+   y las pestañas dentro de una caja en la banda de «Problema» (`--banda`),
+   con su aire: 75 px a 1440 como allá (5,2 vw), 20 en un teléfono. Radio
+   32 a 1440 (2,2 vw), 20 en un teléfono. */
+.cf-grid {
+  display: grid;
+  padding: clamp(20px, 5.2vw, 75px);
+  border-radius: clamp(20px, 2.2vw, 32px);
+  background: var(--banda);
+  gap: clamp(32px, 5vw, 72px);
+}
+
+/* Lo que dice el paso elegido, donde allá van «On-call gets the right
+   people in the room» y su párrafo. Los tres textos se apilan en la misma
+   celda, así el alto no salta, y se ve el del `data-paso` de la escena
+   (lo pone `como-funciona.ts`; sin JavaScript, el del marcado: «ruta»). */
+.cf-texto {
+  display: grid;
+}
+
+.cf-explica {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  opacity: 0;
+  translate: 0 6px;
+  transition:
+    opacity 0.3s var(--ease-out-cubic),
+    translate 0.4s var(--ease-out-cubic);
+}
+
+.cf-grid:has(.cf-escena[data-paso="ruta"]) .cf-explica[data-paso="ruta"],
+.cf-grid:has(.cf-escena[data-paso="bus"]) .cf-explica[data-paso="bus"],
+.cf-grid:has(.cf-escena[data-paso="aviso"]) .cf-explica[data-paso="aviso"] {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* El número en el verde de letra (`--acento`), 13 px seminegrita. */
+.cf-numero {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--acento);
+  letter-spacing: 0.02em;
+}
+
+/* 28–40 px: 36 a 1440, el subtítulo de allá; un escalón bajo el titular. */
+.cf-explica-titulo {
+  font-size: clamp(1.75rem, 1.2rem + 1.2vw, 2.5rem);
+  font-weight: 500;
+  color: var(--tinta);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.cf-explica-texto {
+  max-width: 34ch;
+  font-size: clamp(17px, 1rem + 0.2vw, 19px);
+  color: var(--tinta-media);
+  line-height: 1.5;
 }
 
 /* La ceja como pastilla con filo, la del «Built for enterprises» de
@@ -69,9 +129,10 @@
   background: var(--surface);
 }
 
-/* El cuadro de incident.io, en la banda de «Problema» (`--banda`, dueño,
-   2026-10-12) y con su radio a la escala de este (32 allá, a 1440 de
-   ancho; 24 aquí). Proporción fija, y todo dentro en porcentajes. */
+/* El cuadro de dentro, un punto más hondo que la caja grande, como el de
+   incident.io: el 5 % del verde de letra (`--acento`) sobre `--banda`.
+   Radio 16, la mitad del de fuera. Proporción fija, y todo dentro en
+   porcentajes. */
 .cf-demo {
   min-width: 0;
 }
@@ -80,9 +141,10 @@
   container-type: inline-size;
   position: relative;
   overflow: hidden;
-  aspect-ratio: 690 / 560;
-  border-radius: 24px;
-  background: var(--banda);
+  /* 690 / 710 deja entero el CTA inferior de eta_bottom_sheet.dart. */
+  aspect-ratio: 690 / 710;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--banda), var(--acento) 5%);
 }
 
 /* El teléfono a la derecha, cortado por el borde de abajo como el de
@@ -90,10 +152,21 @@
    debajo de la hoja. 38 cqw son 262 px a 1440, y la app sale a ~0,6 de su
    tamaño, la misma escala que los teléfonos de los lados del hero. */
 .cf-telefono .phone-shell {
-  --ancho: 38cqw;
+  /* 46 cqw hace legibles las capas de la app en escritorio. */
+  --ancho: 46cqw;
   position: absolute;
   top: 7%;
-  right: 10%;
+  /* 5 % deja al chip más largo («Cargando las rutas de Sobusa») 14 px
+     antes del teléfono a 1440. */
+  right: 5%;
+}
+
+/* Atenúa solo las teselas; las rutas y marcadores siguen intactos. */
+.cf-telefono .routes-svg-layer image {
+  /* 0,45 conserva el contexto del mapa y destaca la información del paso. */
+  filter: saturate(0.45);
+  /* 0,72 baja el contraste de las calles sin borrar su textura. */
+  opacity: 0.72;
 }
 
 /* Los dos chips de lo que hace la app en cada paso, como «Checking
@@ -102,7 +175,7 @@
 .cf-chips {
   position: absolute;
   top: 20%;
-  left: 6%;
+  left: 4%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -127,6 +200,40 @@
   font-weight: 500;
   color: var(--tinta-media);
   white-space: nowrap;
+}
+
+/* 0,35 s entre chips deja leer cada elemento antes del siguiente. */
+.cf-chip {
+  /* El chip entra con un fundido y un desplazamiento corto. */
+  opacity: 0;
+  translate: 0 5px;
+  transition: opacity 0.3s var(--ease-out-cubic), translate 0.3s var(--ease-out-cubic);
+  /* El primer chip no espera; el segundo recibe la pausa indicada abajo. */
+  transition-delay: 0s;
+}
+.cf-chip:nth-child(2) {
+  /* 0,35 s retrasa el segundo elemento de cada par. */
+  transition-delay: 0.35s;
+}
+
+.cf-chip-visto {
+  /* 13 px conserva aire al texto y el visto usa el verde de marca. */
+  width: 13px !important;
+  height: 13px !important;
+  color: var(--acento);
+  opacity: 0;
+  transition: opacity 0.2s var(--ease-out-cubic) 0.12s;
+}
+
+.cf-escena[data-paso="ruta"] .cf-chips[data-paso="ruta"] .cf-chip-visto,
+.cf-escena[data-paso="bus"] .cf-chips[data-paso="bus"] .cf-chip-visto,
+.cf-escena[data-paso="aviso"] .cf-chips[data-paso="aviso"] .cf-chip-visto { opacity: 1; }
+
+.cf-escena[data-paso="ruta"] .cf-chips[data-paso="ruta"] .cf-chip,
+.cf-escena[data-paso="bus"] .cf-chips[data-paso="bus"] .cf-chip,
+.cf-escena[data-paso="aviso"] .cf-chips[data-paso="aviso"] .cf-chip {
+  opacity: 1;
+  translate: none;
 }
 
 .cf-chip:nth-child(2) {
@@ -194,6 +301,67 @@
    `coralAccessible` (`--app-coral-accessible`). */
 .cf-capa--bus .eta-tarjeta {
   margin-top: calc(8 * var(--u));
+  margin-inline: calc(24 * var(--u));
+}
+
+/* eta_bottom_sheet.dart deja el botón como último elemento de la hoja;
+   el estado activado ocupa el mismo sitio para que no duplique su altura. */
+.cf-capa--bus .cf-cta-pedir,
+.cf-capa--bus .cf-cta-activo {
+  margin-inline: calc(24 * var(--u));
+}
+
+.cf-capa--bus .cf-cta-activo {
+  position: absolute;
+  right: 0;
+  bottom: calc(26 * var(--u) + var(--alto-inferior));
+  left: 0;
+}
+
+/* eta_bottom_sheet.dart cambia nota y CTA al activar el aviso; ambos estados
+   comparten esta hoja y se funden según el paso de la pestaña. */
+.cf-capa--bus .cf-cta-pedir,
+.cf-capa--bus .cf-cta-activo {
+  transition: opacity 0.25s var(--ease-out-cubic);
+}
+
+.cf-capa--bus .cf-nota-aviso {
+  max-height: 0;
+  overflow: hidden;
+  margin-top: 0;
+  padding-block: 0;
+  border-width: 0;
+  opacity: 0;
+  transition:
+    opacity 0.25s var(--ease-out-cubic),
+    max-height 0.25s var(--ease-out-cubic),
+    margin 0.25s var(--ease-out-cubic),
+    padding 0.25s var(--ease-out-cubic),
+    border-width 0.25s var(--ease-out-cubic);
+}
+
+.cf-capa--bus .cf-nota-aviso {
+  margin-inline: calc(24 * var(--u));
+}
+
+.cf-escena[data-paso="aviso"] .cf-capa--bus .cf-nota-aviso {
+  max-height: calc(54 * var(--u));
+  margin-top: calc(14 * var(--u));
+  padding: calc(10 * var(--u)) calc(12 * var(--u));
+  border-width: 1px;
+  opacity: 1;
+}
+
+.cf-capa--bus .cf-cta-activo {
+  opacity: 0;
+}
+
+.cf-escena[data-paso="aviso"] .cf-capa--bus .cf-cta-activo {
+  opacity: 1;
+}
+
+.cf-escena[data-paso="aviso"] .cf-capa--bus .cf-cta-pedir {
+  opacity: 0;
 }
 
 /* La notificación de iOS (bus_notification_service.dart: «Tu bus de la
@@ -288,7 +456,8 @@
   border-bottom: 2px solid var(--linea);
   background: none;
   font: inherit;
-  font-size: 18px;
+  /* 14 px: control secundario, sin competir con la escena. */
+  font-size: 14px;
   font-weight: 500;
   color: var(--tinta-tenue);
   text-align: left;
@@ -299,8 +468,10 @@
 }
 
 .cf-paso svg {
-  width: 18px;
-  height: 18px;
+  /* 16 px: símbolo uniforme con el verde de marca en todos los estados. */
+  width: 16px;
+  height: 16px;
+  color: var(--acento);
   flex-shrink: 0;
 }
 
@@ -317,6 +488,25 @@
   color: var(--acento);
 }
 
+.cf-paso { position: relative; }
+.cf-paso[aria-selected="true"]::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -2px;
+  height: 2px;
+  background: var(--acento);
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.cf-pasos[data-auto] .cf-paso[aria-selected="true"]::after {
+  /* 5 s empata el llenado de la línea con el intervalo automático. */
+  animation: cf-progreso 5s linear forwards;
+}
+@keyframes cf-progreso {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
 .cf-paso:focus-visible {
   outline: 2px solid var(--acento);
   outline-offset: 2px;
@@ -325,22 +515,39 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cf-chips,
-  .cf-capa {
+  .cf-capa,
+  .cf-explica {
     translate: none;
     transition: opacity 0.2s linear;
+  }
+  .cf-chip {
+    /* Con movimiento reducido los chips solo hacen un fundido, sin retraso. */
+    translate: none;
+    transition: opacity 0.2s linear;
+    transition-delay: 0s;
+  }
+  .cf-chip-visto {
+    /* El visto acompaña al fundido sin esperar su retraso habitual. */
+    transition-delay: 0s;
+  }
+  .cf-pasos[data-auto] .cf-paso[aria-selected="true"]::after {
+    /* Movimiento reducido quita la animación de progreso. */
+    animation: none;
   }
 }
 
 /* En móvil, el cuadro más alto, el teléfono al centro y sin chips ni
-   flecha (no caben al lado); las pestañas, con el ícono encima. A 343/455
-   el corte cae bajo la nota «Te avisamos a…» (a 375 de ancho, 10 px). */
+   flecha (no caben al lado); las pestañas, con el ícono encima. 343/590
+   deja entero el CTA de eta_bottom_sheet.dart tras la hoja. */
 @media (max-width: 1023px) {
   .cf-escena {
-    aspect-ratio: 343 / 455;
+    /* La altura adicional mantiene visible el botón inferior completo. */
+    aspect-ratio: 343 / 590;
   }
 
   .cf-telefono .phone-shell {
-    --ancho: 62cqw;
+    /* 70 cqw agranda la pantalla móvil para facilitar la lectura. */
+    --ancho: 70cqw;
     top: 8%;
     right: auto;
     left: 19%;
@@ -358,7 +565,8 @@
   .cf-paso {
     flex-direction: column;
     gap: 6px;
-    font-size: 14px;
+    /* 13 px: los nombres caben debajo del icono en móvil. */
+    font-size: 13px;
     text-align: center;
   }
 }
@@ -367,10 +575,7 @@
 @media (min-width: 1024px) {
   .cf-grid {
     grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    /* El titular arriba, a la altura del borde del cuadro de dentro. */
     align-items: start;
-  }
-
-  .cf-texto {
-    padding-top: 24px;
   }
 }
