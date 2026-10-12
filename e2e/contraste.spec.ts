@@ -79,7 +79,7 @@ const MUESTRAS: Record<string, string[]> = {
     '.hero-description',
     '.hero-subtext-lead',
     '.apagado',
-    '#problema .columna-texto',
+    '#problema .aviso-titulo',
     '.rutas-dato-numero',
     '.rutas-dato-rotulo',
     // El rótulo «Simulación» del mapa en vivo (T6.10): letra de 10,5 en la

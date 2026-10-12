@@ -4,12 +4,12 @@ import { describe, expect, it } from 'vitest';
 import glosario from '../src/glosario.json';
 
 /**
- * El escenario de «Qué resuelve» (2026-10-12): las voces sueltas, los
- * cables y las tres fichas con párrafo se cambiaron por cuatro avisos
- * como los de un teléfono —un dato pequeño y una frase— sobre una red de
- * líneas tono sobre tono, y los párrafos bajaron a tres columnas sueltas.
- * La lectura sigue estando en el titular y en las columnas: los avisos
- * son dibujo, pero se tienen que poder leer igual.
+ * El escenario de «Qué resuelve» (2026-10-12): cuatro avisos como los de
+ * un teléfono —un título pequeño y una frase— sobre una red de líneas tono
+ * sobre tono, con hasta tres voces sueltas a ciegas. Los avisos son el
+ * contenido de la sección (las tres columnas de texto largo bajaron a
+ * ellos, condensadas), así que se leen: lo decorativo son los iconos, las
+ * voces y la red.
  */
 
 const leer = (nombre: string): string => readFileSync(resolve(process.cwd(), nombre), 'utf8');
@@ -22,13 +22,12 @@ const doc = new DOMParser().parseFromString(seccion, 'text/html');
 const css = leer('src/css/componentes/problema.css');
 const variables = leer('src/css/variables.css');
 
-/** Lo que dice cada aviso en una cara: [dato, frase]. */
+/** Lo que dice cada aviso en una cara: [título, frase]. */
 const avisos = (cara: 'ciego' | 'claro'): [string, string][] =>
-  [...doc.querySelectorAll(`.avisos .aviso-texto > .cara--${cara}`)].map((c) => {
-    const dato = c.querySelector('small')?.textContent?.trim() ?? '';
-    const todo = c.textContent!.replace(/\s+/g, ' ').trim();
-    return [dato, todo.slice(dato.length).trim()];
-  });
+  [...doc.querySelectorAll(`.avisos .aviso-texto > .cara--${cara}`)].map((c) => [
+    c.querySelector('h3')?.textContent?.trim() ?? '',
+    c.querySelector('p')?.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+  ]);
 
 /** El cuerpo de las reglas cuyo selector es exactamente éste. */
 const reglas = (selector: string): string =>
@@ -59,14 +58,24 @@ const contrasteSobreBlanco = (token: string): number =>
   1.05 / (luminancia(sobreBlanco(token)) + 0.05);
 
 describe('el escenario de «Qué resuelve»', () => {
-  it('cuatro avisos decorativos, cada uno con un dato y una frase por cara', () => {
-    expect(doc.querySelector('.avisos')?.getAttribute('aria-hidden')).toBe('true');
+  it('cuatro avisos reales, cada uno con un título y una frase por cara', () => {
+    const contenedor = doc.querySelector('.avisos')!;
+    expect(contenedor.hasAttribute('aria-hidden')).toBe(false);
     expect(doc.querySelectorAll('.avisos .aviso')).toHaveLength(4);
+    for (const aviso of doc.querySelectorAll('.avisos .aviso')) {
+      expect(aviso.hasAttribute('aria-hidden')).toBe(false);
+      // El dibujo sí es decorativo.
+      expect(aviso.querySelector('.aviso-icono')?.getAttribute('aria-hidden')).toBe('true');
+      expect(aviso.querySelectorAll('.aviso-icono svg')).toHaveLength(2);
+      // Sólo se oye la cara que se ve: la otra nace oculta y la mueve problema.ts.
+      expect(aviso.querySelector('.aviso-texto > .cara--ciego')?.hasAttribute('aria-hidden')).toBe(false);
+      expect(aviso.querySelector('.aviso-texto > .cara--claro')?.getAttribute('aria-hidden')).toBe('true');
+    }
     for (const cara of ['ciego', 'claro'] as const) {
       const lista = avisos(cara);
       expect(lista).toHaveLength(4);
-      for (const [dato, frase] of lista) {
-        expect(dato).not.toBe('');
+      for (const [titulo, frase] of lista) {
+        expect(titulo).not.toBe('');
         // Una frase, no un párrafo.
         expect(frase).not.toBe('');
         expect(frase.length).toBeLessThanOrEqual(40);
@@ -74,22 +83,32 @@ describe('el escenario de «Qué resuelve»', () => {
     }
   });
 
-  it('a ciegas: la espera contada en cuatro momentos', () => {
+  it('a ciegas: la espera contada en cuatro cosas, con el robo entre ellas', () => {
     expect(avisos('ciego')).toEqual([
-      ['7:42 a. m.', 'Llevo 30 minutos esperando'],
-      ['Grupo del barrio', '¿Ya pasó el bus?'],
-      ['Paradero de la 46', 'Empezó a llover'],
-      ['Ahora', 'Mejor me voy caminando'],
+      ['Esperar una eternidad', 'Ni tablero ni horario que se cumpla'],
+      ['Bajo el sol o la lluvia', 'Se espera igual, sin sombra y mojándose'],
+      ['Ese tiempo suma', 'Media hora perdida en el paradero'],
+      ['Expuesto a robos', 'Mucho rato en la calle, celular en mano'],
     ]);
   });
 
-  it('con Ya Viene: el aviso de la app tal cual, con una ruta real de Sobusa', () => {
-    const [primero] = avisos('claro');
+  it('con Ya Viene: lo mismo resuelto, y el aviso de la app tal cual con una ruta real de Sobusa', () => {
+    const claro = avisos('claro');
+    expect(claro.map(([titulo]) => titulo)).toEqual([
+      'Sabes cuál viene y por dónde',
+      'Esperas donde te convenga',
+      'Ese tiempo vuelve',
+      'Menos rato en la calle',
+    ]);
+    expect(claro.map(([, frase]) => frase).filter((_, i) => i !== 1)).toEqual([
+      'Ves tu bus en el mapa, a 1,2 km',
+      'La media hora vuelve a tu día',
+      'Sales de casa cuando el bus está cerca',
+    ]);
     const rutas = [...leer('src/data/rutas-landing.ts').matchAll(/nombre: "([A-Z]\d+) [^"]+"/g)];
     // Solo el código: con el nombre entero la frase partía en tres líneas.
-    const ruta = rutas.find((r) => primero[0] === `Sobusa · Ruta ${r[1]}`);
-    expect(ruta, 'el dato es «Sobusa · Ruta <código real>»').toBeDefined();
-    expect(primero[1]).toBe(glosario.aviso.app.replace('{ruta}', ruta![1]));
+    const ruta = rutas.find((r) => claro[1][1] === glosario.aviso.app.replace('{ruta}', r[1]));
+    expect(ruta, 'la frase es el aviso de la app con un código real').toBeDefined();
   });
 
   it('con Ya Viene: distancia y no tiempo, y nunca una placa', () => {
@@ -99,10 +118,10 @@ describe('el escenario de «Qué resuelve»', () => {
     expect(texto).not.toMatch(/\b[A-Z]{3}\s?-?\d{3}\b/);
   });
 
-  it('los avisos se leen: el dato pequeño también pasa AA sobre la tarjeta blanca', () => {
+  it('los avisos se leen: el título pequeño y la frase pasan AA sobre la tarjeta blanca', () => {
     expect(reglas('.aviso')).toMatch(/background:\s*var\(--papel\)/);
-    const dato = reglas('.aviso small').match(/color:\s*var\((--[\w-]+)\)/)![1];
-    expect(contrasteSobreBlanco(dato)).toBeGreaterThanOrEqual(4.5);
+    const titulo = reglas('.aviso-titulo').match(/color:\s*var\((--[\w-]+)\)/)![1];
+    expect(contrasteSobreBlanco(titulo)).toBeGreaterThanOrEqual(4.5);
     const frase = reglas('.aviso-texto').match(/color:\s*var\((--[\w-]+)\)/)![1];
     expect(contrasteSobreBlanco(frase)).toBeGreaterThanOrEqual(4.5);
   });
@@ -115,8 +134,23 @@ describe('el escenario de «Qué resuelve»', () => {
     expect(rojos).toEqual(['.escenario-estado']);
   });
 
+  it('hasta tres voces sueltas, sólo a ciegas y sólo en pantalla ancha', () => {
+    const voces = [...doc.querySelectorAll('.ruido')];
+    expect(voces.map((v) => v.textContent)).toEqual(['¿ya pasó el bus?', 'llevo 30 minutos esperando', 'me iré en taxi']);
+    // Todas dentro de un único bloque decorativo.
+    const bloque = doc.querySelectorAll('.ruidos');
+    expect(bloque).toHaveLength(1);
+    expect(bloque[0].getAttribute('aria-hidden')).toBe('true');
+    expect(bloque[0].querySelectorAll('.ruido')).toHaveLength(voces.length);
+    // Ocultas por defecto: sólo el escenario ancho las enseña.
+    expect(reglas('.ruidos')).toMatch(/display:\s*none/);
+    expect(css).toMatch(/@media \(min-width: 1024px\)\s*\{[\s\S]*?\.ruidos\s*\{\s*display:\s*block/);
+    // En la otra cara se van hacia la píldora.
+    expect(css).toMatch(/\[data-cara='claro'\] \.ruido[^{]*\{[^}]*opacity:\s*0/);
+  });
+
   it('lo retirado no deja CSS huérfano', () => {
-    for (const viejo of ['.ruido', '.ficha', '.escenario-arbol', '.escenario-circuito', '.circuito-cable', '.red-cable', 'chispa--signo']) {
+    for (const viejo of ['.ficha', '.escenario-arbol', '.escenario-circuito', '.circuito-cable', '.red-cable', 'chispa--signo', '.columna']) {
       expect(css, viejo).not.toContain(viejo);
       expect(seccion, viejo).not.toContain(viejo.replace(/^\./, 'class="'));
     }
@@ -124,13 +158,7 @@ describe('el escenario de «Qué resuelve»', () => {
     for (const chispa of doc.querySelectorAll('.chispa')) expect(chispa.textContent!.trim()).toBe('');
   });
 
-  it('los tres textos largos bajan a columnas, con sus dos caras', () => {
-    const columnas = [...doc.querySelectorAll('.columnas > .columna.dos-caras')];
-    expect(columnas).toHaveLength(3);
-    for (const columna of columnas) {
-      expect(columna.querySelector(':scope > .cara--ciego .columna-titulo')).not.toBeNull();
-      expect(columna.querySelector(':scope > .cara--ciego .columna-texto')).not.toBeNull();
-      expect(columna.querySelector(':scope > .cara--claro')?.getAttribute('aria-hidden')).toBe('true');
-    }
+  it('los textos largos ya no cuelgan debajo: viven en los avisos', () => {
+    expect(doc.querySelector('.columnas, .columna-titulo, .columna-texto')).toBeNull();
   });
 });

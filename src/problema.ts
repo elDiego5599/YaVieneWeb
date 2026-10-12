@@ -14,7 +14,7 @@
  *
  * En `aspira` la alerta roja se encoge hasta ser el logo y la sección
  * entera se va hacia él: primero se apaga la red, luego se van los
- * chispazos, luego los cuatro avisos, después las tres columnas y al
+ * chispazos y las voces, luego los cuatro avisos y al
  * final el titular y la frase que los presentan. El orden es el del
  * tamaño, de lo más pequeño a lo más grande, que es como se vacía algo
  * de verdad —lo ligero se va enseguida y lo pesado cuesta— y de paso
@@ -31,7 +31,7 @@
  * que se lleva tiene que notarse en quien se lo lleva. En `carga` ese
  * bulto late y cambia de color. En `brota` se vuelve a abrir como «Ya
  * Viene» soltando de golpe todo lo que había engordado, la red se pone
- * verde y salen del logo el titular, la frase, los avisos y las columnas
+ * verde y salen del logo el titular, la frase y los avisos
  * hasta plantarse en su sitio. Contado así, no es que el desorden desaparezca: es que
  * alguien se lo lleva y devuelve otra cosa en su lugar.
  *
@@ -77,7 +77,7 @@ const PANTALLA = 0.6;
 /**
  * El viaje de una pieza hasta el logo y el relevo entre la primera que
  * sale y la última. El relevo es largo porque no es un desfase de
- * adorno: es el orden de tamaño, y tiene que verse que las columnas se van
+ * adorno: es el orden de tamaño, y tiene que verse que los avisos se van
  * cuando ya no queda nada más que llevarse.
  */
 const VIAJE_MS = 520;
@@ -94,15 +94,14 @@ const RELEVO_MS = 600;
 // sobran son el escenario vacío, que es la mitad de lo que se cuenta.
 const ASPIRA_MS = VIAJE_MS + RELEVO_MS + 150;
 const CARGA_MS = 460;
-// Vuelven nueve piezas —los dos textos, los cuatro avisos y las tres
-// columnas—: la última arranca a los 150 + 8 × 70 = 710 y tarda otros
-// 940 en plantarse.
-const BROTA_MS = 1650;
+// Vuelven seis piezas —los dos textos y los cuatro avisos—: la última
+// arranca a los 150 + 5 × 70 = 500 y tarda otros 940 en plantarse.
+const BROTA_MS = 1510;
 
 /**
  * El despliegue: cuánto espera la primera pieza a que el logo se abra,
  * cuánto va de una a la siguiente y lo que tarda cada una en plantarse.
- * El relevo es corto porque son nueve: con más hueco, la última llega
+ * El relevo es corto porque son seis: con más hueco, la última llega
  * cuando el resto ya lleva rato quieto.
  */
 const ESPERA_FICHA_MS = 150;
@@ -124,8 +123,8 @@ const PASADA = 0.045;
 /**
  * Cuánto se desvía cada pieza del camino recto al centro, en tanto por
  * uno de lo que le falta por recorrer. Todas se desvían hacia el mismo
- * lado: eso es lo que hace que trece viajes se lean como un remolino y
- * no como trece cosas cayendo a un agujero.
+ * lado: eso es lo que hace que seis viajes se lean como un remolino y
+ * no como seis cosas cayendo a un agujero.
  */
 const REMOLINO = 0.3;
 
@@ -145,7 +144,7 @@ const REVIENTA = 1.46;
 
 /**
  * Dos llegadas más juntas que esto se cuentan como un solo trago. Sin
- * esto son trece tirones de 46 ms encabalgados, que no es engordar: es
+ * esto son seis tirones de 46 ms encabalgados, que no es engordar: es
  * vibrar.
  */
 const TRAGO_MINIMO_MS = 150;
@@ -166,9 +165,9 @@ export class Problema {
   /** Lo que está volando hacia el logo ahora mismo. */
   #vuelos: Animation[] = [];
   /**
-   * Lo que vuelve va aparte: los chispazos se los queda el logo, pero
-   * los textos, los avisos y las columnas salen otra vez en el despliegue
-   * y hay que poder cortarles el viaje sin cortar el de los chispazos.
+   * Lo que vuelve va aparte: chispazos y voces se los queda el logo, pero
+   * los textos y los avisos salen otra vez en el despliegue y hay que
+   * poder cortarles el viaje sin cortar el de los chispazos.
    */
   #vuelosFicha: Animation[] = [];
   /** Adónde se fue cada pieza, para saber de dónde tiene que volver. */
@@ -364,13 +363,12 @@ export class Problema {
   }
 
   /**
-   * Se lo lleva todo. No queda nada en el escenario: los chispazos, los
-   * avisos y las tres columnas se van al logo, y la red se apaga con
-   * ellos desde el CSS.
+   * Se lo lleva todo. No queda nada en el escenario: chispazos, voces
+   * y avisos se van al logo, y la red se apaga con ellos desde el CSS.
    *
    * El turno lo reparte el tamaño, de lo más pequeño a lo más grande.
    * Es lo que separa «desaparece el ruido» de «se vacía el escenario»:
-   * si todo sale a la vez es un fundido, y si salen antes las columnas
+   * si todo sale a la vez es un fundido, y si salen antes los avisos
    * —lo que se lee— parece que se ha borrado el argumento. Saliendo al
    * final, lo último que cruza la pantalla es el problema entero.
    *
@@ -389,7 +387,7 @@ export class Problema {
 
     const piezas = Array.from(
       this.#seccion.querySelectorAll<HTMLElement>(
-        '.chispa, .aviso, .columna, .seccion-titulo, .seccion-lead'
+        '.chispa, .ruido, .aviso, .seccion-titulo, .seccion-lead'
       )
     )
       .map((pieza) => {
@@ -402,7 +400,7 @@ export class Problema {
         };
       })
       // Lo que no se dibuja no viaja: por debajo de 1024 px no hay
-      // chispazos en el escenario.
+      // chispazos ni voces en el escenario.
       .filter((v) => v.bulto > 0)
       .sort((a, b) => a.bulto - b.bulto);
 
@@ -411,14 +409,14 @@ export class Problema {
     const llegadas: number[] = [];
 
     piezas.forEach(({ pieza, dx, dy }, turno) => {
-      // Vuelve todo menos los chispazos, que se los queda el logo: para
-      // eso se los llevó.
-      const vuelve = !pieza.classList.contains('chispa');
+      // Vuelve todo menos los chispazos y las voces, que se los queda el
+      // logo: para eso se los llevó.
+      const vuelve = !pieza.matches('.chispa, .ruido');
       const tarjeta = vuelve;
       const espera = (turno / ultima) * RELEVO_MS;
 
       // El desvío es perpendicular al camino recto y del mismo signo
-      // para todas, que es lo que convierte trece viajes en un remolino:
+      // para todas, que es lo que convierte seis viajes en un remolino:
       // en vez de caer al centro en línea, todas lo rodean por el mismo
       // lado antes de entrar.
       const desvioX = -dy * REMOLINO;
@@ -489,7 +487,7 @@ export class Problema {
    * Se le da un tirón por cada llegada —se ensancha de golpe, rebota y
    * se recompone— y entre tirón y tirón el tamaño de reposo sube un
    * escalón, así que al final del viaje mide `GORDO`. Dos llegadas muy
-   * juntas cuentan como una sola: trece tirones encabalgados no se leen
+   * juntas cuentan como una sola: seis tirones encabalgados no se leen
    * como engordar sino como vibrar.
    *
    * Va todo en una animación y no en clases porque los tiempos son los
@@ -565,10 +563,9 @@ export class Problema {
    * Nada aparece en su sitio. Cada pieza sale disparada del logo, abierta
    * hacia un lado y girada, se pasa de largo de donde tiene que quedarse
    * y sólo entonces se cuadra: primero el titular, luego la frase,
-   * después los avisos y al final las columnas, escalonados y de arriba
-   * abajo, que es el orden en que se lee la sección. Se sueltan tan
-   * seguidas que los primeros fotogramas son un chorro y no nueve viajes,
-   * y los últimos son nueve piezas colocándose. Ahí está lo que se cuenta: no es que
+   * después los avisos, escalonados y de arriba abajo, que es el orden en que se lee la sección. Se sueltan tan
+   * seguidas que los primeros fotogramas son un chorro y no seis viajes,
+   * y los últimos son seis piezas colocándose. Ahí está lo que se cuenta: no es que
    * salga otra cosa, es que sale lo mismo puesto en orden.
    *
    * El vuelo no se queda pegado al final —`fill` de ida y no de vuelta—:
@@ -587,7 +584,7 @@ export class Problema {
       const abreX = dy * CHORRO;
       const abreY = -dx * CHORRO;
 
-      // Alternando el giro no salen nueve piezas iguales en fila: sale
+      // Alternando el giro no salen seis piezas iguales en fila: sale
       // un puñado. Poca cosa, porque una frase ladeada se deja de leer
       // antes que una tarjeta y aquí lo que importa es que se coloque,
       // no que dé volteretas.

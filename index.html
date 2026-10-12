@@ -775,9 +775,9 @@
 
         <!--
           El escenario: la misma espera dibujada dos veces sobre una red de
-          líneas tono sobre tono. Lo que se lee de la sección está en el
-          titular, la frase y las tres columnas de abajo; aquí sólo hay
-          dibujo, y por eso todo lo de dentro, salvo la píldora, va con
+          líneas tono sobre tono. Lo que se lee de la sección son los cuatro
+          avisos (el titular y la frase de arriba los presentan); la red, los
+          rayos, las voces sueltas y los iconos son dibujo y van con
           `aria-hidden`. Las cuatro tarjetas no cambian de sitio al pasar de
           cara: el caos se ordena delante de quien mira, no cambia de escena.
         -->
@@ -811,6 +811,15 @@
             <span class="chispa"></span>
             <span class="chispa"></span>
             <span class="chispa"></span>
+          </div>
+
+          <!-- Las voces de la espera a ciegas: tres, no más, y sólo con el
+               escenario ancho (apiladas en un móvil estorbarían). Con Ya
+               Viene se encogen hacia la píldora. -->
+          <div class="ruidos" aria-hidden="true">
+            <span class="ruido">¿ya pasó el bus?</span>
+            <span class="ruido">llevo 30 minutos esperando</span>
+            <span class="ruido">me iré en taxi</span>
           </div>
 
           <p class="escenario-estado">
@@ -867,96 +876,56 @@
           </p>
 
           <!--
-            Los cuatro avisos: uno por momento de la espera, y en la otra
-            cara lo que la app dice en ese mismo momento. Una frase cada uno
-            y un dato pequeño encima, como una notificación. El de la ruta
-            es el texto del aviso de la app tal cual (`aviso.app` del
-            glosario): con ruta, sin placa ni distancia. Las distancias van
-            en kilómetros con coma, nunca en minutos.
+            Los cuatro avisos son el contenido de la sección: uno por cosa
+            que cuesta esperar a ciegas (el tiempo, el sol, la tarde que se
+            pierde, la calle) y, en la otra cara, lo que la app hace con
+            esa misma cosa. Un título pequeño y una frase cada uno, como una
+            notificación. El de la ruta es el texto del aviso de la app tal
+            cual (`aviso.app` del glosario): con ruta, sin placa ni
+            distancia. Las distancias van en kilómetros con coma, nunca en
+            minutos. Sólo el dibujo es decorativo; la cara que no se ve
+            lleva `aria-hidden`, que mueve `problema.ts`.
           -->
-          <div class="avisos" aria-hidden="true">
+          <div class="avisos">
             <div class="aviso">
-              <span class="aviso-icono dos-caras">
-                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
-                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3.5" width="14" height="14" rx="3"/><path d="M5 10.5h14M8 17.5V20M16 17.5V20M8.5 14h.01M15.5 14h.01"/></svg></span>
+              <span class="aviso-icono dos-caras" aria-hidden="true">
+                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 2.5h12M6 21.5h12M7 2.5v3.7a2 2 0 0 0 .6 1.4L12 12l4.4-4.4a2 2 0 0 0 .6-1.4V2.5M7 21.5v-3.7a2 2 0 0 1 .6-1.4L12 12l4.4 4.4a2 2 0 0 1 .6 1.4v3.7"/></svg></span>
+                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg></span>
               </span>
-              <span class="aviso-texto dos-caras">
-                <span class="cara cara--ciego"><small>7:42 a. m.</small>Llevo 30 minutos esperando</span>
-                <span class="cara cara--claro"><small>Sobusa · Ruta C14</small>Tu bus de la ruta C14 está cerca de ti</span>
-              </span>
-            </div>
-            <div class="aviso">
-              <span class="aviso-icono dos-caras">
-                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v10H9.5L4 19.5z"/></svg></span>
-                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4.5 3.5 6.5v13L9 17.5l6 2 5.5-2v-13L15 6.5zM9 4.5v13M15 6.5v13"/></svg></span>
-              </span>
-              <span class="aviso-texto dos-caras">
-                <span class="cara cara--ciego"><small>Grupo del barrio</small>¿Ya pasó el bus?</span>
-                <span class="cara cara--claro"><small>En el mapa</small>Tu bus va a 1,2 km</span>
-              </span>
+              <div class="aviso-texto dos-caras">
+                <div class="cara cara--ciego"><h3 class="aviso-titulo">Esperar una eternidad</h3><p class="aviso-frase">Ni tablero ni horario que se cumpla</p></div>
+                <div class="cara cara--claro" aria-hidden="true"><h3 class="aviso-titulo">Sabes cuál viene y por dónde</h3><p class="aviso-frase">Ves tu bus en el mapa, a 1,2 km</p></div>
+              </div>
             </div>
             <div class="aviso">
-              <span class="aviso-icono dos-caras">
-                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15.5a4 4 0 0 1-.4-8 5.5 5.5 0 0 1 10.6 1.5 3.3 3.3 0 0 1-.2 6.5zM8.5 18.5l-1 2M12.5 18.5l-1 2M16.5 18.5l-1 2"/></svg></span>
-                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5M6 9v10.5h12V9M10 19.5v-5h4v5"/></svg></span>
+              <span class="aviso-icono dos-caras" aria-hidden="true">
+                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.5a8.5 8.5 0 0 1 8.5 8.5h-17A8.5 8.5 0 0 1 12 3.5zM12 2v1.5M12 12v6.5a2 2 0 0 1-4 0"/></svg></span>
+                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0"/></svg></span>
               </span>
-              <span class="aviso-texto dos-caras">
-                <span class="cara cara--ciego"><small>Paradero de la 46</small>Empezó a llover</span>
-                <span class="cara cara--claro"><small>Paradero de la 46</small>Esperas a la sombra</span>
-              </span>
+              <div class="aviso-texto dos-caras">
+                <div class="cara cara--ciego"><h3 class="aviso-titulo">Bajo el sol o la lluvia</h3><p class="aviso-frase">Se espera igual, sin sombra y mojándose</p></div>
+                <div class="cara cara--claro" aria-hidden="true"><h3 class="aviso-titulo">Esperas donde te convenga</h3><p class="aviso-frase">Tu bus de la ruta C14 está cerca de ti</p></div>
+              </div>
             </div>
             <div class="aviso">
-              <span class="aviso-icono dos-caras">
-                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4.5" r="1.8"/><path d="M10 21l2.2-6.5L15 17v4M12.2 14.5 13 9l-3.5 1.5L8 13.5M13 9l2.2 3 3 1"/></svg></span>
-                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0"/></svg></span>
+              <span class="aviso-icono dos-caras" aria-hidden="true">
+                <span class="cara cara--ciego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7M4 4.5v4.2h4.2M12 8v4l2.8 1.8"/></svg></span>
               </span>
-              <span class="aviso-texto dos-caras">
-                <span class="cara cara--ciego"><small>Ahora</small>Mejor me voy caminando</span>
-                <span class="cara cara--claro"><small>Aviso a 1 km</small>Sales cuando toca</span>
+              <div class="aviso-texto dos-caras">
+                <div class="cara cara--ciego"><h3 class="aviso-titulo">Ese tiempo suma</h3><p class="aviso-frase">Media hora perdida en el paradero</p></div>
+                <div class="cara cara--claro" aria-hidden="true"><h3 class="aviso-titulo">Ese tiempo vuelve</h3><p class="aviso-frase">La media hora vuelve a tu día</p></div>
+              </div>
+            </div>
+            <div class="aviso">
+              <span class="aviso-icono dos-caras" aria-hidden="true">
+                <span class="cara cara--ciego"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 1.9 15 14H1z"/><path d="M8 6.4v3.1"/><path d="M8 11.6h.01"/></svg></span>
+                <span class="cara cara--claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 10.5 12 4l8 6.5M6 9v10.5h12V9M10 19.5v-5h4v5"/></svg></span>
               </span>
-            </div>
-          </div>
-        </div>
-
-        <!--
-          Lo que se lee: las tres columnas, con sus dos caras. Sueltas, sin
-          tarjeta, para que no compitan con los avisos de arriba.
-        -->
-        <div class="columnas reveal" data-reveal-delay="140">
-          <div class="columna dos-caras">
-            <div class="cara cara--ciego">
-              <h3 class="columna-titulo">Esperar una eternidad</h3>
-              <p class="columna-texto">No hay tablero, ni horario que se cumpla, ni nadie a quien preguntar.
-                Se espera adivinando, y se decide si seguir esperando también adivinando.</p>
-            </div>
-            <div class="cara cara--claro" aria-hidden="true">
-              <h3 class="columna-titulo">Sabes cuál viene y por dónde</h3>
-              <p class="columna-texto">El bus va en el mapa con su placa y su distancia al paradero. Ya no se
-                decide adivinando: se decide mirando.</p>
-            </div>
-          </div>
-          <div class="columna dos-caras">
-            <div class="cara cara--ciego">
-              <h3 class="columna-titulo">Bajo el sol o la lluvia</h3>
-              <p class="columna-texto">En Barranquilla cada minuto de espera es un minuto más de calor, sin
-                sombra. Y cuando cae el aguacero tampoco hay dónde meterse: se espera igual, mojándose.</p>
-            </div>
-            <div class="cara cara--claro" aria-hidden="true">
-              <h3 class="columna-titulo">Esperas donde te convenga</h3>
-              <p class="columna-texto">El aviso entra cuando el bus está a la distancia que elijas, así que la espera se
-                hace a la sombra, en la tienda o en la casa, y no en el andén.</p>
-            </div>
-          </div>
-          <div class="columna dos-caras">
-            <div class="cara cara--ciego">
-              <h3 class="columna-titulo">Ese tiempo suma</h3>
-              <p class="columna-texto">Llegadas tarde, citas que se corren, planes que dependen de acertar.
-                Media hora perdida en un paradero es media hora perdida en el día.</p>
-            </div>
-            <div class="cara cara--claro" aria-hidden="true">
-              <h3 class="columna-titulo">Ese tiempo vuelve</h3>
-              <p class="columna-texto">La media hora de andén se reparte en lo que uno estaba haciendo, y a la
-                cita se llega cuando toca porque se salió cuando tocaba.</p>
+              <div class="aviso-texto dos-caras">
+                <div class="cara cara--ciego"><h3 class="aviso-titulo">Expuesto a robos</h3><p class="aviso-frase">Mucho rato en la calle, celular en mano</p></div>
+                <div class="cara cara--claro" aria-hidden="true"><h3 class="aviso-titulo">Menos rato en la calle</h3><p class="aviso-frase">Sales de casa cuando el bus está cerca</p></div>
+              </div>
             </div>
           </div>
         </div>

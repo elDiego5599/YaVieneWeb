@@ -9,7 +9,7 @@
 
    «Con Ya Viene» es la misma escena con otro texto: los avisos no se
    mueven, cambian lo que dicen; la red se pone verde, los rayos se van
-   y la alerta es la marca. Debajo, las tres columnas que se leen.
+   y la alerta es la marca. Los cuatro avisos son lo que se lee.
 
    Todo el cambio cuelga de un atributo, `data-cara`, en la sección. No
    hay una clase por pieza que encender ni una animación en JavaScript:
@@ -130,8 +130,8 @@
 
 /* ── Las dos caras ─────────────────────────────────────────────────────
 
-   El mismo mecanismo para el titular, la frase, el estado, los avisos y
-   las columnas: las dos versiones ocupan la misma celda de la
+   El mismo mecanismo para el titular, la frase, el estado y los
+   avisos: las dos versiones ocupan la misma celda de la
    rejilla, así que el hueco lo mide la más alta y nada salta al cambiar.
 
    El detalle que hace que el relevo se lea como un relevo y no como dos
@@ -142,8 +142,8 @@
    se mueve en el mismo sentido a la vez.
 
    `--turno` escalona ese movimiento pieza por pieza: primero el estado,
-   luego el titular, luego la frase, los avisos y al final las columnas
-   de izquierda a derecha. Es lo que separa un relevo de un parpadeo.
+   luego el titular, luego la frase y al final los avisos. Es lo que
+   separa un relevo de un parpadeo.
 
    `aria-hidden` lo pone el HTML y lo mueve `problema.ts`: sin eso el
    lector de pantalla leería las dos versiones seguidas.
@@ -191,9 +191,9 @@
 /*
   El turno de cada pieza en el relevo. Se lee de arriba abajo y de
   izquierda a derecha, que es como se mira la sección: manda el estado,
-  le sigue el titular, luego la frase, los cuatro avisos y al final las
-  tres columnas. Sin esto las doce piezas cambiarían a la vez y el
-  relevo sería un parpadeo.
+  le sigue el titular, luego la frase y al final los cuatro avisos. Sin
+  esto las seis piezas cambiarían a la vez y el relevo sería un
+  parpadeo.
 */
 .escenario-estado {
   --turno: 0ms;
@@ -228,18 +228,6 @@
   --turno: 300ms;
 }
 
-.columna:nth-child(1) {
-  --turno: 340ms;
-}
-
-.columna:nth-child(2) {
-  --turno: 400ms;
-}
-
-.columna:nth-child(3) {
-  --turno: 460ms;
-}
-
 /* ── El escenario ──────────────────────────────────────────────────────
 
    Los dos colores de la red son de aquí y no de `variables.css` porque
@@ -254,6 +242,9 @@
   --hilo-claro: #B5D5CA;
   position: relative;
   display: grid;
+  /* Una columna que se encoge: sin esto la píldora, que no se parte, la
+     ensanchaba y los avisos se salían de la banda en un móvil. */
+  grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   gap: 28px;
   padding-block: 8px;
@@ -328,11 +319,57 @@
   transform: translateY(-14px) scale(0.88);
 }
 
+/* ── Las voces ─────────────────────────────────────────────────────────
+
+   Fondo, no contenido: ninguna dice nada que no digan los avisos, y por
+   eso van con `aria-hidden`. Son tres, no más: la espera a ciegas no es
+   silencio, es gente preguntando lo mismo, pero con más de tres el
+   escenario se vuelve un tablero de mensajes y tapa los avisos.
+
+   Sólo existen con el escenario ancho, que es cuando los avisos salen del
+   flujo y queda aire entre ellos. En un móvil, apiladas, estorbarían.
+   El ladeo va en `--giro` para que el relevo no lo enderece a la fuerza.
+   ────────────────────────────────────────────────────────────────────── */
+
+.ruidos {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.ruido {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border: 1px solid var(--linea);
+  border-radius: 11px;
+  background: var(--papel);
+  box-shadow: 0 8px 20px rgba(11, 18, 32, 0.06);
+  font-size: 12.5px;
+  line-height: 1;
+  color: var(--tinta-media);
+  white-space: nowrap;
+  transform: rotate(var(--giro, 0deg));
+  transition:
+    opacity 0.5s var(--ease-out-cubic),
+    transform 0.66s var(--ease-fluida);
+}
+
+/* Al ordenarse no se desvanecen en el sitio: se encogen y se van hacia la
+   píldora, que es de donde sale la respuesta. */
+[data-cara='claro'] .ruido {
+  opacity: 0;
+  transform: translateY(-14px) rotate(var(--giro, 0deg)) scale(0.88);
+}
+
 /* ── Los avisos ────────────────────────────────────────────────────────
 
-   Cuatro notificaciones: una baldosa con el dibujo, un dato pequeño y
-   una frase. Nada más, porque lo que se lee de la sección está en las
-   columnas; un párrafo aquí competiría con ellas. La tarjeta no lleva
+   Cuatro notificaciones: una baldosa con el dibujo, un título pequeño y
+   una frase. Nada más: son el contenido de la sección, condensado, y un
+   párrafo aquí la volvería a llenar de texto. La tarjeta no lleva
    borde: lo que la separa de la banda es el filo de un píxel al 5 % y
    una sombra larga y pálida, que es lo que la levanta de la red sin
    taparla con un marco.
@@ -389,43 +426,31 @@
   height: 24px;
 }
 
-/* El dato en tinta tenue (4,90:1 sobre blanco) y la frase en tinta
-   plena: aunque el bloque es decorativo, se lee, y lo que se lee pasa
-   AA (tests/escenario-avisos.test.ts). */
+/* El título en tinta tenue (4,90:1 sobre blanco) y la frase en tinta
+   plena: lo que se lee pasa AA (tests/escenario-avisos.test.ts). */
 .aviso-texto {
   font-size: 19px;
   font-weight: 600;
   line-height: 1.3;
   letter-spacing: -0.01em;
-  /* El aviso de la app es la frase más larga y a 418 px partía con «ti»
-     solo abajo: repartida, quedan dos renglones parejos. */
-  text-wrap: balance;
   color: var(--tinta);
 }
 
-.aviso small {
-  display: block;
-  margin-bottom: 4px;
+.aviso-titulo {
+  margin: 0 0 4px;
+  font-family: inherit;
   font-size: 13px;
   font-weight: 500;
+  line-height: inherit;
   letter-spacing: 0;
   color: var(--tinta-tenue);
 }
 
-/* ── Las columnas ──────────────────────────────────────────────────────
-
-   Los tres textos largos, debajo del dibujo y sueltos: sin borde ni
-   sombra, para que lo único con cuerpo de tarjeta sean los avisos.
-   ────────────────────────────────────────────────────────────────────── */
-
-#problema .columnas {
-  margin-top: clamp(40px, 5vw, 64px);
-}
-
-@media (min-width: 860px) {
-  #problema .columnas {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+.aviso-frase {
+  margin: 0;
+  /* El aviso de la app es la frase más larga y a 418 px partía con «ti»
+     solo abajo: repartida, quedan dos renglones parejos. */
+  text-wrap: balance;
 }
 
 /* ── El escenario ancho ────────────────────────────────────────────────
@@ -450,7 +475,8 @@
     padding-block: 0;
   }
 
-  .chispas {
+  .chispas,
+  .ruidos {
     display: block;
   }
 
@@ -487,6 +513,24 @@
     bottom: 13%;
     right: 1%;
     rotate: -0.8deg;
+  }
+
+  .ruido:nth-child(1) {
+    top: 40%;
+    left: 3%;
+    --giro: -3deg;
+  }
+
+  .ruido:nth-child(2) {
+    top: 36%;
+    right: 3%;
+    --giro: 2.5deg;
+  }
+
+  .ruido:nth-child(3) {
+    top: 62%;
+    left: 4%;
+    --giro: 2deg;
   }
 
   .chispa:nth-child(1) {
@@ -564,6 +608,15 @@
 */
 .escenario-estado .dos-caras {
   justify-items: center;
+}
+
+/* En un móvil de 375 la frase larga a 17 px no cabe entre los márgenes de
+   la banda (295 px): a 15 sí, con aire. */
+@media (max-width: 420px) {
+  .escenario-estado {
+    padding-inline: 20px;
+    font-size: 15px;
+  }
 }
 
 .escenario-estado .cara {
