@@ -15,15 +15,16 @@
    `translate` y no en `transform`: `.reveal` ya usa `transform`.
    ────────────────────────────────────────────────────────────────── */
 
-/* Dueño, 2026-10-12: menos vacío, como incident.io. Aire vertical de ~64
-   arriba y ~56 abajo (antes el de toda sección, 72–128), sin raya
-   encima (dueño, 2026-10-12). El texto arranca en el mismo borde izquierdo que el
-   resto de la página (`.panel-inner`). */
+/* Como «Pre-built integrations» de incident.io (dueño, 2026-10-12): la
+   banda más ancha que el contenedor de la página (1280 contra 1160) para
+   que el mockup ocupe su mitad, y aire de sobra arriba y abajo, que es lo
+   que la hace verse sosegada. Sin raya encima. */
 .cf-grid {
   display: grid;
-  gap: clamp(32px, 5vw, 64px);
+  max-width: 1280px;
+  gap: clamp(32px, 5vw, 72px);
   align-items: center;
-  padding-block: clamp(40px, 6vh, 64px) clamp(36px, 5vh, 56px);
+  padding-block: clamp(56px, 10vh, 120px);
 }
 
 .cf-texto {
@@ -33,15 +34,16 @@
   gap: 20px;
 }
 
-/* Más grande (dueño, 2026-10-12), como el «Built for enterprises» de
-   incident.io, que va en tres renglones de ~45 % de la columna: 6 vw son
-   86 px a 1440 y 61 a 1024, con tope en 88, todavía bajo los 102 px del
-   titular de la portada (`.hero-title`). */
+/* En dos renglones parejos, como el de incident.io: 4,6 vw son 66 px a
+   1440 y 47 a 1024, con tope en 72, bajo los 102 px del titular de la
+   portada (`.hero-title`). Interlínea apretada y tracking negativo, que es
+   lo que pide la letra grande. */
 .cf-texto .seccion-titulo {
   max-width: none;
-  font-size: clamp(2.75rem, 6vw, 5.5rem);
+  font-size: clamp(2.5rem, 4.6vw, 4.5rem);
   line-height: 1.04;
   letter-spacing: -0.04em;
+  text-wrap: balance;
 }
 
 /* El párrafo grande y gris de incident.io, que sube con el titular:
@@ -76,13 +78,11 @@
   container-type: inline-size;
   position: relative;
   width: 100%;
-  max-width: 620px;
-  margin-inline: auto;
   aspect-ratio: 620 / 460;
 }
 
 .cf-tarjeta {
-  --u: min(0.85px, calc(100cqw / 640));
+  --u: min(1px, calc(100cqw / 640));
   position: absolute;
   padding: calc(20 * var(--u));
   background: var(--surface);
@@ -102,8 +102,8 @@
 .cf-tarjeta--mapa {
   top: 0;
   right: 0;
-  width: 64%;
-  height: 86%;
+  width: 62%;
+  height: 82%;
   padding: 0;
   overflow: hidden;
 }
@@ -112,9 +112,9 @@
    alto, insignia de 44, 12 de radio; ya lo miden `.app-select*`), con la
    fila de la ruta que pinta el mapa. */
 .cf-tarjeta--selector {
-  top: 2%;
+  top: 5%;
   left: 0;
-  width: 52%;
+  width: 50%;
   display: grid;
   gap: calc(10 * var(--u));
 }
@@ -131,7 +131,7 @@
 .cf-tarjeta--bus {
   bottom: 0;
   left: 6%;
-  width: 40%;
+  width: 46%;
 }
 
 .cf-tarjeta--bus .eta-tarjeta {
@@ -142,9 +142,9 @@
    ruta $ruta está cerca de ti», con ruta y sin placa ni distancia). Es
    icono de 30 con 9 de radio, la marca en versalitas y el título en 700. */
 .cf-tarjeta--aviso {
-  bottom: 9%;
+  bottom: 10%;
   right: 0;
-  width: 60%;
+  width: 42%;
   display: flex;
   align-items: center;
   gap: calc(12 * var(--u));
@@ -188,6 +188,7 @@
 @media (max-width: 1023px) {
   .cf-tarjetas {
     max-width: 440px;
+    margin-inline: auto;
     /* Más alto que en escritorio: el aviso baja a su propio piso y deja
        ver entera la hoja del bus (a 375 px, 74 px de aviso bajo 197 de hoja). */
     aspect-ratio: 440 / 520;
@@ -220,6 +221,6 @@
 
 @media (min-width: 1024px) {
   .cf-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
   }
 }

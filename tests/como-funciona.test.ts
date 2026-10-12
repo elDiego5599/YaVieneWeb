@@ -54,7 +54,7 @@ describe('banda «Cómo funciona»', () => {
   it('lleva ceja, titular y párrafo, sin botón', () => {
     expect(banda).toMatch(/<span class="seccion-rotulo cf-ceja">CÓMO FUNCIONA<\/span>\s*<h2/);
     expect(css).toMatch(/\.cf-ceja \{/);
-    expect(banda).toMatch(/<h2[^>]*>\s*Sal cuando tu bus esté cerca\s*<\/h2>/);
+    expect(banda).toMatch(/<h2[^>]*>\s*Tres pasos y ya sabes dónde viene\.\s*<\/h2>/);
     expect(banda).toContain(
       'Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso. Te avisamos cuando esté cerca de ti.'
     );
