@@ -315,3 +315,49 @@ test('la rueda del paso 3 enseña dos arriba y dos abajo, en el alto de la app',
   expect(medida.asoman).toBe(5);
   expect(medida.proporcion).toBeCloseTo(5 / 1.45, 2);
 });
+
+/* La cinta de logos de la banda de marcas (dueño, 2026-10-12): siete
+   logos y su copia, cargados, corren, caben en la columna de texto y se
+   desvanecen en los bordes. */
+test('la cinta de logos de la banda corre, cabe en su banda y se desvanece', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'load' });
+  const cinta = page.locator('#marcas .empresa-marcas-carrusel');
+  await expect(cinta).toHaveCount(1);
+  await cinta.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(700);
+  const medir = () =>
+    page.evaluate(() => {
+      const c = document.querySelector<HTMLElement>('#marcas .empresa-marcas-carrusel')!;
+      const col = document.querySelector('#marcas')!.getBoundingClientRect();
+      const r = c.getBoundingClientRect();
+      const imgs = Array.from(c.querySelectorAll<HTMLImageElement>('.empresa-marcas-logo'));
+      return {
+        x: new DOMMatrix(getComputedStyle(c.querySelector('.empresa-marcas-track')!).transform).m41,
+        logos: imgs.length,
+        sinCargar: imgs.filter((i) => !(i.complete && i.naturalWidth > 0)).map((i) => i.alt || i.src),
+        filtros: imgs.filter((i) => getComputedStyle(i).filter !== 'none').length,
+        izq: r.left - col.left,
+        der: col.right - r.right,
+        rebosa: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        filos: ['::before', '::after'].map((p) => getComputedStyle(c, p).backgroundImage),
+      };
+    });
+  const antes = await medir();
+  await page.waitForTimeout(600);
+  const despues = await medir();
+  expect(antes.logos, 'siete logos y su copia').toBe(14);
+  expect(antes.sinCargar).toEqual([]);
+  expect(antes.filtros, 'logos con filtro').toBe(0);
+  expect(despues.x, 'la cinta no se mueve').toBeLessThan(antes.x);
+  expect(antes.izq).toBeGreaterThanOrEqual(-1);
+  expect(antes.der).toBeGreaterThanOrEqual(-1);
+  expect(antes.rebosa).toBe(0);
+  for (const f of antes.filos) expect(f).toContain('gradient');
+});
+
+test('con movimiento reducido la cinta de logos se queda quieta', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/', { waitUntil: 'load' });
+  const nombre = await page.locator('.empresa-marcas-track').evaluate((p) => getComputedStyle(p).animationName);
+  expect(nombre).toBe('none');
+});

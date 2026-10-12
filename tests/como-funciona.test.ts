@@ -3,8 +3,8 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 /**
- * La banda «Cómo funciona» (dueño, 2026-10-12): entre dos rayas, justo
- * después del hero y antes de «Problema». Texto a la izquierda, a la
+ * La banda «Cómo funciona» (dueño, 2026-10-12): después de «Problema»
+ * (dueño, 2026-10-12, que antes la puso entre el hero y «Problema»). Texto a la izquierda, a la
  * derecha tres tarjetas encimadas que espejan la app del pasajero (el
  * selector, la hoja del bus y el aviso). Las tarjetas son decoración
  * (`aria-hidden`); lo accesible es la columna de texto.
@@ -20,22 +20,33 @@ const banda = /<section[^>]*id="como-funciona"[^>]*>[\s\S]*?<\/section>/.exec(ht
 const divisor = '<hr class="divisor" aria-hidden="true" />';
 
 describe('banda «Cómo funciona»', () => {
-  it('va entre dos divisores, tras el hero y antes de #problema', () => {
+  it('va tras #problema, con un divisor entre las dos, y es la última banda', () => {
     expect(banda).not.toBe('');
-    const hero = html.indexOf('id="hero"');
     const ini = html.indexOf(banda);
-    const fin = ini + banda.length;
     const problema = html.indexOf('id="problema"');
-    expect(hero).toBeGreaterThan(-1);
-    expect(hero).toBeLessThan(ini);
-    expect(problema).toBeGreaterThan(fin);
-    const antes = html.slice(0, ini).trimEnd();
-    const despues = html.slice(fin);
-    expect(antes.endsWith(divisor)).toBe(true);
-    expect(despues.trimStart().startsWith(divisor)).toBe(true);
-    // El divisor de arriba es el de siempre: nada del hero lo separa de la banda.
-    expect(html.slice(hero, ini).split(divisor)).toHaveLength(2);
-    expect(html.slice(fin, problema).split(divisor)).toHaveLength(2);
+    expect(problema).toBeGreaterThan(-1);
+    expect(problema).toBeLessThan(ini);
+    expect(html.slice(0, ini).trimEnd().endsWith(divisor)).toBe(true);
+    expect(html.slice(problema, ini).split(divisor)).toHaveLength(2);
+  });
+
+  it('la cinta de siete logos va sola entre los dos divisores tras el hero, sin texto (dueño, 2026-10-12)', () => {
+    const franja = /<section[^>]*id="marcas"[^>]*>[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
+    expect(franja).not.toBe('');
+    const ini = html.indexOf(franja);
+    const fin = ini + franja.length;
+    expect(html.indexOf('id="hero"')).toBeLessThan(ini);
+    expect(html.slice(0, ini).trimEnd().endsWith(divisor)).toBe(true);
+    expect(html.slice(fin).trimStart().startsWith(divisor)).toBe(true);
+    expect(html.slice(html.indexOf('id="hero"'), ini).split(divisor)).toHaveLength(2);
+    expect(html.indexOf('id="problema"')).toBeGreaterThan(fin);
+    expect(franja.match(/empresa-marcas-grupo/g)).toHaveLength(2);
+    expect(franja).toMatch(/empresa-marcas-grupo" aria-hidden="true"/);
+    expect(franja.match(/<img [^>]*alt="[^"]+"/g)).toHaveLength(7);
+    expect(franja.match(/<img [^>]*alt=""/g)).toHaveLength(7);
+    // Nada de texto visible: ni titulares, ni párrafos, ni enlaces.
+    expect(franja).not.toMatch(/<h[1-6]|<p\b|<a\b|<span|<button/);
+    expect(franja.replace(/<[^>]*>/g, '').trim()).toBe('');
   });
 
   it('lleva ceja, titular y párrafo, sin botón', () => {
@@ -45,6 +56,10 @@ describe('banda «Cómo funciona»', () => {
       'Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso. Te avisamos cuando esté cerca de ti.'
     );
     expect(banda.slice(0, banda.indexOf('cf-tarjetas'))).not.toMatch(/<a\b|btn-primary/);
+  });
+
+  it('la columna de texto no lleva logos ni botón', () => {
+    expect(banda).not.toMatch(/empresa-marcas|logos-empresas/);
   });
 
   it('las tarjetas son decoración y el aviso lleva ruta, sin placa ni distancia', () => {
