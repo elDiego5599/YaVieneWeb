@@ -90,11 +90,11 @@
 .ruta-ficha {
   position: relative;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 5px;
+  align-items: center;
+  gap: 16px;
   margin: 0;
-  padding: 13px 14px;
+  min-height: 78px;
+  padding: 8px 16px;
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -186,46 +186,47 @@
   background: var(--green-tint);
 }
 
-/* El nombre y el kilometraje comparten renglón: el nombre manda a la
-   izquierda y la cifra se apoya en el filo derecho, alineada con la de
-   las demás fichas. */
-.ruta-ficha-cabeza {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-}
+/* La ficha espeja la fila de ruta del selector de la app
+   (route_selector_sheet.dart, `_compactTile`): 78 de alto mínimo
+   (`minHeight: _kTileHeight`, :1253), md (16) a los lados y sm (8) arriba y
+   abajo (:1256) y md (16) entre la insignia y el título (:1285). */
 
-.ruta-ficha-nombre {
-  font-family: var(--font-family);
-  font-size: 15px;
+/* La insignia: caja de 44×44 con radio md (12) y 4 de aire a los lados
+   (route_selector_sheet.dart:1260 y :1264, `Padding(horizontal: 4)` en :1273),
+   el código en `AppTextStyles.etiqueta` (:1277; app_theme.dart:278 —13,
+   peso 600, interlineado 1,2, -0,1 de tracking—) con `primaryAccessible`
+   (#047857) sobre `primaryTint` (#E6F7F0). Contraste calculado: 4,94:1.
+   El `FittedBox` de la app encoge el código de cuatro caracteres; aquí
+   `nowrap` y el aire de 4 hacen lo mismo en los de hoy (tres). */
+.ruta-ficha-insignia {
+  flex: none;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0 4px;
+  border-radius: 12px;
+  background: var(--green-tint);
+  color: var(--app-primary-accessible);
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: var(--tinta);
+  letter-spacing: -0.1px;
+  white-space: nowrap;
 }
 
-.ruta-ficha-km {
-  flex: none;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  color: var(--tinta-tenue);
-}
-
-.ruta-ficha-tramo {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 5px;
-  font-size: 12.5px;
+/* El título: `AppTextStyles.subtitulo` (route_selector_sheet.dart:1295;
+   app_theme.dart:236 —18, peso 700, interlineado 1,3, -0,3 de tracking—)
+   en `textPrimary` (#0F172A, 17,9:1 sobre el blanco de la ficha). La app lo corta a una
+   línea con puntos suspensivos; aquí cabe en dos para no esconder el
+   nombre en el riel estrecho. */
+.ruta-ficha-nombre {
+  min-width: 0;
+  font-family: var(--font-family);
+  font-size: 18px;
+  font-weight: 700;
   line-height: 1.3;
-  color: var(--tinta-media);
-}
-
-.ruta-ficha-flecha {
-  font-weight: 500;
-  color: var(--tinta-tenue);
+  letter-spacing: -0.3px;
+  color: var(--app-text-primary);
 }

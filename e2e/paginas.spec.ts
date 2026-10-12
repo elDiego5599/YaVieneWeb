@@ -238,18 +238,20 @@ for (const { ruta, nombre } of PAGINAS) {
 }
 
 /* El carril de rutas del teléfono estira las fichas a la más alta. Con
-   230 px fijos la C13 partía su tramo en tres líneas y las seis quedaban
-   en 107 px con el texto flotando en medio. */
+   230 px fijos un nombre largo se partía y las seis quedaban altas con el
+   texto flotando en medio. Desde 2026-10-12 la ficha es la fila de la
+   app: insignia con el código y el nombre al lado, en una línea. */
 test('en el teléfono, las fichas de ruta van en una línea y a su alto', async ({ page }) => {
   await page.setViewportSize({ width: 402, height: 760 });
   await page.goto('/', { waitUntil: 'load' });
   const fichas = await page.locator('.mv-rutas .ruta-ficha').evaluateAll((todas) =>
     todas.map((f) => {
       const alto = (el: Element) => el.getBoundingClientRect().height;
+      const nombre = f.querySelector('.ruta-ficha-nombre')!;
       return {
         alto: alto(f),
-        cabeza: alto(f.querySelector('.ruta-ficha-cabeza')!),
-        tramo: alto(f.querySelector('.ruta-ficha-tramo')!),
+        nombre: alto(nombre),
+        linea: parseFloat(getComputedStyle(nombre).lineHeight),
       };
     })
   );
@@ -257,9 +259,9 @@ test('en el teléfono, las fichas de ruta van en una línea y a su alto', async 
   const [primera] = fichas;
   for (const ficha of fichas) {
     expect(ficha.alto, 'una ficha más alta que el resto').toBe(primera.alto);
-    expect(ficha.tramo, 'el tramo se parte en dos líneas').toBeLessThan(ficha.cabeza * 1.5);
+    expect(ficha.nombre, 'el nombre se parte en dos líneas').toBeLessThan(ficha.linea * 1.5);
   }
-  expect(primera.alto, 'las fichas se estiran').toBeLessThanOrEqual(72);
+  expect(primera.alto, 'las fichas se estiran').toBeLessThanOrEqual(78);
 });
 
 test.describe('el mapa en vivo con el teclado', () => {

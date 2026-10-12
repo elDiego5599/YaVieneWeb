@@ -3,8 +3,8 @@
  *
  * Las seis rutas de Sobusa ya viajaban en el paquete —las carga
  * `src/data/rutas-landing.ts` para dibujar el mapa—, pero se enseñaban en
- * un riel estrecho de dos líneas. Aquí se arma la ficha: el nombre de la
- * ruta y sus dos terminales.
+ * un riel estrecho. Aquí se arma la ficha: la insignia con el código de
+ * la ruta y su nombre, sin terminales (dueño, 2026-10-12).
  *
  * Y sólo eso. La ficha llegó a llevar también el código interno (R-101) y
  * el kilometraje, que son datos reales pero de otra conversación: al lado
@@ -50,7 +50,28 @@ const dato = (valor: string, rotulo: string): HTMLElement => {
 };
 
 /**
- * La ficha de una ruta, lista para el riel del mapa.
+ * Un código de ruta: hasta dos letras, de uno a tres dígitos y una letra
+ * opcional. Espejo de `_codigoDeRuta` en route_selector_sheet.dart:1383.
+ */
+const CODIGO = /^[A-Z]{0,2}\d{1,3}[A-Z]?$/;
+
+/**
+ * «B18 Tcherassi» → {code: 'B18', rest: 'Tcherassi'}. Espejo de `_routeCode`
+ * (route_selector_sheet.dart:1385): `null` si la primera palabra no es un
+ * código o si detrás no queda nombre, y entonces la ficha lleva el nombre
+ * entero sin insignia.
+ */
+export const codigoDeRuta = (nombre: string): { code: string; rest: string } | null => {
+  const [code, ...resto] = nombre.trim().split(/\s+/);
+  if (!code || resto.length === 0 || !CODIGO.test(code)) return null;
+  return { code, rest: resto.join(' ') };
+};
+
+/**
+ * La ficha de una ruta, lista para el riel del mapa: la insignia con el
+ * código y al lado el nombre, como la fila de ruta del selector de la app
+ * (`_compactTile`: `badgeInitials: codigo?.code`, `title: codigo?.rest`).
+ * Sin terminales ni kilometraje (dueño, 2026-10-12).
  *
  * Sale apagada a propósito: el estado `aria-pressed` lo pone quien la
  * coloca, que es el único que sabe cuál está puesta.
@@ -60,31 +81,13 @@ export const fichaDeRuta = (ruta: RutaLanding): HTMLButtonElement => {
   ficha.type = 'button';
   ficha.className = 'ruta-ficha';
   ficha.dataset.ruta = ruta.id;
+  // Dos spans seguidos se leerían «B18Tcherassi»: el nombre accesible es
+  // el nombre entero de la ruta.
+  ficha.setAttribute('aria-label', ruta.nombre);
 
-  const tramo = document.createElement('span');
-  tramo.className = 'ruta-ficha-tramo';
-  const flecha = trozo('ruta-ficha-flecha', '→');
-  // La flecha es dibujo, no lectura: quien escucha la página oye las dos
-  // terminales seguidas y no una flecha en medio.
-  flecha.setAttribute('aria-hidden', 'true');
-  tramo.append(trozo('ruta-ficha-terminal', ruta.terminalA), flecha,
-    trozo('ruta-ficha-terminal', ruta.terminalB));
-
-  /*
-    El kilometraje va en la ficha, no sólo en la suma de la cabecera. Es
-    el dato que distingue una ruta de otra cuando las dos terminales no
-    dicen nada a quien no conoce la ciudad, y estaba en `rutas.json`
-    desde el principio sin aparecer en ninguna parte de la página. Con
-    coma, como el resumen y la lectura del bus que tiene debajo.
-  */
-  const cabeza = document.createElement('span');
-  cabeza.className = 'ruta-ficha-cabeza';
-  cabeza.append(
-    trozo('ruta-ficha-nombre', ruta.nombre),
-    trozo('ruta-ficha-km', `${ruta.km.toFixed(1).replace('.', ',')} km`),
-  );
-
-  ficha.append(cabeza, tramo);
+  const codigo = codigoDeRuta(ruta.nombre);
+  if (codigo) ficha.append(trozo('ruta-ficha-insignia', codigo.code));
+  ficha.append(trozo('ruta-ficha-nombre', codigo ? codigo.rest : ruta.nombre));
   return ficha;
 };
 

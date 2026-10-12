@@ -128,7 +128,8 @@
        pantalla ancha y el mapa acaba pareciendo la ilustración de al
        lado en vez del centro. El techo es el ancho que piden dos
        columnas de fichas y ni un píxel más: 410 por columna, que es lo
-       que mide el nombre de ruta más largo con su tramo debajo. Estaba
+       que pedía el nombre de ruta más largo con su tramo debajo (hoy la
+       ficha es insignia y nombre, y cabe de sobra). Estaba
        en 960 —dos columnas holgadas— y esos 140 de más eran justo los
        que hacían que el mapa se leyera chico al lado. Con él puesto los
        dos van parejos y el grupo se centra, que es lo que ya hacía
@@ -423,7 +424,7 @@
 /* Tres y tres. En una sola columna las seis fichas pedían todo el alto
    del mapa para poner dos palabras por fila, y el mando se quedaba
    estrecho al lado. En dos columnas la lista ocupa el ancho que le
-   sobraba y cada ficha tiene sitio para el nombre y el tramo debajo.
+   sobraba y cada ficha tiene sitio para la insignia y el nombre.
 
    Las tres filas se parten el alto a partes iguales (`1fr`) en vez de
    pedir cada una lo suyo: así llenan justo lo que les toca del mando y
@@ -668,7 +669,7 @@
   }
 
   /* Del ancho de lo que dice, con 230 de suelo. A 230 fijos la C13
-     partía su tramo en tres líneas y el carril, que estira las fichas a
+     partía su tramo (cuando lo llevaba) en tres líneas y el carril, que estira las fichas a
      la más alta, dejaba las seis en 107 px con dos líneas centradas en
      medio: aire arriba y abajo. Así las seis van en una línea y en 68. */
   .ruta-ficha {

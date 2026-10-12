@@ -6,7 +6,7 @@ import type { RutaLanding } from '../src/types';
 /**
  * Las cifras de cabecera de la sección del mapa y la ficha de cada ruta,
  * como las lee quien entra: el número grande con su rótulo, y un botón por
- * ruta con el nombre, los kilómetros y las dos terminales.
+ * ruta (el detalle de la ficha, en rutas-fichas.test.ts).
  */
 
 const rutas = YV_RUTAS.rutas;
@@ -69,34 +69,5 @@ describe('la ficha de ruta', () => {
     expect(f.dataset.ruta).toBe(rutas[0]!.id);
     // El estado lo pone quien la coloca: sale sin marcar.
     expect(f.hasAttribute('aria-pressed')).toBe(false);
-  });
-
-  // Riesgo: el lector de pantalla lee «flecha» entre las dos terminales.
-  it('se lee el nombre, los kilómetros y las dos terminales, sin la flecha', () => {
-    const f = ficha(rutas[0]!);
-    const flecha = f.querySelector('.ruta-ficha-flecha')!;
-    expect(flecha.getAttribute('aria-hidden')).toBe('true');
-    const leido = Array.from(f.querySelectorAll('span span'))
-      .filter((s) => !s.closest('[aria-hidden="true"]'))
-      .map((s) => s.textContent);
-    expect(leido).toEqual([
-      rutas[0]!.nombre,
-      `${rutas[0]!.km.toFixed(1).replace('.', ',')} km`,
-      rutas[0]!.terminalA,
-      rutas[0]!.terminalB,
-    ]);
-  });
-
-  // Riesgo: un kilometraje entero sale sin decimal («12 km») y las fichas no cuadran entre sí.
-  it('un kilometraje entero se escribe igual con su decimal', () => {
-    const f = ficha({ ...rutas[0]!, km: 12 });
-    expect(f.querySelector('.ruta-ficha-km')!.textContent).toBe('12,0 km');
-  });
-
-  // Riesgo: un nombre de ruta con marcado se pinta como HTML.
-  it('el nombre y las terminales se escriben como texto', () => {
-    const f = ficha({ ...rutas[0]!, nombre: '<img src=x>', terminalA: '<b>A</b>' });
-    expect(f.querySelector('img, b')).toBeNull();
-    expect(f.querySelector('.ruta-ficha-nombre')!.textContent).toBe('<img src=x>');
   });
 });
