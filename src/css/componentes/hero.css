@@ -626,11 +626,10 @@
    atrás es quitar `.hero-iphone`, el template y `hero-grid--video`.
    ────────────────────────────────────────────────────────────────── */
 .hero-iphone {
-  /* 750 de alto, casi los 753 del trío, y el ancho justo para que la
-     pantalla tenga la proporción del video (dueño, 2026-10-11): el alto
-     es 1,7218 × el ancho (pantalla 0,928 × 16/9 + biseles 0,072), así
-     que 750 / 1,7218 = 435,6. */
-  --tel: 435.6px;
+  /* Un iPhone de verdad (71,5 × 149,6), algo más ancho que el central
+     del trío: 380 × 795 (dueño, 2026-10-11; a la proporción del video
+     parecía un iPad). */
+  --tel: 380px;
   flex: none;
   display: flex;
   flex-direction: column;
@@ -644,23 +643,18 @@
   text-align: center;
 }
 
-/* La pantalla mide 1080:1920 como el video y la carcasa crece con ella
-   (sale de `aspect-ratio` y la pinta su relleno, el bisel): el video la
-   llena entera, sin franjas y sin recortar nada. */
-.hero-iphone .phone-shell {
-  aspect-ratio: auto;
-}
-
+/* El video (9:16) es más ancho que la pantalla del iPhone: va entero,
+   sin recortar sus globos, y el sobrante de arriba y abajo lleva su
+   mismo fondo, #F4F5EE (medido en sus esquinas), así que no se ve. */
 .hero-iphone .phone-screen {
-  height: auto;
-  aspect-ratio: 1080 / 1920;
+  background: #f4f5ee;
 }
 
 .hero-video {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 /* Apilado, el aparato va entero: el botón «Avisarme» del video es parte
@@ -708,7 +702,7 @@
     font-size: min(14cqw, 104px);
   }
 
-  /* Junto al aparato de 435 el texto de al lado sube un punto (dueño,
+  /* Junto al aparato de 380 el texto de al lado sube un punto (dueño,
      2026-10-11). */
   .hero-grid--video .hero-description {
     font-size: 23px;
