@@ -569,6 +569,26 @@
   object-fit: cover;
 }
 
+/* Desde 1024 el lienzo del degradado es más alto y más angosto (dueño,
+   2026-10-11): llena la primera pantalla menos una cuneta de 32 abajo
+   —tope 900, para que en un monitor alto no quede un cajón vacío— y se
+   recoge a 1240, 72 px más ancho por lado que el contenedor del nav, así
+   que la marca y el botón siguen dentro con aire. */
+@media (min-width: 1024px) {
+  .hero-panel:has(.hero-grid--video) {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 2 * var(--calle));
+    max-width: 1240px;
+    margin-inline: auto;
+    min-height: min(800px, calc(100svh - 100px));
+  }
+
+  .hero-panel:has(.hero-grid--video) .hero-grid--video {
+    flex: 1;
+  }
+}
+
 /* Desde 1024 el trío va a la derecha y la copia a la izquierda (dueño,
    2026-10-11), con los tamaños de letra que ya tenía junto al video. */
 @media (min-width: 1024px) {
@@ -590,13 +610,17 @@
      falta para que se vea todo lo que enseña (dueño, 2026-10-11). */
   .hero-grid--video .hero-scene {
     /* Cabe con la copia dentro del contenedor del nav: a 270 el trío mide
-       ~620 y la copia se queda con ~430 (dueño, 2026-10-11). */
+       ~620 y la copia se queda con ~430, lo justo para los dos botones
+       en un renglón (a 290 se partían) (dueño, 2026-10-11). */
     --tel: 270px;
     --sangrado: calc(var(--alto-tel) * 0.1);
   }
 
+  /* La copia se centra con lo que se ve del trío, no con el lienzo: el
+     trío va abajo y se hunde, así que su centro visible cae más bajo. */
   .hero-grid--video .hero-copy {
-    align-self: center;
+    align-self: end;
+    margin-bottom: clamp(48px, 8vh, 96px);
     align-items: flex-start;
     text-align: left;
   }
