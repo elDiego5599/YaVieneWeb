@@ -19,12 +19,10 @@ import './css/phone-simulator.css';
 import './css/animations.css';
 import './css/accesibilidad.css';
 
-import { MapaVivo } from './mapa-vivo';
 import { NavIsland } from './nav-island';
 import { PhoneMap } from './phone-map';
 import { PhoneSimulator } from './phone-simulator';
 import { Problema } from './problema';
-import { pintarCifras } from './rutas';
 import { reboteDelPie } from './rebote';
 import { dormirLoQueNoSeVe } from './reposo';
 import { encenderScrollSuave } from './scroll-suave';
@@ -32,22 +30,6 @@ import { entrarEscena, ScrollEffects } from './scroll-effects';
 import { sinMovimiento } from './scrolly';
 
 const arrancar = (): void => {
-  /*
-    Lo que se pinta con `.reveal` va antes que el observador, sin
-    excepción: `ScrollEffects` recoge los nodos una sola vez, al
-    construirse, y lo que nazca después entra ya visible —la sección
-    aparecería de golpe en vez de escalonada—.
-
-    Son dos: las tres cifras de la cabecera y las seis fichas de ruta,
-    que las pinta el mapa porque es él quien sabe cuál está elegida.
-  */
-  const cifras = document.querySelector<HTMLElement>('[data-rutas-cifras]');
-  if (cifras) pintarCifras(cifras);
-
-  // El mapa jugable: la única parte de la página que se toca.
-  const mapa = document.querySelector<HTMLElement>('[data-mapa-vivo]');
-  if (mapa) new MapaVivo(mapa);
-
   // Apariciones al entrar en pantalla: ya está puesto todo lo que mira.
   new ScrollEffects();
   // La escena del hero, que entra sola al cargar.

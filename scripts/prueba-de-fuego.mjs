@@ -52,18 +52,6 @@ export const MUTACIONES = [
   { archivo: 'src/phone-map.ts', de: 'const RADIO_CERCA_M = 2000;', a: 'const RADIO_CERCA_M = 3000;', que: 'radio de «cerca» del chip' },
   { archivo: 'src/phone-map.ts', de: "node.style.display = i < ts.length ? '' : 'none';", a: "node.style.display = '';", que: 'buses sobrantes escondidos' },
   { archivo: 'src/phone-map.ts', de: 'const clamped = Math.max(0, Math.min(1, t));', a: 'const clamped = t;', que: 'punto acotado al recorrido' },
-  // El mapa en vivo de la portada.
-  { archivo: 'src/mapa-vivo.ts', de: 'const RADIO_AVISO_M = 1000;', a: 'const RADIO_AVISO_M = 1500;', que: 'radio del aviso (mapa)' },
-  { archivo: 'src/mapa-vivo.ts', de: 'Math.max(100, Math.round(m / 100) * 100);', a: 'Math.max(10, Math.round(m / 10) * 10);', que: 'redondeo a la centena' },
-  { archivo: 'src/mapa-vivo.ts', de: 'm < 1000 ? `${redondear(m)} m`', a: 'm <= 1000 ? `${redondear(m)} m`', que: 'metros o kilómetros (mapa)' },
-  { archivo: 'src/mapa-vivo.ts', de: 'if (evento.button !== 0) return;', a: 'if (false) return;', que: 'solo el botón principal mueve el punto' },
-  { archivo: 'src/mapa-vivo.ts', de: 'evento.preventDefault();', a: 'void evento;', que: 'las flechas no desplazan la página' },
-  { archivo: 'src/mapa-vivo.ts', de: 'if (d < minimo) {', a: 'if (d > minimo) {', que: 'el punto más cercano de la ruta' },
-  { archivo: 'src/mapa-vivo.ts', de: 'const lejos = this.#buses.every(b => b.metros > RADIO_AVISO_M * 2.4);', a: 'const lejos = this.#buses.some(b => b.metros > RADIO_AVISO_M * 2.4);', que: 'todos lejos para reponer' },
-  { archivo: 'src/mapa-vivo.ts', de: 'return delta > 0 && delta < 0.5;', a: 'return delta > 0;', que: 'bus que ya pasó' },
-  { archivo: 'src/mapa-vivo.ts', de: 'const cerca = this.#buses.reduce((a, b) => (b.metros < a.metros ? b : a));', a: 'const cerca = this.#buses.reduce((a, b) => (b.metros > a.metros ? b : a));', que: 'la lectura habla del bus más cercano' },
-  { archivo: 'src/mapa-vivo.ts', de: 'const dentro = cerca.metros <= RADIO_AVISO_M;', a: 'const dentro = cerca.metros < RADIO_AVISO_M / 2;', que: 'dentro del radio' },
-  { archivo: 'src/mapa-vivo.ts', de: 'if (dentro && !this.#avisado) {', a: 'if (dentro) {', que: 'el aviso suena una vez' },
   // El panel de flota dibujado.
   { archivo: 'src/panel-flota.ts', de: "if (!bus.visible) return 'oculto';", a: "if (!bus.visible && false) return 'oculto';", que: 'oculto manda sobre el resto' },
   { archivo: 'src/panel-flota.ts', de: 'return bus.online && !bus.isGhost;', a: 'return bus.online;', que: 'en línea sin fantasmas' },
@@ -85,9 +73,6 @@ export const MUTACIONES = [
   { archivo: 'src/problema.ts', de: 'x: e.offsetLeft + (celda?.offsetLeft ?? 0),', a: 'x: e.offsetLeft,', que: 'la píldora se mide desde el escenario, no desde su celda' },
   { archivo: 'src/escenario-red.ts', de: "pieza = recta === 1 ? 'tronco' : recta === rectas ? 'bajada' : 'viga';", a: "pieza = recta === 0 ? 'tronco' : recta === rectas ? 'bajada' : 'viga';", que: 'el árbol crece por piezas: la primera recta es el tronco' },
   { archivo: 'src/escenario-red.ts', de: 'l - o[i - 1] > MISMO_PUESTO', a: 'l - o[i - 1] > 0', que: 'dos avisos simétricos llegan a la vez aunque la píldora caiga en medio píxel' },
-  // Las cifras de rutas.
-  { archivo: 'src/rutas.ts', de: 'const km = rutas.reduce((suma, r) => suma + r.km, 0);', a: 'const km = rutas.reduce((suma, r) => Math.max(suma, r.km), 0);', que: 'kilómetros totales' },
-  { archivo: 'src/rutas.ts', de: 'const terminales = new Set(rutas.flatMap(r => [r.terminalA, r.terminalB]));', a: 'const terminales = new Set(rutas.flatMap(r => [r.terminalA]));', que: 'terminales distintos' },
   // Lo que escribe la construcción.
   { archivo: 'vite.config.ts', de: "const ruta = ctx.path === '/index.html' ? '/' : ctx.path;", a: 'const ruta = ctx.path;', que: 'canonical de la portada' },
   { archivo: 'vite.config.ts', de: "sitio = String(config.env.VITE_SITE_URL ?? '').replace(/\\/+$/, '');", a: "sitio = String(config.env.VITE_SITE_URL ?? '');", que: 'barra final del dominio' },

@@ -81,8 +81,8 @@ export class ScrollEffects {
               Lo que ya quedó por encima de la ventana no va a entrar
               nunca: un observador avisa cuando algo cruza el borde, y
               esto lo cruzó antes de que hubiera nadie mirando. Pasa al
-              abrir un enlace directo —el CTA de la barra apunta a
-              `#mapa`— y al volver atrás, que el navegador restaura el
+              abrir un enlace directo —un enlace de la barra apunta a
+              `#como-funciona`— y al volver atrás, que el navegador restaura el
               scroll. Sin esto la cabecera de la sección se queda en
               `opacity: 0` para siempre y ahí no hay animación que
               valga: hay un hueco en blanco.

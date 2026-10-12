@@ -44,13 +44,6 @@
     transition: opacity 0.2s linear !important;
     transform: none !important;
   }
-  /* El aviso del mapa: igual, aparece fundiéndose y sin la subida con
-     escala. `visibility` viaja con el mismo tiempo para que no corte el
-     fundido de salida. */
-  .mapa-aviso {
-    transition: opacity 0.2s linear, visibility 0.2s !important;
-    transform: none !important;
-  }
   /* La entrada del hero anima `scale`, no `transform`: hay que apagar esa
      propiedad y no la otra. */
   .escena-entra {
@@ -61,12 +54,6 @@
   .phone-shell {
     transition: none !important;
     transform: none !important;
-  }
-  /* El saltito de las fichas de ruta. El borde verde y el relleno de la
-     elegida siguen diciendo lo mismo sin que nada se mueva. */
-  .ruta-ficha {
-    transition: none !important;
-    translate: none !important;
   }
   /* La respiración del trío del hero anima `translate`, no `transform`:
      hay que apagar esa propiedad y no la otra, que en los laterales

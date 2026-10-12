@@ -63,9 +63,7 @@ describe("glosario (T6.8)", () => {
 
   it("la landing avisa sin placa, con las palabras del glosario", () => {
     const { landing } = glosario.aviso;
-    for (const archivo of ["src/phone-simulator.ts", "src/mapa-vivo.ts"]) {
-      expect(leer(archivo), archivo).toContain(`'${landing}'`);
-    }
+    expect(leer("src/phone-simulator.ts")).toContain(`'${landing}'`);
     // Regla 12: la app nombra la ruta (sin placa ni distancia desde el
     // 2026-10-02); la landing, no.
     expect(landing).not.toBe(glosario.aviso.app);

@@ -122,8 +122,8 @@ export class NavIsland {
       del formulario se marcan igual que aquí; «Inicio» va a `/` y se
       queda fuera. Lo que allí no cambia es el
       rótulo de la barra plegada, que no lleva `data-nav-lugar` y dice
-      siempre «Para empresas». El botón del mapa entra como uno más,
-      porque es el único enlace que hay a esa sección.
+      siempre «Para empresas». Los botones con ancla entran como un
+      enlace más.
     */
     const dianas: [HTMLElement, HTMLElement][] = [];
     for (const enlace of isla.querySelectorAll<HTMLAnchorElement>(
@@ -137,8 +137,8 @@ export class NavIsland {
     // El rótulo de la barra plegada. Debajo de 880 los enlaces no están a
     // la vista, así que la marca que se les pone no la ve nadie: el
     // nombre de la sección se escribe también aquí. Lo que se copia es
-    // `data-lugar` si el enlace lo trae —el botón del mapa dice «Ver el
-    // mapa en vivo», que arriba no pega— y si no, su propio texto.
+    // `data-lugar` si el enlace lo trae —para un botón cuyo texto no pega
+    // arriba— y si no, su propio texto.
     const lugar = isla.querySelector<HTMLElement>('[data-nav-lugar]');
 
     /*

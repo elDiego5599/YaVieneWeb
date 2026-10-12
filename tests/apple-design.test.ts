@@ -33,7 +33,6 @@ const reglas = (hoja: string, selector: string): string =>
 
 const nav = css('componentes/nav.css');
 const botones = css('componentes/botones.css');
-const mapa = css('componentes/mapa.css');
 const pie = css('componentes/pie.css');
 const acc = css('accesibilidad.css');
 const anim = css('animations.css');
@@ -42,11 +41,9 @@ const sim = css('phone-simulator.css');
 describe('movimiento reducido: quita el desplazamiento y deja el fundido', () => {
   const reducido = media(anim, '(prefers-reduced-motion: reduce)');
 
-  it('las apariciones, el aviso del mapa y el panel del menú se funden en ~200 ms', () => {
+  it('las apariciones y el panel del menú se funden en ~200 ms', () => {
     expect(reglas(reducido, '.reveal')).toMatch(/transition:\s*opacity 0?\.2s/);
     expect(reglas(reducido, '.reveal')).toMatch(/transform:\s*none\s*!important/);
-    expect(reglas(reducido, '.mapa-aviso')).toMatch(/transition:[^;]*opacity 0?\.2s/);
-    expect(reglas(reducido, '.mapa-aviso')).toMatch(/transform:\s*none\s*!important/);
   });
 
   it('el panel del menú móvil se funde y el botón que lo abre sigue ahí', () => {
@@ -71,8 +68,7 @@ describe('transparencia reducida', () => {
     expect(reglas(r, '.site-header:not(.is-arriba)')).toMatch(/background:\s*var\(--papel\)/);
   });
 
-  it('el crédito del mapa y el botón del pie dejan de ser translúcidos', () => {
-    expect(reglas(r, '.mapa-credito')).toMatch(/background:\s*#fff/i);
+  it('el botón del pie deja de ser translúcido', () => {
     expect(reglas(r, '.footer-actions .btn-outline')).toMatch(/background:\s*#fff/i);
   });
 });
@@ -96,10 +92,8 @@ describe('más contraste', () => {
     expect(c).toMatch(/var\(--linea-fuerte\)/);
   });
 
-  it('interruptor y ficha de ruta llevan borde de 1px (el botón de contorno ya usa el token)', () => {
-    for (const sel of ['.interruptor', '.ruta-ficha']) {
-      expect(reglas(r, sel), sel).toMatch(/border:\s*1px solid var\(--linea-fuerte\)/);
-    }
+  it('el interruptor lleva borde de 1px (el botón de contorno ya usa el token)', () => {
+    expect(reglas(r, '.interruptor')).toMatch(/border:\s*1px solid var\(--linea-fuerte\)/);
   });
 });
 
@@ -151,11 +145,9 @@ describe('botones y avisos', () => {
     expect(reglas(botones, '.btn-primary')).toMatch(/transition:[^;]*transform var\(--transition-hover\)/);
   });
 
-  it('la flecha y el aviso del mapa no rebotan', () => {
+  it('la flecha no rebota', () => {
     expect(reglas(botones, '.btn-flecha')).not.toMatch(/ease-spring/);
     expect(reglas(botones, '.btn-flecha')).toMatch(/transform 0\.38s var\(--ease-fluida\)/);
-    expect(reglas(mapa, '.mapa-aviso')).not.toMatch(/ease-spring/);
-    expect(reglas(mapa, '.mapa-aviso')).toMatch(/transform 0\.45s var\(--ease-fluida\)/);
   });
 });
 
@@ -188,7 +180,6 @@ describe('código muerto fuera', () => {
 
 describe('tipografía', () => {
   const hero = css('componentes/hero.css');
-  const rutas = css('componentes/rutas.css');
   const legales = css('componentes/legales.css');
   const e404 = css('componentes/error-404.css');
   const empresas = css('componentes/empresas-pagina.css');
@@ -205,25 +196,19 @@ describe('tipografía', () => {
     expect(pie).toMatch(/font-size:\s*clamp\(30px,\s*1\.35rem \+ 2\.25vw,\s*54px\)/);
   });
 
-  it('titulares de mapa y empresas: 600 y -0.035em, como el resto', () => {
-    for (const hoja of [mapa, empresas]) {
-      const t = reglas(hoja, '.mapa-inner > .seccion-cabecera .seccion-titulo') +
-        reglas(hoja, '#panel .seccion-titulo');
-      expect(t).toMatch(/font-weight:\s*600/);
-      expect(t).toMatch(/letter-spacing:\s*-0\.035em/);
-    }
+  it('titular de empresas: 600 y -0.035em, como el resto', () => {
+    const t = reglas(empresas, '#panel .seccion-titulo');
+    expect(t).toMatch(/font-weight:\s*600/);
+    expect(t).toMatch(/letter-spacing:\s*-0\.035em/);
   });
 
   it('letra pequeña con tracking neutro o positivo', () => {
     expect(reglas(hero, '.tienda-chip')).toMatch(/letter-spacing:\s*0;/);
     expect(reglas(hero, '.hero-credit')).toMatch(/letter-spacing:\s*0?\.015em/);
-    expect(reglas(mapa, '.mapa-credito')).toMatch(/letter-spacing:\s*0?\.015em/);
     const fecha = reglas(legales, '.legal-fecha');
     expect(fecha).toMatch(/letter-spacing:\s*0?\.08em/);
     expect(fecha).toMatch(/font-weight:\s*700/);
     expect(fecha).toMatch(/line-height:\s*1\.3/);
-    // La insignia de la ficha de ruta espeja `AppTextStyles.etiqueta` (-0,1 de tracking).
-    expect(reglas(rutas, '.ruta-ficha-insignia')).toMatch(/letter-spacing:\s*-0\.1px/);
   });
 
   it('los rótulos del 404 usan el tracking de los demás rótulos y peso 600', () => {

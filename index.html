@@ -199,18 +199,8 @@
         <div class="nav-island-inner">
           <nav class="nav-island-links" aria-label="Navegación principal">
             <a href="#problema" class="nav-link">Problema</a>
-            <a href="#mapa" class="nav-link">Mapa en vivo</a>
+            <a href="#como-funciona" class="nav-link">Cómo funciona</a>
           </nav>
-          <!-- El botón dice lo mismo que el del hero y el del pie: una sola
-               acción con un solo nombre. Antes aquí era «Probar el mapa», en
-               el hero «Ver el mapa en vivo» y en el pie «Probar mapa en
-               vivo»: tres frases para el mismo sitio, y quien las lee duda
-               de si son tres cosas. Se quedó la del hero porque es la que
-               dice qué hay al llegar —el mapa, y en vivo—, no una prueba.
-
-               `data-lugar` es cómo se llama la sección, que no es lo que
-               dice el botón: arriba tiene que leerse «el mapa», no «ver el
-               mapa en vivo», que ahí ya no se está invitando a nada. -->
           <a href="/empresas.html" class="nav-island-cta">Para empresas</a>
         </div>
       </div>
@@ -244,7 +234,7 @@
             llegar a tu paradero.</p>
 
           <div class="hero-actions reveal" data-reveal-delay="0">
-            <a href="#mapa" class="btn-primary btn-green">Ver el mapa en vivo <span class="btn-flecha" aria-hidden="true">→</span></a>
+            <a href="#como-funciona" class="btn-primary btn-green">Cómo funciona <span class="btn-flecha" aria-hidden="true">→</span></a>
             <a href="/empresas.html" class="btn-outline">Para empresas</a>
           </div>
 
@@ -760,7 +750,6 @@
           <span class="seccion-rotulo cf-ceja">CÓMO FUNCIONA</span>
           <h2 class="seccion-titulo">Sal cuando tu bus esté cerca</h2>
           <p class="seccion-lead">Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso. Te avisamos cuando esté cerca de ti.</p>
-          <a href="#mapa" class="btn-primary btn-green">Ver el mapa en vivo <span class="btn-flecha" aria-hidden="true">→</span></a>
         </div>
 
         <div class="cf-tarjetas" aria-hidden="true">
@@ -823,10 +812,10 @@
           </div>
 
           <div class="cf-tarjeta cf-tarjeta--aviso reveal" data-reveal-delay="280">
-            <div class="mapa-aviso-icono"><img src="/logo.svg" alt="" width="20" height="20"></div>
-            <div class="mapa-aviso-texto">
-              <span class="mapa-aviso-app">Ya Viene · ahora</span>
-              <strong class="mapa-aviso-titulo">Tu bus de la ruta C16 está cerca de ti</strong>
+            <div class="cf-aviso-icono"><img src="/logo.svg" alt="" width="20" height="20"></div>
+            <div class="cf-aviso-texto">
+              <span class="cf-aviso-app">Ya Viene · ahora</span>
+              <strong class="cf-aviso-titulo">Tu bus de la ruta C16 está cerca de ti</strong>
             </div>
           </div>
         </div>
@@ -992,113 +981,6 @@
         </div>
       </div>
     </section>
-
-    <!-- ============ LAS SEIS RUTAS, EN VIVO ============
-      Esta sección se toca, y es también la que trae los datos: las seis
-      rutas reales de Sobusa con su código, sus terminales y su
-      kilometraje, el radio de aviso con el que arranca la app —un
-      kilómetro, el punto de partida de su rueda— y el texto exacto de
-      la notificación. Lo único simulado son los buses, y lo dicen la
-      entrada, encima del mapa, y el rótulo «Simulación» dentro de él.
-
-      Las fichas no son una lista aparte de las del mando: son el mando.
-      Tocar una cambia la ruta que el mapa dibuja, ahí mismo, sin salir de
-      la sección. Las pinta `MapaVivo` con el molde de `rutas.ts`, que es
-      el que sabe cómo se ve una ficha.
-
-      Sin fondo propio y sin marco: la sección va en el papel blanco, como
-      la portada y como los pasos. El mapa ya es una lámina de color y un
-      marco entero; ponerle además una banda debajo era enmarcar un cuadro
-      dos veces. La única banda de la página es la de arriba, «Qué
-      resuelve», y así se lee como lo que es: un alto en el camino.
-    -->
-    <section class="panel" id="mapa">
-      <div class="panel-inner panel-inner--ancho mapa-inner">
-        <header class="seccion-cabecera seccion-cabecera--partida reveal">
-          <span class="seccion-rotulo">El producto</span>
-          <h2 class="seccion-titulo">El mapa, <span class="acentuado">funcionando aquí mismo.</span></h2>
-          <p class="seccion-lead">Las seis rutas reales de Sobusa, con sus terminales y su kilometraje.
-            Elige una, mueve tu punto de espera y mira a qué distancia va el bus más cercano.
-            Lo único simulado son los buses.</p>
-        </header>
-        <!--
-          Ni el aviso ni la pista de toque van encima del mosaico. Estuvieron
-          ahí y tapaban justo lo que hay que mirar —la ruta y el círculo del
-          kilómetro—. Ahora comparten una banda propia sobre el mapa: la
-          pista mientras no ha pasado nada, el aviso cuando el bus entra.
-          Nunca se ven las dos, así que la banda no reserva hueco de más.
-        -->
-        <div class="mapa-tablero" data-mapa-vivo>
-          <div class="mapa-vista">
-            <div class="mapa-tira">
-              <p class="mapa-toque" aria-hidden="true">Toca el mapa para mover tu punto</p>
-              <div class="mapa-aviso" data-mapa-aviso role="status" aria-live="polite">
-                <div class="mapa-aviso-icono" aria-hidden="true">
-                  <img src="/logo.svg" alt="" width="20" height="20">
-                </div>
-                <div class="mapa-aviso-texto">
-                  <span class="mapa-aviso-app">Ya Viene · ahora</span>
-                  <strong class="mapa-aviso-titulo" data-mapa-aviso-titulo></strong>
-                </div>
-              </div>
-            </div>
-            <div class="mapa-lienzo" data-mapa-lienzo>
-              <!--
-                El mapa se puede tocar, así que también se tiene que poder
-                usar con el teclado: `tabindex` lo mete en el recorrido de
-                tabulación y las flechas mueven el punto de espera por el
-                recorrido (src/mapa-vivo.ts). El rótulo lo dice, porque es lo
-                único que se oye al llegar aquí; lo que pasa después lo
-                cuenta el `role="status"` de abajo.
-
-                Es un deslizador y no una imagen: con `role="img"`, en modo
-                lectura el lector de pantalla se quedaba las flechas para
-                recorrer el texto y no llegaban al mapa. Un deslizador lo
-                pasa a modo foco. El valor es por dónde va el punto a lo
-                largo del recorrido, de 0 a 100, y lo escribe mapa-vivo.ts
-                junto con su lectura en palabras.
-              -->
-              <svg class="mapa-svg" data-mapa-svg role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-label="Tu punto de espera en el mapa de Barranquilla, sobre la ruta elegida. Con las flechas lo mueves por la ruta"></svg>
-              <p class="solo-lectores" data-mapa-voz role="status" aria-live="polite"></p>
-              <!--
-                El rótulo «Simulación» (T6.10, decisión D8). Las rutas, los
-                kilómetros y el radio del aviso (el kilómetro con el que
-                arranca la rueda) son los de la app, pero los
-                dos buses los mueve esta página (src/mapa-vivo.ts), y el mapa
-                se mira sin leer la entrada de la sección, que es donde se
-                decía. Va primero en la pastilla de la atribución, que ya
-                estaba sobre el mapa: no pone otra pieza encima del trazado
-                ni pide CSS propio, y la negrita es lo que lo separa del
-                crédito.
-              -->
-              <p class="mapa-credito"><strong data-mapa-simulacion>Simulación</strong> · Mapa base © <a href="https://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> · © <a href="https://carto.com" target="_blank" rel="noopener">CARTO</a></p>
-            </div>
-          </div>
-          <div class="mapa-mando">
-            <div class="mapa-columna mapa-columna--rutas">
-              <span class="mapa-rotulo">Elige una ruta</span>
-              <div class="mv-rutas" data-mapa-rutas role="group" aria-label="Rutas disponibles"></div>
-            </div>
-            <!--
-              Las cifras del catálogo —seis rutas, sus terminales y sus
-              kilómetros— van pegadas a la lista que describen, no en una
-              banda suelta debajo del marco. Ahí abajo eran un pie de
-              página; aquí son el resumen de las seis fichas que tienen
-              encima, y de paso llenan el alto que la lista le dejaba a la
-              columna al lado de un mosaico más alto que ella.
-            -->
-            <div class="rutas-cifras reveal" data-reveal-delay="90" data-rutas-cifras></div>
-            <div class="mapa-lectura" data-mapa-lectura>
-              <span class="mapa-rotulo">Bus más cercano</span>
-              <span class="mapa-lectura-bus" data-mapa-bus></span>
-              <span class="mapa-lectura-metros" data-mapa-metros></span>
-              <span class="mapa-lectura-pie" data-mapa-lectura-pie>en línea recta hasta tu punto</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
   </main>
 
   <footer class="site-footer" id="pie">
@@ -1108,7 +990,7 @@
       <p>Menos adivinar, más llegar. Ya Viene convierte cada ruta de Barranquilla en una respuesta en tiempo real.</p>
       <div class="footer-actions">
         <a href="/empresas.html" class="btn-primary btn-green">Conecta tu flota <span class="btn-flecha" aria-hidden="true">→</span></a>
-        <a href="#mapa" class="btn-outline">Ver el mapa en vivo</a>
+        <a href="#como-funciona" class="btn-outline">Cómo funciona</a>
       </div>
     </div>
 
@@ -1125,7 +1007,7 @@
         <div class="footer-nav-group">
           <span>Explora</span>
           <a href="#problema">El problema</a>
-          <a href="#mapa">El mapa en vivo</a>
+          <a href="#como-funciona">Cómo funciona</a>
         </div>
         <div class="footer-nav-group">
           <span>Conecta</span>

@@ -126,16 +126,6 @@
      las secciones. Se acabaron los paneles flotantes con radio y las
      bandas a sangre. */
   --contenedor: 1160px;
-  /* Las bandas que enseñan producto —el mapa
-     panorámico— van por una pista más ancha que el texto. Estaba en 1320 y
-     en un monitor grande las dos parecían islas en medio del papel.
-
-     1440 es lo que aguantan las dos: el visor de los pasos cabe con los
-     tres teléfonos y su carril, y el tablero del mapa se llena —la lista
-     de rutas, sus cifras y la lectura a un lado; el mosaico al otro— sin
-     que sobre sitio dentro del marco. Más ancho sólo lo llenaba una de
-     las dos, y la otra se quedaba con un agujero. */
-  --contenedor-ancho: 1440px;
   --calle: clamp(20px, 4vw, 32px);
   --aire-seccion: clamp(72px, 9vh, 128px);
 

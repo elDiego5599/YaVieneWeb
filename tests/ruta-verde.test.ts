@@ -3,12 +3,10 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 /**
- * La ruta del mapa, en todas partes como en «El producto» (2026-09-28).
+ * La ruta del mapa, verde sobre orla blanca (2026-09-28).
  *
- * El mapa de la portada (`mapa.css`, `.mv-casing` + `.mv-activa`) pinta la
- * ruta en el verde de la marca sobre una orla blanca; el teléfono la
- * pintaba en el azul eléctrico, sola, espejando el azul que
- * llevaba map_widget.dart. El dueño pidió una sola ruta: la del producto,
+ * El teléfono la pintaba en el azul eléctrico, sola, espejando el azul que
+ * llevaba map_widget.dart. El dueño pidió una sola ruta, la del producto,
  * en la web y en la app. La app la lleva en `estilo_ruta.dart` y este es su
  * espejo en el teléfono.
  */
@@ -22,14 +20,8 @@ const reglas = (css: string, selector: string): string =>
     (m) => m[1]
   ).join('\n');
 
-describe('la ruta del teléfono, como la del producto', () => {
+describe('la ruta del teléfono', () => {
   const telefono = leer('src/css/phone-simulator.css');
-  const producto = leer('src/css/componentes/mapa.css');
-
-  it('el producto sigue siendo verde sobre orla blanca (la referencia)', () => {
-    expect(reglas(producto, '.mv-activa')).toMatch(/stroke:\s*var\(--green\)/);
-    expect(reglas(producto, '.mv-casing')).toMatch(/stroke:\s*#FFFFFF/i);
-  });
 
   it('la línea del teléfono va en el mismo verde, entera', () => {
     const linea = reglas(telefono, '.map-route-active');

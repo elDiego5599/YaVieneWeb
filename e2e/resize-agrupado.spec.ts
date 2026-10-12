@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test';
  * Un `resize` no mide la maqueta en el acto: lo deja para el cuadro.
  *
  * En el móvil la barra de direcciones dispara `resize` a cada tirón del
- * scroll. El mapa del teléfono y el mapa en vivo leían su caja en el mismo
+ * scroll. El mapa del teléfono y la isla leían su caja en el mismo
  * oyente: varias
  * maquetas forzadas por aviso (auditoría, hallazgo 17). Ahora las piden
  * con `requestAnimationFrame`, como la isla, y la lectura cae

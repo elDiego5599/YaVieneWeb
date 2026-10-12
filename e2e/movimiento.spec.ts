@@ -79,36 +79,3 @@ test.describe('la deriva del trío', () => {
     expect(await bajada(page, '.hero-scene')).toBe(0);
   });
 });
-
-test.describe('el foco de las fichas de ruta', () => {
-  const foco = (page: Page, prop: 'opacity' | 'zIndex' | 'content') =>
-    page.locator('.ruta-ficha').first().evaluate((el, p) => getComputedStyle(el, '::before')[p], prop);
-
-  // PT-03 y R-20: se enciende con el `:hover`, sin JavaScript, y queda
-  // detrás del texto de la ficha.
-  test('con ratón se enciende al pasar, detrás del texto', async ({ page }, info) => {
-    test.skip(info.project.name !== 'escritorio', 'el foco es sólo de puntero fino');
-    await page.goto('/');
-    /*
-      El `scroll-behavior: smooth` de `base.css` vuelve animado el scroll
-      con el que Playwright acerca la ficha: el ratón se posaba donde
-      estaba a media bajada y, al terminar, la ficha quedaba 440 px más
-      abajo, sin `:hover` (4 de 15 corridas con 5 hilos). Lo que se prueba
-      es el foco, no el desplazamiento suave: se apaga sólo aquí.
-    */
-    await page.addStyleTag({ content: 'html { scroll-behavior: auto !important; }' });
-    const ficha = page.locator('.ruta-ficha').first();
-    await ficha.scrollIntoViewIfNeeded();
-
-    expect(await foco(page, 'zIndex')).toBe('-1');
-    expect(await foco(page, 'opacity')).toBe('0');
-    await ficha.hover();
-    await expect.poll(() => foco(page, 'opacity')).toBe('1');
-  });
-
-  test('en el táctil no existe', async ({ page }, info) => {
-    test.skip(info.project.name !== 'movil', 'sólo el móvil tiene puntero grueso');
-    await page.goto('/');
-    expect(await foco(page, 'content')).toBe('none');
-  });
-});

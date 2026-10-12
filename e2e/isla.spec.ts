@@ -104,7 +104,7 @@ test('marca la sección que se está leyendo, y ninguna en el hero', async ({ pa
   await page.goto('/');
   const marcado = page.locator('.nav-island [aria-current="location"]');
   await expect(marcado).toHaveCount(0);
-  for (const [id, href] of [['problema', '#problema'], ['mapa', '#mapa']]) {
+  for (const [id, href] of [['problema', '#problema'], ['como-funciona', '#como-funciona']]) {
     await page.locator(`#${id}`).evaluate((s) => window.scrollTo(0, s.getBoundingClientRect().top + window.scrollY - innerHeight * 0.3));
     await expect(marcado, `#${id}`).toHaveAttribute('href', href);
     await expect(marcado).toHaveCount(1);

@@ -20,7 +20,7 @@ const menu = (pagina: string): string[] => {
 describe('el nav', () => {
   it('es el mismo en la portada, empresas, privacidad y términos', () => {
     const portada = menu('index.html');
-    expect(portada).toEqual(['Problema → #problema', 'Mapa en vivo → #mapa', 'Para empresas → /empresas.html']);
+    expect(portada).toEqual(['Problema → #problema', 'Cómo funciona → #como-funciona', 'Para empresas → /empresas.html']);
     for (const pagina of ['empresas.html', 'privacidad.html', 'terminos.html']) {
       expect(menu(pagina), pagina).toEqual(portada);
     }

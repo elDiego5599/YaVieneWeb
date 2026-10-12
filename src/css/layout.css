@@ -42,12 +42,6 @@
   padding: var(--aire-seccion) var(--calle);
 }
 
-/* Las bandas que enseñan producto necesitan más ancho: el marco del mapa
-   con su lista de rutas al lado no cabe en 1160 sin encoger el mapa. */
-.panel-inner--ancho {
-  max-width: var(--contenedor-ancho);
-}
-
 /* ── Cabecera de sección ───────────────────────────────────────────────
 
    Tres piezas siempre en el mismo orden: el rótulo que dice de qué va la

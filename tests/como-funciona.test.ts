@@ -38,13 +38,13 @@ describe('banda «Cómo funciona»', () => {
     expect(html.slice(fin, problema).split(divisor)).toHaveLength(2);
   });
 
-  it('lleva ceja, titular, párrafo y el botón primario del hero', () => {
+  it('lleva ceja, titular y párrafo, sin botón', () => {
     expect(banda).toMatch(/class="seccion-rotulo cf-ceja"[^>]*>\s*CÓMO FUNCIONA\s*</);
     expect(banda).toMatch(/<h2[^>]*>\s*Sal cuando tu bus esté cerca\s*<\/h2>/);
     expect(banda).toContain(
       'Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso. Te avisamos cuando esté cerca de ti.'
     );
-    expect(banda).toMatch(/<a href="#mapa" class="btn-primary btn-green">\s*Ver el mapa en vivo/);
+    expect(banda.slice(0, banda.indexOf('cf-tarjetas'))).not.toMatch(/<a\b|btn-primary/);
   });
 
   it('las tarjetas son decoración y el aviso lleva ruta, sin placa ni distancia', () => {

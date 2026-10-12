@@ -3,8 +3,8 @@
    La banda entre las dos rayas, justo tras el hero: el texto a un lado y,
    al otro, tres tarjetas encimadas que son pedazos de la app del pasajero.
    No dibuja nada que ya esté dibujado: las filas, la hoja del bus, su nota
-   y el aviso reutilizan `.app-select*`, `.eta-*` y `.mapa-aviso-*`, que
-   mide `--u` (un punto lógico de Flutter) en `phone-simulator.css`. Aquí
+   y el aviso reutilizan `.app-select*`, `.eta-*`, que
+   miden `--u` (un punto lógico de Flutter) en `phone-simulator.css`. Aquí
    solo van la rejilla, el marco de cada tarjeta y cómo se montan.
 
    Las tarjetas entran por turnos con el `.reveal` de la página; con
@@ -127,8 +127,7 @@
 
 /* Delante, abajo a la izquierda: la notificación (bus_notification_service.dart: «Tu bus de la
    ruta $ruta está cerca de ti», con ruta y sin placa ni distancia). Es
-   la misma pieza que el aviso del mapa: icono de 30 con 9 de radio, la
-   marca en versalitas y el título en 700 (`mapa.css`). */
+   icono de 30 con 9 de radio, la marca en versalitas y el título en 700. */
 .cf-tarjeta--aviso {
   bottom: 0;
   left: 12%;
@@ -138,6 +137,38 @@
   gap: calc(12 * var(--u));
   padding: calc(14 * var(--u)) calc(16 * var(--u));
   border-radius: calc(20 * var(--u));
+}
+
+.cf-aviso-icono {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--green-tint);
+}
+
+.cf-aviso-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cf-aviso-app {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-text-secondary);
+}
+
+.cf-aviso-titulo {
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--app-text-primary);
 }
 
 /* En móvil el grupo se compacta: más apretado y sin pasar de ~360 de alto. */
