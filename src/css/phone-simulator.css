@@ -1400,10 +1400,20 @@
   }
 }
 
+/* Con movimiento reducido la cifra no gira: solo se funde, 200 ms. Sin
+   fundido el número cambia de golpe y se pierde que ha cambiado; la
+   estela borrosa y el recorrido son lo que se quita. `!important` para
+   ganarle al suelo de `animations.css`. */
+@keyframes cifra-funde {
+  from {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cifra-sube,
   .cifra-baja {
-    animation: none;
+    animation: cifra-funde 200ms linear !important;
   }
 }
 
@@ -1830,7 +1840,10 @@
 }
 
 .app-launch.is-lista {
-  background: var(--green);
+  /* Lista, el botón va en primaryAccessible (#047857), como
+     route_selector_sheet.dart (`listo ? primaryAccessible : acento`):
+     blanco encima da 5,48:1; el verde de marca daba 3,11:1. */
+  background: var(--app-primary-accessible);
 }
 
 /* ── El velo del teléfono del hero ───────────────────────────────── */
@@ -1968,118 +1981,6 @@
   fill: var(--ink);
   stroke: rgba(255, 255, 255, 0.28);
   stroke-width: 1.6;
-}
-
-/*
-  El bus y su estela. Todas las capas son la misma curva con la misma
-  animación de `stroke-dashoffset`; lo único que cambia es dónde cae el
-  trazo dentro del patrón, y eso es lo que las separa en fila detrás de la
-  cabeza. Sale más barato que mover cinco elementos a la vez.
-
-  La curva mide 512,55 puntos y la estela 0,13 de eso: cuatro tramos de
-  16,66 que se van encendiendo hacia el bus, igual que en `_pintarBus`.
-*/
-.tinta-bus {
-  animation: tinta-bus-asoma 18s linear infinite;
-}
-
-.tinta-bus path {
-  fill: none;
-  stroke-linecap: round;
-  /*
-    En largo, no con el atajo `animation`. El atajo repone a cero todo lo
-    que no nombra —el retraso incluido— y esta regla pesa más que las de
-    abajo (una clase y una etiqueta contra una clase), así que se comía
-    los cuatro retrasos: los cinco trazos salían con el mismo desfase y la
-    cabeza, que es un punto de largo cero, se quedaba pegada al arranque
-    de la estela en vez de a su final. El bus iba entonces empujando el
-    rastro por delante, que es exactamente al revés de como se lee un bus
-    que llega.
-  */
-  animation-name: tinta-bus-avanza;
-  animation-duration: 18s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-
-/*
-  Los cuatro tramos son el mismo trozo de 16,66 corriendo por la misma
-  curva con distinto retraso. El retraso es distancia: la vuelta son
-  512,55 puntos en 18 s —28,475 por segundo—, así que adelantar un tramo
-  16,66 es arrancarlo 0,585 s antes.
-
-  Antes cada tramo llevaba su hueco delante escrito en el patrón
-  (`0 16,66 16,66 …`). Ese primer `0` no es nada con `linecap: butt`,
-  pero con `round` es un punto redondo del grosor del trazo: se pintaban
-  cuatro puntos clavados en el arranque de la ruta, y el del bus —mismo
-  patrón, grosor 36— pintaba un segundo bus encima de la segunda parada.
-*/
-.tinta-estela-1,
-.tinta-estela-2,
-.tinta-estela-3,
-.tinta-estela-4 {
-  stroke-width: 2.6;
-  stroke-dasharray: 16.66 495.89;
-}
-
-.tinta-estela-1 { stroke: rgba(0, 168, 89, 0.10); animation-delay: 0s; }
-.tinta-estela-2 { stroke: rgba(0, 168, 89, 0.24); animation-delay: -0.585s; }
-.tinta-estela-3 { stroke: rgba(0, 168, 89, 0.38); animation-delay: -1.170s; }
-.tinta-estela-4 { stroke: rgba(0, 168, 89, 0.52); animation-delay: -1.755s; }
-
-/*
-  La cabeza: halo difuso, disco verde y núcleo blanco, uno sobre otro.
-  Cada capa es un guion de longitud cero con cabeza redonda —o sea un
-  punto de radio 18, 6,5 y 3, los tres círculos de `_pintarBus`— y va
-  66,63 por delante del primer tramo de estela: 2,34 s de ventaja.
-*/
-.tinta-bus-halo,
-.tinta-bus-disco,
-.tinta-bus-nucleo {
-  stroke-dasharray: 0.01 512.54;
-  animation-delay: -2.34s;
-}
-
-.tinta-bus-halo { stroke: rgba(0, 168, 89, 0.45); stroke-width: 36; filter: url(#tinta-difuminado); }
-.tinta-bus-disco { stroke: #00A859; stroke-width: 13; }
-.tinta-bus-nucleo { stroke: #FFFFFF; stroke-width: 6; }
-
-@keyframes tinta-bus-avanza {
-  from { stroke-dashoffset: 0; }
-  to { stroke-dashoffset: -512.55; }
-}
-
-/* Entra y sale por los bordes en vez de aparecer y cortarse de golpe. */
-@keyframes tinta-bus-asoma {
-  0%, 100% { opacity: 0; }
-  6%, 94% { opacity: 1; }
-}
-
-/* Quieto, el bus se planta a media ruta: se sigue leyendo que hay un bus
-   en una ruta, que es todo lo que el fondo tiene que decir. */
-@media (prefers-reduced-motion: reduce) {
-  .tinta-bus,
-  .tinta-bus path {
-    animation: none;
-  }
-
-  .tinta-bus {
-    opacity: 1;
-  }
-
-  /* Sin animación no hay retraso que separe los tramos, así que cada uno
-     lleva escrito dónde se planta: el bus a 0,58 de la ruta —297,3— y la
-     estela detrás, de 16,66 en 16,66. */
-  .tinta-estela-1 { stroke-dashoffset: -230.65; }
-  .tinta-estela-2 { stroke-dashoffset: -247.31; }
-  .tinta-estela-3 { stroke-dashoffset: -263.97; }
-  .tinta-estela-4 { stroke-dashoffset: -280.63; }
-
-  .tinta-bus-halo,
-  .tinta-bus-disco,
-  .tinta-bus-nucleo {
-    stroke-dashoffset: -297.29;
-  }
 }
 
 .phone-status--claro {

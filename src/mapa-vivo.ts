@@ -18,6 +18,7 @@
  * redimensionar sin que los marcadores se vayan a la deriva.
  */
 
+import { arrastrable } from './arrastre';
 import { YV_RUTAS } from './data/rutas-landing';
 import { fichaDeRuta } from './rutas';
 import { sinMovimiento } from './scrolly';
@@ -108,6 +109,14 @@ export class MapaVivo {
   /** Lo que separa el punto de espera del recorrido, en metros. */
   #aparte = 0;
   #avisado = false;
+  /** Al agarrar el pin: lo que separa su punta del puntero (en el SVG) y de dónde salió. */
+  #agarre: { desfase: Punto; punto: Punto; t: number } | null = null;
+  /** Hacia dónde lo lleva el puntero; se pinta una vez por cuadro. */
+  #destinoArrastre: Punto | null = null;
+  #cuadroArrastre = 0;
+  #movido = false;
+  /** El clic que sigue a soltar un arrastre no es un toque nuevo. */
+  #soltoArrastre = false;
   #cuadro = 0;
   #ultimo = 0;
   #vigia: IntersectionObserver | null = null;
@@ -163,6 +172,7 @@ export class MapaVivo {
     this.#svg.appendChild(defs);
 
     const img = nuevo('image');
+    img.setAttribute('class', 'mv-mosaico');
     img.setAttribute('href', YV_RUTAS.ciudad.mapa.src);
     img.setAttributeNS(XLINK, 'xlink:href', YV_RUTAS.ciudad.mapa.src);
     img.setAttribute('x', String(vx));
@@ -210,6 +220,17 @@ export class MapaVivo {
       con el ratón sólo con el botón principal.
     */
     this.#svg.addEventListener('click', e => this.#alTocar(e));
+    // Arrastrar el pin es otro camino al mismo sitio: lo que cambia es que
+    // el dedo ya no tiene que volver a apuntar, lo lleva. Aquí sí vale
+    // `pointerdown` (ver arriba): sólo cuenta si cae sobre el pin, que lleva
+    // `touch-action: none` y por eso el navegador no lo confunde con bajar
+    // la página; en el resto del mapa el desplazamiento sigue intacto.
+    arrastrable(this.#pin, {
+      alAgarrar: e => this.#agarrar(e),
+      alMover: e => this.#seguir(e),
+      alSoltar: (e, arrastro) => this.#soltar(e, arrastro),
+      alCancelar: () => this.#cancelarArrastre()
+    });
     this.#svg.addEventListener('keydown', e => this.#alTeclado(e));
     window.addEventListener('resize', this.#alRedimensionar, { passive: true });
 
@@ -354,12 +375,90 @@ export class MapaVivo {
   /** El toque del visitante, pasado del espacio de la pantalla al del SVG. */
   #alTocar(evento: MouseEvent): void {
     if (evento.button !== 0) return;
-    const ctm = this.#svg.getScreenCTM();
-    if (!ctm) return;
-    const p = new DOMPoint(evento.clientX, evento.clientY).matrixTransform(ctm.inverse());
-    this.#ponerPin({ x: p.x, y: p.y });
+    // Un toque sobre el pin no lo mueve (ya está ahí) y el clic con que
+    // acaba un arrastre tampoco: lo fijó el propio arrastre.
+    if (this.#soltoArrastre || this.#pin.contains(evento.target as Node)) return;
+    const p = this.#aSvg(evento.clientX, evento.clientY);
+    if (!p) return;
+    this.#ponerPin(p);
     this.#raiz.classList.add('es-tocado');
     this.#anunciarPunto();
+  }
+
+  /** Un punto de la pantalla, pasado al espacio del SVG (y dentro del mapa). */
+  #aSvg(x: number, y: number): Punto | null {
+    const ctm = this.#svg.getScreenCTM();
+    if (!ctm) return null;
+    const p = new DOMPoint(x, y).matrixTransform(ctm.inverse());
+    const [vx, vy, w, h] = YV_RUTAS.ciudad.viewBox;
+    // Con el puntero capturado se puede salir del mapa; el pin no.
+    return {
+      x: Math.min(vx + w, Math.max(vx, p.x)),
+      y: Math.min(vy + h, Math.max(vy, p.y))
+    };
+  }
+
+  /* ---------- Arrastrar el pin ---------- */
+
+  /** Al apoyar: feedback en el acto y se apunta dónde se agarró. */
+  #agarrar(e: PointerEvent): void {
+    this.#pin.classList.add('es-agarrado');
+    const p = this.#aSvg(e.clientX, e.clientY);
+    // Se agarra por donde se agarró, no por la punta: el pin no salta al dedo.
+    this.#agarre = p
+      ? {
+          desfase: { x: this.#pinPunto.x - p.x, y: this.#pinPunto.y - p.y },
+          punto: this.#pinPunto,
+          t: this.#pinT
+        }
+      : null;
+    this.#movido = false;
+  }
+
+  /** Pasado el umbral: el pin va con el puntero, una pintura por cuadro. */
+  #seguir(e: PointerEvent): void {
+    const p = this.#aSvg(e.clientX, e.clientY);
+    if (!p || !this.#agarre) return;
+    this.#destinoArrastre = { x: p.x + this.#agarre.desfase.x, y: p.y + this.#agarre.desfase.y };
+    if (this.#cuadroArrastre) return;
+    this.#cuadroArrastre = requestAnimationFrame(() => {
+      this.#cuadroArrastre = 0;
+      this.#aplicarArrastre();
+    });
+  }
+
+  #aplicarArrastre(): void {
+    if (!this.#destinoArrastre) return;
+    this.#ponerPin(this.#destinoArrastre);
+    this.#destinoArrastre = null;
+    this.#movido = true;
+  }
+
+  /** Al soltar se fija el punto como con un toque: mismo estado, misma voz. */
+  #soltar(_e: PointerEvent, arrastro: boolean): void {
+    this.#terminarArrastre();
+    if (!arrastro) return;
+    this.#aplicarArrastre();
+    this.#raiz.classList.add('es-tocado');
+    this.#anunciarPunto();
+    this.#soltoArrastre = true;
+    setTimeout(() => {
+      this.#soltoArrastre = false;
+    }, 0);
+  }
+
+  /** El navegador se llevó el gesto: el pin vuelve de donde salió. */
+  #cancelarArrastre(): void {
+    const antes = this.#agarre;
+    this.#terminarArrastre();
+    this.#destinoArrastre = null;
+    if (antes && this.#movido) this.#ponerPin(antes.punto, antes.t);
+  }
+
+  #terminarArrastre(): void {
+    cancelAnimationFrame(this.#cuadroArrastre);
+    this.#cuadroArrastre = 0;
+    this.#pin.classList.remove('es-agarrado');
   }
 
   /**

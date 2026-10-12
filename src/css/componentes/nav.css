@@ -102,11 +102,20 @@
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px) scale(0.97);
-  transform-origin: 50% 0;
+  /* El panel nace del botón que lo abre y vuelve a él (Apple, «Designing
+     Fluid Interfaces»: anclar al origen). Medido a 375 px: el panel ocupa
+     de x=20 a x=355 y el botón (38 px) acaba en 355, así que su centro
+     queda a 19 px del borde derecho del panel. Con `--calle` el panel y
+     el botón se mueven juntos, por eso es la misma cuenta en todo el
+     rango de móvil. Y 0: arriba, pegado a la barra. */
+  transform-origin: calc(100% - 19px) 0;
+  /* Cerrar es más corto que abrir (0,22 s contra 0,3 s): lo que se va
+     no se hace esperar. La misma curva fluida en las dos direcciones,
+     sin rebote: un menú no lleva el impulso de un gesto. */
   transition:
     opacity 0.18s var(--ease-out-cubic),
-    transform 0.24s var(--ease-out-cubic),
-    visibility 0s linear 0.24s;
+    transform 0.22s var(--ease-fluida),
+    visibility 0s linear 0.22s;
 }
 
 .nav-island.is-open > .nav-island-reveal {
@@ -115,7 +124,7 @@
   transform: translateY(0) scale(1);
   transition:
     opacity 0.24s var(--ease-out-cubic),
-    transform 0.5s var(--ease-spring),
+    transform 0.3s var(--ease-fluida),
     visibility 0s;
 }
 
@@ -408,13 +417,6 @@
     padding-left: 6px;
   }
 
-  /* En horizontal las piezas entran desde la izquierda, empujadas por el
-     propio pliegue, y no desde arriba como en el panel de móvil. */
-  .nav-island-inner .nav-link,
-  .nav-island-inner .nav-island-cta {
-    transform: translateX(-12px);
-  }
-
   .nav-island-links {
     flex-direction: row;
     gap: 2px;
@@ -427,9 +429,21 @@
   }
 }
 
-/* Sin animación: la isla se queda abierta y no se mueve nada. */
+/* Sin movimiento: el panel del menú no se desliza ni crece, se funde (200
+   ms: lo bastante para que el cambio no sea un parpadeo, sin nada que
+   marear). El botón que lo abre se queda, porque sin él en el teléfono
+   no habría forma de abrirlo. `!important` porque el suelo de
+   `animations.css` pone 0,01 ms a todo con `!important`. */
 @media (prefers-reduced-motion: reduce) {
-  .nav-island-reveal,
+  .nav-island-reveal {
+    transform: none;
+    transition: opacity 0.2s linear, visibility 0s linear 0.2s !important;
+  }
+
+  .nav-island.is-open > .nav-island-reveal {
+    transition: opacity 0.2s linear, visibility 0s !important;
+  }
+
   .nav-island-inner,
   .nav-island-inner .nav-link,
   .nav-island-inner .nav-island-cta,
@@ -438,16 +452,11 @@
     transition: none;
   }
 
-  .nav-island-reveal,
+  /* Las piezas de dentro entran ya puestas: el que se funde es el panel. */
   .nav-island-inner .nav-link,
   .nav-island-inner .nav-island-cta {
     opacity: 1;
-    visibility: visible;
     transform: none;
-  }
-
-  .nav-island-toggle {
-    display: none;
   }
 
   @media (min-width: 880px) {
@@ -518,23 +527,31 @@
   margin: 0;
   display: block;
   pointer-events: auto;
-  /* Arriba del todo la barra es el mismo lienzo: sin velo ni línea, el
+  /* Arriba del todo la barra es el mismo lienzo: sin velo ni sombra, el
      hero la continúa sin separación. Al bajar aparecen los dos, con una
      transición larga para que el cambio se sienta y no se note. El
      desenfoque va siempre puesto: `backdrop-filter` no se anima entre
-     navegadores, así que sólo viajan el color y la línea. */
+     navegadores, así que sólo viajan el color y la sombra. */
   background: transparent;
-  border-bottom: 1px solid transparent;
+  /* Sin línea dura: la barra se despega del contenido con una sombra, un
+     «scroll edge» (Apple, materiales). Las dos capas existen también en
+     reposo, a opacidad cero, porque `box-shadow` sólo interpola entre
+     listas del mismo largo. */
+  box-shadow: 0 1px 0 rgba(11, 18, 32, 0), 0 8px 24px -16px rgba(11, 18, 32, 0);
   backdrop-filter: saturate(1.6) blur(12px);
   -webkit-backdrop-filter: saturate(1.6) blur(12px);
   transition:
     background-color 0.8s var(--ease-fluida),
-    border-color 0.8s var(--ease-fluida);
+    box-shadow 0.8s var(--ease-fluida);
 }
 
+/* Capa 1: un pelo de 1 px al 6 % que hace de filo (el mismo trabajo que la
+   línea que se quita, pero sin ocupar alto). Capa 2: la sombra larga, a
+   24 px de desenfoque y -16 de extensión para que no asome por los lados,
+   al 18 %. */
 .site-header:not(.is-arriba) {
   background: rgba(255, 255, 255, 0.82);
-  border-bottom-color: var(--linea);
+  box-shadow: 0 1px 0 rgba(11, 18, 32, 0.06), 0 8px 24px -16px rgba(11, 18, 32, 0.18);
 }
 
 .nav-island {
@@ -596,7 +613,9 @@
   font-weight: 500;
   letter-spacing: var(--rotulo-track);
   text-transform: uppercase;
-  color: var(--tinta-tenue);
+  /* Tinta media y no tenue: a 10,5 px en versales la tenue (4,9:1 sobre
+     blanco) se quedaba en el límite; la media da 9,3:1. */
+  color: var(--tinta-media);
   white-space: nowrap;
   text-overflow: ellipsis;
   opacity: 0;
@@ -731,7 +750,15 @@
   font-weight: 700;
   letter-spacing: -0.01em;
   box-shadow: none;
+  /* Esta regla pesa lo mismo que `.nav-island-inner .nav-island-cta` (la de
+     arriba) y va después, así que le quitaba la opacidad y el transform:
+     al cerrar el menú el botón desaparecía de golpe mientras los enlaces
+     se iban en 140 ms. Se repiten aquí con los mismos tiempos. Al abrir
+     manda `.nav-island.is-open .nav-island-cta` (una clase más), con su
+     escalonado. */
   transition:
+    opacity 0.14s linear,
+    transform 0.14s var(--ease-out-cubic),
     background-color var(--transition-hover),
     border-color var(--transition-hover),
     box-shadow var(--transition-hover);

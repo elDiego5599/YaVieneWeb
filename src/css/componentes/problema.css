@@ -42,6 +42,10 @@
    radio, con la banda de fondo, para que se lea como el paso siguiente
    y no como otra página (dueño, 2026-10-12, a partir de incident.io). */
 #problema.panel--banda {
+  /* Crema en vez de la banda verdosa (dueño, 2026-10-12). Medido sobre
+     #FAF6F0 nada baja de lo que daba la banda: tinta 17,39:1, tinta-media
+     9,05, tinta-tenue 4,80, coral 4,86, acento 5,37 (todo ≥ 4,5). */
+  background: var(--arena);
   margin: 16px var(--calle) 0;
   border: 0;
   border-radius: 32px;
@@ -97,7 +101,18 @@
   color: var(--tinta-media);
   white-space: nowrap;
   cursor: pointer;
-  transition: color 0.4s var(--ease-out-cubic);
+  transition:
+    color 0.4s var(--ease-out-cubic),
+    opacity 0.2s var(--ease-out-cubic);
+}
+
+/* El acuse del toque, en cuanto el dedo apoya y no al soltar: baja a
+   0,7 en 90 ms (por debajo de los ~100 ms en que un toque se lee como
+   instantáneo) y vuelve en 0,2 s al soltar. Opacidad y no escala: la
+   marca blanca va debajo y encogerse la despegaría de ella. */
+.interruptor-opcion:active {
+  opacity: 0.7;
+  transition-duration: 0.4s, 90ms;
 }
 
 .interruptor-opcion[aria-pressed='true'] {
@@ -114,7 +129,11 @@
   }
 }
 
-[data-cara='claro'] .interruptor-marca {
+/* La marca sigue al control (`data-pulsado`, que cambia con el toque),
+   no a la escena (`data-cara`, que cambia a mitad de la ceremonia): si
+   esperara a la escena, el interruptor tardaría 1,4 s en darse por
+   enterado. */
+[data-pulsado='claro'] .interruptor-marca {
   transform: translateX(100%);
 }
 
@@ -186,8 +205,8 @@
   visibility: visible;
   transform: none;
   transition:
-    opacity 0.55s var(--ease-out-cubic) calc(var(--turno, 0ms) + 0.12s),
-    transform 0.7s var(--ease-fluida) calc(var(--turno, 0ms) + 0.12s),
+    opacity 0.55s var(--ease-out-cubic) calc(var(--turno, 0ms) + 60ms),
+    transform 0.7s var(--ease-fluida) calc(var(--turno, 0ms) + 60ms),
     visibility 0s linear var(--turno, 0ms);
 }
 
@@ -196,39 +215,43 @@
   izquierda a derecha, que es como se mira la sección: manda el estado,
   le sigue el titular, luego la frase y al final los cuatro avisos. Sin
   esto las seis piezas cambiarían a la vez y el relevo sería un
-  parpadeo.
+  parpadeo. El escalón es de 30 ms y el último sale a los 150: la
+  primera pieza se mueve en el primer cuadro y el relevo entero cabe en
+  lo que el ojo todavía lee como respuesta al toque, no como espera. La
+  cara que entra va 60 ms detrás de la que sale, lo justo para que no se
+  pisen.
 */
 .escenario-estado {
   --turno: 0ms;
 }
 
 #problema .seccion-titulo {
-  --turno: 80ms;
+  --turno: 30ms;
   /* Del ancho de la frase de abajo, como la referencia (dueño). */
   max-width: none;
   font-size: clamp(2rem, 1rem + 2.4vw, 3.3rem);
 }
 
 #problema .seccion-lead {
-  --turno: 140ms;
+  --turno: 60ms;
   max-width: 54ch;
   font-size: clamp(16.5px, 0.95rem + 0.4vw, 20px);
 }
 
 .aviso:nth-child(1) {
-  --turno: 180ms;
+  --turno: 90ms;
 }
 
 .aviso:nth-child(2) {
-  --turno: 220ms;
+  --turno: 110ms;
 }
 
 .aviso:nth-child(3) {
-  --turno: 260ms;
+  --turno: 130ms;
 }
 
 .aviso:nth-child(4) {
-  --turno: 300ms;
+  --turno: 150ms;
 }
 
 /* ── El escenario ──────────────────────────────────────────────────────
@@ -282,11 +305,12 @@
   stroke-dashoffset: 0;
 }
 
-/* La maraña vuelve a salir cuando los avisos ya casi se han desordenado
-   (0,6 s): antes llegaría a sitios donde todavía no hay nada. */
+/* La maraña vuelve a salir con la vuelta, a los 0,1 s: lo justo para
+   que el árbol empiece a recogerse antes, sin que la vuelta se lea como
+   espera (antes esperaba 0,6 s y lo primero que se veía era nada). */
 .hilo--enredo {
   stroke: var(--hilo);
-  transition: stroke-dashoffset 0.5s var(--ease-out-cubic) 0.6s;
+  transition: stroke-dashoffset 0.5s var(--ease-out-cubic) 0.1s;
 }
 
 .hilo--arbol {
@@ -310,6 +334,13 @@
 [data-cara='claro'] .hilo--arbol {
   stroke-dashoffset: 0;
   transition: stroke-dashoffset 0.6s var(--ease-fluida) 0.35s;
+}
+
+/* En la vuelta el árbol se recoge hacia la píldora mientras los avisos
+   entran en ella: 0,3 s, lo que dura `recoge` (`problema.ts`). */
+[data-fase='recoge'] .hilo--arbol {
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.3s var(--ease-out-cubic);
 }
 
 /* Los rayos sólo existen con el escenario ancho: apilados en un móvil no
@@ -493,8 +524,13 @@
   height: 24px;
 }
 
-/* El título en tinta tenue (4,90:1 sobre blanco) y la frase en tinta
-   plena: lo que se lee pasa AA (tests/escenario-avisos.test.ts). */
+/* Título, no rótulo: es un `h3` y cada aviso es una cosa distinta (el
+   tiempo, el sol, la tarde, la calle), así que es lo primero que se lee
+   y por donde se salta con el lector de pantalla. Manda él: tamaño del
+   aviso (19/17), 600 y tinta plena (18,7:1). La frase lo explica debajo,
+   un 12 % más chica, a 400 y en tinta media (9,5:1 sobre blanco): la
+   jerarquía sale del peso y del tono, no sólo del tamaño. Todo pasa AA
+   (tests/escenario-avisos.test.ts). */
 .aviso-texto {
   font-size: 19px;
   font-weight: 600;
@@ -504,17 +540,18 @@
 }
 
 .aviso-titulo {
-  margin: 0 0 4px;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: inherit;
-  letter-spacing: 0;
-  color: var(--tinta-tenue);
+  margin: 0 0 2px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--tinta);
 }
 
 .aviso-frase {
   margin: 0;
+  font-size: 0.88em;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--tinta-media);
   /* El aviso de la app es la frase más larga y a 418 px partía con «ti»
      solo abajo: repartida, quedan dos renglones parejos. */
   text-wrap: balance;
@@ -567,9 +604,15 @@
     gap: 12px;
     padding: 18px 20px 20px;
     rotate: var(--giro);
+    /* Del desorden a la fila son hasta ~330 px; con --ease-fluida (pico
+       6,25 veces la media) eso era ~50 px en un cuadro al cortar la
+       escena. Con (0.3, 0, 0.2, 1), la curva del regreso, el pico es
+       2,56 × 330 px / 620 ms × 16,7 ms ≈ 23 px: bajo los 25 que se
+       siguen con la vista. Solo suena al cortar: en la ida y la vuelta
+       la fase «brota» la apaga. */
     transition:
-      translate 0.62s var(--ease-fluida) var(--turno),
-      rotate 0.62s var(--ease-fluida) var(--turno);
+      translate 0.62s cubic-bezier(0.3, 0, 0.2, 1) var(--turno),
+      rotate 0.62s cubic-bezier(0.3, 0, 0.2, 1) var(--turno);
   }
 
   .aviso-icono {
@@ -593,13 +636,21 @@
     transition: none;
   }
 
-  .escenario-estado {
+  /* El halo se inclina con ella: es su borde. */
+  :is(.escenario-estado, .estado-halo) {
     rotate: -1.5deg;
   }
 
   [data-cara='claro'] .escenario-estado {
     translate: 0 var(--subida, 0px);
     rotate: 0deg;
+  }
+
+  /* En la vuelta la píldora baja a su sitio de «A ciegas» mientras los
+     avisos entran en ella, y de ahí vuelven a salir: el mismo centro en
+     el que se los tragó a la ida. */
+  [data-fase='recoge'] .escenario-estado {
+    translate: none;
   }
 
   /* El desorden, en tantos por ciento del escenario de 460 de alto: dos
@@ -686,24 +737,42 @@
    primero que se mira— y el anillo de alrededor la separa de la red.
    ────────────────────────────────────────────────────────────────────── */
 
+/* La celda del escenario que ocupan la píldora y su halo, apilados en
+   su propia rejilla: así el halo, estirado, mide el alto de la píldora y
+   no los 460 del escenario. Sin posición ni transform: no hace contexto
+   de apilado, y los `z-index` de los dos siguen compitiendo con las
+   piezas del escenario como antes. */
+.estado-celda {
+  display: grid;
+  grid-area: 1 / 1;
+  place-items: center;
+}
+
 .escenario-estado {
   position: relative;
   z-index: 10;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  grid-area: 1 / 1;
   margin: 0;
-  /* El ancho lo mide `problema.ts` y lo deja en `--ancho-estado`.
-     Con `min-width: max-content` garantizamos que el texto nunca quede recortado
-     ni comprimido en reposo. */
+  /* La píldora no cambia nunca de tamaño: lo que se cierra hasta el
+     círculo es el recorte (`clip-path`), que va en el compositor y no
+     deforma el texto. `min-width` para que la columna estrecha de un
+     móvil no la parta. 36 = los 28 de aire de siempre más los 8 que
+     antes sumaba `problema.ts` al medirla: mide lo mismo que medía. */
   min-width: max-content;
-  width: var(--ancho-estado, max-content);
-  padding: 14px 28px;
+  padding: 14px 36px;
   border-radius: 999px;
   background: var(--coral-accessible);
   box-shadow:
     0 0 0 6px rgba(206, 45, 29, 0.08),
     0 10px 24px rgba(206, 45, 29, 0.16);
+  /* En reposo el recorte no corta nada: 40 px de sobra por cada lado
+     dejan entera la sombra (10 de caída + 24 de difuminado), y con el
+     mismo redondeo el arco del recorte es concéntrico con el de la
+     píldora. */
+  clip-path: inset(-40px round 999px);
   color: #FFFFFF;
   /* En la letra de los avisos y a 17: en mono de 14 la píldora se
      quedaba chica entre avisos de 420, y es lo único saturado del
@@ -716,8 +785,7 @@
     transform 0.6s var(--ease-fluida),
     translate 0.6s var(--ease-fluida),
     rotate 0.6s var(--ease-fluida),
-    width 0.52s var(--ease-fluida),
-    padding 0.52s var(--ease-fluida);
+    clip-path 0.52s var(--ease-fluida);
 }
 
 /*
@@ -732,10 +800,10 @@
 }
 
 /* En un móvil de 375 la frase larga a 17 px no cabe entre los márgenes de
-   la banda (295 px): a 15 sí, con aire. */
+   la banda (295 px): a 15 sí, con aire (28 = 20 + los 8 de siempre). */
 @media (max-width: 420px) {
   .escenario-estado {
-    padding-inline: 20px;
+    padding-inline: 28px;
     font-size: 15px;
   }
 }
@@ -791,20 +859,45 @@
   height: 22px;
 }
 
+/* El halo: lo que el círculo lleva alrededor —sombra, remolino y
+   anillos— y que el recorte de la píldora se comería. Va al lado de la
+   píldora, en su misma celda (`.estado-celda`) y centrado, del tamaño
+   del círculo (46 de ancho por el alto de la píldora), y sólo se ve
+   mientras ella lo es. */
+.estado-halo {
+  grid-area: 1 / 1;
+  position: relative;
+  z-index: 10;
+  width: 46px;
+  align-self: stretch;
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 6px rgba(206, 45, 29, 0.08),
+    0 10px 24px rgba(206, 45, 29, 0.16);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.26s var(--ease-out-cubic),
+    box-shadow 0.65s var(--ease-out-cubic);
+}
+
+.estado-halo::before,
+.estado-halo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--acento);
+  border-radius: 999px;
+  opacity: 0;
+}
+
 /* El remolino. Un anillo de trazos girando alrededor del logo mientras
    aspira: es lo que dice que lo que se lleva las voces es una corriente
    y no un interruptor. Se para en cuanto empieza a cargar. */
-.estado-nucleo::before {
-  content: '';
-  position: absolute;
+[data-fase='aspira'] .estado-halo::before {
   inset: -10px;
   border: 1.5px dashed rgba(4, 116, 84, 0.5);
   border-radius: 50%;
-  opacity: 0;
-  transition: opacity 0.24s var(--ease-out-cubic);
-}
-
-[data-fase='aspira'] .estado-nucleo::before {
   opacity: 1;
   animation: nucleo-remolino 1s linear infinite;
 }
@@ -823,9 +916,7 @@
 
 [data-fase='aspira'] .escenario-estado,
 [data-fase='carga'] .escenario-estado {
-  min-width: 0;
-  width: 46px;
-  padding-inline: 0;
+  clip-path: inset(0 calc(50% - 23px) round 999px);
 }
 
 [data-fase='aspira'] .escenario-estado .dos-caras,
@@ -837,9 +928,10 @@
    llevando: las piezas entran por detrás y ahí se acaban. Pasando por delante se las
    vería encogerse encima del logo, que es justo lo contrario de que se
    las trague. */
-[data-fase='aspira'] .escenario-estado,
-[data-fase='carga'] .escenario-estado {
+[data-fase='aspira'] :is(.escenario-estado, .estado-halo),
+[data-fase='carga'] :is(.escenario-estado, .estado-halo) {
   z-index: 12;
+  opacity: 1;
 }
 
 [data-fase='aspira'] .estado-nucleo,
@@ -858,20 +950,27 @@
   viajaban a la fila con el texto viejo todavía encima.
 
   Escenario y cabecera: el titular y la frase también se los traga la
-  píldora (`problema.ts`) y salen de ella ya con la cara nueva.
+  píldora (`problema.ts`) y salen de ella ya con la cara nueva. Vale en
+  las dos direcciones: en la vuelta lo que sale es «A ciegas».
 */
-[data-fase='brota'] .escenario .cara--ciego,
-[data-fase='brota'] .seccion-cabecera .cara--ciego {
+[data-fase='brota'][data-cara='claro'] :is(.escenario, .seccion-cabecera) .cara--ciego,
+[data-fase='brota'][data-cara='ciego'] :is(.escenario, .seccion-cabecera) .cara--claro {
   opacity: 0;
   visibility: hidden;
   transition: none;
 }
 
-[data-fase='brota'] .escenario .cara--claro,
-[data-fase='brota'] .seccion-cabecera .cara--claro {
+[data-fase='brota'][data-cara='claro'] :is(.escenario, .seccion-cabecera) .cara--claro,
+[data-fase='brota'][data-cara='ciego'] :is(.escenario, .seccion-cabecera) .cara--ciego {
   opacity: 1;
   visibility: visible;
   transform: none;
+  transition: none;
+}
+
+/* Los rayos y las voces salen de la píldora en la vuelta
+   (`problema.ts`): ya en su sitio, sin su transición por debajo. */
+[data-fase='brota'] :is(.chispa, .ruido) {
   transition: none;
 }
 
@@ -879,6 +978,9 @@
    latido. Corto a propósito —un latido largo se vuelve espera—. */
 [data-fase='carga'] .escenario-estado {
   background: var(--acento);
+}
+
+[data-fase='carga'] .estado-halo {
   box-shadow:
     0 0 0 6px rgba(4, 116, 84, 0.09),
     0 10px 24px rgba(4, 116, 84, 0.16);
@@ -900,25 +1002,13 @@
   }
 }
 
-/* Los dos anillos que salen del núcleo al cargarse. Van en los
-   pseudoelementos de la píldora porque tienen que salir de su borde
-   exacto, sea cual sea el tamaño al que haya quedado. */
-.escenario-estado::before,
-.escenario-estado::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 1.5px solid var(--acento);
-  border-radius: 999px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-[data-fase='carga'] .escenario-estado::before {
+/* Los dos anillos que salen del núcleo al cargarse, del borde del
+   halo, que es el del círculo. */
+[data-fase='carga'] .estado-halo::after {
   animation: nucleo-anillo 0.62s var(--ease-out-cubic);
 }
 
-[data-fase='carga'] .escenario-estado::after {
+[data-fase='carga'] .estado-halo::before {
   animation: nucleo-anillo 0.62s var(--ease-out-cubic) 0.18s;
 }
 
@@ -950,5 +1040,14 @@
   .interruptor * {
     transition-delay: 0s !important;
     animation: none !important;
+  }
+
+  /* Pero sin movimiento no es sin respuesta: las caras se cruzan con un
+     fundido de 0,2 s, en el sitio. Opacidad y nada más, sin el viaje
+     de `--reposo`; 0,2 s se lee como cambio y no como corte, y gana al
+     suelo de 0,01 ms de `animations.css` por especificidad. */
+  #problema .cara {
+    --reposo: 0px;
+    transition: opacity 0.2s var(--ease-out-cubic), visibility 0.2s !important;
   }
 }

@@ -48,9 +48,12 @@
 /* Titular de la sección a la talla de los demás de la portada. */
 .mapa-inner > .seccion-cabecera .seccion-titulo {
   font-size: clamp(34px, 4.3vw, 64px);
-  font-weight: 700;
+  /* 600 y -0,035em, como el resto de titulares (`layout.css`): a 64 px la
+     tracking de -0,018em quedaba floja y el 700 lo hacía más pesado que
+     los demás de la portada. */
+  font-weight: 600;
   line-height: 1.02;
-  letter-spacing: -0.018em;
+  letter-spacing: -0.035em;
 }
 
 /*
@@ -286,6 +289,13 @@
   touch-action: manipulation;
 }
 
+/* Las calles del mosaico CARTO salían muy tenues sobre el crema del
+   panel (dueño, 2026-10-12): un punto de contraste las oscurece sin
+   tocar el fondo, que casi no cambia a 1,18 sobre un gris tan claro. */
+.mv-mosaico {
+  filter: contrast(1.18) saturate(1.05);
+}
+
 /* Los trazos van en píxeles de pantalla, no en unidades del mosaico: así
    la ruta se ve del mismo grosor con el mapa grande y con el mapa
    pequeño, que es como se dibuja un mapa de verdad. */
@@ -325,13 +335,40 @@
   transition: r 0.25s var(--ease-out-cubic);
 }
 
-.mv-bus,
-.mv-pin {
+.mv-bus {
   pointer-events: none;
 }
 
+/* El pin se agarra y se arrastra (src/arrastre.ts). `touch-action: none`
+   sólo aquí: sobre el pin el dedo lleva el pin y no baja la página; en el
+   resto del mapa sigue el desplazamiento de siempre. */
 .mv-pin {
+  cursor: grab;
+  touch-action: none;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.28));
+}
+
+/* Feedback al apoyar, en el acto: el pin se levanta 6 unidades y la sombra
+   crece, como una pieza que se despega del mapa. La elevación va en el
+   grupo interior porque el exterior ya lleva el `transform` de posición.
+   Con movimiento reducido no hay transición: cambia sin animarse. */
+.mv-pin > g {
+  transition: transform 120ms ease-out;
+}
+
+.mv-pin.es-agarrado {
+  cursor: grabbing;
+  filter: drop-shadow(0 9px 10px rgba(0, 0, 0, 0.3));
+}
+
+.mv-pin.es-agarrado > g {
+  transform: translate(-40px, -82px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mv-pin > g {
+    transition: none;
+  }
 }
 
 /* ── La pista de toque ──
@@ -392,6 +429,9 @@
   background: rgba(255, 255, 255, 0.88);
   font-size: 10.5px;
   line-height: 1.4;
+  /* Letra pequeña: un toque de aire positivo, no el tracking cero de los
+     titulares (Apple, tipografía: lo pequeño pide más espacio). */
+  letter-spacing: 0.015em;
   color: var(--tinta-media);
   pointer-events: none;
 }
@@ -589,9 +629,11 @@
   opacity: 0;
   transform: translateY(-10px) scale(0.97);
   visibility: hidden;
+  /* Curva fluida, no rebote: el aviso llega y se queda, no se lanza. Un
+     pico de 1,56 sobre la curva original lo hacía pasarse de su sitio. */
   transition:
     opacity 0.35s var(--ease-out-cubic),
-    transform 0.45s var(--ease-spring),
+    transform 0.45s var(--ease-fluida),
     visibility 0.35s;
 }
 

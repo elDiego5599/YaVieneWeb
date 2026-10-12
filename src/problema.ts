@@ -10,7 +10,12 @@
  * Pasar de una cara a la otra no es un cambio, es una escena, y por eso
  * hay un segundo atributo, `data-fase`, con el tramo en el que va:
  *
- *   reposo → aspira → carga → brota → reposo
+ *   ida:    reposo → aspira → carga → brota → reposo
+ *   vuelta: reposo → recoge → brota → reposo
+ *
+ * Y un tercero, `data-pulsado`, que es el del interruptor: cambia con el
+ * toque, junto con `aria-pressed`, y de él cuelga la marca blanca. La
+ * escena puede tardar en llegar a la cara nueva; el control no.
  *
  * En `aspira` la alerta roja se encoge hasta ser el logo, la maraña de
  * hilos se recoge hacia él y se traga los rayos y las voces, que son el
@@ -27,14 +32,21 @@
  * voces, largo y suave (ease-in, la escala baja a lo largo del viaje y la
  * opacidad sólo cae al llegar); al acabar quedan en su sitio, enteros y sin transformación.
  *
+ * Pulsar a media escena la corta, y cada pieza vuelve a su sitio desde
+ * donde se estaba viendo, no desde donde debería estar: se lee lo que el
+ * navegador está pintando antes de cancelar y se vuelve desde ahí.
+ *
  * Aquí se calculan las medidas que dependen del ancho: el vuelo de cada
  * pieza hasta el logo, adónde viaja cada aviso y por dónde pasa cada hilo
  * (`escenario-red.ts`, con las cajas de verdad). Lo demás —el encogido,
  * el latido, el viaje y el dibujo de los hilos— es CSS colgando de
  * `data-cara` y `data-fase`.
  *
- * La vuelta no tiene ceremonia: volver a «A ciegas» es rebobinar, y
- * repetir el ritual al revés lo abarataría.
+ * La vuelta es corta, 0,8 s, y hace el camino de la ida al revés: los
+ * avisos y la cabecera entran en la píldora mientras baja al centro, y
+ * de ahí salen a su desorden, con los rayos y las voces, por el mismo
+ * remolino y con la curva espejada. Sin el carga ni el latido: deshacer
+ * no se celebra, pero lo que entró por un sitio sale por el mismo.
  *
  * Lo otro que hace, y por lo que no basta con dos `<button>` sueltos: el
  * lector de pantalla no puede oír las dos versiones del titular seguidas,
@@ -43,8 +55,9 @@
  * Y una cortesía: la primera vez que la sección asoma se cambia sola de
  * lado, una vez, para que se vea que el interruptor está ahí. Quien lo
  * toque antes cancela el aviso —a partir de ese momento manda quien lee—,
- * y quien haya pedido que nada se mueva no lo ve nunca: ni ceremonia ni
- * cambio automático.
+ * y quien haya pedido que nada se mueva no lo ve nunca: ni ceremonia, ni
+ * vuelta, ni regreso, ni cambio automático; sólo el fundido de las caras
+ * del CSS.
  */
 
 import { trazar } from './escenario-red';
@@ -117,9 +130,6 @@ const REMOLINO = 0.3;
 /** El texto de la cabecera que cambia de cara: titular y párrafo (el interruptor no). */
 const CABEZA = '.seccion-cabecera .dos-caras';
 
-/** Lo que mide la píldora una vez encogida: un círculo con el logo dentro. */
-const NUCLEO_PX = 46;
-
 /**
  * El engorde. `GORDO` es lo que mide el logo al acabar de tragárselo
  * todo, en tanto por uno de su tamaño de partida; `TRAGO` es el tirón
@@ -141,10 +151,69 @@ const TRAGO_MINIMO_MS = 220;
 /** Lo que tarda el logo en soltar el bulto al abrirse. */
 const SUELTA_MS = 400;
 
+/**
+ * El regreso cuando se corta la escena. Cerca de su sitio, 350 ms: más
+ * corto se lee como un salto, más largo como que la escena no hace caso.
+ * Lejos, la duración crece con lo que le falta a la pieza más lejana,
+ * 1,75 ms por px, y todas llegan juntas: la curva de abajo tiene su pico
+ * a 2,56 veces la media, así que 1/1,75 px/ms × 2,56 × 16,7 ms ≈ 24 px
+ * en el peor cuadro, el tope de lo que se sigue con la vista sin leerse
+ * como salto. Hasta 800 ms, lo que dura la vuelta entera: un regreso no
+ * puede tardar más que la escena que deshace; ese tope llega a ~460 px,
+ * y más lejos que eso solo están las chispas, chicas o transparentes.
+ * Medido en el navegador (1440×900), el peor cuadro pesado por
+ * opacidad × escala queda bajo 25 px en cualquier momento del corte.
+ */
+const REGRESO_MS = 350;
+const REGRESO_MAX_MS = 800;
+const REGRESO_MS_POR_PX = 1.75;
+
+/**
+ * La curva del regreso, ease-in-out (0.3, 0, 0.2, 1): arranca con
+ * pendiente 0, porque las piezas iban hacia el logo y dar la vuelta con
+ * la velocidad de salida de `--ease-fluida` (6× la media en el primer
+ * cuadro, hasta 136 px) es un muro; se posa con la cola larga de la
+ * fluida (el 0,2 y el 1), sin rebote. Su pico es 2,6× la media: con
+ * 1,1 ms por px, unos 39 px por cuadro sin pesar, y a esa altura del
+ * vuelo la pieza aún va pequeña y transparente.
+ */
+const REGRESO_CURVA = 'cubic-bezier(0.3, 0, 0.2, 1)';
+
+/**
+ * La vuelta, 0,8 s entre todo. `recoge`: cada pieza tarda 240 ms en
+ * entrar y la siguiente sale 25 ms después (seis piezas, la última a los
+ * 125: bajo el techo de 150 en el que un escalonado aún se lee como un
+ * solo gesto), y el tramo se cierra a los 380, un cuadro después de que
+ * llegue la última. Luego salen en 340 ms, repartidas en 80: 380 + 80 +
+ * 340 = 800.
+ */
+const ENTRA_MS = 240;
+const ESCALON_ENTRA_MS = 25;
+const RECOGE_MS = 380;
+const SUELTA_VUELTA_MS = 340;
+const RELEVO_VUELTA_MS = 80;
+const VUELTA_MS = RECOGE_MS + RELEVO_VUELTA_MS + SUELTA_VUELTA_MS;
+
+/**
+ * Las curvas de la vuelta, espejo de las de la ida (los puntos de
+ * control, al revés y restados de 1). Entrar en la píldora es la salida
+ * de `brota` (0.16, 1, 0.3, 1) espejada, pero con el primer punto en 0,4
+ * y no en 0,7: la espejada exacta pasa los primeros 50 ms quieta, y la
+ * primera pieza tiene que moverse en el primer cuadro. Salir es el
+ * remolino de `aspira` (0.42, 0, 0.8, 0.55) espejado.
+ */
+const ENTRA_CURVA = 'cubic-bezier(0.4, 0, 1, 1)';
+const SALE_CURVA = 'cubic-bezier(0.2, 0.45, 0.58, 1)';
+
+/** Una animación y la pieza que mueve: hace falta la pieza para leer dónde está. */
+type Vuelo = { el: HTMLElement; anim: Animation };
+
 export class Problema {
   readonly #seccion: HTMLElement;
   readonly #botones: HTMLButtonElement[];
   readonly #estado: HTMLElement | null;
+  /** Lo que rodea al círculo y el recorte de la píldora se comería. */
+  readonly #halo: HTMLElement | null;
 
   #ojo: IntersectionObserver | null = null;
   #reloj: number | null = null;
@@ -152,9 +221,9 @@ export class Problema {
   /** Los relojes de la ceremonia, para poder cortarla a media escena. */
   #tramos: number[] = [];
   /** Lo que está volando hacia el logo ahora mismo. */
-  #vuelos: Animation[] = [];
+  #vuelos: Vuelo[] = [];
   /** Lo mismo, pero de los avisos: `brota` los cancela para medirlos. */
-  #cartas: Animation[] = [];
+  #cartas: Vuelo[] = [];
   /** Los hilos, creados una vez; `#trazar` sólo les cambia el `d`. */
   #enredo: SVGPathElement[] = [];
   #arbol: SVGPathElement[] = [];
@@ -162,9 +231,11 @@ export class Problema {
   constructor(seccion: HTMLElement) {
     this.#seccion = seccion;
     this.#estado = seccion.querySelector<HTMLElement>('.escenario-estado');
+    this.#halo = seccion.querySelector<HTMLElement>('.estado-halo');
     this.#botones = Array.from(
       seccion.querySelectorAll<HTMLButtonElement>('.interruptor-opcion')
     );
+    this.#pulsar(seccion.dataset.cara ?? 'ciego');
 
     for (const boton of this.#botones) {
       boton.addEventListener('click', () => {
@@ -175,11 +246,8 @@ export class Problema {
       });
     }
 
-    // El ancho de la píldora hay que saberlo en píxeles para poder
-    // encogerla hasta el círculo: `width: auto` no se puede animar. Se
-    // mide con la tipografía ya cargada, porque con la de respaldo el
-    // texto ocupa otra cosa, y con ella se trazan los hilos.
-    this.#medirEstado();
+    // Los hilos se trazan con la tipografía ya cargada: con la de
+    // respaldo la píldora y los avisos miden otra cosa.
     if (document.fonts) void document.fonts.ready.then(() => this.#pedirMedida());
     // El escenario y los avisos, no la ventana: los avisos van fuera del
     // flujo y cambian de alto con el ancho y la letra sin que el
@@ -232,7 +300,8 @@ export class Problema {
       window.clearTimeout(this.#reloj);
       this.#reloj = null;
     }
-    this.#poner('ciego');
+    // Fuera de la vista no hay a quién enseñarle la vuelta.
+    this.#poner('ciego', false);
   }
 
   #parar(): void {
@@ -244,35 +313,13 @@ export class Problema {
     this.#ojo = null;
   }
 
-  // ── La medida de la píldora ────────────────────────────────────────
+  // ── La medida ──────────────────────────────────────────────────────
 
   #pedirMedida(): void {
-    // Sólo en reposo: a media ceremonia la píldora está encogida y
-    // medirla ahí congelaría el círculo como si fuera su tamaño real.
+    // Sólo en reposo: a media escena los avisos están volando y la
+    // fila se mediría desde donde no están.
     if (this.#seccion.dataset.fase && this.#seccion.dataset.fase !== 'reposo') return;
-    this.#medirEstado();
     this.#trazar();
-  }
-
-  /**
-   * No se mide la píldora, se mide lo que lleva dentro. La píldora tiene
-   * el ancho en transición para poder encogerse, así que preguntarle
-   * cuánto mide a media transición devuelve el número de ese cuadro, no
-   * el suyo. El bloque de las dos caras no se anima nunca y no baja de
-   * su ancho mínimo aunque el padre se cierre: ése es el número bueno.
-   */
-  #medirEstado(): void {
-    if (!this.#estado) return;
-    const caras = this.#estado.querySelector<HTMLElement>('.dos-caras');
-    if (!caras) return;
-
-    const estilo = getComputedStyle(this.#estado);
-    const aire =
-      parseFloat(estilo.paddingLeft || '0') + parseFloat(estilo.paddingRight || '0');
-    const ancho = Math.ceil(caras.getBoundingClientRect().width + aire + 16);
-
-    if (ancho <= NUCLEO_PX) return;
-    this.#estado.style.setProperty('--ancho-estado', `${ancho}px`);
   }
 
   // ── Los hilos y la fila ────────────────────────────────────────────
@@ -299,12 +346,9 @@ export class Problema {
       return { x: parseFloat(left), y: parseFloat(top), w: parseFloat(width), h: parseFloat(height) };
     };
 
-    // La píldora con su ancho de reposo, el medido: la de verdad puede
-    // estar todavía abriéndose.
-    const ancho = parseFloat(this.#estado.style.getPropertyValue('--ancho-estado')) || this.#estado.offsetWidth;
+    // La píldora no cambia de tamaño (lo que se cierra es su recorte):
+    // su caja es la de reposo siempre.
     const pildora = caja(this.#estado);
-    pildora.x += (pildora.w - ancho) / 2;
-    pildora.w = ancho;
 
     const w = escena.clientWidth;
     const h = escena.clientHeight;
@@ -337,32 +381,42 @@ export class Problema {
 
   // ── El cambio de cara ──────────────────────────────────────────────
 
-  #poner(cara: string): void {
-    // Adónde va la sección ahora mismo. Con una ceremonia en marcha va a
-    // «claro» aunque el atributo todavía diga otra cosa: la cara sólo se
-    // cambia a mitad de la escena. Pedir esa misma cara no es un cambio y
-    // no se rehace nada. Sin esto, volver a pulsar el botón ya pulsado
-    // mientras la red acababa de ponerse verde relanzaba la ceremonia
-    // con `data-cara` ya en «claro», y el tramo del enredo se
-    // representaba con los textos y los avisos de «Con Ya Viene».
-    const destino = this.#tramos.length ? 'claro' : this.#seccion.dataset.cara;
-    if (destino === cara) return;
+  #poner(cara: string, escena = true): void {
+    // Adónde va la sección es lo que dice el control, no la escena: la
+    // cara sólo cambia a mitad de la ceremonia. Pedir lo que ya está
+    // pedido no es un cambio y no se rehace nada. Sin esto, volver a
+    // pulsar el botón ya pulsado mientras la red acababa de ponerse verde
+    // relanzaba la ceremonia con `data-cara` ya en «claro», y el tramo
+    // del enredo se representaba con los textos y los avisos de «Con Ya
+    // Viene».
+    if (this.#seccion.dataset.pulsado === cara) return;
+    this.#pulsar(cara);
 
-    this.#cortarCeremonia();
+    // A media escena (o a media vuelta atrás de otra) no se empieza otra
+    // ceremonia encima: se vuelve al reposo desde lo que se ve y la cara
+    // cambia con el relevo del CSS.
+    const aMedias = this.#tramos.length > 0;
+    this.#cortarCeremonia(aMedias);
 
-    if (cara === 'claro' && !sinMovimiento()) this.#ceremonia();
+    if (aMedias || !escena || sinMovimiento() || this.#seccion.dataset.cara === cara) this.#cambiar(cara);
+    else if (cara === 'claro') this.#ceremonia();
+    else if (this.#ancho()) this.#vuelta();
     else this.#cambiar(cara);
   }
 
-  /** El cambio pelado, sin escena: es lo que hace la vuelta atrás. */
+  /** El control, en el acto: la marca cuelga de `data-pulsado`. */
+  #pulsar(cara: string): void {
+    this.#seccion.dataset.pulsado = cara;
+    for (const boton of this.#botones) {
+      boton.setAttribute('aria-pressed', String(boton.dataset.cara === cara));
+    }
+  }
+
+  /** El cambio pelado de la escena, sin ceremonia. */
   #cambiar(cara: string): void {
     this.#seccion.dataset.fase = 'reposo';
     if (this.#seccion.dataset.cara === cara) return;
     this.#seccion.dataset.cara = cara;
-
-    for (const boton of this.#botones) {
-      boton.setAttribute('aria-pressed', String(boton.dataset.cara === cara));
-    }
 
     for (const rostro of this.#seccion.querySelectorAll<Element>('.cara')) {
       if (rostro.classList.contains(`cara--${cara}`)) {
@@ -443,8 +497,15 @@ export class Problema {
     piezas.forEach(({ pieza, dx, dy }, turno) => {
       const espera = (turno / ultima) * RELEVO_MS;
 
-      const vuelo = this.#volar(pieza, dx, dy, espera, pieza.matches(CABEZA) ? GIRO_TEXTO : 1);
-      (pieza.matches(`.aviso, ${CABEZA}`) ? this.#cartas : this.#vuelos).push(vuelo);
+      const anim = pieza.animate(this.#remolino(dx, dy, pieza.matches(CABEZA) ? GIRO_TEXTO : 1), {
+        duration: VIAJE_MS,
+        delay: espera,
+        // Aceleración progresiva (ease-in suave): sale con calma, coge
+        // velocidad y entra sin el latigazo de la curva anterior.
+        easing: 'cubic-bezier(0.42, 0, 0.8, 0.55)',
+        fill: 'forwards',
+      });
+      (pieza.matches(`.aviso, ${CABEZA}`) ? this.#cartas : this.#vuelos).push({ el: pieza, anim });
       llegadas.push(espera + VIAJE_MS);
     });
 
@@ -458,10 +519,11 @@ export class Problema {
   }
 
   /**
-   * El vuelo de una pieza (dx, dy es lo que le falta hasta el centro del
-   * logo). Compartido por rayos, voces y avisos: el mismo remolino.
+   * El camino de una pieza hasta el centro del logo (dx, dy es lo que le
+   * falta). Compartido por rayos, voces, avisos y texto: el mismo
+   * remolino a la ida y, recorrido al revés, en la vuelta.
    */
-  #volar(pieza: HTMLElement, dx: number, dy: number, espera: number, giro = 1): Animation {
+  #remolino(dx: number, dy: number, giro = 1): Keyframe[] {
     // El desvío es perpendicular al camino recto y del mismo signo
     // para todas, que es lo que convierte siete viajes en un remolino:
     // en vez de caer al centro en línea, todas lo rodean por el mismo
@@ -472,9 +534,8 @@ export class Problema {
     // La escala baja a lo largo de todo el viaje y no llega a casi 0
     // hasta el último cuadro; la opacidad se mantiene entera hasta tres
     // cuartos y cae sólo al llegar: la pieza se ve entrar, no se apaga.
-    return pieza.animate(
-      [
-        { transform: `translate(0px, 0px) scale(1)`, opacity: 1 },
+    return [
+        { offset: 0, transform: `translate(0px, 0px) scale(1)`, opacity: 1 },
         {
           offset: 0.18,
           transform: `translate(${(-dx * 0.04).toFixed(1)}px, ${(-dy * 0.04).toFixed(1)}px) scale(1.03)`,
@@ -491,19 +552,11 @@ export class Problema {
           opacity: 0.75,
         },
         {
+          offset: 1,
           transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(0.04) ${gira(200)}`,
           opacity: 0,
         },
-      ],
-      {
-        duration: VIAJE_MS,
-        delay: espera,
-        // Aceleración progresiva (ease-in suave): sale con calma, coge
-        // velocidad y entra sin el latigazo de la curva anterior.
-        easing: 'cubic-bezier(0.42, 0, 0.8, 0.55)',
-        fill: 'forwards',
-      }
-    );
+    ];
   }
 
   /**
@@ -516,7 +569,7 @@ export class Problema {
   #brotar(): void {
     if (!this.#estado || !this.#ancho()) return;
     // Las animaciones de `aspira` los tienen encogidos: fuera, para medirlos.
-    for (const vuelo of this.#cartas) vuelo.cancel();
+    for (const { anim } of this.#cartas) anim.cancel();
     this.#cartas = [];
 
     const n = this.#estado.getBoundingClientRect();
@@ -533,8 +586,9 @@ export class Problema {
       if (caja.width * caja.height === 0) return;
       const dx = destino.x - (caja.x + caja.width / 2);
       const dy = destino.y - (caja.y + caja.height / 2);
-      this.#vuelos.push(
-        aviso.animate(
+      this.#vuelos.push({
+        el: aviso,
+        anim: aviso.animate(
           [
             { transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(0.04)`, opacity: 0 },
             { transform: 'translate(0px, 0px) scale(1)', opacity: 1 },
@@ -547,8 +601,8 @@ export class Problema {
             // `both`: encogido y sin verse mientras espera su turno.
             fill: 'both',
           }
-        )
-      );
+        ),
+      });
     });
   }
 
@@ -619,20 +673,156 @@ export class Problema {
     marcar(ASPIRA_MS + CARGA_MS, REVIENTA, 'cubic-bezier(0.22, 1, 0.36, 1)');
     cuadros.push({ offset: 1, transform: 'scale(1)' });
 
-    this.#vuelos.push(
-      this.#estado.animate(cuadros, {
-        duration: total,
-        easing: 'linear',
-        fill: 'forwards',
-      })
+    // El halo engorda con la píldora: es su borde.
+    for (const el of [this.#estado, this.#halo]) {
+      if (el) this.#vuelos.push({ el, anim: el.animate(cuadros, { duration: total, easing: 'linear', fill: 'forwards' }) });
+    }
+  }
+
+  // ── La vuelta ──────────────────────────────────────────────────────
+
+  /**
+   * Avisos y cabecera entran en la píldora mientras ella baja al centro
+   * (CSS de `recoge`): del último que salió al primero, y van al centro
+   * de «A ciegas», no a donde está ahora, para encontrarse con ella.
+   * Luego la cara cambia y todo sale de ese centro a su desorden.
+   */
+  #vuelta(): void {
+    if (!this.#estado) return;
+    this.#seccion.dataset.fase = 'recoge';
+
+    const n = this.#estado.getBoundingClientRect();
+    const subida = parseFloat(this.#estado.style.getPropertyValue('--subida')) || 0;
+    const centro = { x: n.x + n.width / 2, y: n.y + n.height / 2 - subida };
+
+    const entran = Array.from(this.#seccion.querySelectorAll<HTMLElement>(`${CABEZA}, .aviso`)).reverse();
+    entran.forEach((el, i) => {
+      const caja = el.getBoundingClientRect();
+      if (caja.width * caja.height === 0) return;
+      const dx = centro.x - (caja.x + caja.width / 2);
+      const dy = centro.y - (caja.y + caja.height / 2);
+      this.#cartas.push({
+        el,
+        anim: el.animate(
+          [
+            { transform: 'translate(0px, 0px) scale(1)', opacity: 1 },
+            { transform: `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(0.04)`, opacity: 0 },
+          ],
+          { duration: ENTRA_MS, delay: i * ESCALON_ENTRA_MS, easing: ENTRA_CURVA, fill: 'forwards' }
+        ),
+      });
+    });
+
+    this.#tramos.push(
+      window.setTimeout(() => {
+        this.#cambiar('ciego');
+        this.#seccion.dataset.fase = 'brota';
+        this.#soltar(centro);
+      }, RECOGE_MS),
+      window.setTimeout(() => {
+        this.#cortarCeremonia();
+        this.#seccion.dataset.fase = 'reposo';
+        this.#pedirMedida();
+      }, VUELTA_MS)
     );
   }
 
-  #cortarCeremonia(): void {
+  /**
+   * Todo sale del centro a su desorden por el remolino de la ida, al
+   * revés: rayos, voces, avisos y texto, de lo más grande a lo más
+   * pequeño (el último que entró a la ida es el primero que sale). Sin
+   * el tirón de arranque de la ida, que al revés sería un rebote al
+   * llegar.
+   */
+  #soltar(centro: { x: number; y: number }): void {
+    // Lo de `recoge` los tiene encogidos en el centro: fuera, para medirlos.
+    for (const { anim } of this.#cartas) anim.cancel();
+    this.#cartas = [];
+
+    const piezas = Array.from(this.#seccion.querySelectorAll<HTMLElement>(`.chispa, .ruido, .aviso, ${CABEZA}`))
+      .map((el) => {
+        const caja = el.getBoundingClientRect();
+        return {
+          el,
+          dx: centro.x - (caja.x + caja.width / 2),
+          dy: centro.y - (caja.y + caja.height / 2),
+          bulto: caja.width * caja.height,
+        };
+      })
+      .filter((v) => v.bulto > 0)
+      .sort((a, b) => b.bulto - a.bulto);
+
+    const ultima = Math.max(1, piezas.length - 1);
+    piezas.forEach(({ el, dx, dy }, turno) => {
+      const camino = this.#remolino(dx, dy, el.matches(CABEZA) ? GIRO_TEXTO : 1)
+        .filter((cuadro) => cuadro.offset !== 0.18)
+        .reverse()
+        .map((cuadro) => ({ ...cuadro, offset: 1 - Number(cuadro.offset) }));
+      this.#vuelos.push({
+        el,
+        anim: el.animate(camino, {
+          duration: SUELTA_VUELTA_MS,
+          delay: (turno / ultima) * RELEVO_VUELTA_MS,
+          easing: SALE_CURVA,
+          fill: 'both',
+        }),
+      });
+    });
+  }
+
+  /**
+   * Corta lo que esté en marcha. Con `suave`, cada pieza vuelve a su
+   * reposo desde lo que se está viendo: se lee el transform y la
+   * opacidad que el navegador pinta ahora —antes de cancelar, que
+   * cancelada la pieza ya está en su sitio y se leería el destino— y se
+   * anima desde ahí hasta el valor de debajo (un solo cuadro, en 0: el
+   * final lo pone el CSS). Sin esto la píldora y los avisos saltaban de
+   * golpe a su sitio.
+   */
+  #cortarCeremonia(suave = false): void {
     for (const reloj of this.#tramos) window.clearTimeout(reloj);
     this.#tramos = [];
-    for (const vuelo of [...this.#vuelos, ...this.#cartas]) vuelo.cancel();
+    const todos = [...this.#vuelos, ...this.#cartas];
     this.#vuelos = [];
     this.#cartas = [];
+
+    const vistos =
+      suave && !sinMovimiento()
+        ? [...new Set(todos.map(({ el }) => el))].map((el) => {
+            const { transform, opacity } = window.getComputedStyle(el);
+            return { el, transform: transform || 'none', opacity, falta: falta(el, transform) };
+          })
+        : [];
+    for (const { anim } of todos) anim.cancel();
+
+    const lejos = Math.max(0, ...vistos.map((v) => v.falta));
+    const duracion = Math.round(Math.min(REGRESO_MAX_MS, Math.max(REGRESO_MS, lejos * REGRESO_MS_POR_PX)));
+    for (const { el, transform, opacity } of vistos) {
+      const desde: Keyframe = { offset: 0, transform };
+      if (opacity) desde.opacity = opacity;
+      this.#vuelos.push({ el, anim: el.animate([desde], { duration: duracion, easing: REGRESO_CURVA }) });
+    }
+    // Mientras vuelven, un toque más es otro corte, no una ceremonia nueva.
+    if (vistos.length) {
+      this.#tramos.push(
+        window.setTimeout(() => {
+          this.#tramos = [];
+          this.#vuelos = [];
+        }, duracion)
+      );
+    }
   }
+}
+
+/**
+ * Cuánto le falta a una pieza para volver a su sitio desde `transform`
+ * (lo que pinta el navegador, `matrix(a, b, c, d, e, f)`): lo que está
+ * desplazada más lo que se mueve su borde al recuperar la escala, que
+ * en la píldora encogida es todo el viaje.
+ */
+function falta(el: HTMLElement, transform: string): number {
+  const m = transform.match(/^matrix\(([^)]+)\)$/)?.[1].split(',').map(Number);
+  if (!m || m.length !== 6 || m.some((n) => !Number.isFinite(n))) return 0;
+  const escala = Math.hypot(m[0], m[1]);
+  return Math.hypot(m[4], m[5]) + (Math.abs(1 - escala) * Math.max(el.offsetWidth, el.offsetHeight)) / 2;
 }

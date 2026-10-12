@@ -65,11 +65,11 @@ describe('cifraViva', () => {
     expect(el.firstChild).toBe(antes);
   });
 
-  it('el CSS la apaga con movimiento reducido y fija cifras tabulares', () => {
+  it('el CSS la reduce a un fundido con movimiento reducido y fija cifras tabulares', () => {
     const css = readFileSync(resolve(process.cwd(), 'src/css/phone-simulator.css'), 'utf8');
     expect(css).toMatch(/\.eta-number\s*\{[^}]*font-variant-numeric:\s*tabular-nums/);
     expect(css).toMatch(
-      /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.cifra-sube,\s*\.cifra-baja\s*\{\s*animation: none/
+      /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.cifra-sube,\s*\.cifra-baja\s*\{\s*animation: cifra-funde 200ms/
     );
   });
 });

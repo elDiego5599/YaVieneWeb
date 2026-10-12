@@ -27,7 +27,9 @@ const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 
 export const MUTACIONES = [
   // El formulario de empresas: lo único de la web que manda datos.
-  { archivo: 'src/contact-form.ts', de: 'if (!this.#form.reportValidity()) return;', a: 'if (this.#form.reportValidity()) return;', que: 'validación del formulario' },
+  { archivo: 'src/contact-form.ts', de: 'if (malos.length > 0) {', a: 'if (malos.length < 0) {', que: 'validación del formulario' },
+  { archivo: 'src/contact-form.ts', de: "campo.value.trim() === ''", a: "campo.value === ''", que: 'espacios solos cuentan como vacío' },
+  { archivo: 'src/contact-form.ts', de: "getAttribute('aria-invalid') === 'true'", a: "getAttribute('aria-invalid') !== 'true'", que: 'el campo marcado se revisa al escribir' },
   { archivo: 'src/contact-form.ts', de: 'if (this.#enviando) return;', a: 'if (false) return;', que: 'doble envío' },
   { archivo: 'src/contact-form.ts', de: "if (typeof valor === 'string') salida[clave] = valor.trim();", a: "if (typeof valor === 'string') salida[clave] = valor;", que: 'espacios sobrantes en los campos' },
   { archivo: 'src/contact-form.ts', de: 'if (!respuesta.ok) throw new Error', a: 'if (respuesta.ok) throw new Error', que: 'respuesta de error del servidor' },
@@ -78,8 +80,8 @@ export const MUTACIONES = [
   { archivo: 'src/scroll-effects.ts', de: "if (ev.target !== el || ev.propertyName !== 'opacity') return;", a: 'if (ev.target !== el) return;', que: 'retirar al terminar la opacidad' },
   { archivo: 'src/reposo.ts', de: "entrada.target.classList.toggle('en-reposo', !entrada.isIntersecting);", a: "entrada.target.classList.toggle('en-reposo', entrada.isIntersecting);", que: 'reposo fuera de vista' },
   { archivo: 'src/problema.ts', de: 'else if (entrada.intersectionRatio <= ASOMO_SALE) this.#rebobinar();', a: 'else if (entrada.intersectionRatio < 0) this.#rebobinar();', que: 'rebobinar al salir' },
-  { archivo: 'src/problema.ts', de: "if (cara === 'claro' && !sinMovimiento()) this.#ceremonia();", a: "if (cara === 'claro') this.#ceremonia();", que: 'sin ceremonia con movimiento reducido' },
-  { archivo: 'src/problema.ts', de: 'if (ancho <= NUCLEO_PX) return;', a: 'if (false) return;', que: 'ancho mínimo del estado' },
+  { archivo: 'src/problema.ts', de: 'if (aMedias || !escena || sinMovimiento() || this.#seccion.dataset.cara === cara) this.#cambiar(cara);', a: 'if (aMedias || !escena || this.#seccion.dataset.cara === cara) this.#cambiar(cara);', que: 'sin ceremonia con movimiento reducido' },
+  { archivo: 'src/problema.ts', de: 'const aMedias = this.#tramos.length > 0;', a: 'const aMedias = false;', que: 'un corte a medias no encadena otra escena' },
   // Las cifras de rutas.
   { archivo: 'src/rutas.ts', de: 'const km = rutas.reduce((suma, r) => suma + r.km, 0);', a: 'const km = rutas.reduce((suma, r) => Math.max(suma, r.km), 0);', que: 'kilómetros totales' },
   { archivo: 'src/rutas.ts', de: 'const terminales = new Set(rutas.flatMap(r => [r.terminalA, r.terminalB]));', a: 'const terminales = new Set(rutas.flatMap(r => [r.terminalA]));', que: 'terminales distintos' },

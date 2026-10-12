@@ -112,5 +112,62 @@
   :root {
     --text-secondary: rgba(11, 22, 40, 0.85);
     --divider: rgba(11, 22, 40, 0.35);
+    /* Las tintas con las que se escribe casi todo el texto de la página:
+       la media sube de 0,78 a 0,88 (de 9,3:1 a 12,5:1 sobre blanco) y la
+       tenue de 0,60 a 0,78, que es donde estaba la media (4,9:1 → 9,3:1).
+       `--text-muted` es el mismo gris que la tenue, así que la sigue. */
+    --tinta-media: rgba(11, 18, 32, 0.88);
+    --tinta-tenue: rgba(11, 18, 32, 0.78);
+    --text-muted: var(--tinta-tenue);
+    /* Los filos pasan de #E2E8E4 / #D5DBE3 (1,2:1 con el papel) a una tinta
+       al 45 %: unos 3,4:1, que es lo que la norma pide a un borde que
+       delimita un control (WCAG 1.4.11, 3:1). */
+    --linea: rgba(11, 18, 32, 0.45);
+    --linea-fuerte: rgba(11, 18, 32, 0.45);
+  }
+
+  /* La cabecera pierde el cristal: papel entero y un filo debajo. Es el
+     filo de `box-shadow` de una capa y no un `border`, para que la barra
+     no gane un píxel de alto al activar la preferencia. */
+  .site-header:not(.is-arriba) {
+    background: var(--papel);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: 0 1px 0 var(--linea-fuerte);
+  }
+
+  /* Dos controles que se distinguían por relleno o sombra y no por
+     contorno: con la preferencia puesta llevan el filo a la vista.
+     `.btn-outline` ya usa `--linea-fuerte`, así que lo sube la variable. */
+  .interruptor,
+  .ruta-ficha {
+    border: 1px solid var(--linea-fuerte);
+  }
+}
+
+/* ---------- 5. Menos transparencia ----------
+
+   «Reducir transparencia» pide superficies sólidas: el cristal de la
+   cabecera (82 % de blanco y desenfoque) y las pastillas de blanco
+   translúcido que van sobre fondos que cambian —el mosaico del mapa, el
+   degradado del pie— pasan a blanco pleno, sin desenfoque. */
+
+@media (prefers-reduced-transparency: reduce) {
+  .site-header {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .site-header:not(.is-arriba) {
+    background: var(--papel);
+  }
+
+  .mapa-credito {
+    background: #fff;
+  }
+
+  .footer-actions .btn-outline,
+  .footer-actions .btn-outline:hover {
+    background: #fff;
   }
 }

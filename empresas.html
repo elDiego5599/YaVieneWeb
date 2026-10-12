@@ -501,7 +501,7 @@
           <p>El número de buses y las rutas que cubren se definen con cada empresa. Déjenos
             sus datos y nos comunicaremos con usted.</p>
 
-          <form id="contact-form" class="contact-form-card">
+          <form id="contact-form" class="contact-form-card" novalidate>
             <!--
               `autocomplete` para que el teléfono ofrezca lo que ya tiene
               guardado —tres campos que casi todo el mundo tiene rellenos en
@@ -510,23 +510,37 @@
               lo que se envía tenga un tamaño con sentido: sin él, el formulario
               acepta cualquier cosa que quepa en la memoria del navegador y
               eso viaja tal cual al endpoint o al mensaje de WhatsApp.
+
+              `novalidate`: las burbujas nativas no se usan. El aviso de cada
+              campo es el `<p id="…-error">` de debajo, que escribe
+              src/contact-form.ts al salir del campo o al enviar (región viva
+              educada: se lee sin interrumpir). Las reglas siguen aquí
+              (`required`, `pattern`) y el guion las lee.
             -->
             <div class="form-group">
               <label class="form-label" for="nombre">Nombre</label>
               <input required type="text" id="nombre" name="nombre" class="form-input" placeholder="Su nombre"
-                autocomplete="name" maxlength="60" />
+                autocomplete="name" maxlength="60" aria-describedby="nombre-error" />
+              <p id="nombre-error" class="form-campo-error" aria-live="polite"></p>
             </div>
 
             <div class="form-group">
               <label class="form-label" for="empresa">Empresa de transporte</label>
               <input required type="text" id="empresa" name="empresa" class="form-input"
-                placeholder="Nombre de la empresa" autocomplete="organization" maxlength="80" />
+                placeholder="Nombre de la empresa" autocomplete="organization" maxlength="80" aria-describedby="empresa-error" />
+              <p id="empresa-error" class="form-campo-error" aria-live="polite"></p>
             </div>
 
             <div class="form-group">
               <label class="form-label" for="telefono">Teléfono / WhatsApp</label>
               <input required type="tel" id="telefono" name="telefono" class="form-input" placeholder="300 000 0000"
-                autocomplete="tel" inputmode="tel" maxlength="20" />
+                autocomplete="tel" inputmode="tel" maxlength="20"
+                pattern="[0-9 +\(\)\-]{7,20}" aria-describedby="telefono-ayuda telefono-error" />
+              <!-- El patrón lleva los paréntesis y el guion escapados: los
+                   navegadores lo compilan con la bandera `v`, que los rechaza
+                   sin escapar y entonces ignora el patrón entero. -->
+              <p id="telefono-ayuda" class="form-ayuda">Ej.: 300 123 4567</p>
+              <p id="telefono-error" class="form-campo-error" aria-live="polite"></p>
             </div>
 
             <p id="form-error" class="form-error" role="alert" hidden></p>

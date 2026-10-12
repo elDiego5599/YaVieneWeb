@@ -33,8 +33,11 @@
 
 .legal-fecha {
   font-size: 11.5px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
+  font-weight: 700;
+  /* 0,08em y no 0,2em: versales de 11,5 px con aire de cartel se leían como
+     una letra suelta tras otra. Interlineado 1,3 por si pasa a dos líneas. */
+  line-height: 1.3;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-secondary);
 }

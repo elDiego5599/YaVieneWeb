@@ -14,6 +14,15 @@
     a mano en el HTML siguen apuntando a este número y no a uno viejo. */
 export const WHATSAPP = '573004438626';
 
+/** Lo que se le dice a la empresa cuando un campo viene vacío. */
+const FALTA: Record<string, string> = {
+  nombre: 'Escriba su nombre.',
+  empresa: 'Escriba el nombre de la empresa.',
+  telefono: 'Escriba un teléfono o WhatsApp.'
+};
+const FALTA_GENERICO = 'Complete este campo.';
+const TELEFONO_MALO = 'Escriba un teléfono válido: solo números, de 7 a 20 caracteres.';
+
 export class ContactForm {
   readonly #form: HTMLFormElement;
   readonly #boton: HTMLButtonElement;
@@ -31,10 +40,56 @@ export class ContactForm {
     this.#exito = document.getElementById('form-success');
     this.#error = document.getElementById('form-error');
 
+    // La validación la hace este archivo, con mensajes propios junto a cada
+    // campo; las burbujas nativas de `reportValidity()` salen sin estilo,
+    // en el idioma del navegador y de una en una. Las reglas siguen siendo
+    // las del HTML (`required`, `pattern`): aquí sólo se leen.
+    form.noValidate = true;
+    // Al salir del campo se revisa; al escribir sólo se revisa si ya estaba
+    // marcado, para no regañar a quien aún está a mitad de la frase.
+    form.addEventListener('focusout', e => {
+      if (e.target instanceof HTMLInputElement) this.#validar(e.target);
+    });
+    form.addEventListener('input', e => {
+      if (e.target instanceof HTMLInputElement && e.target.getAttribute('aria-invalid') === 'true') {
+        this.#validar(e.target);
+      }
+    });
+    form.addEventListener('reset', () => {
+      for (const c of this.#campos) this.#marcar(c, '');
+    });
+
     form.addEventListener('submit', e => {
       e.preventDefault();
       void this.#enviar();
     });
+  }
+
+  get #campos(): HTMLInputElement[] {
+    return [...this.#form.querySelectorAll<HTMLInputElement>('input[name]')];
+  }
+
+  /** El mensaje que toca al campo, o '' si está bien. */
+  #mensaje(campo: HTMLInputElement): string {
+    // Unos espacios solos no son un dato: el envío los recorta y quedaría vacío.
+    if (campo.required && campo.value.trim() === '') return FALTA[campo.name] ?? FALTA_GENERICO;
+    if (campo.value !== '' && !campo.checkValidity()) return TELEFONO_MALO;
+    return '';
+  }
+
+  /** Revisa un campo y lo marca o desmarca. Devuelve si está bien. */
+  #validar(campo: HTMLInputElement): boolean {
+    const mensaje = this.#mensaje(campo);
+    this.#marcar(campo, mensaje);
+    return mensaje === '';
+  }
+
+  /** `aria-invalid` + el texto del aviso (`<id>-error`, que es región viva educada). */
+  #marcar(campo: HTMLInputElement, mensaje: string): void {
+    if (mensaje) campo.setAttribute('aria-invalid', 'true');
+    else campo.removeAttribute('aria-invalid');
+    const aviso = document.getElementById(`${campo.id}-error`);
+    if (aviso) aviso.textContent = mensaje;
   }
 
   get #datos(): Record<string, string> {
@@ -48,7 +103,13 @@ export class ContactForm {
 
   async #enviar(): Promise<void> {
     if (this.#enviando) return;
-    if (!this.#form.reportValidity()) return;
+    // Se marcan todos a la vez (no se corta en el primero) y el foco va al
+    // primero que falla, que es donde el lector de pantalla empieza a leer.
+    const malos = this.#campos.filter(c => !this.#validar(c));
+    if (malos.length > 0) {
+      malos[0]!.focus();
+      return;
+    }
 
     this.#enviando = true;
     // Cada intento parte limpio: sin el aviso de error del anterior y sin

@@ -809,41 +809,18 @@
             <span class="ruido">me iré en taxi</span>
           </div>
 
-          <p class="escenario-estado">
-            <!--
-              El núcleo. Mientras dura la ceremonia la píldora se encoge
-              hasta este círculo y todo lo suelto del escenario se va
-              hacia él; en reposo no se ve. Es decorativo: lo que dice
-              está en las dos caras de al lado.
-            -->
-            <span class="estado-nucleo" aria-hidden="true">
-              <svg viewBox="0 0 512 512" aria-hidden="true" focusable="false">
-                <circle cx="256" cy="256" r="256" fill="#00A859" />
-                <path d="M 120 130 A 200 200 0 0 1 392 130" fill="none" stroke="#FFFFFF" stroke-width="32"
-                stroke-linecap="round" opacity="0.5" />
-                <path d="M 176 190 A 130 130 0 0 1 336 190" fill="none" stroke="#FFFFFF" stroke-width="32"
-                stroke-linecap="round" />
-                <rect x="136" y="240" width="240" height="180" rx="36" fill="#14274E" />
-                <rect x="166" y="270" width="180" height="72" rx="16" fill="#FFFFFF" />
-                <rect x="290" y="270" width="30" height="72" fill="#14274E" opacity="0.1" />
-                <circle cx="180" cy="375" r="16" fill="#FFC107" />
-                <circle cx="332" cy="375" r="16" fill="#FFC107" />
-                <rect x="160" y="410" width="32" height="24" rx="8" fill="#0A1428" />
-                <rect x="320" y="410" width="32" height="24" rx="8" fill="#0A1428" />
-              </svg>
-            </span>
-
-            <span class="dos-caras">
-              <span class="cara cara--ciego">
-                <svg class="estado-icono" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                  <path d="M8 1.9 15 14H1z" />
-                  <path d="M8 6.4v3.1" />
-                  <path d="M8 11.6h.01" />
-                </svg>
-                Nadie sabe dónde va el bus
-              </span>
-              <span class="cara cara--claro" aria-hidden="true">
-                <svg class="estado-marca" viewBox="0 0 512 512" aria-hidden="true" focusable="false">
+          <!-- La celda de la píldora: ella y su halo, uno encima del otro,
+               para que el halo mida lo que ella y no lo que el escenario. -->
+          <div class="estado-celda">
+            <p class="escenario-estado">
+              <!--
+                El núcleo. Mientras dura la ceremonia la píldora se recorta
+                hasta este círculo y todo lo suelto del escenario se va
+                hacia él; en reposo no se ve. Es decorativo: lo que dice
+                está en las dos caras de al lado.
+              -->
+              <span class="estado-nucleo" aria-hidden="true">
+                <svg viewBox="0 0 512 512" aria-hidden="true" focusable="false">
                   <circle cx="256" cy="256" r="256" fill="#00A859" />
                   <path d="M 120 130 A 200 200 0 0 1 392 130" fill="none" stroke="#FFFFFF" stroke-width="32"
                   stroke-linecap="round" opacity="0.5" />
@@ -857,10 +834,42 @@
                   <rect x="160" y="410" width="32" height="24" rx="8" fill="#0A1428" />
                   <rect x="320" y="410" width="32" height="24" rx="8" fill="#0A1428" />
                 </svg>
-                Ya Viene
               </span>
-            </span>
-          </p>
+
+              <span class="dos-caras">
+                <span class="cara cara--ciego">
+                  <svg class="estado-icono" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <path d="M8 1.9 15 14H1z" />
+                    <path d="M8 6.4v3.1" />
+                    <path d="M8 11.6h.01" />
+                  </svg>
+                  Nadie sabe dónde va el bus
+                </span>
+                <span class="cara cara--claro" aria-hidden="true">
+                  <svg class="estado-marca" viewBox="0 0 512 512" aria-hidden="true" focusable="false">
+                    <circle cx="256" cy="256" r="256" fill="#00A859" />
+                    <path d="M 120 130 A 200 200 0 0 1 392 130" fill="none" stroke="#FFFFFF" stroke-width="32"
+                    stroke-linecap="round" opacity="0.5" />
+                    <path d="M 176 190 A 130 130 0 0 1 336 190" fill="none" stroke="#FFFFFF" stroke-width="32"
+                    stroke-linecap="round" />
+                    <rect x="136" y="240" width="240" height="180" rx="36" fill="#14274E" />
+                    <rect x="166" y="270" width="180" height="72" rx="16" fill="#FFFFFF" />
+                    <rect x="290" y="270" width="30" height="72" fill="#14274E" opacity="0.1" />
+                    <circle cx="180" cy="375" r="16" fill="#FFC107" />
+                    <circle cx="332" cy="375" r="16" fill="#FFC107" />
+                    <rect x="160" y="410" width="32" height="24" rx="8" fill="#0A1428" />
+                    <rect x="320" y="410" width="32" height="24" rx="8" fill="#0A1428" />
+                  </svg>
+                  Ya Viene
+                </span>
+              </span>
+            </p>
+
+            <!-- El halo del círculo: sombra, remolino y anillos de la
+                 ceremonia, fuera de la píldora para que su recorte no se los
+                 coma (`problema.css`). Decorativo. -->
+            <span class="estado-halo" aria-hidden="true"></span>
+          </div>
 
           <!--
             Los cuatro avisos son el contenido de la sección: uno por cosa

@@ -31,8 +31,11 @@
   letter-spacing: -0.01em;
   white-space: nowrap;
   cursor: pointer;
+  /* `transform` va en la lista porque el `:active` encoge el botón (0,985):
+     sin ella la vuelta era un salto seco al soltar. Misma duración que el
+     resto de la lista, `--transition-hover` (0,22 s). */
   transition: background-color var(--transition-hover), border-color var(--transition-hover),
-    box-shadow var(--transition-hover);
+    box-shadow var(--transition-hover), transform var(--transition-hover);
 }
 
 /* El principal pone la forma y un relleno de tinta de respaldo. El color
@@ -160,7 +163,9 @@
   font-weight: 400;
   line-height: 1;
   background: rgba(255, 255, 255, 0.16);
-  transition: transform 0.38s var(--ease-spring), background-color var(--transition-hover);
+  /* Curva fluida y no rebote: el botón no se lanza, el puntero se acerca y
+     la flecha acompaña. 0,38 s se queda como estaba. */
+  transition: transform 0.38s var(--ease-fluida), background-color var(--transition-hover);
 }
 
 @media (hover: hover) {

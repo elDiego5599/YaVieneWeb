@@ -67,6 +67,9 @@ h1, h2, h3, h4 {
   font-family: var(--font-display);
   letter-spacing: -0.03em;
   font-weight: 600;
+  /* Que la fuente use su eje de tamaño óptico si lo tiene: los titulares
+     grandes cierran contraformas y afinan trazos solos. */
+  font-optical-sizing: auto;
   line-height: 1.1;
   color: var(--tinta);
 }

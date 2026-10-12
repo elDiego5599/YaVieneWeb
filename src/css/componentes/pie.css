@@ -27,32 +27,7 @@
     linear-gradient(180deg, #FFFDF8 0%, #FFF5EC 48%, #FBE7E4 100%);
   background-size: 135% 135%, 115% 115%, 100% 100%;
   background-position: 50% 100%, 50% 100%, 50% 50%;
-  animation: footer-gradient-respiro 10s ease-in-out infinite alternate;
   color: var(--text-primary);
-}
-
-/* Los tres degradados del fondo crecen y se encogen a la vez; lo que se
-   ve es que la luz de abajo se acerca y se aleja. El tercero, el lineal,
-   se queda quieto: es el color base y moverlo despegaría el pie del
-   borde. */
-@keyframes footer-gradient-respiro {
-  0% {
-    background-size: 135% 135%, 115% 115%, 100% 100%;
-  }
-  100% {
-    background-size: 155% 155%, 132% 132%, 100% 100%;
-  }
-}
-
-.site-footer::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.28;
-  background-image: radial-gradient(rgba(11, 22, 40, 0.16) 1px, transparent 1px);
-  background-size: 18px 18px;
-  mask-image: linear-gradient(90deg, transparent, black 16%, black 84%, transparent);
 }
 
 .footer-cta,
@@ -77,16 +52,6 @@
   align-items: center;
   gap: 22px;
   text-align: center;
-}
-
-.footer-cta h2 {
-  max-width: 12ch;
-  color: var(--text-primary);
-  font-family: var(--font-display);
-  font-size: clamp(3.2rem, 7vw, 7.4rem);
-  font-weight: 800;
-  line-height: 0.88;
-  letter-spacing: -0.065em;
 }
 
 .footer-cta > p {
@@ -222,13 +187,6 @@
   border-left: 1px solid rgba(11, 22, 40, 0.14);
 }
 
-.footer-status strong {
-  color: var(--text-primary);
-  font-family: var(--font-display);
-  font-size: clamp(24px, 2.5vw, 34px);
-  letter-spacing: -0.04em;
-}
-
 .footer-status p {
   max-width: 22ch;
   font-size: 14px;
@@ -238,10 +196,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 54px;
-  padding-top: 19px;
-  border-top: 1px solid rgba(11, 22, 40, 0.14);
-  color: var(--text-muted);
   font-size: 12px;
 }
 
@@ -319,12 +273,7 @@
 .site-footer {
   padding: 0;
   border-top: 1px solid var(--linea);
-  animation: none;
   color: var(--tinta);
-}
-
-.site-footer::before {
-  content: none;
 }
 
 .footer-cta,
@@ -369,7 +318,10 @@
   margin: 16px 0 0;
   max-width: 16ch;
   font-family: var(--font-display);
-  font-size: clamp(34px, 1.9rem + 1.9vw, 54px);
+  /* 30 px a 375 y 54 a 1440 (la recta: 1,35rem + 2,25vw da 30,0 y 54,0).
+     Antes 34 → 54 con otra pendiente: a 375 medía 37,5 y partía el
+     titular en una línea más de la cuenta. */
+  font-size: clamp(30px, 1.35rem + 2.25vw, 54px);
   font-weight: 600;
   line-height: 1.04;
   letter-spacing: -0.035em;
@@ -443,13 +395,23 @@
 
 .footer-status strong {
   color: var(--tinta);
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.5vw, 34px);
   font-weight: 600;
+  /* 1,05 y no el 1,1 heredado de `h1…h4`: es una cifra de una línea, y a
+     34 px el aire de más la separaba de su rótulo. */
+  line-height: 1.05;
+  letter-spacing: -0.04em;
 }
 
 .footer-bottom {
   margin-top: clamp(38px, 4vw, 54px);
-  padding-top: 18px;
+  /* El filo de 1 px se cambia por aire: 18 + 8 de la línea y su respiro.
+     Ya hay otra línea justo encima (la de `.footer-grid`) y dos seguidas
+     leen como una tabla; el resto de filos del pie se quedan. */
+  padding-top: 26px;
   padding-bottom: 22px;
-  border-top: 1px solid var(--linea);
-  color: var(--tinta-tenue);
+  /* Tinta media (9,3:1 sobre blanco) y no tenue (4,9:1 en el límite):
+     es letra de 12 px. */
+  color: var(--tinta-media);
 }

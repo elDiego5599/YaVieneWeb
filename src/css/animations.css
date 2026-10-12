@@ -34,9 +34,21 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  /* Lo que quita «reducir movimiento» es el desplazamiento, no la
+     aparición: sin los 24 px de subida, la pieza se funde en 200 ms. Un
+     cambio de golpe también es brusco, y el fundido no marea. Va con
+     `!important` para ganarle al suelo de arriba, que también lo lleva.
+     `scroll-effects.ts` suelta la capa al `transitionend` de `opacity`,
+     que con este fundido sí llega. */
   .reveal {
-    transition: none !important;
-    opacity: 1 !important;
+    transition: opacity 0.2s linear !important;
+    transform: none !important;
+  }
+  /* El aviso del mapa: igual, aparece fundiéndose y sin la subida con
+     escala. `visibility` viaja con el mismo tiempo para que no corte el
+     fundido de salida. */
+  .mapa-aviso {
+    transition: opacity 0.2s linear, visibility 0.2s !important;
     transform: none !important;
   }
   /* La entrada del hero anima `scale`, no `transform`: hay que apagar esa

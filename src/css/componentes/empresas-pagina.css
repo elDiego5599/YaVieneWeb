@@ -40,9 +40,9 @@
 */
 #panel .seccion-titulo {
   font-size: clamp(34px, 4.3vw, 64px);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.02;
-  letter-spacing: -0.018em;
+  letter-spacing: -0.035em;
 }
 
 /* La parte en verde siempre en su propia línea. A 1440 ya caía ahí por
@@ -813,9 +813,13 @@
 /* El `Switch` de Material 3 recogido a su tamaño, 52 × 32. Encendido:
    pista en `AppColors.online`, como dice el `switchTheme` del panel, y
    botón blanco de 24, a 4 del borde: 52 − 4 − 24 = 24 desde
-   la izquierda. Se mide siempre desde la izquierda, y no desde la derecha
-   encendido y desde la izquierda apagado, porque entre `right` y `left`
-   no hay transición y el botón saltaría en vez de cruzar. Colocado y
+   la izquierda. El botón se coloca a 4 del borde izquierdo (el centro a 16)
+   y se mueve con `translate` y `scale`, que van por la tarjeta gráfica:
+   animar `top`, `left`, `width` y `height` obligaba a recalcular el layout
+   en cada cuadro. Encendido: `translate` de 20 (centro a 36, el de 24 desde
+   la izquierda más 12). Apagado: sin desplazar y a 16/24 = 0,6667 de
+   escala, que es el botón gris de 16 con su centro en 16, el mismo punto
+   (8 + 8) que antes. Colocado y
    después del botón de la fila en el HTML, así que queda encima de él y
    el toque es suyo. */
 .flota-interruptor {
@@ -832,16 +836,15 @@
   content: '';
   position: absolute;
   top: calc(4 * var(--u));
-  left: calc(24 * var(--u));
+  left: calc(4 * var(--u));
   width: calc(24 * var(--u));
   height: calc(24 * var(--u));
   border-radius: 50%;
   background: #fff;
+  translate: calc(20 * var(--u)) 0;
   transition:
-    top var(--f-tiempo),
-    left var(--f-tiempo),
-    width var(--f-tiempo),
-    height var(--f-tiempo),
+    translate var(--f-tiempo),
+    scale var(--f-tiempo),
     background-color var(--f-tiempo);
 }
 
@@ -853,10 +856,8 @@
 }
 
 .flota-fila--oculta .flota-interruptor::after {
-  top: calc(8 * var(--u));
-  left: calc(8 * var(--u));
-  width: calc(16 * var(--u));
-  height: calc(16 * var(--u));
+  translate: 0 0;
+  scale: 0.6667;
   background: var(--bus-ghost);
 }
 
@@ -1627,6 +1628,36 @@
   outline: none;
   border-color: var(--green);
   box-shadow: 0 0 0 3px rgba(0, 168, 89, 0.16);
+}
+
+/* Campo con error (lo marca src/contact-form.ts con aria-invalid): borde y
+   aro en el coral accesible, que sobre la tarjeta blanca da 5,2:1 en el
+   texto; el aro conserva la forma del foco, así que el error se ve también
+   mientras se escribe encima. Va después de `:focus` para ganarle. */
+.form-input[aria-invalid="true"] {
+  border-color: var(--coral-accessible);
+  box-shadow: 0 0 0 3px rgba(206, 45, 29, 0.14);
+}
+
+/* El mensaje de cada campo, pegado a su campo (el hueco del grupo ya lo
+   separa) y sin caja: la caja es del aviso general del envío. Vacío no
+   ocupa sitio, pero sigue en la página para que el lector lo anuncie al
+   llenarse. */
+.form-campo-error {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--coral-accessible);
+}
+
+.form-campo-error:empty {
+  display: none;
+}
+
+.form-ayuda {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-muted);
 }
 
 /* Verde accesible y no el de marca, por lo mismo que `.btn-green`: es
