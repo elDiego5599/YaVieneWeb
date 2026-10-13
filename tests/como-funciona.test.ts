@@ -92,18 +92,39 @@ describe('banda «Cómo funciona»', () => {
   });
 
   it('los pasos son un carrusel: se recorta de lado y se arrastra', () => {
-    expect(css).toMatch(/\.cf-texto\s*\{[^}]*overflow-x:\s*clip[^}]*touch-action:\s*pan-y/s);
+    // Una sola lámina: la caja grande recorta, y texto y cuadro viajan lo
+    // mismo, su ancho entero (dueño, 2026-10-13).
+    expect(css).toMatch(/\.cf-grid\s*\{[^}]*--cf-viaje:\s*calc\(100cqw \+ 2 \* var\(--cf-aire\)\)[^}]*container-type:\s*inline-size[^}]*overflow-x:\s*clip/s);
+    for (const pieza of ['explica', 'escena']) {
+      expect(css).toMatch(new RegExp(`\\.cf-${pieza}\\s*\\{[^}]*translate:\\s*calc\\(var\\(--cf-lugar\\) \\* var\\(--cf-viaje\\)`, 's'));
+    }
+    expect(css).toMatch(/\.cf-texto\s*\{[^}]*touch-action:\s*pan-y/s);
+    expect(css.match(/\.cf-texto\s*\{[^}]*\}/)![0]).not.toMatch(/overflow/);
     expect(css).toMatch(/\.cf-explica\[data-lugar="antes"\]\s*\{[^}]*--cf-lugar:\s*-1/s);
     expect(css).toMatch(/\.cf-explica\[data-lugar="despues"\]\s*\{[^}]*--cf-lugar:\s*1/s);
     // Mientras se arrastra no hay transición: el texto va pegado al dedo.
     expect(css).toMatch(/\.cf-grid\[data-arrastrando\] :is\(\.cf-explica, \.cf-escena\)\s*\{[^}]*transition:\s*none/s);
-    // La escena va en el mismo carrusel, recortada por su marco redondo.
+    // El cuadro entero viaja con el texto: fondo, esquinas y filo son de
+    // la escena, y el marco no recorta (dueño, 2026-10-13).
     expect(banda).toMatch(/<div class="cf-marco">\s*<div class="cf-escena"/);
-    expect(css).toMatch(/\.cf-marco\s*\{[^}]*overflow:\s*clip/s);
+    expect(css.match(/\.cf-marco\s*\{[^}]*\}/)![0]).not.toMatch(/overflow|background|border-radius/);
+    expect(css).not.toContain('.cf-marco::after');
+    expect(css).toMatch(/\.cf-escena\s*\{[^}]*border-radius:\s*20px[^}]*background:/s);
+    expect(css).toMatch(/\.cf-escena::after\s*\{[^}]*z-index:\s*3[^}]*border:\s*1px/s);
+    // Al dar la vuelta, lo que llega se pasa y vuelve, y cabe en el aire.
+    expect(css).toMatch(
+      /\.cf-grid\[data-rebote\] :is\(\.cf-explica, \.cf-escena\)[^{]*\{[^}]*cubic-bezier\(0\.3, 0, 0\.2, 1\.2\)/s
+    );
     expect(css).toMatch(/\.cf-escena\[data-lugar="antes"\]\s*\{[^}]*--cf-lugar:\s*-1/s);
     // Con movimiento reducido no hay desliz: solo el fundido.
     const reducido = css.slice(css.lastIndexOf('@media (prefers-reduced-motion: reduce)'));
     expect(reducido).toMatch(/\.cf-explica,\s*\.cf-escena\s*\{[^}]*translate:\s*none/s);
+  });
+
+  it('el teléfono de «Elige tu ruta» echa una sombra larga abajo a la derecha (dueño, 2026-10-13)', () => {
+    const tel = css.match(/\.cf-telefono \.phone-shell\s*\{[^}]*\}/)![0];
+    // Cada capa larga corre más a la derecha y abajo que la anterior.
+    expect(tel).toMatch(/box-shadow:[^;]*24px 28px 48px[^;]*56px 64px 110px/s);
   });
 
   it('«Elige tu ruta» se queda quieta: no repite su entrada (dueño, 2026-10-12)', () => {

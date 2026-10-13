@@ -68,10 +68,18 @@
   --cf-borde: rgba(20, 39, 78, 0.078);
   /* 1–16 px y alfa 0,035–0,14 separan en dos planos con un filo suave. */
   --cf-sombra: 0 1px 2px rgba(11, 18, 32, 0.035), 0 16px 40px -24px rgba(11, 18, 32, 0.14);
+  --cf-aire: clamp(20px, 3.34vw, 48px);
+  /* El carrusel es una sola lámina: texto y cuadro viajan juntos el ancho
+     entero de la caja (su contenido, `100cqw`, más el aire de los dos
+     lados), y es la caja la que recorta (dueño, 2026-10-13). Así el paso
+     de al lado espera entero fuera, texto y cuadro a la vez. */
+  --cf-viaje: calc(100cqw + 2 * var(--cf-aire));
+  container-type: inline-size;
   display: grid;
+  overflow-x: clip;
   max-width: 1192px;
   margin-inline: auto;
-  padding: clamp(20px, 3.34vw, 48px);
+  padding: var(--cf-aire);
   border-radius: clamp(8px, 0.56vw, 20px);
   background: var(--banda);
   border: 1px solid var(--cf-borde);
@@ -84,17 +92,13 @@
    celda, así el alto no salta, y es un carrusel (dueño, 2026-10-12): el
    paso entero se va de lado y el siguiente entra por el otro, y se puede
    agarrar y arrastrar. `data-lugar` lo pone `como-funciona.ts` (sin
-   JavaScript queda el del marcado: «ruta» a la vista). El recorte es
-   solo de lado y con 16 px de aire, que cubren la sombra del cuadro
-   blanco (la honda se encoge 24 y difumina 40: no pasa del filo); `pan-y` deja al dedo bajar la página y el gesto de lado es
-   nuestro. */
+   JavaScript queda el del marcado: «ruta» a la vista). Recorta la caja
+   grande, no la columna; `pan-y` deja al dedo bajar la página y el gesto
+   de lado es nuestro. */
 .cf-texto {
   display: grid;
   align-self: stretch;
   min-height: 0;
-  overflow-x: clip;
-  margin-inline: -16px;
-  padding-inline: 16px;
   touch-action: pan-y;
   user-select: none;
   cursor: grab;
@@ -104,9 +108,9 @@
   cursor: grabbing;
 }
 
-/* Cada paso se corre su ancho más el aire de 16 px de cada lado (32),
-   así el de al lado espera justo fuera del recorte. `--cf-arrastre` es lo
-   que va del dedo, 1:1. 480 ms con la curva de «Problema». */
+/* Cada paso se corre `--cf-viaje`, lo mismo que su cuadro, así el de al
+   lado espera justo fuera de la caja. `--cf-arrastre` es lo que va del
+   dedo, 1:1. 480 ms con la curva de «Problema». */
 .cf-explica {
   --cf-lugar: 0;
   grid-area: 1 / 1;
@@ -115,7 +119,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   gap: 16px;
-  translate: calc(var(--cf-lugar) * (100% + 32px) + var(--cf-arrastre, 0px)) 0;
+  translate: calc(var(--cf-lugar) * var(--cf-viaje) + var(--cf-arrastre, 0px)) 0;
   will-change: translate;
 }
 
@@ -205,27 +209,22 @@
   min-width: 0;
 }
 
-/* El marco es la caja, quieta: fondo, filo y esquinas. La escena se
-   desliza dentro como el texto de al lado (dueño, 2026-10-12) y el marco
-   la recorta; la que sale es una copia muda (`.cf-escena--fantasma`, de
-   `como-funciona.ts`) en la misma celda. */
+/* El marco es la celda del cuadro: el cuadro entero, con su fondo, su
+   filo y sus esquinas, viaja con el texto como una sola cosa (dueño,
+   2026-10-13) y lo recorta la caja grande. La que sale es una copia muda
+   (`.cf-escena--fantasma`, de `como-funciona.ts`) en la misma celda. */
 .cf-marco {
-  position: relative;
   display: grid;
-  overflow: clip;
-  /* 20 px suaviza las esquinas de la escena. */
-  border-radius: 20px;
-  background: color-mix(in srgb, var(--banda), var(--acento) 5%);
   touch-action: pan-y;
   user-select: none;
   cursor: grab;
 }
-/* El filo va encima, para que la escena que pasa no lo tape; 1 px de
-   brillo conserva profundidad. */
-.cf-marco::after {
+/* El filo va encima de lo de dentro, para que el teléfono no lo tape;
+   1 px de brillo conserva profundidad. */
+.cf-escena::after {
   content: "";
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   inset: 0;
   border: 1px solid var(--cf-borde);
   border-radius: inherit;
@@ -240,9 +239,12 @@
   container-type: inline-size;
   position: relative;
   overflow: hidden;
+  /* 20 px suaviza las esquinas del cuadro. */
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--banda), var(--acento) 5%);
   /* 600 / 455 da la escena apaisada de referencia y deja aire al teléfono. */
   aspect-ratio: 600 / 455;
-  translate: calc(var(--cf-lugar) * (100% + 32px) + var(--cf-arrastre, 0px)) 0;
+  translate: calc(var(--cf-lugar) * var(--cf-viaje) + var(--cf-arrastre, 0px)) 0;
   will-change: translate;
 }
 .cf-escena[data-lugar="antes"] { --cf-lugar: -1; }
@@ -250,6 +252,13 @@
 .cf-escena[data-lugar="actual"],
 .cf-escena[data-sale] {
   transition: translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
+}
+/* Al dar la vuelta, del primero al último o al revés, lo que llega se pasa
+   y vuelve: el rebote (dueño, 2026-10-13). El 1,2 de la curva lo pasa un
+   2,25 % del viaje: 25 px a 1440, dentro de los 48 de aire de la caja. */
+.cf-grid[data-rebote] :is(.cf-explica, .cf-escena):is([data-lugar="actual"], [data-sale]) {
+  transition-duration: 560ms;
+  transition-timing-function: cubic-bezier(0.3, 0, 0.2, 1.2);
 }
 /* La escena que entra ya trae su paso puesto: lo de dentro no se funde
    mientras viaja, llega entera. */
@@ -567,7 +576,10 @@
   }
 }
 
-/* El teléfono queda entero y centrado verticalmente; con sombra profunda como en la referencia. */
+/* El teléfono queda entero y centrado verticalmente. Su sombra es la del
+   teléfono de On-call de incident.io (dueño, 2026-10-13): larga, suave y
+   echada abajo a la derecha, que se deshace en el fondo; un contacto
+   corto de 2 px lo asienta y la escena la recorta en su cuadro. */
 .cf-telefono .phone-shell {
   --ancho: clamp(230px, 41cqw, 310px);
   z-index: 2;
@@ -575,8 +587,9 @@
   top: 3.5%;
   right: 8%;
   box-shadow:
-    0 16px 40px -8px rgba(11, 18, 32, 0.2),
-    0 8px 20px -4px rgba(11, 18, 32, 0.12);
+    0 2px 6px rgba(11, 18, 32, 0.08),
+    24px 28px 48px -12px rgba(11, 18, 32, 0.2),
+    56px 64px 110px -20px rgba(11, 18, 32, 0.18);
 }
 
 /* Atenúa solo las teselas; las rutas y marcadores siguen intactos. */

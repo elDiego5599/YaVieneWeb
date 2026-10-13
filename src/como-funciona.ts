@@ -18,10 +18,14 @@
  * velocidad (la fórmula de las listas de iOS) y se pasa de paso si el
  * gesto llevaba a más de un tercio del ancho.
  *
- * La escena va en el mismo carrusel, dentro de su marco: es una sola (la
- * del lector y la que anima `main.ts`), así que la que se ve salir, o
- * asomar al arrastrar, es una copia muda (`.cf-escena--fantasma`) que se
- * quita al llegar.
+ * La escena va en el mismo carrusel, con su cuadro entero (dueño,
+ * 2026-10-13): es una sola (la del lector y la que anima `main.ts`), así
+ * que la que se ve salir, o asomar al arrastrar, es una copia muda
+ * (`.cf-escena--fantasma`) que se quita al llegar.
+ *
+ * Los pasos dan la vuelta: del primero hacia atrás se va al último, y al
+ * revés. Ahí el arrastre cede menos que el dedo (la goma de iOS) y el paso
+ * que llega rebota (`data-rebote`, dueño, 2026-10-13).
  */
 
 import { sinMovimiento } from './scrolly';
@@ -31,8 +35,8 @@ export type OpcionesPasos = {
   alCambiar?: (paso: string) => void;
 };
 
-/** Los 480 ms del desliz y un margen; luego la copia sobra. */
-const VIAJE = 500;
+/** Los 560 ms del desliz con rebote y un margen; luego la copia sobra. */
+const VIAJE = 600;
 
 /** Lo que se mueve el dedo antes de que el gesto sea de lado (o no). */
 const UMBRAL = 10;
@@ -40,6 +44,10 @@ const UMBRAL = 10;
 /** Dónde acabaría un gesto que se suelta a `v` px/ms: la deceleración de
     las listas de iOS (0,998 por milisegundo). */
 const proyectar = (v: number): number => (v * 0.998) / (1 - 0.998);
+
+/** Lo que cede el paso cuando se tira más allá de un extremo: la goma de
+    iOS (constante 0,55), que frena más cuanto más se tira. */
+const goma = (dx: number, ancho: number): number => (dx * ancho * 0.55) / (ancho + 0.55 * Math.abs(dx));
 
 const TECLAS: Record<string, (i: number, n: number) => number> = {
   ArrowRight: (i, n) => (i + 1) % n,
@@ -59,8 +67,10 @@ export class Pasos {
   readonly #explicas: HTMLElement[];
   readonly #marco: HTMLElement | null;
   #fantasma: HTMLElement | null = null;
+  readonly #saliendo = new Map<HTMLElement, number>();
   #preparada = '';
   #llegada = 0;
+  #rebote = 0;
   #temporizador = 0;
   #observador?: IntersectionObserver;
   #activo = true;
@@ -90,8 +100,10 @@ export class Pasos {
         if (!ir) return;
         ev.preventDefault();
         const j = ir(i, this.#pestanas.length);
-        // Las flechas dan vuelta en círculo: su lado es el de la tecla.
-        this.#elegir(j, ev.key === 'ArrowRight' ? 'adelante' : ev.key === 'ArrowLeft' ? 'atras' : undefined);
+        // Las flechas dan vuelta en círculo: su lado es el de la tecla, y
+        // al dar la vuelta rebota como el arrastre.
+        const lado = ev.key === 'ArrowRight' ? 'adelante' : ev.key === 'ArrowLeft' ? 'atras' : undefined;
+        this.#elegir(j, lado, lado === 'adelante' ? j < i : lado === 'atras' && j > i);
         this.#pestanas[j].focus();
       });
     });
@@ -133,16 +145,28 @@ export class Pasos {
   /* El texto del paso entra por el lado hacia el que se va: la pestaña de
      la derecha llega desde la derecha, la de la izquierda desde la
      izquierda, y la vuelta automática del tercero al primero sigue
-     adelante, porque es el mismo recorrido que viene repitiendo. */
-  #elegir(indice: number, direccion = indice >= this.#actual() ? 'adelante' : 'atras'): void {
+     adelante, porque es el mismo recorrido que viene repitiendo. El paso
+     que aún va saliendo vuelve por donde iba, sin rebote: si no, su texto
+     saltaría al otro lado mientras su cuadro sigue yéndose. */
+  #elegir(indice: number, direccion = indice >= this.#actual() ? 'adelante' : 'atras', rebote = false): void {
     const elegida = this.#pestanas[indice];
     const paso = elegida.dataset.paso ?? '';
+    const vuela = this.#enVuelo(paso);
+    if (vuela) {
+      direccion = vuela.dataset.lugar === 'despues' ? 'adelante' : 'atras';
+      rebote = false;
+    }
     for (const pestana of this.#pestanas) {
       const si = pestana === elegida;
       pestana.setAttribute('aria-selected', String(si));
       pestana.tabIndex = si ? 0 : -1;
     }
     const entrada = direccion === 'adelante' ? 'despues' : 'antes';
+    window.clearTimeout(this.#rebote);
+    if (rebote && !sinMovimiento()) {
+      this.#cuadricula?.setAttribute('data-rebote', '');
+      this.#rebote = window.setTimeout(() => this.#cuadricula?.removeAttribute('data-rebote'), VIAJE);
+    } else this.#cuadricula?.removeAttribute('data-rebote');
     this.#moverEscena(paso, entrada);
     this.#cuadricula?.setAttribute('data-paso', paso);
     this.#cuadricula?.setAttribute('data-direccion', direccion);
@@ -157,7 +181,7 @@ export class Pasos {
      lado y el resto espera también fuera, por el lado de salida. */
   #mover(paso: string, entrada: 'antes' | 'despues'): void {
     const nueva = this.#explicas.find(e => e.dataset.paso === paso);
-    if (!nueva || nueva.dataset.lugar === 'actual') return;
+    if (!nueva || nueva.dataset.lugar === 'actual') return this.#soltarTextos();
     const salida = entrada === 'despues' ? 'antes' : 'despues';
     if (nueva.dataset.lugar !== entrada) {
       delete nueva.dataset.sale;
@@ -166,18 +190,54 @@ export class Pasos {
     }
     for (const e of this.#explicas) {
       if (e === nueva) continue;
-      if (e.dataset.lugar === 'actual') e.dataset.sale = '';
-      else delete e.dataset.sale;
+      // El que aún viaja sigue su viaje, como su copia del cuadro; solo
+      // salta, por detrás del recorte, el que ya llegó a su sitio.
+      if (e.dataset.lugar === 'actual') {
+        this.#fijar(e);
+        this.#salir(e);
+      } else if (e.hasAttribute('data-sale')) continue;
       e.dataset.lugar = salida;
     }
+    this.#fijar(nueva);
     nueva.dataset.lugar = 'actual';
+    this.#soltarTextos();
+  }
+
+  /* Lo que quedó fijo donde se veía sale de ahí hacia su sitio. */
+  #soltarTextos(): void {
+    for (const e of this.#explicas) e.style.removeProperty('translate');
+  }
+
+  /* El texto que se va lleva `data-sale` (su transición) hasta llegar. */
+  #salir(e: HTMLElement): void {
+    e.dataset.sale = '';
+    window.clearTimeout(this.#saliendo.get(e));
+    this.#saliendo.set(e, window.setTimeout(() => delete e.dataset.sale, VIAJE));
+  }
+
+  /* Un texto que cambia de rumbo a medio viaje se fija donde está y sale
+     de ahí con un desliz entero, como el cuadro (que siempre parte de
+     donde se ve): el navegador, al invertir una transición, la acorta y la
+     curva ya no coincide con la del cuadro. */
+  #fijar(e: HTMLElement): void {
+    const corre = e
+      .getAnimations?.()
+      .some(a => (a as CSSTransition).transitionProperty === 'translate' && a.playState === 'running');
+    if (!corre) return;
+    const donde = getComputedStyle(e).translate;
+    e.style.transition = 'none';
+    e.style.translate = donde;
+    void e.offsetWidth;
+    e.style.removeProperty('transition');
   }
 
   /* Una copia de la escena que se ve y no se oye: sin ids, sin pestaña que
-     la nombre, sin las descripciones ni el toque. Va detrás de la viva, así
-     `querySelector('.cf-escena')` sigue dando esa. */
+     la nombre, sin las descripciones ni el toque, y sin las animaciones de
+     `main.ts` a medias, que volverían a empezar. Va detrás de la viva, así
+     `querySelector('.cf-escena')` sigue dando esa. La que asomaba sin irse
+     sobra; la que ya se va termina su viaje y se quita sola. */
   #copiar(paso: string, lugar: string): HTMLElement {
-    this.#quitarFantasma();
+    if (this.#fantasma && !this.#fantasma.hasAttribute('data-sale')) this.#fantasma.remove();
     const copia = this.#escena.cloneNode(true) as HTMLElement;
     copia.removeAttribute('id');
     copia.removeAttribute('role');
@@ -188,6 +248,9 @@ export class Pasos {
     copia.classList.add('cf-escena--fantasma');
     for (const e of copia.querySelectorAll('.solo-lectores, .cf-tap')) e.remove();
     for (const e of copia.querySelectorAll('[id]')) e.removeAttribute('id');
+    for (const e of copia.querySelectorAll('.cf-aviso-rodando, .cf-guardando')) {
+      e.classList.remove('cf-aviso-rodando', 'cf-guardando');
+    }
     copia.dataset.paso = paso;
     copia.dataset.lugar = lugar;
     this.#escena.after(copia);
@@ -195,20 +258,51 @@ export class Pasos {
     return copia;
   }
 
-  #quitarFantasma(): void {
-    window.clearTimeout(this.#llegada);
-    this.#fantasma?.remove();
-    this.#fantasma = null;
+  /* La copia de ese paso que aún va saliendo, si la hay. */
+  #enVuelo(paso: string): HTMLElement | undefined {
+    return Array.from(this.#marco?.querySelectorAll<HTMLElement>('.cf-escena--fantasma[data-sale]') ?? []).find(
+      f => f.dataset.paso === paso,
+    );
   }
 
-  /* Deja la escena lista para entrar: la de ahora, copiada, en el centro;
-     la viva, ya con su paso, en el lado por donde llega. Sin animar: se
-     fuerza el cálculo para que el desliz parta de ahí. */
+  /* La copia se va animada y, al llegar, se quita. */
+  #irse(copia: HTMLElement): void {
+    copia.dataset.sale = '';
+    window.setTimeout(() => {
+      copia.remove();
+      if (this.#fantasma === copia) this.#fantasma = null;
+    }, VIAJE);
+  }
+
+  /* Al agarrar, lo que aún viaja se planta: el gesto manda. */
+  #plantar(): void {
+    window.clearTimeout(this.#llegada);
+    window.clearTimeout(this.#rebote);
+    this.#cuadricula?.removeAttribute('data-rebote');
+    for (const f of this.#marco?.querySelectorAll('.cf-escena--fantasma') ?? []) f.remove();
+    this.#fantasma = null;
+    delete this.#escena.dataset.entra;
+  }
+
+  /* Deja la escena lista para entrar: la de ahora, copiada, donde se ve
+     (en el centro, bajo el dedo o a medio viaje si se cambió de paso
+     antes de llegar); la viva, ya con su paso, en el lado por donde
+     llega. Sin animar: se fuerza el cálculo para que el desliz parta de
+     ahí. */
   #preparar(paso: string, entrada: 'antes' | 'despues'): void {
-    this.#copiar(this.#escena.dataset.paso ?? '', 'actual');
+    const donde = getComputedStyle(this.#escena).translate;
+    const copia = this.#copiar(this.#escena.dataset.paso ?? '', 'actual');
+    if (donde && donde !== 'none') copia.style.translate = donde;
+    void copia.offsetWidth;
     this.#escena.dataset.entra = '';
     this.#escena.dataset.paso = paso;
     this.#escena.dataset.lugar = entrada;
+    // Si ese paso aún iba saliendo, la viva parte de donde va su copia, y
+    // la copia sobra.
+    const vuela = this.#enVuelo(paso);
+    const desde = vuela && getComputedStyle(vuela).translate;
+    if (desde && desde !== 'none') this.#escena.style.translate = desde;
+    vuela?.remove();
     void this.#escena.offsetWidth;
     this.#preparada = paso;
   }
@@ -224,14 +318,13 @@ export class Pasos {
     }
     this.#preparada = '';
     const vieja = this.#fantasma!;
-    vieja.dataset.sale = '';
+    vieja.style.removeProperty('translate');
     vieja.dataset.lugar = entrada === 'despues' ? 'antes' : 'despues';
+    this.#irse(vieja);
+    this.#escena.style.removeProperty('translate');
     this.#escena.dataset.lugar = 'actual';
-    this.#llegada = window.setTimeout(() => {
-      this.#fantasma?.remove();
-      this.#fantasma = null;
-      delete this.#escena.dataset.entra;
-    }, VIAJE);
+    window.clearTimeout(this.#llegada);
+    this.#llegada = window.setTimeout(() => delete this.#escena.dataset.entra, VIAJE);
   }
 
   /* El arrastre: tras 10 px se decide si el gesto es de lado; si lo es, el
@@ -244,8 +337,11 @@ export class Pasos {
     let inicio: { x: number; y: number } | null = null;
     let deLado = false;
     let muestras: { x: number; t: number }[] = [];
+    let dedo = -1;
     const n = this.#pestanas.length;
     const vecino = (dx: number): number => (this.#actual() + (dx < 0 ? 1 : n - 1)) % n;
+    // Del primero hacia atrás, o del último hacia adelante: da la vuelta.
+    const daVuelta = (dx: number): boolean => (dx > 0 ? this.#actual() === 0 : this.#actual() === n - 1);
     const asomar = (dx: number): void => {
       const paso = this.#pestanas[vecino(dx)].dataset.paso;
       const lado = dx < 0 ? 'despues' : 'antes';
@@ -263,14 +359,23 @@ export class Pasos {
     };
 
     const empezar = (ev: PointerEvent): void => {
-      if (ev.button > 0) return;
+      // Un segundo dedo, o otro botón, no empieza otro gesto (el mismo
+      // puntero sí: si apretó otra vez, el gesto de antes ya terminó).
+      if (ev.button > 0 || (inicio && ev.pointerId !== dedo)) return;
+      dedo = ev.pointerId;
       asa = ev.currentTarget as HTMLElement;
       inicio = { x: ev.clientX, y: ev.clientY };
       deLado = false;
       muestras = [{ x: ev.clientX, t: performance.now() }];
     };
     const mover = (ev: PointerEvent): void => {
-      if (!inicio) return;
+      if (!inicio || ev.pointerId !== dedo) return;
+      // Un ratón que soltó fuera, antes de que el gesto fuera de lado
+      // (sin captura no llega el `pointerup`): ya no hay gesto.
+      if (ev.pointerType === 'mouse' && ev.buttons === 0) {
+        inicio = null;
+        return;
+      }
       const dx = ev.clientX - inicio.x;
       const dy = ev.clientY - inicio.y;
       if (!deLado) {
@@ -281,19 +386,19 @@ export class Pasos {
         }
         deLado = true;
         this.#detener();
-        // Una escena que aún llega se planta: el gesto manda.
-        this.#quitarFantasma();
-        delete this.#escena.dataset.entra;
+        this.#plantar();
         grid.setAttribute('data-arrastrando', '');
         asa.setPointerCapture?.(ev.pointerId);
       }
       asomar(dx);
-      grid.style.setProperty('--cf-arrastre', `${dx}px`);
+      const sigue = daVuelta(dx) ? goma(dx, asa.clientWidth || 1) : dx;
+      grid.style.setProperty('--cf-arrastre', `${sigue}px`);
       const t = performance.now();
       muestras.push({ x: ev.clientX, t });
       muestras = muestras.filter(m => t - m.t <= 100);
     };
     const terminar = (ev: PointerEvent): void => {
+      if (ev.pointerId !== dedo) return;
       if (!inicio || !deLado) {
         inicio = null;
         return;
@@ -314,17 +419,16 @@ export class Pasos {
         if (this.#marco && !sinMovimiento()) {
           this.#preparar(this.#pestanas[j].dataset.paso ?? '', dx < 0 ? 'despues' : 'antes');
         }
+        // El texto también se queda donde lo dejó el dedo, y de ahí sale.
+        for (const e of this.#explicas) e.style.translate = getComputedStyle(e).translate;
+        const vuelta = daVuelta(dx);
         soltar();
-        this.#elegir(j, dx < 0 ? 'adelante' : 'atras');
+        this.#elegir(j, dx < 0 ? 'adelante' : 'atras', vuelta);
       } else {
         soltar();
         // Vuelve a su sitio: el vecino que asomaba también se va animado.
-        for (const e of this.#explicas) if (e.dataset.lugar !== 'actual') e.dataset.sale = '';
-        const f = this.#fantasma;
-        if (f) {
-          f.dataset.sale = '';
-          this.#llegada = window.setTimeout(() => this.#quitarFantasma(), VIAJE);
-        }
+        for (const e of this.#explicas) if (e.dataset.lugar !== 'actual') this.#salir(e);
+        if (this.#fantasma) this.#irse(this.#fantasma);
       }
     };
     for (const e of asas) {
