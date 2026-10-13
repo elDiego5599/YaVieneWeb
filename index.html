@@ -1213,7 +1213,48 @@
       </div>
     </section>
 
-
+    <!--
+      «Preguntas frecuentes» (dueño, 2026-10-12): lo último antes del pie.
+      El pie ya le habla a las empresas; esto le contesta al pasajero lo que
+      se pregunta antes de bajarse la app. `<details>` nativos: teclado y
+      lector de pantalla sin JavaScript. Cada respuesta dice lo que hace el
+      producto hoy (D3 sin cuenta, D4 y D13 los avisos, el GPS en el bus y
+      la distancia por la calle); `tests/preguntas.test.ts` lo vigila.
+    -->
+    <section class="panel" id="preguntas" aria-labelledby="preguntas-titulo">
+      <div class="panel-inner preguntas-bloque">
+        <div class="preguntas-cabeza">
+          <h2 class="seccion-titulo" id="preguntas-titulo">Preguntas frecuentes</h2>
+          <p class="seccion-lead">Lo que todos preguntan antes de bajarse la app.</p>
+        </div>
+        <div class="preguntas-lista">
+          <details class="pregunta">
+            <summary>¿Tengo que crear una cuenta?</summary>
+            <p>No. La app del pasajero no tiene cuenta: no te pide correo, ni nombre, ni contraseña. La abres, escoges tu ruta y ya.</p>
+          </details>
+          <details class="pregunta">
+            <summary>¿Cómo sabe dónde viene el bus?</summary>
+            <p>El GPS va montado en el bus, no en el teléfono de nadie. Manda su posición al servidor y tu app la pinta en el mapa a medida que avanza.</p>
+          </details>
+          <details class="pregunta">
+            <summary>¿La distancia es en línea recta?</summary>
+            <p>No. Se mide por la calle, siguiendo el recorrido de la ruta hasta tu punto, que es lo que de verdad le falta al bus para llegar a ti.</p>
+          </details>
+          <details class="pregunta">
+            <summary>¿Me avisa con la app cerrada?</summary>
+            <p>En Android sí: tú eliges la distancia, de 500 m a 3 km, y el aviso te llega aunque cierres la app. En iPhone, por ahora, el aviso suena con la app abierta.</p>
+          </details>
+          <details class="pregunta">
+            <summary>¿Qué empresas están?</summary>
+            <p>Sobusa y Coolitoral. Si tienes una empresa de transporte y quieres que tus buses salgan en el mapa, mira <a href="/empresas.html">Para empresas</a>.</p>
+          </details>
+          <details class="pregunta">
+            <summary>¿Qué pasa con mi ubicación?</summary>
+            <p>La distancia la calcula tu propio teléfono. Solo el aviso con la app cerrada en Android le deja al servidor tu punto de espera, redondeado, y se borra al quitar el aviso. Los detalles están en <a href="/privacidad.html">Privacidad</a>.</p>
+          </details>
+        </div>
+      </div>
+    </section>
 
   </main>
 

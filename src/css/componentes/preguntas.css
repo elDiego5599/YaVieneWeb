@@ -1,0 +1,140 @@
+/* ============ PREGUNTAS FRECUENTES ============
+
+   Lo último antes del pie, como el cierre de incident.io: el titular a
+   la izquierda, quieto mientras se lee, y a la derecha una lista de
+   preguntas separadas por una línea de un píxel. Sin cajas ni sombras:
+   lo que separa es la línea; lo que agrupa, el aire.
+
+   Cada pregunta es un `<details>` nativo. Su marca es un más dibujado
+   con dos trazos que, al abrir, gira y se queda en menos: dice «se abre»
+   y «se cierra» sin una palabra. Donde el navegador sabe animar el alto
+   (`::details-content` con `interpolate-size`) la respuesta se despliega;
+   donde no, aparece sin más, que también vale.
+   =============================================== */
+
+.preguntas-bloque {
+  display: grid;
+  gap: 32px;
+}
+
+.preguntas-cabeza {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+/* 24 px por fila de pregunta: la letra de 17,5 con su aire arriba y
+   abajo da un blanco de toque de unos 72 px, holgado para el dedo. */
+.pregunta {
+  border-bottom: 1px solid var(--linea);
+  interpolate-size: allow-keywords;
+}
+
+.pregunta:first-child {
+  border-top: 1px solid var(--linea);
+}
+
+.pregunta summary {
+  position: relative;
+  display: block;
+  padding: 24px 48px 24px 0;
+  font-family: var(--font-display);
+  font-size: clamp(16.5px, 0.95rem + 0.3vw, 19px);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  color: var(--tinta);
+  list-style: none;
+  cursor: pointer;
+}
+
+.pregunta summary::-webkit-details-marker {
+  display: none;
+}
+
+/* El más: dos trazos de 14 × 1,75 px en un círculo de 32 con la línea
+   del separador, centrado en la fila. */
+.pregunta summary::before,
+.pregunta summary::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  width: 14px;
+  height: 1.75px;
+  margin-top: -0.875px;
+  border-radius: 1px;
+  background: var(--tinta);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pregunta summary::after {
+  transform: rotate(90deg);
+}
+
+.pregunta[open] summary::before {
+  transform: rotate(180deg);
+}
+
+.pregunta[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.pregunta summary:hover {
+  color: var(--acento);
+}
+
+.pregunta summary:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.pregunta p {
+  max-width: 60ch;
+  margin: 0;
+  padding: 0 48px 26px 0;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--tinta-media);
+}
+
+.pregunta a {
+  color: var(--acento);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
+/* El despliegue, donde el navegador lo sabe hacer. */
+.pregunta::details-content {
+  block-size: 0;
+  overflow: clip;
+  transition: block-size 0.35s cubic-bezier(0.22, 1, 0.36, 1), content-visibility 0.35s allow-discrete;
+}
+
+.pregunta[open]::details-content {
+  block-size: auto;
+}
+
+/* En ancho, el titular a la izquierda y quieto (pegado bajo la isla de
+   la barra, que mide 64 con su margen) y la lista a la derecha. */
+@media (min-width: 900px) {
+  .preguntas-bloque {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(48px, 7vw, 120px);
+    align-items: start;
+  }
+
+  .preguntas-cabeza {
+    position: sticky;
+    top: 112px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pregunta summary::before,
+  .pregunta summary::after,
+  .pregunta::details-content {
+    transition: none;
+  }
+}
