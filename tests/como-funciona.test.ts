@@ -154,6 +154,13 @@ describe('banda «Cómo funciona»', () => {
     expect(css).toMatch(/\.cf-tap\b/);
   });
 
+  it('usa la ciudad completa y tokens de acabado sereno en la demo', () => {
+    expect(leer('src/main.ts')).toMatch(/new PhoneMap\(svgCf, lienzoCf, \{ zoom: 1 \}\)/);
+    expect(css).toMatch(/--cf-borde:\s*rgba\(/);
+    expect(css).toMatch(/--cf-sombra:\s*0 1px 2px/);
+    expect(css).toMatch(/scale:\s*0\.985/);
+  });
+
   it('espeja Dart con su comentario y entra con el .reveal de la página', () => {
     expect(css).toMatch(/eta_bottom_sheet\.dart/);
     expect(css).toMatch(/bus_notification_service\.dart/);

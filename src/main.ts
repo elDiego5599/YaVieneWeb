@@ -91,10 +91,10 @@ const arrancar = (): void => {
   let mostrarToque: (() => void) | undefined;
   let toqueAnimTimer = 0;
   if (svgCf && lienzoCf) {
-    // Zoom 1,5 abre la ciudad; el encuadre tiene aire para la ruta, el pin y ambos buses.
-    const mapaCf = new PhoneMap(svgCf, lienzoCf, { zoom: 1.5 });
+    // Zoom 1 muestra el mosaico completo, el límite de PhoneMap, para abrir la vista hasta el máximo.
+    const mapaCf = new PhoneMap(svgCf, lienzoCf, { zoom: 1 });
     mapaCf.setRoute('R-106');
-    // El segundo bus llega a 4,4 km atrás al inicio; la cámara deja dentro ambos buses móviles.
+    // 55 % / 36 % centra el pin; las distancias 1,8 y 4,4 km incluyen ambos buses con margen.
     const pin = mapaCf.tVisible(0.55, 0.36, [1800, 4400]);
     mapaCf.setPin(pin);
     mapaCf.setBuses([pin - 1800 / mapaCf.metrosDeRuta, pin - 3600 / mapaCf.metrosDeRuta]);

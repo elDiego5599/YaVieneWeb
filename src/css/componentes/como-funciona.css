@@ -64,12 +64,18 @@
    con su aire: 48 px a 1440, 20 en un teléfono. Radio
    8 px a 1440 como la referencia, y 20 en un teléfono. */
 .cf-grid {
+  /* 0,078 da un filo visible sobre blanco y verde pálido, sin endurecer la banda. */
+  --cf-borde: rgba(20, 39, 78, 0.078);
+  /* 1–16 px y alfa 0,035–0,14 separan en dos planos con un filo suave. */
+  --cf-sombra: 0 1px 2px rgba(11, 18, 32, 0.035), 0 16px 40px -24px rgba(11, 18, 32, 0.14);
   display: grid;
   max-width: 1192px;
   margin-inline: auto;
   padding: clamp(20px, 3.34vw, 48px);
   border-radius: clamp(8px, 0.56vw, 20px);
   background: var(--banda);
+  border: 1px solid var(--cf-borde);
+  box-shadow: var(--cf-sombra);
   gap: clamp(32px, 6.67vw, 96px);
 }
 
@@ -155,7 +161,10 @@
   overflow: hidden;
   /* 600 / 455 da la escena apaisada de referencia y deja aire al teléfono. */
   aspect-ratio: 600 / 455;
-  border-radius: 16px;
+  border: 1px solid var(--cf-borde);
+  /* 20 px suaviza las esquinas de la escena; 1 px de brillo conserva profundidad. */
+  border-radius: 20px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
   background: color-mix(in srgb, var(--banda), var(--acento) 5%);
 }
 
@@ -167,10 +176,13 @@
   inset: 0;
   opacity: 0;
   translate: 0 8px;
+  /* 0,985 da entrada apenas más compacta, sin competir con el cambio de paso. */
+  scale: 0.985;
   pointer-events: none;
   transition:
     opacity 450ms cubic-bezier(0.3, 0, 0.2, 1),
-    translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
+    translate 480ms cubic-bezier(0.3, 0, 0.2, 1),
+    scale 480ms cubic-bezier(0.3, 0, 0.2, 1);
   will-change: opacity, translate;
 }
 
@@ -180,6 +192,7 @@
 .cf-escena[data-paso="aviso"] .cf-aviso-composicion {
   opacity: 1;
   translate: 0 0;
+  scale: 1;
   pointer-events: auto;
 }
 .cf-escena[data-paso="ruta"] .cf-capa--ruta {
@@ -204,8 +217,10 @@
   width: 80%;
   height: 80%;
   overflow: hidden;
-  border-radius: var(--radio-marco);
-  box-shadow: var(--sombra-producto);
+  border: 1px solid var(--cf-borde);
+  /* 18 px redondea el marco del mapa sin perder área útil. */
+  border-radius: 18px;
+  box-shadow: var(--cf-sombra);
 }
 /* El radio de 2 km tapa la ruta a este encuadre y no aporta a esta vista. */
 .cf-mapa-tarjeta .map-radio {
@@ -219,16 +234,19 @@
 /* La distancia destaca sobre una tarjeta blanca con la sombra de interfaz. */
 .cf-mapa-distancia {
   position: absolute;
-  right: 4%;
+  /* 5 % alinea esta tarjeta con el CTA y los márgenes del selector. */
+  right: 5%;
   bottom: 5%;
   display: grid;
   grid-template-columns: auto auto;
   align-items: baseline;
   gap: 0 5px;
   padding: 16px 20px;
-  border-radius: var(--radio-tarjeta);
+  border: 1px solid var(--cf-borde);
+  /* 16 px mantiene una curva coherente en las tarjetas flotantes. */
+  border-radius: 16px;
   background: var(--surface);
-  box-shadow: var(--sombra-producto);
+  box-shadow: var(--cf-sombra);
   color: var(--tinta);
   /* 260 ms acompaña la entrada de la tarjeta al terminar el toque. */
   transition: opacity 260ms ease, scale 260ms ease;
@@ -258,26 +276,30 @@
 .cf-bus-cta {
   position: absolute;
   top: 5%;
-  left: 4%;
+  /* 5 % hace coincidir el CTA con los otros elementos flotantes. */
+  left: 5%;
   padding: 10px 14px;
-  border-radius: var(--radio-tarjeta);
+  border: 1px solid var(--cf-borde);
+  /* 14 px da al CTA una curva menor que la tarjeta principal. */
+  border-radius: 14px;
   background: var(--surface);
-  box-shadow: var(--sombra-tarjeta);
+  box-shadow: var(--cf-sombra);
   color: var(--azul-boton);
   font-size: 13px;
   font-weight: 600;
 }
 
-/* La rueda tiene cinco opciones; 20 px de margen y radio 16 la mantienen compacta. */
+/* Cinco opciones; el 5 % de inset y 20 px de relleno mantienen aire alrededor de la rueda. */
 .cf-aviso-selector {
   position: absolute;
   top: 5%;
-  left: 8%;
-  width: 84%;
+  left: 5%;
+  width: 90%;
   padding: 20px;
   border-radius: var(--radio-marco);
   background: var(--surface);
-  box-shadow: var(--sombra-producto);
+  border: 1px solid var(--cf-borde);
+  box-shadow: var(--cf-sombra);
   text-align: center;
 }
 .cf-aviso-titulo-rueda {
@@ -343,7 +365,7 @@
   font-weight: 600;
 }
 
-/* 5 % de margen y 78 % de ancho dejan la notificación dentro del mapa; conserva ruta y omite placa, como bus_notification_service.dart. */
+/* 5 % de margen y 90 % de ancho alinean la notificación y conservan ruta sin placa, como bus_notification_service.dart. */
 .cf-aviso-notificacion {
   position: absolute;
   right: 5%;
@@ -351,11 +373,12 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 78%;
+  width: 90%;
   padding: 14px;
-  border-radius: var(--radio-marco);
+  border: 1px solid var(--cf-borde);
+  border-radius: 16px;
   background: var(--surface);
-  box-shadow: var(--sombra-producto);
+  box-shadow: var(--cf-sombra);
 }
 
 /* El fundido queda sin desplazamiento cuando se reduce el movimiento. */
@@ -363,6 +386,7 @@
   .cf-composicion,
   .cf-telefono {
     translate: none;
+    scale: 1;
     transition: opacity 0.2s linear;
   }
 }
@@ -543,8 +567,9 @@
 .cf-pasos {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 40px;
+  /* 12 px entre opciones y 32 px arriba ordenan tabs respecto a la demo. */
+  gap: 12px;
+  margin-top: 32px;
 }
 
 .cf-paso {
@@ -554,12 +579,13 @@
   gap: 10px;
   padding: 14px 6px;
   border: 0;
-  border-bottom: 2px solid var(--linea);
+  border-bottom: 1px solid var(--cf-borde);
   background: none;
   font: inherit;
   font-size: 14px;
   font-weight: 500;
-  color: var(--tinta-tenue);
+  color: #596574; /* Contraste calculado 5,49:1 sobre --banda (#F3F7F4), supera AA. */
+  letter-spacing: 0.01em;
   text-align: center;
   cursor: pointer;
   position: relative;
@@ -581,7 +607,7 @@
 
 .cf-paso[aria-selected="true"] {
   color: var(--tinta);
-  border-bottom-color: var(--linea);
+  border-bottom-color: var(--cf-borde);
 }
 
 .cf-paso[aria-selected="true"] svg {
@@ -655,7 +681,7 @@
 
   /* 4 % deja aire al rótulo y la tarjeta de distancia sin salir del mapa. */
   .cf-mapa-distancia {
-    right: 7%;
+    right: 5%;
     bottom: 7%;
     padding: 12px 16px;
   }
