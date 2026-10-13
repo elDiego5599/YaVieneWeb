@@ -34,6 +34,14 @@ afterEach(() => {
 });
 
 describe('pestañas de los tres pasos', () => {
+  it('la entrada al bus anima toque y tarjeta, y cambiar de paso cancela el toque pendiente', () => {
+    const main = readFileSync(resolve(process.cwd(), 'src/main.ts'), 'utf8');
+    expect(main).toMatch(/setBuses\(\[.*?,.*?\]\)/s);
+    expect(main).toMatch(/clearTimeout/);
+    expect(main).toMatch(/sinMovimiento\(\)/);
+    expect(main).toMatch(/cf-tap/);
+  });
+
   it('un toque cambia el paso, la escena y lo que oye el lector', () => {
     pestana('bus').click();
     expect(pestana('bus').getAttribute('aria-selected')).toBe('true');

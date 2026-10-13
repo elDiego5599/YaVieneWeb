@@ -88,18 +88,45 @@ const arrancar = (): void => {
   const svgCfTel = document.querySelector<SVGSVGElement>('#cf-mapa-tel-rutas');
   const lienzoCfTel = document.querySelector<HTMLElement>('#cf-mapa-tel');
   let llevarBus: ((metros: number) => void) | undefined;
+  let mostrarToque: (() => void) | undefined;
+  let toqueAnimTimer = 0;
   if (svgCf && lienzoCf) {
-    const mapaCf = new PhoneMap(svgCf, lienzoCf, { zoom: 2.1 });
+    // Zoom 1,5 abre la ciudad; el encuadre tiene aire para la ruta, el pin y ambos buses.
+    const mapaCf = new PhoneMap(svgCf, lienzoCf, { zoom: 1.5 });
     mapaCf.setRoute('R-106');
-    const pin = mapaCf.tVisible(0.55, 0.36, [1800]);
+    // El segundo bus llega a 4,4 km atrás al inicio; la cámara deja dentro ambos buses móviles.
+    const pin = mapaCf.tVisible(0.55, 0.36, [1800, 4400]);
     mapaCf.setPin(pin);
-    mapaCf.setBuses([pin - 1800 / mapaCf.metrosDeRuta]);
+    mapaCf.setBuses([pin - 1800 / mapaCf.metrosDeRuta, pin - 3600 / mapaCf.metrosDeRuta]);
     mapaCf.showRoute(true);
     mapaCf.showPin(true);
     mapaCf.showBuses(true);
     const distancia = document.querySelector<HTMLElement>('.cf-mapa-distancia .eta-number');
+    const tarjeta = document.querySelector<HTMLElement>('.cf-mapa-distancia');
+    let toque: SVGCircleElement | null = null;
+    mostrarToque = (): void => {
+      const bus = mapaCf.nodoBus(0);
+      if (!bus) return;
+      toque?.remove();
+      toque = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      toque.setAttribute('class', 'cf-tap');
+      toque.setAttribute('cx', '0');
+      toque.setAttribute('cy', '0');
+      // 40 en las unidades del bus son ~14 px a 1440: el ancho de una yema.
+      toque.setAttribute('r', '40');
+      toque.setAttribute('aria-hidden', 'true');
+      bus.appendChild(toque);
+      if (toqueAnimTimer) window.clearTimeout(toqueAnimTimer);
+      // 650 ms coincide con el pulso CSS y revela la tarjeta al terminar.
+      toqueAnimTimer = window.setTimeout(() => {
+        toque?.remove();
+        toque = null;
+        tarjeta?.classList.remove('cf-distancia-espera');
+      }, 650);
+    };
     llevarBus = (metros: number): void => {
-      mapaCf.setBuses([pin - metros / mapaCf.metrosDeRuta]);
+      // Conserva los 1,8 km entre buses mientras los dos avanzan por la C16.
+      mapaCf.setBuses([pin - metros / mapaCf.metrosDeRuta, pin - (metros + 1800) / mapaCf.metrosDeRuta]);
       if (distancia) distancia.textContent = (metros / 1000).toFixed(1).replace('.', ',');
     };
   }
@@ -111,12 +138,18 @@ const arrancar = (): void => {
     mapaCfTel.showPin(true);
   }
   const demo = document.querySelector<HTMLElement>('.cf-demo');
+  let llegadaFrame = 0;
+  let toqueTimer = 0;
   const animarLlegada = (): void => {
     if (!llevarBus) return;
+    if (llegadaFrame) cancelAnimationFrame(llegadaFrame);
+    if (toqueTimer) window.clearTimeout(toqueTimer);
+    document.querySelector('.cf-mapa-distancia')?.classList.add('cf-distancia-espera');
     const desde = 2600;
     const hasta = 1800;
     if (sinMovimiento()) {
       llevarBus(hasta);
+      document.querySelector('.cf-mapa-distancia')?.classList.remove('cf-distancia-espera');
       return;
     }
     const inicio = performance.now();
@@ -124,13 +157,25 @@ const arrancar = (): void => {
       const progreso = Math.min(1, (ahora - inicio) / 1600);
       const suavizado = 1 - (1 - progreso) ** 3;
       llevarBus(desde - (desde - hasta) * suavizado);
-      if (progreso < 1) requestAnimationFrame(actualizar);
+      if (progreso < 1) llegadaFrame = requestAnimationFrame(actualizar);
+      // 100 ms deja terminar el fundido de la escena antes de mostrar el dedo.
+      else if (mostrarToque) toqueTimer = window.setTimeout(mostrarToque, 100);
     };
     llevarBus(desde);
-    requestAnimationFrame(actualizar);
+    llegadaFrame = requestAnimationFrame(actualizar);
   };
   if (demo) new Pasos(demo, { intervalo: 5000, alCambiar: paso => {
     if (paso === 'bus') animarLlegada();
+    else {
+      if (llegadaFrame) cancelAnimationFrame(llegadaFrame);
+      if (toqueTimer) window.clearTimeout(toqueTimer);
+      if (toqueAnimTimer) window.clearTimeout(toqueAnimTimer);
+      llegadaFrame = 0;
+      toqueTimer = 0;
+      toqueAnimTimer = 0;
+      document.querySelector('.cf-tap')?.remove();
+      document.querySelector('.cf-mapa-distancia')?.classList.remove('cf-distancia-espera');
+    }
   } });
 
   /*

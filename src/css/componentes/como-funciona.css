@@ -200,9 +200,9 @@
 }
 .cf-mapa-tarjeta #cf-mapa {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: 10%;
+  width: 80%;
+  height: 80%;
   overflow: hidden;
   border-radius: var(--radio-marco);
   box-shadow: var(--sombra-producto);
@@ -230,6 +230,13 @@
   background: var(--surface);
   box-shadow: var(--sombra-producto);
   color: var(--tinta);
+  /* 260 ms acompaña la entrada de la tarjeta al terminar el toque. */
+  transition: opacity 260ms ease, scale 260ms ease;
+}
+.cf-mapa-distancia.cf-distancia-espera {
+  opacity: 0;
+  /* 0,96 reduce apenas la tarjeta mientras permanece oculta. */
+  scale: 0.96;
 }
 .cf-mapa-distancia .eta-number {
   font-size: 30px;
@@ -385,6 +392,7 @@
    compactos, delicados, pegados al hombro izquierdo del teléfono y el segundo ladeado. */
 .cf-chips {
   position: absolute;
+  z-index: 2;
   top: 13%;
   left: 8.5%;
   display: flex;
@@ -472,6 +480,7 @@
 /* La flecha curva corta y fina que baja del segundo chip y apunta al teléfono. */
 .cf-flecha {
   position: absolute;
+  z-index: 1;
   top: 28%;
   left: 17%;
   width: clamp(100px, 24cqw, 150px);
@@ -483,6 +492,25 @@
     translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
   pointer-events: none;
   will-change: opacity, translate;
+}
+
+/* Un toque de 650 ms señala el bus antes de revelar su tarjeta de distancia. */
+.cf-tap {
+  /* El toque de iOS: un disco claro con su aro, no solo una raya. */
+  fill: rgba(255, 255, 255, 0.35);
+  stroke: var(--surface);
+  /* 8 unidades del bus son ~3 px a 1440: un aro que se ve sobre el mapa. */
+  stroke-width: 8;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cf-tap 650ms ease-out both;
+  pointer-events: none;
+}
+@keyframes cf-tap {
+  /* De 0,6 a 2,2: de ~8 a ~30 px de radio, el disco que deja un dedo. */
+  0% { opacity: 0.9; scale: 0.6; }
+  100% { opacity: 0; scale: 2.2; }
 }
 
 .cf-escena[data-paso="ruta"] .cf-flecha {
@@ -600,6 +628,9 @@
     transition: opacity 0.2s linear;
     transition-delay: 0s;
   }
+  .cf-tap {
+    animation: none;
+  }
   .cf-pasos[data-auto] .cf-paso[aria-selected="true"]::after {
     /* Movimiento reducido quita la animación de progreso. */
     animation: none;
@@ -624,14 +655,14 @@
 
   /* 4 % deja aire al rótulo y la tarjeta de distancia sin salir del mapa. */
   .cf-mapa-distancia {
-    right: 4%;
-    bottom: 4%;
+    right: 7%;
+    bottom: 7%;
     padding: 12px 16px;
   }
   /* 4 % y 11 px contienen el CTA sobre la esquina superior del mapa. */
   .cf-bus-cta {
-    top: 4%;
-    left: 4%;
+    top: 7%;
+    left: 7%;
     max-width: 70%;
     padding: 8px 10px;
     font-size: 11px;

@@ -146,6 +146,14 @@ describe('banda «Cómo funciona»', () => {
     expect(css).toMatch(/\.cf-escena\[data-paso="ruta"\] \.cf-capa--ruta\s*\{[^}]*opacity:\s*1/);
   });
 
+  it('pone las fichas de la ruta delante de la flecha y el mapa en una tarjeta inset', () => {
+    expect(css).toMatch(/\.cf-chips\s*\{[^}]*z-index:\s*2/);
+    expect(css).toMatch(/\.cf-flecha\s*\{[^}]*z-index:\s*1/);
+    expect(css).toMatch(/\.cf-mapa-tarjeta #cf-mapa\s*\{[^}]*width:\s*80%/);
+    expect(css).toMatch(/\.cf-mapa-tarjeta #cf-mapa\s*\{[^}]*height:\s*80%/);
+    expect(css).toMatch(/\.cf-tap\b/);
+  });
+
   it('espeja Dart con su comentario y entra con el .reveal de la página', () => {
     expect(css).toMatch(/eta_bottom_sheet\.dart/);
     expect(css).toMatch(/bus_notification_service\.dart/);
