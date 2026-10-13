@@ -167,13 +167,28 @@ const KB = 1024;
  *  Ese mismo día se quita la sección «Cómo funciona» (el rodillo de arriba
  *  incluido) con todo lo que solo ella usaba: dist baja de 736.8 a 667.7 KB,
  *  el JavaScript de 60.4 a 44.9, el CSS de 117.2 a 101.2 y la primera visita
- *  de 429.7 a 360.9. Los topes tampoco se tocan. */
+ *  de 429.7 a 360.9. Los topes tampoco se tocan.
+ *
+ *  El 12/10/2026 entra el video de la app en el teléfono del hero (pedido
+ *  del dueño, rama `experimento-hero-video`): `video/yaviene-av1.mp4`
+ *  (2.9 MB) y `video/yaviene.mp4` (4.8 MB, H.264 para el Safari que no
+ *  decodifica AV1). Son dos `<source>` del mismo `<video>`: cada navegador
+ *  se baja uno solo, y con `preload="metadata"` el póster (50 KB) es lo que
+ *  pinta primero. Sumarlos a «todo dist» y a «primera visita» contaba dos
+ *  veces lo que nadie se baja dos veces y dejaba los dos topes rotos sin
+ *  decir nada útil. Por eso el video va aparte, con su propio tope medido
+ *  como lo que se baja un navegador: el más pesado de los dos (4941 KB)
+ *  más el 3 %. Los otros cuatro siguen midiendo lo de siempre. */
 const TOPES = {
   'todo dist': 797,
   'JavaScript': 66,
   'CSS': 121,
   'primera visita': 560,
+  'video del hero': 5090,
 };
+
+/** Las fuentes del video del hero: cada navegador pide una sola. */
+const ES_VIDEO = /^video\/[^/]*\.mp4$/;
 
 /** Lo que el navegador se baja de verdad al abrir la portada por primera
  *  vez. El resto de dist (las otras tres páginas, la imagen para redes) no
@@ -215,15 +230,17 @@ const suma = (lista) => lista.reduce((a, f) => a + f.bytes, 0) / KB;
 
 // La portada arrastra su CSS y su JS; el resto de ficheros de assets sólo
 // cuenta si no está en la lista de exclusiones de arriba.
-const primeraVisita = ficheros.filter(
+const sinVideo = ficheros.filter((f) => !ES_VIDEO.test(f.rel));
+const primeraVisita = sinVideo.filter(
   (f) => !NO_ENTRA_EN_LA_PRIMERA_VISITA.some((re) => re.test(f.rel.replace(/^assets\//, '')))
 );
 
 const medidas = {
-  'todo dist': suma(ficheros),
+  'todo dist': suma(sinVideo),
   'JavaScript': suma(ficheros.filter((f) => extname(f.rel) === '.js')),
   'CSS': suma(ficheros.filter((f) => extname(f.rel) === '.css')),
   'primera visita': suma(primeraVisita),
+  'video del hero': Math.max(0, ...ficheros.filter((f) => ES_VIDEO.test(f.rel)).map((f) => f.bytes)) / KB,
 };
 
 let fallo = false;
