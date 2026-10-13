@@ -91,21 +91,21 @@ describe('banda «Cómo funciona»', () => {
     expect(ancho).toMatch(/\.cf-grid\s*\{[^}]*row-gap:\s*0/s);
   });
 
-  it('los pasos son un carrusel: se recorta de lado y se arrastra', () => {
+  it('los pasos son un carrusel: se recorta de lado y cambia con botones', () => {
     // Una sola lámina: la caja grande recorta, y texto y cuadro viajan lo
     // mismo, su ancho entero (dueño, 2026-10-13).
     expect(css).toMatch(/\.cf-grid\s*\{[^}]*--cf-viaje:\s*calc\(100cqw \+ 2 \* var\(--cf-aire\)\)[^}]*container-type:\s*inline-size[^}]*overflow-x:\s*clip/s);
     for (const pieza of ['explica', 'escena']) {
       expect(css).toMatch(new RegExp(`\\.cf-${pieza}\\s*\\{[^}]*translate:\\s*calc\\(var\\(--cf-lugar\\) \\* var\\(--cf-viaje\\)`, 's'));
     }
-    expect(css).toMatch(/\.cf-texto\s*\{[^}]*touch-action:\s*pan-y/s);
     expect(css.match(/\.cf-texto\s*\{[^}]*\}/)![0]).not.toMatch(/overflow/);
     expect(css).toMatch(/\.cf-explica\[data-lugar="antes"\]\s*\{[^}]*--cf-lugar:\s*-1/s);
     expect(css).toMatch(/\.cf-explica\[data-lugar="despues"\]\s*\{[^}]*--cf-lugar:\s*1/s);
-    // Mientras se arrastra no hay transición: el texto va pegado al dedo.
-    expect(css).toMatch(/\.cf-grid\[data-arrastrando\] :is\(\.cf-explica, \.cf-escena\)\s*\{[^}]*transition:\s*none/s);
     // El cuadro entero viaja con el texto: fondo, esquinas y filo son de
     // la escena, y el marco no recorta (dueño, 2026-10-13).
+    // Las flechas van fuera de la caja que recorta, para montarse en su
+    // filo exterior (dueño, 2026-10-13).
+    expect(banda).toMatch(/<div class="cf-carrusel">\s*<button type="button" class="cf-control cf-control--anterior"[\s\S]*?<button type="button" class="cf-control cf-control--siguiente"[\s\S]*?<\/button>\s*<div class="cf-grid">/);
     expect(banda).toMatch(/<div class="cf-marco">\s*<div class="cf-escena"/);
     expect(css.match(/\.cf-marco\s*\{[^}]*\}/)![0]).not.toMatch(/overflow|background|border-radius/);
     expect(css).not.toContain('.cf-marco::after');
@@ -121,6 +121,24 @@ describe('banda «Cómo funciona»', () => {
     expect(reducido).toMatch(/\.cf-explica,\s*\.cf-escena\s*\{[^}]*translate:\s*none/s);
   });
 
+
+  it('las flechas quedan ocultas hasta hover/foco, aparecen en táctil y miden 44 px', () => {
+    expect(banda).toMatch(/class="cf-control cf-control--anterior" aria-label="Paso anterior" aria-controls="cf-escena" hidden/);
+    expect(banda).toMatch(/class="cf-control cf-control--siguiente" aria-label="Paso siguiente" aria-controls="cf-escena" hidden/);
+    expect(css).toMatch(/\.cf-control\s*\{[^}]*position:\s*absolute[^}]*width:\s*44px[^}]*height:\s*44px/s);
+    expect(css).toMatch(/@media \(hover:\s*hover\) and \(pointer:\s*fine\)[\s\S]*?\.cf-control \{ opacity:\s*0/);
+    expect(css).toMatch(/\.cf-carrusel:hover \.cf-control/);
+    // Centradas en el filo de la caja grande: mitad dentro, mitad fuera.
+    expect(css).toMatch(/\.cf-control--anterior\s*\{[^}]*left:\s*0[^}]*translate:\s*max\(-50%, -1 \* var\(--calle\)\) -50%/s);
+    expect(css).toMatch(/\.cf-control--siguiente\s*\{[^}]*right:\s*0[^}]*translate:\s*min\(50%, var\(--calle\)\) -50%/s);
+    expect(css).toMatch(/@media \(hover:\s*none\)[\s\S]*?\.cf-control \{ opacity:\s*1/);
+    expect(css).toMatch(/\.cf-carrusel:focus-within \.cf-control/);
+    // Con 60 px libres a cada lado, fuera de la caja, a 16 px de su filo.
+    const ancho = css.slice(css.indexOf('@media (min-width: 1312px)'));
+    expect(ancho).toMatch(/\.cf-control--anterior \{ translate:\s*calc\(-100% - 16px\) -50%/);
+    expect(ancho).toMatch(/\.cf-control--siguiente \{ translate:\s*calc\(100% \+ 16px\) -50%/);
+    expect(ancho).toMatch(/\.cf-carrusel::before\s*\{[^}]*inset:\s*0 -60px/s);
+  });
   it('el teléfono de «Elige tu ruta» echa una sombra larga abajo a la derecha (dueño, 2026-10-13)', () => {
     const tel = css.match(/\.cf-telefono \.phone-shell\s*\{[^}]*\}/)![0];
     // Cada capa larga corre más a la derecha y abajo que la anterior.
@@ -243,8 +261,7 @@ describe('banda «Cómo funciona»', () => {
   it('pone las fichas de la ruta delante de la flecha y el mapa en una tarjeta inset', () => {
     expect(css).toMatch(/\.cf-chips\s*\{[^}]*z-index:\s*2/);
     expect(css).toMatch(/\.cf-flecha\s*\{[^}]*z-index:\s*1/);
-    expect(css).toMatch(/\.cf-mapa-tarjeta #cf-mapa\s*\{[^}]*width:\s*80%/);
-    expect(css).toMatch(/\.cf-mapa-tarjeta #cf-mapa\s*\{[^}]*height:\s*80%/);
+    expect(css).toMatch(/\.cf-mapa-tarjeta \.phone-map\s*\{[^}]*position:\s*absolute[^}]*inset:\s*0/s);
     expect(css).toMatch(/\.cf-tap\b/);
   });
 

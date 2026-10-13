@@ -32,6 +32,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe('pestañas de los tres pasos', () => {
@@ -50,16 +51,19 @@ describe('pestañas de los tres pasos', () => {
     pestana('bus').click();
     expect([lugar('bus'), lugar('aviso')]).toEqual(['actual', 'despues']);
     llega();
-    // Las flechas dan la vuelta en círculo: manda la tecla, no el índice.
+    // Las flechas dan la vuelta en círculo: al pasar del borde la lámina
+    // rebota y corre al otro extremo, como si se devolviera el carrete.
     tecla('bus', 'ArrowRight');
     llega();
     tecla('aviso', 'ArrowRight');
     expect(escena().dataset.paso).toBe('ruta');
-    expect([lugar('ruta'), lugar('aviso')]).toEqual(['actual', 'antes']);
+    expect([lugar('ruta'), fantasma()?.dataset.lugar]).toEqual(['actual', 'despues']);
+    expect([lugar('ruta'), lugar('aviso')]).toEqual(['actual', 'despues']);
     llega();
     tecla('ruta', 'ArrowLeft');
     expect(escena().dataset.paso).toBe('aviso');
-    expect([lugar('aviso'), lugar('ruta')]).toEqual(['actual', 'despues']);
+    expect([lugar('aviso'), fantasma()?.dataset.lugar]).toEqual(['actual', 'antes']);
+    expect([lugar('aviso'), lugar('ruta')]).toEqual(['actual', 'antes']);
   });
 
   it('la escena va en el carrusel: la vieja se va de lado, copia muda, y se quita al llegar', () => {
@@ -98,20 +102,20 @@ describe('pestañas de los tres pasos', () => {
   it('elegir el paso que aún va saliendo lo trae de vuelta por donde va, texto y cuadro juntos', () => {
     vi.useFakeTimers();
     const grid = document.querySelector<HTMLElement>('.cf-grid')!;
-    // De la ruta a la izquierda: el aviso entra por la izquierda y la ruta
-    // se va por la derecha, con rebote.
+    // De la ruta a la izquierda: rebota y avanza hasta el aviso, que entra
+    // por la derecha; la ruta se va por la izquierda.
     tecla('ruta', 'ArrowLeft');
     vi.advanceTimersByTime(120);
-    // A medio viaje se vuelve a la ruta: regresa por la derecha, por donde
-    // se iba, aunque la pestaña quede a la izquierda; y sin rebote.
+    // A medio viaje se vuelve a la ruta: regresa por la izquierda, por
+    // donde se iba, aunque la pestaña quede a la izquierda; y sin rebote.
     pestana('ruta').click();
-    expect(grid.dataset.direccion).toBe('adelante');
+    expect(grid.dataset.direccion).toBe('atras');
     expect(grid.hasAttribute('data-rebote')).toBe(false);
     const ruta = document.querySelector<HTMLElement>('.cf-explica[data-paso="ruta"]')!;
     expect(ruta.dataset.lugar).toBe('actual');
     // Su copia en vuelo la toma la escena viva: no quedan dos rutas.
     const copias = Array.from(document.querySelectorAll<HTMLElement>('.cf-escena--fantasma'));
-    expect(copias.map((c) => [c.dataset.paso, c.dataset.lugar])).toEqual([['aviso', 'antes']]);
+    expect(copias.map((c) => [c.dataset.paso, c.dataset.lugar])).toEqual([['aviso', 'despues']]);
     vi.advanceTimersByTime(600);
     expect(fantasma()).toBeNull();
   });
@@ -332,203 +336,69 @@ describe('avance automático: sin observador y al salir de la vista', () => {
     new Pasos(document.querySelector<HTMLElement>('.cf-demo')!, {
       intervalo: 5000,
     });
+    // La barrita solo corre cuando el carrusel se ve: antes no arranca.
+    const lista = document.querySelector<HTMLElement>('[role="tablist"]')!;
+    expect(lista.hasAttribute('data-auto')).toBe(false);
     avisar([{ isIntersecting: true }]);
+    expect(lista.hasAttribute('data-auto')).toBe(true);
     vi.advanceTimersByTime(5000);
     expect(escena().dataset.paso).toBe('bus');
     avisar([{ isIntersecting: false }]);
+    expect(lista.hasAttribute('data-auto')).toBe(false);
     vi.advanceTimersByTime(20000);
     expect(escena().dataset.paso).toBe('bus');
     avisar([{ isIntersecting: true }]);
+    expect(lista.hasAttribute('data-auto')).toBe(true);
     vi.advanceTimersByTime(5000);
     expect(escena().dataset.paso).toBe('aviso');
   });
+
+  it('pausa con la pestaña oculta y reanuda al volver', () => {
+    const oculta = vi.spyOn(document, 'hidden', 'get');
+    oculta.mockReturnValue(true);
+    new Pasos(document.querySelector<HTMLElement>('.cf-demo')!, { intervalo: 5000 });
+    vi.advanceTimersByTime(10000);
+    expect(escena().dataset.paso).toBe('ruta');
+    expect(document.querySelector('[role="tablist"]')!.hasAttribute('data-auto')).toBe(false);
+    oculta.mockReturnValue(false);
+    document.dispatchEvent(new Event('visibilitychange'));
+    vi.advanceTimersByTime(5000);
+    expect(escena().dataset.paso).toBe('bus');
+  });
 });
 
-describe('arrastrar los pasos de lado', () => {
-  const texto = (): HTMLElement => document.querySelector<HTMLElement>('.cf-texto')!;
-  const cuadricula = (): HTMLElement => document.querySelector<HTMLElement>('.cf-grid')!;
-  const puntero = (tipo: string, x: number, y = 0, en: HTMLElement = texto(), mas: PointerEventInit = {}): void => {
-    en.dispatchEvent(
-      new PointerEvent(tipo, {
-        clientX: x,
-        clientY: y,
-        pointerId: 1,
-        bubbles: true,
-        ...mas,
-      }),
-    );
-  };
-  const arrastre = (): number => parseFloat(cuadricula().style.getPropertyValue('--cf-arrastre'));
 
-  beforeEach(() => {
+
+describe('flechas fijas sobre el cuadro', () => {
+  const boton = (direccion: 'anterior' | 'siguiente'): HTMLButtonElement =>
+    document.querySelector<HTMLButtonElement>(`.cf-control--${direccion}`)!;
+
+  it('siguiente y anterior recorren, dan la vuelta con rebote y paran el avance automático', () => {
     vi.useFakeTimers();
-    Object.defineProperty(texto(), 'clientWidth', {
-      value: 400,
-      configurable: true,
-    });
-  });
-
-  it('arrastrar hacia la izquierda trae el paso siguiente, pegado al dedo', () => {
-    puntero('pointerdown', 300);
-    puntero('pointermove', 280);
-    expect(cuadricula().hasAttribute('data-arrastrando')).toBe(true);
-    puntero('pointermove', 100);
-    expect(cuadricula().style.getPropertyValue('--cf-arrastre')).toBe('-200px');
-    vi.advanceTimersByTime(100);
-    puntero('pointerup', 100);
-    expect(escena().dataset.paso).toBe('bus');
-    expect(cuadricula().hasAttribute('data-arrastrando')).toBe(false);
-    expect(cuadricula().style.getPropertyValue('--cf-arrastre')).toBe('');
-  });
-
-  it('la escena asoma también: su vecino entra pegado al dedo y, al soltar, el viejo se va', () => {
-    puntero('pointerdown', 300);
-    puntero('pointermove', 100);
-    const asoma = fantasma()!;
-    expect([asoma.dataset.paso, asoma.dataset.lugar]).toEqual(['bus', 'despues']);
-    vi.advanceTimersByTime(100);
-    puntero('pointerup', 100);
-    expect([escena().dataset.paso, escena().dataset.lugar]).toEqual(['bus', 'actual']);
-    expect([fantasma()!.dataset.paso, fantasma()!.dataset.lugar]).toEqual(['ruta', 'antes']);
-  });
-
-  it('se arrastra también desde la escena', () => {
-    const marco = document.querySelector<HTMLElement>('.cf-marco')!;
-    Object.defineProperty(marco, 'clientWidth', {
-      value: 400,
-      configurable: true,
-    });
-    puntero('pointerdown', 300, 0, marco);
-    puntero('pointermove', 100, 0, marco);
-    vi.advanceTimersByTime(100);
-    puntero('pointerup', 100, 0, marco);
-    expect(escena().dataset.paso).toBe('bus');
-  });
-
-  it('hacia la derecha trae el anterior, dando la vuelta', () => {
-    puntero('pointerdown', 100);
-    puntero('pointermove', 300);
-    vi.advanceTimersByTime(100);
-    puntero('pointerup', 300);
-    expect(escena().dataset.paso).toBe('aviso');
-  });
-
-  it('pasado el primero, el tirón cede como goma, y al soltar da la vuelta con rebote', () => {
-    puntero('pointerdown', 100);
-    puntero('pointermove', 300);
-    // 200 px de dedo hacia atrás desde el primero: la goma de iOS da
-    // 200·400·0,55 / (400 + 0,55·200) = 86,3 px, menos de la mitad.
-    expect(arrastre()).toBeCloseTo(86.27, 1);
-    vi.advanceTimersByTime(100);
-    puntero('pointerup', 300);
-    expect(escena().dataset.paso).toBe('aviso');
-    expect(cuadricula().hasAttribute('data-rebote')).toBe(true);
-    vi.advanceTimersByTime(600);
-    expect(cuadricula().hasAttribute('data-rebote')).toBe(false);
-    // Y desde el último hacia adelante, igual.
-    puntero('pointerdown', 300);
-    puntero('pointermove', 100);
-    expect(arrastre()).toBeCloseTo(-86.27, 1);
-    vi.advanceTimersByTime(100);
-    puntero('pointerup', 100);
-    expect(escena().dataset.paso).toBe('ruta');
-    expect(cuadricula().hasAttribute('data-rebote')).toBe(true);
-  });
-
-  it('entre vecinos el tirón va pegado al dedo y no rebota', () => {
-    puntero('pointerdown', 300);
-    puntero('pointermove', 100);
-    expect(arrastre()).toBe(-200);
-    vi.advanceTimersByTime(100);
-    puntero('pointerup', 100);
-    expect(escena().dataset.paso).toBe('bus');
-    expect(cuadricula().hasAttribute('data-rebote')).toBe(false);
-  });
-
-  it('un segundo dedo no arranca otro gesto ni mueve el primero', () => {
-    puntero('pointerdown', 300);
-    puntero('pointerdown', 50, 0, texto(), { pointerId: 2 });
-    puntero('pointermove', 350, 0, texto(), { pointerId: 2 });
-    expect(cuadricula().hasAttribute('data-arrastrando')).toBe(false);
-    puntero('pointermove', 100);
-    expect(arrastre()).toBe(-200);
-    puntero('pointerup', 350, 0, texto(), { pointerId: 2 });
-    expect(cuadricula().hasAttribute('data-arrastrando')).toBe(true);
-    vi.advanceTimersByTime(100);
-    puntero('pointerup', 100);
-    expect(escena().dataset.paso).toBe('bus');
-  });
-
-  it('un ratón soltado fuera antes de arrancar no deja el gesto colgado', () => {
-    const raton = (b: number): PointerEventInit => ({
-      pointerType: 'mouse',
-      buttons: b,
-    });
-    puntero('pointerdown', 300, 0, texto(), raton(1));
-    // Volvió sin botón: se soltó fuera, donde no se oyó el `pointerup`.
-    puntero('pointermove', 100, 0, texto(), raton(0));
-    expect(cuadricula().hasAttribute('data-arrastrando')).toBe(false);
-    puntero('pointermove', 50, 0, texto(), raton(0));
-    expect(cuadricula().hasAttribute('data-arrastrando')).toBe(false);
-    expect(escena().dataset.paso).toBe('ruta');
-  });
-
-  it('un tirón corto y lento vuelve a su sitio; uno corto y rápido pasa de paso', () => {
-    puntero('pointerdown', 200);
-    puntero('pointermove', 170);
-    vi.advanceTimersByTime(1000);
-    puntero('pointermove', 170);
-    puntero('pointerup', 170);
-    expect(escena().dataset.paso).toBe('ruta');
-    // El vecino que asomaba se va animado, no de golpe.
-    expect(document.querySelector<HTMLElement>('.cf-explica[data-paso="bus"]')!.hasAttribute('data-sale')).toBe(true);
-    // Y la escena que asomaba también vuelve animada y luego se quita.
-    expect(fantasma()!.hasAttribute('data-sale')).toBe(true);
-    vi.advanceTimersByTime(600);
-    expect(fantasma()).toBeNull();
-    puntero('pointerdown', 200);
-    vi.advanceTimersByTime(16);
-    puntero('pointermove', 150);
-    vi.advanceTimersByTime(16);
-    puntero('pointerup', 150);
-    expect(escena().dataset.paso).toBe('bus');
-  });
-
-  it('menos de 10 px, o un gesto vertical, no arrastra ni cambia de paso', () => {
-    puntero('pointerdown', 200, 0);
-    puntero('pointermove', 205, 0);
-    expect(cuadricula().hasAttribute('data-arrastrando')).toBe(false);
-    puntero('pointermove', 210, 80);
-    puntero('pointermove', 100, 80);
-    puntero('pointerup', 100, 80);
-    expect(escena().dataset.paso).toBe('ruta');
-  });
-
-  it('arrastrar detiene el avance automático', () => {
-    vi.stubGlobal(
-      'IntersectionObserver',
-      class {
-        constructor(readonly avisar: (e: { isIntersecting: boolean }[]) => void) {}
-        observe(): void {
-          this.avisar([{ isIntersecting: true }]);
-        }
-        disconnect(): void {}
-      }
-    );
+    vi.stubGlobal('IntersectionObserver', undefined);
+    delete (window as { IntersectionObserver?: unknown }).IntersectionObserver;
     document.body.innerHTML = banda;
-    Object.defineProperty(texto(), 'clientWidth', {
-      value: 400,
-      configurable: true,
-    });
-    new Pasos(document.querySelector<HTMLElement>('.cf-demo')!, {
-      intervalo: 5000,
-    });
-    puntero('pointerdown', 200);
-    puntero('pointermove', 100);
-    vi.advanceTimersByTime(100);
-    puntero('pointerup', 100);
+    new Pasos(document.querySelector<HTMLElement>('.cf-demo')!, { intervalo: 5000 });
+    boton('siguiente').focus();
+    boton('siguiente').click();
     expect(escena().dataset.paso).toBe('bus');
-    vi.advanceTimersByTime(20000);
-    expect(escena().dataset.paso).toBe('bus');
+    expect(document.activeElement).toBe(boton('siguiente'));
+    expect(document.querySelector('.cf-grid')!.hasAttribute('data-rebote')).toBe(false);
+    boton('siguiente').click();
+    expect(escena().dataset.paso).toBe('aviso');
+    // Ya en reposo (un paso que aún sale vuelve por donde iba, sin rebote).
+    vi.advanceTimersByTime(600);
+    boton('siguiente').click();
+    expect(escena().dataset.paso).toBe('ruta');
+    expect(document.querySelector('.cf-grid')!.hasAttribute('data-rebote')).toBe(true);
+    expect(document.querySelector<HTMLElement>('.cf-grid')!.dataset.direccion).toBe('atras');
+    vi.advanceTimersByTime(600);
+    boton('anterior').click();
+    expect(escena().dataset.paso).toBe('aviso');
+    expect(document.querySelector('.cf-grid')!.hasAttribute('data-rebote')).toBe(true);
+    expect(document.querySelector<HTMLElement>('.cf-grid')!.dataset.direccion).toBe('adelante');
+    vi.advanceTimersByTime(15000);
+    expect(escena().dataset.paso).toBe('aviso');
+    expect(document.querySelector('[role="tablist"]')!.hasAttribute('data-auto')).toBe(false);
   });
 });

@@ -812,250 +812,258 @@
           <p class="seccion-lead">Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso.<br />Te avisamos cuando esté cerca de ti.</p>
         </div>
 
-        <div class="cf-grid">
-          <!-- Lo que dice el paso elegido, a la vista. Lo oye el lector en la
-               escena (sus `.solo-lectores`), así que aquí va aria-hidden. -->
-          <div class="cf-texto" aria-hidden="true">
-            <div class="cf-explica" data-paso="ruta" data-lugar="actual">
-              <span class="cf-numero">Paso 1 de 3</span>
-              <p class="cf-explica-titulo">Elige tu ruta</p>
-              <p class="cf-explica-texto">Escoges la empresa y la ruta, y la ves dibujada en el mapa.</p>
-              <div class="cf-explica-extra"><p class="cf-extra-titulo">Cero fricción</p><p class="cf-extra-texto">Sin cuentas, sin correos y sin contraseñas. Abres la app, seleccionas tu empresa y en dos toques estás viendo el recorrido completo.</p></div>
+        <div class="cf-carrusel">
+          <button type="button" class="cf-control cf-control--anterior" aria-label="Paso anterior" aria-controls="cf-escena" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+          <button type="button" class="cf-control cf-control--siguiente" aria-label="Paso siguiente" aria-controls="cf-escena" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+          <div class="cf-grid">
+            <!-- Lo que dice el paso elegido, a la vista. Lo oye el lector en la
+                 escena (sus `.solo-lectores`), así que aquí va aria-hidden. -->
+            <div class="cf-texto" aria-hidden="true">
+              <div class="cf-explica" data-paso="ruta" data-lugar="actual">
+                <span class="cf-numero">Paso 1 de 3</span>
+                <p class="cf-explica-titulo">Elige tu ruta</p>
+                <p class="cf-explica-texto">Escoges la empresa y la ruta, y la ves dibujada en el mapa.</p>
+                <div class="cf-explica-extra"><p class="cf-extra-titulo">Cero fricción</p><p class="cf-extra-texto">Sin cuentas, sin correos y sin contraseñas. Abres la app, seleccionas tu empresa y en dos toques estás viendo el recorrido completo.</p></div>
+              </div>
+              <div class="cf-explica" data-paso="bus" data-lugar="despues">
+                <span class="cf-numero">Paso 2 de 3</span>
+                <p class="cf-explica-titulo">Mira el bus</p>
+                <p class="cf-explica-texto">Ves el bus moverse en el mapa y a qué distancia viene de ti, medida por la calle.</p>
+                <div class="cf-explica-extra"><p class="cf-extra-titulo">Cálculo real</p><p class="cf-extra-texto">La distancia no se mide en línea recta; calcula los giros y el trazado real de la calle. Si la app dice 940 metros, es porque esa es la distancia exacta sobre el asfalto.</p></div>
+              </div>
+              <div class="cf-explica" data-paso="aviso" data-lugar="antes">
+                <span class="cf-numero">Paso 3 de 3</span>
+                <p class="cf-explica-titulo">Deja un aviso</p>
+                <p class="cf-explica-texto">Eliges a qué distancia quieres el aviso y la app te avisa cuando tu bus esté cerca.</p>
+                <div class="cf-explica-extra"><p class="cf-extra-titulo">Seguridad en la calle</p><p class="cf-extra-texto">Activa la notificación y guarda el teléfono. No tienes que estar con el celular en la mano en el paradero mirando la pantalla cada 30 segundos.</p></div>
+              </div>
             </div>
-            <div class="cf-explica" data-paso="bus" data-lugar="despues">
-              <span class="cf-numero">Paso 2 de 3</span>
-              <p class="cf-explica-titulo">Mira el bus</p>
-              <p class="cf-explica-texto">Ves el bus moverse en el mapa y a qué distancia viene de ti, medida por la calle.</p>
-              <div class="cf-explica-extra"><p class="cf-extra-titulo">Cálculo real</p><p class="cf-extra-texto">La distancia no se mide en línea recta; calcula los giros y el trazado real de la calle. Si la app dice 940 metros, es porque esa es la distancia exacta sobre el asfalto.</p></div>
-            </div>
-            <div class="cf-explica" data-paso="aviso" data-lugar="antes">
-              <span class="cf-numero">Paso 3 de 3</span>
-              <p class="cf-explica-titulo">Deja un aviso</p>
-              <p class="cf-explica-texto">Eliges a qué distancia quieres el aviso y la app te avisa cuando tu bus esté cerca.</p>
-              <div class="cf-explica-extra"><p class="cf-extra-titulo">Seguridad en la calle</p><p class="cf-extra-texto">Activa la notificación y guarda el teléfono. No tienes que estar con el celular en la mano en el paradero mirando la pantalla cada 30 segundos.</p></div>
-            </div>
-          </div>
 
-          <div class="cf-demo reveal">
-            <!-- El marco es la caja redonda y quieta; la escena se desliza
-                 dentro, en el mismo carrusel que el texto (dueño, 2026-10-12). -->
-            <div class="cf-marco">
-            <div class="cf-escena" id="cf-escena" role="tabpanel" aria-labelledby="cf-paso-ruta" data-paso="ruta" data-lugar="actual">
-              <p class="solo-lectores" data-paso="ruta">Paso 1: en la app escoges la empresa y la ruta, y la ves en el mapa. Cero fricción. Sin cuentas, sin correos y sin contraseñas. Abres la app, seleccionas tu empresa y en dos toques estás viendo el recorrido completo.</p>
-              <p class="solo-lectores" data-paso="bus" hidden>Paso 2: ves el bus moverse en el mapa y a qué distancia viene de ti, medida por la calle. Cálculo real. La distancia no se mide en línea recta; calcula los giros y el trazado real de la calle. Si la app dice 940 metros, es porque esa es la distancia exacta sobre el asfalto.</p>
-              <p class="solo-lectores" data-paso="aviso" hidden>Paso 3: dejas un aviso a la distancia que quieras y la app te avisa cuando tu bus esté cerca. Seguridad en la calle. Activa la notificación y guarda el teléfono. No tienes que estar con el celular en la mano en el paradero mirando la pantalla cada 30 segundos.</p>
+            <div class="cf-demo reveal">
+              <!-- El marco es la caja redonda y quieta; la escena se desliza
+                   dentro, en el mismo carrusel que el texto (dueño, 2026-10-12). -->
+              <div class="cf-marco">
+              <div class="cf-escena" id="cf-escena" role="tabpanel" aria-labelledby="cf-paso-ruta" data-paso="ruta" data-lugar="actual">
+                <p class="solo-lectores" data-paso="ruta">Paso 1: en la app escoges la empresa y la ruta, y la ves en el mapa. Cero fricción. Sin cuentas, sin correos y sin contraseñas. Abres la app, seleccionas tu empresa y en dos toques estás viendo el recorrido completo.</p>
+                <p class="solo-lectores" data-paso="bus" hidden>Paso 2: ves el bus moverse en el mapa y a qué distancia viene de ti, medida por la calle. Cálculo real. La distancia no se mide en línea recta; calcula los giros y el trazado real de la calle. Si la app dice 940 metros, es porque esa es la distancia exacta sobre el asfalto.</p>
+                <p class="solo-lectores" data-paso="aviso" hidden>Paso 3: dejas un aviso a la distancia que quieras y la app te avisa cuando tu bus esté cerca. Seguridad en la calle. Activa la notificación y guarda el teléfono. No tienes que estar con el celular en la mano en el paradero mirando la pantalla cada 30 segundos.</p>
 
-              <div class="cf-telefono" aria-hidden="true">
-                <div class="cf-chips" data-paso="ruta">
-                  <span class="cf-chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                      <circle class="r ic-arena" cx="12" cy="12" r="8.5" />
-                      <path d="M12 7.5V12l3 2" />
-                    </svg>
-                    <span>Cargando las rutas de Sobusa</span>
-                  </span>
-                  <span class="cf-chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                      <path class="r ic-verde" d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
-                      <circle class="b" cx="12" cy="10" r="2.4" />
-                    </svg>
-                    <span>Dibujando la C16</span>
-                  </span>
-                </div>
-                <div class="cf-chips" data-paso="bus">
-                  <span class="cf-chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                      <circle class="r ic-azul" cx="12" cy="12" r="3.5" />
-                      <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-                    </svg>
-                    <span>Leyendo el GPS del bus</span>
-                  </span>
-                  <span class="cf-chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                      <path class="r ic-verde-suave" d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7z" stroke="none" />
-                      <path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7M4 4.5v4.2h4.2M12 8v4l2.8 1.8" />
-                    </svg>
-                    <span>Midiendo por la calle</span>
-                  </span>
-                </div>
-                <div class="cf-chips" data-paso="aviso">
-                  <span class="cf-chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                      <path class="r ic-amarillo" d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z" />
-                      <path d="M10 20.5a2 2 0 0 0 4 0" />
-                    </svg>
-                    <span>Aviso a 1,0 km</span>
-                  </span>
-                  <span class="cf-chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-                      <path class="r ic-verde" d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
-                      <circle class="b" cx="12" cy="10" r="2.4" />
-                    </svg>
-                    <span>Tu bus está cerca</span>
-                  </span>
-                </div>
-                <svg class="cf-flecha" viewBox="0 0 100 65" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 2C5 39 38 52 92 52" /><path d="M85 46l7 6-7 6" /></svg>
+                <div class="cf-telefono" aria-hidden="true">
+                  <div class="cf-chips" data-paso="ruta">
+                    <span class="cf-chip">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <circle class="r ic-arena" cx="12" cy="12" r="8.5" />
+                        <path d="M12 7.5V12l3 2" />
+                      </svg>
+                      <span>Cargando las rutas de Sobusa</span>
+                    </span>
+                    <span class="cf-chip">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <path class="r ic-verde" d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
+                        <circle class="b" cx="12" cy="10" r="2.4" />
+                      </svg>
+                      <span>Dibujando la C16</span>
+                    </span>
+                  </div>
+                  <div class="cf-chips" data-paso="bus">
+                    <span class="cf-chip">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <circle class="r ic-azul" cx="12" cy="12" r="3.5" />
+                        <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+                      </svg>
+                      <span>Leyendo el GPS del bus</span>
+                    </span>
+                    <span class="cf-chip">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <path class="r ic-verde-suave" d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7z" stroke="none" />
+                        <path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7M4 4.5v4.2h4.2M12 8v4l2.8 1.8" />
+                      </svg>
+                      <span>Midiendo por la calle</span>
+                    </span>
+                  </div>
+                  <div class="cf-chips" data-paso="aviso">
+                    <span class="cf-chip">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <path class="r ic-amarillo" d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z" />
+                        <path d="M10 20.5a2 2 0 0 0 4 0" />
+                      </svg>
+                      <span>Aviso a 1,0 km</span>
+                    </span>
+                    <span class="cf-chip">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                        <path class="r ic-verde" d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
+                        <circle class="b" cx="12" cy="10" r="2.4" />
+                      </svg>
+                      <span>Tu bus está cerca</span>
+                    </span>
+                  </div>
+                  <svg class="cf-flecha" viewBox="0 0 100 65" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 2C5 39 38 52 92 52" /><path d="M85 46l7 6-7 6" /></svg>
 
-                <div class="phone-shell">
-                  <span class="phone-key phone-key--power"></span>
-                  <span class="phone-key phone-key--accion"></span>
-                  <span class="phone-key phone-key--vol-sube"></span>
-                  <span class="phone-key phone-key--vol-baja"></span>
+                  <div class="phone-shell">
+                    <span class="phone-key phone-key--power"></span>
+                    <span class="phone-key phone-key--accion"></span>
+                    <span class="phone-key phone-key--vol-sube"></span>
+                    <span class="phone-key phone-key--vol-baja"></span>
 
-                  <div class="phone-screen">
-                    <span class="phone-island"></span>
+                    <div class="phone-screen">
+                      <span class="phone-island"></span>
 
-                    <div class="phone-map" id="cf-mapa-tel"><svg class="routes-svg-layer" id="cf-mapa-tel-rutas"></svg></div>
+                      <div class="phone-map" id="cf-mapa-tel"><svg class="routes-svg-layer" id="cf-mapa-tel-rutas"></svg></div>
 
-                    <!-- Paso 1: el selector es un diálogo, con su barrera. -->
-                    <div class="phone-scrim cf-capa cf-capa--ruta"></div>
+                      <!-- Paso 1: el selector es un diálogo, con su barrera. -->
+                      <div class="phone-scrim cf-capa cf-capa--ruta"></div>
 
-                    <div class="phone-status">
-                        <span class="phone-status-reloj">7:23</span>
-                        <span class="phone-status-glifos">
-                          <!-- Cobertura: las cuatro barras de iOS, todas encendidas, no la cuña de Android. -->
-                          <svg class="glifo-cobertura" viewBox="0 0 17 12" fill="currentColor">
-                            <rect x="0" y="8.2" width="3" height="3.8" rx="1" />
-                            <rect x="4.7" y="5.5" width="3" height="6.5" rx="1" />
-                            <rect x="9.4" y="2.8" width="3" height="9.2" rx="1" />
-                            <rect x="14" y="0" width="3" height="12" rx="1" />
-                          </svg>
-                          <!-- Wifi: tres arcos concéntricos y el punto, que es como lo dibuja iOS. -->
-                          <svg class="glifo-wifi" viewBox="0 0 16 12" fill="none" stroke="currentColor"
-                            stroke-width="1.5" stroke-linecap="round">
-                            <path d="M1.31 4.98A9 9 0 0 1 14.69 4.98" />
-                            <path d="M3.54 6.99A6 6 0 0 1 12.46 6.99" />
-                            <path d="M5.7 8.93A3.1 3.1 0 0 1 10.3 8.93" />
-                            <circle cx="8" cy="10.8" r="0.95" fill="currentColor" stroke="none" />
-                          </svg>
-                          <!-- Batería: contorno a media luz, la carga sólida dentro y el pezón. -->
-                          <svg class="glifo-bateria" viewBox="0 0 25 12" fill="none">
-                            <rect x="0.5" y="0.5" width="21" height="11" rx="3.6" stroke="currentColor"
-                              stroke-width="1" opacity="0.35" />
-                            <rect x="1.9" y="1.9" width="15.2" height="8.2" rx="1.9" fill="currentColor" />
-                            <path d="M22.9 4.5v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                              opacity="0.35" />
-                          </svg>
-                        </span>
-                      </div>
-
-                    <div class="phone-gesture"></div>
-
-                    <!-- Selector completo de route_selector_sheet.dart: conserva los pasos confirmados y el CTA. -->
-                    <div class="phone-sheet phone-sheet--fija cf-capa cf-capa--ruta">
-                    <span class="sheet-handle"></span>
-
-                    <div class="sheet-selector">
-                      <div class="sheet-head">
-                        <span class="sheet-head-title">Elige tu ruta</span>
-                      </div>
-                      <p class="sheet-head-sub">Dos pasos y ves los buses moviéndose.</p>
-
-                      <div class="escalon">
-                        <span class="escalon-riel">
-                          <span class="escalon-linea"></span>
-                          <span class="escalon-nodo is-hecho">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                              stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M5 12.5l4.5 4.5L19 7.5" />
+                      <div class="phone-status">
+                          <span class="phone-status-reloj">7:23</span>
+                          <span class="phone-status-glifos">
+                            <!-- Cobertura: las cuatro barras de iOS, todas encendidas, no la cuña de Android. -->
+                            <svg class="glifo-cobertura" viewBox="0 0 17 12" fill="currentColor">
+                              <rect x="0" y="8.2" width="3" height="3.8" rx="1" />
+                              <rect x="4.7" y="5.5" width="3" height="6.5" rx="1" />
+                              <rect x="9.4" y="2.8" width="3" height="9.2" rx="1" />
+                              <rect x="14" y="0" width="3" height="12" rx="1" />
+                            </svg>
+                            <!-- Wifi: tres arcos concéntricos y el punto, que es como lo dibuja iOS. -->
+                            <svg class="glifo-wifi" viewBox="0 0 16 12" fill="none" stroke="currentColor"
+                              stroke-width="1.5" stroke-linecap="round">
+                              <path d="M1.31 4.98A9 9 0 0 1 14.69 4.98" />
+                              <path d="M3.54 6.99A6 6 0 0 1 12.46 6.99" />
+                              <path d="M5.7 8.93A3.1 3.1 0 0 1 10.3 8.93" />
+                              <circle cx="8" cy="10.8" r="0.95" fill="currentColor" stroke="none" />
+                            </svg>
+                            <!-- Batería: contorno a media luz, la carga sólida dentro y el pezón. -->
+                            <svg class="glifo-bateria" viewBox="0 0 25 12" fill="none">
+                              <rect x="0.5" y="0.5" width="21" height="11" rx="3.6" stroke="currentColor"
+                                stroke-width="1" opacity="0.35" />
+                              <rect x="1.9" y="1.9" width="15.2" height="8.2" rx="1.9" fill="currentColor" />
+                              <path d="M22.9 4.5v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                opacity="0.35" />
                             </svg>
                           </span>
-                          <span class="escalon-linea is-visible is-hecho"></span>
-                        </span>
-                        <span class="escalon-ficha">
-                          <div class="app-select is-activa">
-                            <span class="app-select-icon">
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3.5 20.5V9.5l7-3.5" />
-                            <path d="M10.5 20.5V4.6a1.6 1.6 0 0 1 1.6-1.6h6.3A1.6 1.6 0 0 1 20 4.6v15.9" />
-                            <path d="M2 20.5h20" />
-                            <path d="M13.5 7.5h3M13.5 11.5h3M13.5 15.5h3" />
-                              </svg>
-                            </span>
-                            <span class="app-select-body">
-                              <span class="app-select-title">Sobusa</span>
-                              <span class="app-select-sub">Empresa de transporte masivo</span>
-                            </span>
-                            <span class="app-select-chevron">
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9.5 5l7 7l-7 7" />
-                              </svg>
-                            </span>
-                          </div>
-                        </span>
-                      </div>
+                        </div>
 
-                      <div class="escalon">
-                        <span class="escalon-riel">
-                          <span class="escalon-linea is-visible is-hecho"></span>
-                          <span class="escalon-nodo is-hecho">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                              stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M5 12.5l4.5 4.5L19 7.5" />
-                            </svg>
+                      <div class="phone-gesture"></div>
+
+                      <!-- Selector completo de route_selector_sheet.dart: conserva los pasos confirmados y el CTA. -->
+                      <div class="phone-sheet phone-sheet--fija cf-capa cf-capa--ruta">
+                      <span class="sheet-handle"></span>
+
+                      <div class="sheet-selector">
+                        <div class="sheet-head">
+                          <span class="sheet-head-title">Elige tu ruta</span>
+                        </div>
+                        <p class="sheet-head-sub">Dos pasos y ves los buses moviéndose.</p>
+
+                        <div class="escalon">
+                          <span class="escalon-riel">
+                            <span class="escalon-linea"></span>
+                            <span class="escalon-nodo is-hecho">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12.5l4.5 4.5L19 7.5" />
+                              </svg>
+                            </span>
+                            <span class="escalon-linea is-visible is-hecho"></span>
                           </span>
-                          <span class="escalon-linea"></span>
-                        </span>
-                        <span class="escalon-ficha">
-                          <div class="app-select is-activa">
-                            <span class="app-select-icon">
-                              <!-- Icons.alt_route_rounded: la bifurcación de la fila «Ruta»
-                                   del selector, con el trazado de Material Icons. -->
-                              <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                                <path d="M9.78 11.16l-1.42 1.42c-.68-.69-1.34-1.58-1.79-2.94l1.94-.49c.3.89.75 1.5 1.27 2.01zM11 6L7 2 3 6h3.02c.02.81.08 1.54.19 2.17l1.94-.49C8.08 7.2 8.03 6.63 8.02 6H11zm10 0l-4-4-4 4h2.99c-.1 3.68-1.28 4.75-2.54 5.88-.5.44-1.01.92-1.45 1.55-.34-.49-.73-.88-1.13-1.24L9.46 13.6c.93.85 1.54 1.54 1.54 3.4v5h2v-5c0-2.02.71-2.66 1.79-3.63 1.38-1.24 3.08-2.78 3.2-7.37H21z" />
-                              </svg>
-                            </span>
-                            <span class="app-select-body">
-                              <span class="app-select-title">C16 Calle 72 Uninorte</span>
-                              <span class="app-select-sub">Granabastos ↔ Uninorte</span>
-                            </span>
-                            <span class="app-select-chevron">
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9.5 5l7 7l-7 7" />
-                              </svg>
-                            </span>
-                          </div>
-                        </span>
-                      </div>
+                          <span class="escalon-ficha">
+                            <div class="app-select is-activa">
+                              <span class="app-select-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                                  stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M3.5 20.5V9.5l7-3.5" />
+                              <path d="M10.5 20.5V4.6a1.6 1.6 0 0 1 1.6-1.6h6.3A1.6 1.6 0 0 1 20 4.6v15.9" />
+                              <path d="M2 20.5h20" />
+                              <path d="M13.5 7.5h3M13.5 11.5h3M13.5 15.5h3" />
+                                </svg>
+                              </span>
+                              <span class="app-select-body">
+                                <span class="app-select-title">Sobusa</span>
+                                <span class="app-select-sub">Empresa de transporte masivo</span>
+                              </span>
+                              <span class="app-select-chevron">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                  stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M9.5 5l7 7l-7 7" />
+                                </svg>
+                              </span>
+                            </div>
+                          </span>
+                        </div>
 
-                      <div class="app-launch is-lista">Ver buses en vivo</div>
+                        <div class="escalon">
+                          <span class="escalon-riel">
+                            <span class="escalon-linea is-visible is-hecho"></span>
+                            <span class="escalon-nodo is-hecho">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12.5l4.5 4.5L19 7.5" />
+                              </svg>
+                            </span>
+                            <span class="escalon-linea"></span>
+                          </span>
+                          <span class="escalon-ficha">
+                            <div class="app-select is-activa">
+                              <span class="app-select-icon">
+                                <!-- Icons.alt_route_rounded: la bifurcación de la fila «Ruta»
+                                     del selector, con el trazado de Material Icons. -->
+                                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                                  <path d="M9.78 11.16l-1.42 1.42c-.68-.69-1.34-1.58-1.79-2.94l1.94-.49c.3.89.75 1.5 1.27 2.01zM11 6L7 2 3 6h3.02c.02.81.08 1.54.19 2.17l1.94-.49C8.08 7.2 8.03 6.63 8.02 6H11zm10 0l-4-4-4 4h2.99c-.1 3.68-1.28 4.75-2.54 5.88-.5.44-1.01.92-1.45 1.55-.34-.49-.73-.88-1.13-1.24L9.46 13.6c.93.85 1.54 1.54 1.54 3.4v5h2v-5c0-2.02.71-2.66 1.79-3.63 1.38-1.24 3.08-2.78 3.2-7.37H21z" />
+                                </svg>
+                              </span>
+                              <span class="app-select-body">
+                                <span class="app-select-title">C16 Calle 72 Uninorte</span>
+                                <span class="app-select-sub">Granabastos ↔ Uninorte</span>
+                              </span>
+                              <span class="app-select-chevron">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                  stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M9.5 5l7 7l-7 7" />
+                                </svg>
+                              </span>
+                            </div>
+                          </span>
+                        </div>
+
+                        <div class="app-launch is-lista">Ver buses en vivo</div>
+                      </div>
+                    </div>
+
+
                     </div>
                   </div>
+                </div>
 
-
+                <div class="cf-composicion cf-mapa-tarjeta" aria-hidden="true">
+                  <div class="phone-map" id="cf-mapa"><svg class="routes-svg-layer" id="cf-mapa-rutas"></svg></div>
+                  <div class="cf-mapa-hoja">
+                    <div class="cf-mapa-distancia"><span class="eta-number">1,8</span><span class="cf-mapa-unidad">km</span><span class="cf-mapa-etiqueta">medido por la calle</span></div>
+                    <span class="cf-bus-cta">Avisarme cuando esté cerca</span>
+                  </div>
+                </div>
+                <div class="cf-composicion cf-aviso-composicion" aria-hidden="true">
+                  <div class="cf-aviso-selector">
+                    <p class="cf-aviso-titulo-rueda">¿A qué distancia te avisamos?</p>
+                    <div class="cf-rueda"><span>800 m</span><span>900 m</span><strong>1,0 km</strong><span>1,1 km</span><span>1,2 km</span></div>
+                    <span class="cf-guardar">Guardar</span>
+                    <span class="cf-aviso-confirmacion">Te avisamos a 1,0 km · <span class="eta-detail-accion">Cambiar</span><br>Aviso activado</span>
+                  </div>
+                  <div class="cf-aviso-notificacion" aria-hidden="true">
+                    <div class="cf-aviso-icono"><img src="/logo.svg" alt="" width="20" height="20"></div>
+                    <div class="cf-aviso-texto"><span class="cf-aviso-app">Ya Viene · ahora</span><strong class="cf-aviso-titulo">Bus de la ruta C16 está cerca de ti</strong></div>
                   </div>
                 </div>
               </div>
-
-              <div class="cf-composicion cf-mapa-tarjeta" aria-hidden="true">
-                <div class="phone-map" id="cf-mapa"><svg class="routes-svg-layer" id="cf-mapa-rutas"></svg></div>
-                <div class="cf-mapa-hoja">
-                  <div class="cf-mapa-distancia"><span class="eta-number">1,8</span><span class="cf-mapa-unidad">km</span><span class="cf-mapa-etiqueta">medido por la calle</span></div>
-                  <span class="cf-bus-cta">Avisarme cuando esté cerca</span>
-                </div>
               </div>
-              <div class="cf-composicion cf-aviso-composicion" aria-hidden="true">
-                <div class="cf-aviso-selector">
-                  <p class="cf-aviso-titulo-rueda">¿A qué distancia te avisamos?</p>
-                  <div class="cf-rueda"><span>800 m</span><span>900 m</span><strong>1,0 km</strong><span>1,1 km</span><span>1,2 km</span></div>
-                  <span class="cf-guardar">Guardar</span>
-                  <span class="cf-aviso-confirmacion">Te avisamos a 1,0 km · <span class="eta-detail-accion">Cambiar</span><br>Aviso activado</span>
-                </div>
-                <div class="cf-aviso-notificacion" aria-hidden="true">
-                  <div class="cf-aviso-icono"><img src="/logo.svg" alt="" width="20" height="20"></div>
-                  <div class="cf-aviso-texto"><span class="cf-aviso-app">Ya Viene · ahora</span><strong class="cf-aviso-titulo">Bus de la ruta C16 está cerca de ti</strong></div>
-                </div>
-              </div>
-            </div>
-            </div>
 
-            <div class="cf-pasos" role="tablist" aria-label="Los tres pasos">
-              <button type="button" class="cf-paso" role="tab" id="cf-paso-ruta" data-paso="ruta" aria-controls="cf-escena" aria-selected="true" tabindex="0"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.78 11.16l-1.42 1.42c-.68-.69-1.34-1.58-1.79-2.94l1.94-.49c.3.89.75 1.5 1.27 2.01zM11 6L7 2 3 6h3.02c.02.81.08 1.54.19 2.17l1.94-.49C8.08 7.2 8.03 6.63 8.02 6H11zm10 0l-4-4-4 4h2.99c-.1 3.68-1.28 4.75-2.54 5.88-.5.44-1.01.92-1.45 1.55-.34-.49-.73-.88-1.13-1.24L9.46 13.6c.93.85 1.54 1.54 1.54 3.4v5h2v-5c0-2.02.71-2.66 1.79-3.63 1.38-1.24 3.08-2.78 3.2-7.37H21z" /></svg><span>Elige tu ruta</span></button>
-              <button type="button" class="cf-paso" role="tab" id="cf-paso-bus" data-paso="bus" aria-controls="cf-escena" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z" /></svg><span>Mira el bus</span></button>
-              <button type="button" class="cf-paso" role="tab" id="cf-paso-aviso" data-paso="aviso" aria-controls="cf-escena" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7" /><path d="M10.2 20a2 2 0 0 0 3.6 0" /></svg><span>Deja un aviso</span></button>
+              <div class="cf-pasos" role="tablist" aria-label="Los tres pasos">
+                <button type="button" class="cf-paso" role="tab" id="cf-paso-ruta" data-paso="ruta" aria-controls="cf-escena" aria-selected="true" tabindex="0"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.78 11.16l-1.42 1.42c-.68-.69-1.34-1.58-1.79-2.94l1.94-.49c.3.89.75 1.5 1.27 2.01zM11 6L7 2 3 6h3.02c.02.81.08 1.54.19 2.17l1.94-.49C8.08 7.2 8.03 6.63 8.02 6H11zm10 0l-4-4-4 4h2.99c-.1 3.68-1.28 4.75-2.54 5.88-.5.44-1.01.92-1.45 1.55-.34-.49-.73-.88-1.13-1.24L9.46 13.6c.93.85 1.54 1.54 1.54 3.4v5h2v-5c0-2.02.71-2.66 1.79-3.63 1.38-1.24 3.08-2.78 3.2-7.37H21z" /></svg><span>Elige tu ruta</span></button>
+                <button type="button" class="cf-paso" role="tab" id="cf-paso-bus" data-paso="bus" aria-controls="cf-escena" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z" /></svg><span>Mira el bus</span></button>
+                <button type="button" class="cf-paso" role="tab" id="cf-paso-aviso" data-paso="aviso" aria-controls="cf-escena" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7" /><path d="M10.2 20a2 2 0 0 0 3.6 0" /></svg><span>Deja un aviso</span></button>
+              </div>
             </div>
           </div>
         </div>

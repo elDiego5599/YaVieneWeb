@@ -13,19 +13,15 @@
  * lo único que dice en palabras lo que el teléfono enseña.
  *
  * El texto del paso, al lado, es un carrusel (dueño, 2026-10-12): cada
- * `.cf-explica` lleva su `data-lugar` (antes, actual, después) y se puede
- * arrastrar con el ratón o el dedo, pegado 1:1; al soltar se proyecta la
- * velocidad (la fórmula de las listas de iOS) y se pasa de paso si el
- * gesto llevaba a más de un tercio del ancho.
+ * `.cf-explica` lleva su `data-lugar` (antes, actual, después).
  *
  * La escena va en el mismo carrusel, con su cuadro entero (dueño,
  * 2026-10-13): es una sola (la del lector y la que anima `main.ts`), así
- * que la que se ve salir, o asomar al arrastrar, es una copia muda
+ * que la que se ve salir es una copia muda
  * (`.cf-escena--fantasma`) que se quita al llegar.
  *
  * Los pasos dan la vuelta: del primero hacia atrás se va al último, y al
- * revés. Ahí el arrastre cede menos que el dedo (la goma de iOS) y el paso
- * que llega rebota (`data-rebote`, dueño, 2026-10-13).
+ * revés. El paso que llega rebota (`data-rebote`, dueño, 2026-10-13).
  */
 
 import { sinMovimiento } from './scrolly';
@@ -37,17 +33,6 @@ export type OpcionesPasos = {
 
 /** Los 560 ms del desliz con rebote y un margen; luego la copia sobra. */
 const VIAJE = 600;
-
-/** Lo que se mueve el dedo antes de que el gesto sea de lado (o no). */
-const UMBRAL = 10;
-
-/** Dónde acabaría un gesto que se suelta a `v` px/ms: la deceleración de
-    las listas de iOS (0,998 por milisegundo). */
-const proyectar = (v: number): number => (v * 0.998) / (1 - 0.998);
-
-/** Lo que cede el paso cuando se tira más allá de un extremo: la goma de
-    iOS (constante 0,55), que frena más cuanto más se tira. */
-const goma = (dx: number, ancho: number): number => (dx * ancho * 0.55) / (ancho + 0.55 * Math.abs(dx));
 
 const TECLAS: Record<string, (i: number, n: number) => number> = {
   ArrowRight: (i, n) => (i + 1) % n,
@@ -74,6 +59,7 @@ export class Pasos {
   #temporizador = 0;
   #observador?: IntersectionObserver;
   #activo = true;
+  #enVista = true;
 
   constructor(raiz: HTMLElement, opciones: OpcionesPasos = {}) {
     this.#pestanas = Array.from(raiz.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
@@ -87,7 +73,15 @@ export class Pasos {
     this.#texto = this.#cuadricula?.querySelector<HTMLElement>('.cf-texto') ?? null;
     this.#explicas = Array.from(this.#texto?.querySelectorAll<HTMLElement>('.cf-explica[data-paso]') ?? []);
     this.#marco = this.#escena.parentElement?.classList.contains('cf-marco') ? this.#escena.parentElement : null;
-    this.#arrastrable([this.#texto, this.#marco].filter((e): e is HTMLElement => e !== null));
+    const controles = Array.from(this.#escena.closest('.cf-carrusel')?.querySelectorAll<HTMLButtonElement>('.cf-control') ?? []);
+    controles.forEach((control, i) => {
+      control.hidden = false;
+      control.addEventListener('click', () => {
+        this.#detener();
+        // El foco se queda en la flecha: se puede seguir pulsando.
+        this.#moverConFlecha(i === 0 ? 'ArrowLeft' : 'ArrowRight', this.#actual(), false);
+      });
+    });
 
     this.#pestanas.forEach((pestana, i) => {
       pestana.addEventListener('click', () => {
@@ -99,34 +93,53 @@ export class Pasos {
         const ir = TECLAS[ev.key];
         if (!ir) return;
         ev.preventDefault();
+        if (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') {
+          this.#moverConFlecha(ev.key, i);
+          return;
+        }
         const j = ir(i, this.#pestanas.length);
-        // Las flechas dan vuelta en círculo: su lado es el de la tecla, y
-        // al dar la vuelta rebota como el arrastre.
-        const lado = ev.key === 'ArrowRight' ? 'adelante' : ev.key === 'ArrowLeft' ? 'atras' : undefined;
-        this.#elegir(j, lado, lado === 'adelante' ? j < i : lado === 'atras' && j > i);
+        this.#elegir(j);
         this.#pestanas[j].focus();
       });
     });
 
     if (opciones.intervalo && opciones.intervalo > 0 && !sinMovimiento()) {
-      this.#lista?.setAttribute('data-auto', '');
+      // La barrita (`data-auto`) corre con el reloj, no con la carga: solo
+      // cuando el carrusel se ve, y vuelve a empezar al reanudar, a la par
+      // del intervalo nuevo (dueño, 2026-10-13).
       const arrancar = (): void => {
-        if (this.#temporizador || !this.#activo) return;
+        if (this.#temporizador || !this.#activo || document.hidden || !this.#enVista) return;
+        this.#lista?.setAttribute('data-auto', '');
         this.#temporizador = window.setInterval(() => {
           this.#elegir((this.#actual() + 1) % this.#pestanas.length, 'adelante');
         }, opciones.intervalo);
       };
+      const pausar = (): void => {
+        window.clearInterval(this.#temporizador);
+        this.#temporizador = 0;
+        this.#lista?.removeAttribute('data-auto');
+      };
       if ('IntersectionObserver' in window) {
         this.#observador = new IntersectionObserver(([entrada]) => {
-          if (entrada.isIntersecting) arrancar();
-          else {
-            window.clearInterval(this.#temporizador);
-            this.#temporizador = 0;
-          }
+          this.#enVista = entrada.isIntersecting;
+          if (this.#enVista) arrancar();
+          else pausar();
         });
         this.#observador.observe(raiz);
       } else arrancar();
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) pausar();
+        else arrancar();
+      });
     }
+  }
+
+  #moverConFlecha(tecla: 'ArrowLeft' | 'ArrowRight', indice = this.#actual(), enfocar = true): void {
+    const j = TECLAS[tecla](indice, this.#pestanas.length);
+    const lado = tecla === 'ArrowRight' ? 'adelante' : 'atras';
+    const vuelta = lado === 'adelante' ? j < indice : j > indice;
+    this.#elegir(j, vuelta ? (lado === 'adelante' ? 'atras' : 'adelante') : lado, vuelta);
+    if (enfocar) this.#pestanas[j].focus();
   }
 
   #actual(): number {
@@ -176,8 +189,8 @@ export class Pasos {
     this.#alCambiar?.(paso);
   }
 
-  /* El que entra se pone primero, sin animar, en el lado por donde llega
-     (si el arrastre no lo dejó ya ahí); luego el que estaba se va al otro
+  /* El que entra se pone primero, sin animar, en el lado por donde llega;
+     luego el que estaba se va al otro
      lado y el resto espera también fuera, por el lado de salida. */
   #mover(paso: string, entrada: 'antes' | 'despues'): void {
     const nueva = this.#explicas.find(e => e.dataset.paso === paso);
@@ -274,16 +287,6 @@ export class Pasos {
     }, VIAJE);
   }
 
-  /* Al agarrar, lo que aún viaja se planta: el gesto manda. */
-  #plantar(): void {
-    window.clearTimeout(this.#llegada);
-    window.clearTimeout(this.#rebote);
-    this.#cuadricula?.removeAttribute('data-rebote');
-    for (const f of this.#marco?.querySelectorAll('.cf-escena--fantasma') ?? []) f.remove();
-    this.#fantasma = null;
-    delete this.#escena.dataset.entra;
-  }
-
   /* Deja la escena lista para entrar: la de ahora, copiada, donde se ve
      (en el centro, bajo el dedo o a medio viaje si se cambió de paso
      antes de llegar); la viva, ya con su paso, en el lado por donde
@@ -327,115 +330,5 @@ export class Pasos {
     this.#llegada = window.setTimeout(() => delete this.#escena.dataset.entra, VIAJE);
   }
 
-  /* El arrastre: tras 10 px se decide si el gesto es de lado; si lo es, el
-     texto sigue al dedo y el vecino de ese lado asoma. Al soltar, la
-     velocidad de los últimos ~100 ms se proyecta y decide. */
-  #arrastrable(asas: HTMLElement[]): void {
-    const grid = (this.#cuadricula as HTMLElement | null) ?? asas[0];
-    if (!grid) return;
-    let asa: HTMLElement = asas[0];
-    let inicio: { x: number; y: number } | null = null;
-    let deLado = false;
-    let muestras: { x: number; t: number }[] = [];
-    let dedo = -1;
-    const n = this.#pestanas.length;
-    const vecino = (dx: number): number => (this.#actual() + (dx < 0 ? 1 : n - 1)) % n;
-    // Del primero hacia atrás, o del último hacia adelante: da la vuelta.
-    const daVuelta = (dx: number): boolean => (dx > 0 ? this.#actual() === 0 : this.#actual() === n - 1);
-    const asomar = (dx: number): void => {
-      const paso = this.#pestanas[vecino(dx)].dataset.paso;
-      const lado = dx < 0 ? 'despues' : 'antes';
-      for (const e of this.#explicas) {
-        if (e.dataset.paso === paso && e.dataset.lugar !== lado) e.dataset.lugar = lado;
-      }
-      const f = this.#fantasma;
-      if (this.#marco && !sinMovimiento() && (!f || f.dataset.paso !== paso || f.dataset.lugar !== lado)) {
-        this.#copiar(paso ?? '', lado);
-      }
-    };
-    const soltar = (): void => {
-      grid.removeAttribute('data-arrastrando');
-      grid.style.removeProperty('--cf-arrastre');
-    };
 
-    const empezar = (ev: PointerEvent): void => {
-      // Un segundo dedo, o otro botón, no empieza otro gesto (el mismo
-      // puntero sí: si apretó otra vez, el gesto de antes ya terminó).
-      if (ev.button > 0 || (inicio && ev.pointerId !== dedo)) return;
-      dedo = ev.pointerId;
-      asa = ev.currentTarget as HTMLElement;
-      inicio = { x: ev.clientX, y: ev.clientY };
-      deLado = false;
-      muestras = [{ x: ev.clientX, t: performance.now() }];
-    };
-    const mover = (ev: PointerEvent): void => {
-      if (!inicio || ev.pointerId !== dedo) return;
-      // Un ratón que soltó fuera, antes de que el gesto fuera de lado
-      // (sin captura no llega el `pointerup`): ya no hay gesto.
-      if (ev.pointerType === 'mouse' && ev.buttons === 0) {
-        inicio = null;
-        return;
-      }
-      const dx = ev.clientX - inicio.x;
-      const dy = ev.clientY - inicio.y;
-      if (!deLado) {
-        if (Math.max(Math.abs(dx), Math.abs(dy)) < UMBRAL) return;
-        if (Math.abs(dy) > Math.abs(dx)) {
-          inicio = null;
-          return;
-        }
-        deLado = true;
-        this.#detener();
-        this.#plantar();
-        grid.setAttribute('data-arrastrando', '');
-        asa.setPointerCapture?.(ev.pointerId);
-      }
-      asomar(dx);
-      const sigue = daVuelta(dx) ? goma(dx, asa.clientWidth || 1) : dx;
-      grid.style.setProperty('--cf-arrastre', `${sigue}px`);
-      const t = performance.now();
-      muestras.push({ x: ev.clientX, t });
-      muestras = muestras.filter(m => t - m.t <= 100);
-    };
-    const terminar = (ev: PointerEvent): void => {
-      if (ev.pointerId !== dedo) return;
-      if (!inicio || !deLado) {
-        inicio = null;
-        return;
-      }
-      const dx = ev.clientX - inicio.x;
-      const t = performance.now();
-      muestras.push({ x: ev.clientX, t });
-      const viejas = muestras.filter(m => t - m.t <= 100);
-      const primera = viejas[0];
-      const v = primera && t > primera.t ? (ev.clientX - primera.x) / (t - primera.t) : 0;
-      const llega = dx + proyectar(v);
-      inicio = null;
-      const ancho = asa.clientWidth || 1;
-      if (ev.type === 'pointerup' && Math.abs(llega) > ancho / 3 && Math.sign(llega) === Math.sign(dx)) {
-        const j = vecino(dx);
-        // La escena se cambia aún pegada al dedo, para que el desliz salga
-        // de donde se soltó y no del centro.
-        if (this.#marco && !sinMovimiento()) {
-          this.#preparar(this.#pestanas[j].dataset.paso ?? '', dx < 0 ? 'despues' : 'antes');
-        }
-        // El texto también se queda donde lo dejó el dedo, y de ahí sale.
-        for (const e of this.#explicas) e.style.translate = getComputedStyle(e).translate;
-        const vuelta = daVuelta(dx);
-        soltar();
-        this.#elegir(j, dx < 0 ? 'adelante' : 'atras', vuelta);
-      } else {
-        soltar();
-        // Vuelve a su sitio: el vecino que asomaba también se va animado.
-        for (const e of this.#explicas) if (e.dataset.lugar !== 'actual') this.#salir(e);
-        if (this.#fantasma) this.#irse(this.#fantasma);
-      }
-    };
-    for (const e of asas) {
-      e.addEventListener('pointerdown', empezar);
-      e.addEventListener('pointermove', mover);
-      e.addEventListener('pointerup', terminar);
-      e.addEventListener('pointercancel', terminar);
-    }
-  }
 }

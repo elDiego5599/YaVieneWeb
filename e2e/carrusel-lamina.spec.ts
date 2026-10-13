@@ -44,14 +44,8 @@ function roturas(filas: Fila[], separacion: number, ancho: number): string[] {
 
 const pestana = (page: Page, paso: string) => page.locator(`[role=tab][data-paso="${paso}"]`);
 
-async function arrastrar(page: Page, desde: number, hasta: number, paso: number): Promise<void> {
-  const b = (await page.locator('.cf-marco').boundingBox())!;
-  const y = b.y + b.height / 3;
-  await page.mouse.move(b.x + desde, y);
-  await page.mouse.down();
-  for (let x = desde; Math.sign(hasta - x) === Math.sign(hasta - desde) && x !== hasta; x += paso) await page.mouse.move(b.x + x, y);
-  await page.mouse.move(b.x + hasta, y);
-  await page.mouse.up();
+async function mover(page: Page, direccion: 'anterior' | 'siguiente'): Promise<void> {
+  await page.locator(`.cf-control--${direccion}`).click();
 }
 
 const GESTOS: [string, (page: Page, ancho: number) => Promise<void>][] = [
@@ -71,11 +65,14 @@ const GESTOS: [string, (page: Page, ancho: number) => Promise<void>][] = [
     await page.waitForTimeout(200);
     await pestana(page, 'ruta').click();
   }],
-  ['arrastrar dando la vuelta, con goma', async (page, ancho) => arrastrar(page, ancho * 0.1, ancho * 0.45, ancho / 40)],
-  ['arrastrar y elegir otro a medio viaje', async (page, ancho) => {
-    await arrastrar(page, ancho * 0.45, ancho * 0.1, -ancho / 40);
+  ['la vuelta con la flecha del cuadro', async page => {
+    await pestana(page, 'ruta').click();
+    await mover(page, 'anterior');
+  }],
+  ['elegir otro a medio viaje con la flecha', async page => {
+    await mover(page, 'siguiente');
     await page.waitForTimeout(120);
-    await pestana(page, 'aviso').click();
+    await mover(page, 'siguiente');
   }],
 ];
 
@@ -99,12 +96,65 @@ test('texto y cuadro de cada paso se mueven como una sola lámina', async ({ pag
     const filas = (await page.evaluate('window.__lamina()')) as Fila[];
     expect(filas.length, nombre).toBeGreaterThan(20);
     expect(roturas(filas, separacion, ancho), nombre).toEqual([]);
-    // Al llegar no queda nada a medias: ni copias, ni rebote, ni arrastre.
+    // Al llegar no queda nada a medias: ni copias, rebote ni textos saliendo.
     const fin = await page.evaluate(() => ({
       copias: document.querySelectorAll('.cf-escena--fantasma').length,
-      marcas: ['data-rebote', 'data-arrastrando'].filter(a => document.querySelector('.cf-grid')!.hasAttribute(a)),
+      marcas: ['data-rebote'].filter(a => document.querySelector('.cf-grid')!.hasAttribute(a)),
       saliendo: document.querySelectorAll('.cf-explica[data-sale]').length,
     }));
     expect(fin, nombre).toEqual({ copias: 0, marcas: [], saliendo: 0 });
+  }
+});
+
+test('el mapa llena el cuadro igual en la escena viva y en su copia', async ({ page }) => {
+  await page.goto('/');
+  await pestana(page, 'bus').click();
+  await page.waitForTimeout(600);
+  // El mapa contra su propio cuadro: en reposo la escena viva, y luego la
+  // copia que sale, medida en pleno viaje.
+  const medir = (sel: string) => page.evaluate(s => {
+    const e = document.querySelector<HTMLElement>(s)!;
+    const c = e.getBoundingClientRect();
+    const m = e.querySelector('.cf-mapa-tarjeta .phone-map')!.getBoundingClientRect();
+    return [m.width - c.width, m.height - c.height, m.left - c.left, m.top - c.top].map(Math.abs);
+  }, sel);
+  const viva = await medir('#cf-escena');
+  await pestana(page, 'aviso').click();
+  const copia = await medir('.cf-escena--fantasma[data-paso="bus"]');
+  for (const d of [...viva, ...copia]) expect(d).toBeLessThanOrEqual(1);
+});
+
+test('las flechas aparecen al pasar el ratón y quedan fuera de la caja, a 16 px', async ({ page }, info) => {
+  // Con ratón y a 1440 px: en el teléfono están siempre a la vista, en el filo.
+  test.skip(info.project.name === 'movil', 'el teléfono no tiene puntero que pase por encima');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const marco = page.locator('.cf-grid');
+  await marco.scrollIntoViewIfNeeded();
+  const botones = page.locator('.cf-control');
+  await expect(botones).toHaveCount(2);
+  const antes = await Promise.all([0, 1].map(i => botones.nth(i).evaluate(e => getComputedStyle(e).opacity)));
+  expect(antes).toEqual(['0', '0']);
+  // Pasar por el hueco hacia la flecha no la apaga.
+  await marco.hover();
+  const caja = (await marco.boundingBox())!;
+  await page.mouse.move(caja.x - 8, caja.y + caja.height / 2);
+  await expect(botones.nth(0)).toHaveCSS('opacity', '1');
+  for (let i = 0; i < 2; i++) {
+    await expect(botones.nth(i)).toHaveCSS('opacity', '1');
+    const [cajaCuadricula, cajaBoton] = await Promise.all([
+      marco.boundingBox(),
+      botones.nth(i).boundingBox(),
+    ]);
+    expect(cajaCuadricula).not.toBeNull();
+    expect(cajaBoton).not.toBeNull();
+    expect(Math.abs(cajaBoton!.y + cajaBoton!.height / 2 - (cajaCuadricula!.y + cajaCuadricula!.height / 2))).toBeLessThanOrEqual(1);
+    // Fuera de la caja grande, a 16 px de su filo.
+    const hueco = i === 0
+      ? cajaCuadricula!.x - (cajaBoton!.x + cajaBoton!.width)
+      : cajaBoton!.x - (cajaCuadricula!.x + cajaCuadricula!.width);
+    expect(Math.abs(hueco - 16)).toBeLessThanOrEqual(1);
+    expect(cajaBoton!.width).toBeGreaterThanOrEqual(44);
+    expect(cajaBoton!.height).toBeGreaterThanOrEqual(44);
   }
 });

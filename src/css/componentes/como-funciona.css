@@ -63,9 +63,19 @@
    y las pestañas dentro de una caja en la banda de «Problema» (`--banda`),
    con su aire: 48 px a 1440, 20 en un teléfono. Radio
    8 px a 1440 como la referencia, y 20 en un teléfono. */
-.cf-grid {
-  /* 0,078 da un filo visible sobre blanco y verde pálido, sin endurecer la banda. */
+/* La caja grande y sus dos flechas: la caja recorta lo que viaja, así
+   que las flechas viven fuera de ella, en esta envoltura del mismo
+   ancho, para montarse en su filo (dueño, 2026-10-13). */
+.cf-carrusel {
+  /* 0,078 da un filo visible sobre blanco y verde pálido, sin endurecer la
+     banda (lo heredan la caja y las flechas). */
   --cf-borde: rgba(20, 39, 78, 0.078);
+  position: relative;
+  max-width: 1192px;
+  margin-inline: auto;
+}
+
+.cf-grid {
   /* 1–16 px y alfa 0,035–0,14 separan en dos planos con un filo suave. */
   --cf-sombra: 0 1px 2px rgba(11, 18, 32, 0.035), 0 16px 40px -24px rgba(11, 18, 32, 0.14);
   --cf-aire: clamp(20px, 3.34vw, 48px);
@@ -75,6 +85,7 @@
      de al lado espera entero fuera, texto y cuadro a la vez. */
   --cf-viaje: calc(100cqw + 2 * var(--cf-aire));
   container-type: inline-size;
+  position: relative;
   display: grid;
   overflow-x: clip;
   max-width: 1192px;
@@ -90,27 +101,17 @@
 /* Lo que dice el paso elegido, donde allá van «On-call gets the right
    people in the room» y su párrafo. Los tres textos se apilan en la misma
    celda, así el alto no salta, y es un carrusel (dueño, 2026-10-12): el
-   paso entero se va de lado y el siguiente entra por el otro, y se puede
-   agarrar y arrastrar. `data-lugar` lo pone `como-funciona.ts` (sin
-   JavaScript queda el del marcado: «ruta» a la vista). Recorta la caja
-   grande, no la columna; `pan-y` deja al dedo bajar la página y el gesto
-   de lado es nuestro. */
+   paso entero se va de lado y el siguiente entra por el otro. `data-lugar`
+   lo pone `como-funciona.ts` (sin JavaScript queda el del marcado: «ruta»
+   a la vista). Recorta la caja grande, no la columna. */
 .cf-texto {
   display: grid;
   align-self: stretch;
   min-height: 0;
-  touch-action: pan-y;
-  user-select: none;
-  cursor: grab;
-}
-
-.cf-grid[data-arrastrando] :is(.cf-texto, .cf-marco) {
-  cursor: grabbing;
 }
 
 /* Cada paso se corre `--cf-viaje`, lo mismo que su cuadro, así el de al
-   lado espera justo fuera de la caja. `--cf-arrastre` es lo que va del
-   dedo, 1:1. 480 ms con la curva de «Problema». */
+   lado espera justo fuera de la caja. 480 ms con la curva de «Problema». */
 .cf-explica {
   --cf-lugar: 0;
   grid-area: 1 / 1;
@@ -119,7 +120,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   gap: 16px;
-  translate: calc(var(--cf-lugar) * var(--cf-viaje) + var(--cf-arrastre, 0px)) 0;
+  translate: calc(var(--cf-lugar) * var(--cf-viaje)) 0;
   will-change: translate;
 }
 
@@ -131,10 +132,6 @@
 .cf-explica[data-lugar="actual"],
 .cf-explica[data-sale] {
   transition: translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
-}
-
-.cf-grid[data-arrastrando] :is(.cf-explica, .cf-escena) {
-  transition: none;
 }
 
 /* El cuadro blanco con la idea del paso va al pie de la columna, que mide
@@ -209,15 +206,9 @@
   min-width: 0;
 }
 
-/* El marco es la celda del cuadro: el cuadro entero, con su fondo, su
-   filo y sus esquinas, viaja con el texto como una sola cosa (dueño,
-   2026-10-13) y lo recorta la caja grande. La que sale es una copia muda
-   (`.cf-escena--fantasma`, de `como-funciona.ts`) en la misma celda. */
+/* El marco ordena la escena, que viaja con el texto dentro de la cuadrícula. */
 .cf-marco {
   display: grid;
-  touch-action: pan-y;
-  user-select: none;
-  cursor: grab;
 }
 /* El filo va encima de lo de dentro, para que el teléfono no lo tape;
    1 px de brillo conserva profundidad. */
@@ -227,9 +218,78 @@
   z-index: 3;
   inset: 0;
   border: 1px solid var(--cf-borde);
-  border-radius: inherit;
+  border-radius: 20px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
   pointer-events: none;
+}
+
+
+/* 44 px alcanzan el área táctil mínima. Van centradas en el filo de la
+   caja grande, mitad dentro y mitad fuera (dueño, 2026-10-13): no tapan
+   el texto (su aire mínimo es 20 px y la mitad de la flecha, 22) ni el
+   teléfono. El z-index 5 las deja sobre la caja y su sombra. */
+.cf-control {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--cf-borde);
+  border-radius: 50%;
+  /* 0,82 deja traslucir el mapa bajo el fondo blanco. */
+  background: rgba(255, 255, 255, 0.82);
+  /* 2/8 px dan sombra corta, suave y legible sobre el mapa. */
+  box-shadow: 0 2px 8px rgba(20, 39, 78, 0.14);
+  color: var(--tinta);
+  /* 8 px suavizan el mapa bajo el vidrio sin borrar sus formas. */
+  backdrop-filter: blur(8px);
+  opacity: 1;
+  /* 160 ms funde el botón; 100 ms hace inmediata la presión del dedo. */
+  transition: opacity 160ms ease, scale 100ms ease, background-color 160ms ease;
+  cursor: pointer;
+}
+.cf-control[hidden] { display: none; }
+/* Mitad fuera, salvo que la calle de la página (`--calle`, 20 px en un
+   teléfono) no alcance los 22 px: entonces asoman lo que cabe. */
+.cf-control--anterior { left: 0; translate: max(-50%, -1 * var(--calle)) -50%; }
+.cf-control--siguiente { right: 0; translate: min(50%, var(--calle)) -50%; }
+/* 20 px dejan aire dentro del círculo táctil de 44 px. */
+.cf-control svg { width: 20px; height: 20px; }
+/* Con aire de sobra, fuera de la caja (dueño, 2026-10-13): 16 px de
+   hueco más los 44 de la flecha piden 60 px a cada lado, que la caja de
+   1192 px deja desde 1312 px de ancho. La franja `::before` cubre ese
+   hueco, para que el puntero no pierda el `:hover` al ir hacia ella. */
+@media (min-width: 1312px) {
+  .cf-carrusel { isolation: isolate; }
+  .cf-carrusel::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0 -60px;
+  }
+  .cf-control--anterior { translate: calc(-100% - 16px) -50%; }
+  .cf-control--siguiente { translate: calc(100% + 16px) -50%; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .cf-control { opacity: 0; }
+  .cf-carrusel:hover .cf-control,
+  .cf-carrusel:focus-within .cf-control,
+  .cf-control:focus-visible { opacity: 1; }
+}
+/* 0,96 aclara el fondo apenas al pasar el puntero. */
+.cf-control:hover { background: rgba(255, 255, 255, 0.96); }
+/* 0,96 hunde el botón un 4 % durante la pulsación. */
+.cf-control:active { scale: 0.96; }
+@media (hover: none) {
+  .cf-control { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Movimiento reducido quita el fundido y deja intacto el tamaño. */
+  .cf-control { transition: none; }
+  .cf-control:active { scale: 1; }
 }
 
 /* Las mismas cuentas que `.cf-explica`: su ancho más 32 px de aire. */
@@ -244,7 +304,7 @@
   background: color-mix(in srgb, var(--banda), var(--acento) 5%);
   /* 600 / 455 da la escena apaisada de referencia y deja aire al teléfono. */
   aspect-ratio: 600 / 455;
-  translate: calc(var(--cf-lugar) * var(--cf-viaje) + var(--cf-arrastre, 0px)) 0;
+  translate: calc(var(--cf-lugar) * var(--cf-viaje)) 0;
   will-change: translate;
 }
 .cf-escena[data-lugar="antes"] { --cf-lugar: -1; }
@@ -309,17 +369,14 @@
 .cf-mapa-tarjeta {
   overflow: visible;
 }
-.cf-mapa-tarjeta #cf-mapa {
+.cf-mapa-tarjeta .phone-map {
   /* 268–356 px replica el hero; 0,964 quita biseles y 402 son puntos lógicos. */
   --u: calc((clamp(268px, 30vw, 356px) * 0.964) / 402);
   position: absolute;
-  inset: 10%;
-  width: 80%;
-  height: 80%;
+  inset: 0;
   overflow: hidden;
   border: 1px solid var(--cf-borde);
-  /* 18 px redondea el marco del mapa sin perder área útil. */
-  border-radius: 18px;
+  border-radius: inherit;
   box-shadow: var(--cf-sombra);
 }
 /* Anchos lógicos de la ruta C16, escalados como el teléfono del mockup. */
