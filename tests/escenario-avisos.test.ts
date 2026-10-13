@@ -177,6 +177,15 @@ describe('el escenario de «Qué resuelve»', () => {
     expect(css).toMatch(/\[data-cara='claro'\] \.aviso\s*\{[^}]*translate:\s*var\(--fila\)[^}]*rotate:\s*0deg/);
   });
 
+  it('el título comparte fila con el icono y la frase ocupa el ancho de la tarjeta', () => {
+    // Sin `display: contents` en las caras: borraría su caja y con ella el
+    // cruce de opacidad entre las dos caras.
+    expect(css).not.toMatch(/display:\s*contents/);
+    expect(css).toMatch(/\.aviso-icono\s*\{[^}]*grid-area:\s*1 \/ 1/);
+    expect(css).toMatch(/\.aviso-texto\s*\{[^}]*grid-area:\s*1 \/ 1/);
+    expect(css).toMatch(/\.aviso-titulo\s*\{[^}]*padding-inline-start:\s*calc\(var\(--icono\)/);
+  });
+
   it('los textos largos ya no cuelgan debajo: viven en los avisos', () => {
     expect(doc.querySelector('.columnas, .columna-titulo, .columna-texto')).toBeNull();
   });

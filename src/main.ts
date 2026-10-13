@@ -140,6 +140,69 @@ const arrancar = (): void => {
   const demo = document.querySelector<HTMLElement>('.cf-demo');
   let llegadaFrame = 0;
   let toqueTimer = 0;
+  let cicloTimer = 0;
+  let secuenciaTimer = 0;
+  let pasoActual = 'ruta';
+  let demoVisible = true;
+  const ruedaAviso = demo?.querySelector<HTMLElement>('.cf-aviso-composicion');
+  const guardarAviso = demo?.querySelector<HTMLElement>('.cf-guardar');
+  const notificacionAviso = demo?.querySelector<HTMLElement>('.cf-aviso-notificacion');
+  const limpiarSecuencia = (): void => {
+    if (llegadaFrame) cancelAnimationFrame(llegadaFrame);
+    if (toqueTimer) window.clearTimeout(toqueTimer);
+    if (cicloTimer) window.clearTimeout(cicloTimer);
+    if (secuenciaTimer) window.clearTimeout(secuenciaTimer);
+    if (toqueAnimTimer) window.clearTimeout(toqueAnimTimer);
+    llegadaFrame = 0;
+    toqueTimer = 0;
+    cicloTimer = 0;
+    secuenciaTimer = 0;
+    toqueAnimTimer = 0;
+    document.querySelector('.cf-tap')?.remove();
+    document.querySelector('.cf-mapa-distancia')?.classList.remove('cf-distancia-espera');
+    ruedaAviso?.classList.remove('cf-aviso-rodando');
+    guardarAviso?.classList.remove('cf-guardando');
+    notificacionAviso?.classList.remove('cf-notificacion-visible');
+    demo?.querySelector('.cf-escena')?.classList.remove('cf-ruta-reproduciendo');
+  };
+  const iniciarCiclo = (): void => {
+    limpiarSecuencia();
+    if (!demoVisible) return;
+    const ciclo = (): void => {
+      if (sinMovimiento()) {
+        llevarBus?.(1800); // 1,8 km es la llegada final que enseña la escena.
+        notificacionAviso?.classList.add('cf-notificacion-visible');
+        return;
+      }
+      if (pasoActual === 'ruta') {
+        const escena = demo?.querySelector<HTMLElement>('.cf-escena');
+        escena?.classList.remove('cf-ruta-reproduciendo');
+        void escena?.offsetWidth;
+        escena?.classList.add('cf-ruta-reproduciendo');
+      } else if (pasoActual === 'bus') {
+        animarLlegada();
+      } else if (pasoActual === 'aviso') {
+        ruedaAviso?.classList.remove('cf-aviso-rodando');
+        guardarAviso?.classList.remove('cf-guardando');
+        notificacionAviso?.classList.remove('cf-notificacion-visible');
+        void ruedaAviso?.offsetWidth;
+        ruedaAviso?.classList.add('cf-aviso-rodando');
+        secuenciaTimer = window.setTimeout(() => {
+          guardarAviso?.classList.add('cf-guardando');
+          secuenciaTimer = window.setTimeout(() => {
+            notificacionAviso?.classList.add('cf-notificacion-visible');
+            // 700 ms deja que se lea el toque antes de mostrar el aviso.
+          }, 700);
+          // 950 ms deja terminar el giro de la rueda antes de guardar.
+        }, 950);
+      }
+      // Cada paso dura lo que su pestaña (5 s): la secuencia (≤ 2,4 s) se
+      // ve entera y se queda quieta un rato antes de repetirse, y con el
+      // carrusel parado sigue repitiéndose sin quedar estática.
+      cicloTimer = window.setTimeout(ciclo, 5000);
+    };
+    ciclo();
+  };
   const animarLlegada = (): void => {
     if (!llevarBus) return;
     if (llegadaFrame) cancelAnimationFrame(llegadaFrame);
@@ -164,19 +227,29 @@ const arrancar = (): void => {
     llevarBus(desde);
     llegadaFrame = requestAnimationFrame(actualizar);
   };
-  if (demo) new Pasos(demo, { intervalo: 5000, alCambiar: paso => {
-    if (paso === 'bus') animarLlegada();
-    else {
-      if (llegadaFrame) cancelAnimationFrame(llegadaFrame);
-      if (toqueTimer) window.clearTimeout(toqueTimer);
-      if (toqueAnimTimer) window.clearTimeout(toqueAnimTimer);
-      llegadaFrame = 0;
-      toqueTimer = 0;
-      toqueAnimTimer = 0;
-      document.querySelector('.cf-tap')?.remove();
-      document.querySelector('.cf-mapa-distancia')?.classList.remove('cf-distancia-espera');
-    }
-  } });
+  if (demo && 'IntersectionObserver' in window) {
+    const visibilidad = new IntersectionObserver(([entrada]) => {
+      demoVisible = entrada.isIntersecting;
+      if (demoVisible) iniciarCiclo();
+      else limpiarSecuencia();
+    });
+    visibilidad.observe(demo);
+  }
+  if (demo) {
+    const escena = demo.querySelector<HTMLElement>('.cf-escena');
+    const movimientoReducido = sinMovimiento();
+    if (movimientoReducido) notificacionAviso?.classList.add('cf-notificacion-visible');
+    else iniciarCiclo();
+    new Pasos(demo, { intervalo: 5000, alCambiar: paso => {
+      pasoActual = paso;
+      iniciarCiclo();
+      if (movimientoReducido) {
+        llevarBus?.(1800); // La tarjeta de bus queda en su distancia final.
+        notificacionAviso?.classList.add('cf-notificacion-visible');
+        escena?.classList.remove('cf-ruta-reproduciendo');
+      }
+    } });
+  }
 
   /*
     Qué resuelve: la sección de dos caras. Va aquí y no antes porque el

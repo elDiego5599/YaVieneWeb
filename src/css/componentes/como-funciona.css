@@ -212,6 +212,8 @@
   overflow: visible;
 }
 .cf-mapa-tarjeta #cf-mapa {
+  /* 268–356 px replica el hero; 0,964 quita biseles y 402 son puntos lógicos. */
+  --u: calc((clamp(268px, 30vw, 356px) * 0.964) / 402);
   position: absolute;
   inset: 10%;
   width: 80%;
@@ -222,6 +224,9 @@
   border-radius: 18px;
   box-shadow: var(--cf-sombra);
 }
+/* Anchos lógicos de la ruta C16, escalados como el teléfono del mockup. */
+.cf-mapa-tarjeta .map-route-casing { stroke-width: calc(8 * var(--u)); }
+.cf-mapa-tarjeta .map-route-active { stroke-width: calc(4 * var(--u)); }
 /* El radio de 2 km tapa la ruta a este encuadre y no aporta a esta vista. */
 .cf-mapa-tarjeta .map-radio {
   display: none;
@@ -379,6 +384,59 @@
   border-radius: 16px;
   background: var(--surface);
   box-shadow: var(--cf-sombra);
+  /* 18 px y 350 ms hacen que la notificación baje sin tapar la rueda. */
+  opacity: 0;
+  translate: 0 -18px;
+  transition: opacity 350ms ease, translate 350ms ease;
+}
+.cf-aviso-notificacion.cf-notificacion-visible {
+  opacity: 1;
+  translate: 0 0;
+}
+/* Dos renglones como la notificación del sistema: la app y la hora arriba,
+   en 12 px tenue, y el aviso debajo en 14 px y 600 (dueño, 2026-10-12:
+   centrado). */
+.cf-aviso-texto {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  text-align: center;
+}
+.cf-aviso-app {
+  color: var(--tinta-tenue);
+  font-size: 12px;
+}
+.cf-aviso-titulo {
+  color: var(--tinta);
+  font-size: 14px;
+  font-weight: 600;
+}
+.cf-guardar.cf-guardando {
+  /* 650 ms coincide con el pulso del toque del mapa. */
+  animation: cf-guardar-toque 650ms ease-out;
+}
+@keyframes cf-guardar-toque {
+  /* El brillo breve hace visible el toque sin mover el botón. */
+  /* Se oscurece y se hunde un 4 %, como un botón al dedo, y vuelve. */
+  0% { filter: brightness(1); scale: 1; }
+  25% { filter: brightness(0.78); scale: 0.96; }
+  100% { filter: brightness(1); scale: 1; }
+}
+/* La rueda gira: las filas entran dos puestos abajo (2 × ~21 px, fila de
+   13 px más 4 de calle con su interlínea) y se asientan en 1,0 km con un
+   rebote de 3 px, como la de la alarma del iPhone. El recorte las deja
+   salir sólo por la ventana de la rueda. */
+.cf-aviso-composicion.cf-aviso-rodando .cf-rueda {
+  overflow: hidden;
+}
+.cf-aviso-composicion.cf-aviso-rodando .cf-rueda > * {
+  /* 900 ms deja leer las distancias pasar antes de que se guarde. */
+  animation: cf-rueda-giro 900ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes cf-rueda-giro {
+  0% { translate: 0 42px; }
+  75% { translate: 0 -3px; }
+  100% { translate: 0 0; }
 }
 
 /* El fundido queda sin desplazamiento cuando se reduce el movimiento. */
@@ -543,6 +601,27 @@
   transition-delay: 0.18s;
 }
 
+/* Al volver al paso, los chips y la flecha repiten su entrada. */
+.cf-escena.cf-ruta-reproduciendo .cf-chips,
+.cf-escena.cf-ruta-reproduciendo .cf-flecha {
+  /* 900 ms reproduce la entrada sin competir con el cambio de pestaña. */
+  animation: cf-ruta-entrada 900ms ease both;
+}
+.cf-escena.cf-ruta-reproduciendo .cf-telefono .map-route-active {
+  /* El trazo también se anima cuando los chips se ocultan en móvil. */
+  animation: cf-ruta-trazo 900ms ease both;
+}
+@keyframes cf-ruta-entrada {
+  /* 8 px devuelve chips y flecha desde el mismo reposo visual. */
+  0% { opacity: 0; translate: 0 8px; }
+  100% { opacity: 1; translate: 0 0; }
+}
+@keyframes cf-ruta-trazo {
+  /* El 0,45 revela el mismo trazo activo que termina en opacidad plena. */
+  0% { opacity: 0.45; }
+  100% { opacity: 1; }
+}
+
 /* Lo de encima del mapa, por paso: el selector con su barrera (1), la
    hoja del bus (2 y 3) y la notificación (3). La hoja sube desde abajo y
    la notificación baja desde arriba, cada una por donde entra en la app. */
@@ -657,6 +736,12 @@
   .cf-tap {
     animation: none;
   }
+  .cf-aviso-notificacion { opacity: 1; translate: none; transition: none; }
+  .cf-guardar.cf-guardando,
+  .cf-aviso-composicion.cf-aviso-rodando .cf-rueda > *,
+  .cf-escena.cf-ruta-reproduciendo .cf-chips,
+  .cf-escena.cf-ruta-reproduciendo .cf-flecha,
+  .cf-escena.cf-ruta-reproduciendo .cf-telefono .map-route-active { animation: none; }
   .cf-pasos[data-auto] .cf-paso[aria-selected="true"]::after {
     /* Movimiento reducido quita la animación de progreso. */
     animation: none;

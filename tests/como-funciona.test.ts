@@ -99,7 +99,7 @@ describe('banda «Cómo funciona»', () => {
     expect(banda).toMatch(/eta-detail-accion">Cambiar</);
     document.body.innerHTML = banda;
     const aviso = document.querySelector('.cf-aviso-notificacion')!.textContent ?? '';
-    expect(aviso).toContain('Tu bus de la ruta C16 está cerca de ti');
+    expect(document.querySelector('.cf-aviso-titulo')?.textContent).toBe('Bus de la ruta C16 está cerca de ti'); // (dueño, 2026-10-12)
     expect(aviso).not.toMatch(/[A-Z]{3}\d{3}/);
     expect(aviso).not.toMatch(/\d\s?(m|km)\b/);
   });
@@ -138,6 +138,12 @@ describe('banda «Cómo funciona»', () => {
     expect(banda).toMatch(/Avisarme cuando esté cerca/);
     document.body.innerHTML = banda;
     expect(document.querySelector('.cf-aviso-composicion button, .cf-aviso-composicion h1, .cf-aviso-composicion h2, .cf-aviso-composicion h3')).toBeNull();
+    expect(css).toMatch(/\.cf-aviso-texto\s*\{[^}]*text-align:\s*center/s);
+    // La app y el aviso van en dos renglones, no pegados en uno.
+    expect(css).toMatch(/\.cf-aviso-texto\s*\{[^}]*display:\s*grid/s);
+    expect(css).toMatch(/\.cf-mapa-tarjeta\s+\.map-route-active\s*\{[^}]*stroke-width/s);
+    expect(leer('src/main.ts')).toMatch(/pasoActual === 'aviso'/);
+    expect(leer('src/main.ts')).toMatch(/cancelAnimationFrame/);
   });
 
   it('en el paso de la ruta enseña el selector dentro del teléfono', () => {

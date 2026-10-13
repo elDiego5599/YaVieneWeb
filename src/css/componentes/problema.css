@@ -359,11 +359,15 @@
 }
 
 .aviso {
+  /* Icono y texto comparten la celda: el título se corre a la derecha del
+     icono y la frase pasa por debajo de los dos, a todo el ancho (dueño,
+     2026-10-12: tarjeta más ancha y menos alta). Las caras no se tocan:
+     siguen apiladas y cruzándose con su opacidad. 40 px de icono. */
+  --icono: 40px;
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
-  align-items: center;
-  gap: 16px;
-  padding: 20px 24px 20px 20px;
+  grid-template-columns: minmax(0, 1fr);
+  /* 18 px acorta la tarjeta sin apretar el texto. */
+  padding: 18px 24px 18px 20px;
   border-radius: 16px;
   background: var(--papel);
   box-shadow:
@@ -378,7 +382,10 @@
 }
 
 .aviso-icono {
-  height: 52px;
+  grid-area: 1 / 1;
+  align-self: start;
+  width: var(--icono);
+  height: var(--icono);
   border-radius: 10px;
   color: var(--tinta);
 }
@@ -463,8 +470,18 @@
   color: var(--tinta);
 }
 
+.aviso-texto {
+  grid-area: 1 / 1;
+}
+
+/* Al alto del icono y corrido su ancho más 14 px de calle: queda centrado
+   en la fila del icono aunque parta en dos renglones. */
 .aviso-titulo {
-  margin: 0 0 2px;
+  display: flex;
+  align-items: center;
+  min-height: var(--icono);
+  margin: 0 0 8px;
+  padding-inline-start: calc(var(--icono) + 14px);
   font: inherit;
   font-weight: 600;
   color: var(--tinta);
@@ -606,9 +623,8 @@
    el ladeo en `rotate`, no en `transform`, para que se enderecen solos
    por el camino.
 
-   El dibujo va arriba y el texto debajo, como las tarjetas de
-   incident.io: en un cuarto de escenario, al lado del dibujo la frase se
-   partía en cuatro renglones.
+   El título va al lado del dibujo y la frase debajo, para que las
+   tarjetas sean más anchas y menos altas.
 
    La píldora sigue en el flujo, centrada por la rejilla, y sube con
    `translate` (`--subida`, también de `problema.ts`).
@@ -636,16 +652,9 @@
   .aviso {
     position: absolute;
     width: calc((100% - 3 * 24px) / 4);
-    grid-template-columns: minmax(0, 1fr);
-    align-items: start;
-    gap: 12px;
+    --icono: 44px;
     padding: 18px 20px 20px;
     rotate: var(--giro);
-  }
-
-  .aviso-icono {
-    width: 44px;
-    height: 44px;
   }
 
   .aviso-texto {
