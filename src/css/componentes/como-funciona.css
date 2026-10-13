@@ -46,6 +46,10 @@
   text-wrap: balance;
 }
 
+.cf-cabeza .seccion-titulo .acentuado {
+  color: var(--acento);
+}
+
 /* 17–19 px en la tinta media, dos renglones a 1440 como el de allá. */
 .cf-cabeza .seccion-lead {
   max-width: 46ch;
@@ -75,21 +79,27 @@
    (lo pone `como-funciona.ts`; sin JavaScript, el del marcado: «ruta»). */
 .cf-texto {
   display: grid;
+  align-self: center;
 }
 
 .cf-explica {
   grid-area: 1 / 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: flex-start;
-  gap: 14px;
+  gap: 16px;
   opacity: 0;
-  translate: 0 6px;
+  translate: 0 8px;
   transition:
-    opacity 0.3s var(--ease-out-cubic),
-    translate 0.4s var(--ease-out-cubic);
+    opacity 450ms cubic-bezier(0.3, 0, 0.2, 1),
+    translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
+  will-change: opacity, translate;
 }
 
+.cf-grid[data-paso="ruta"] .cf-explica[data-paso="ruta"],
+.cf-grid[data-paso="bus"] .cf-explica[data-paso="bus"],
+.cf-grid[data-paso="aviso"] .cf-explica[data-paso="aviso"],
 .cf-grid:has(.cf-escena[data-paso="ruta"]) .cf-explica[data-paso="ruta"],
 .cf-grid:has(.cf-escena[data-paso="bus"]) .cf-explica[data-paso="bus"],
 .cf-grid:has(.cf-escena[data-paso="aviso"]) .cf-explica[data-paso="aviso"] {
@@ -97,28 +107,28 @@
   translate: 0 0;
 }
 
-/* El número en el verde de letra (`--acento`), 13 px seminegrita. */
+/* El número en el verde de letra (`--acento`), con mayor presencia. */
 .cf-numero {
-  font-size: 13px;
+  font-size: clamp(14px, 0.95rem + 0.1vw, 16px);
   font-weight: 600;
   color: var(--acento);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
 }
 
-/* 28–40 px: 36 a 1440, el subtítulo de allá; un escalón bajo el titular. */
+/* Título de cada paso más grande y con mayor jerarquía visual. */
 .cf-explica-titulo {
-  font-size: clamp(1.75rem, 1.2rem + 1.2vw, 2.25rem);
+  font-size: clamp(2.2rem, 1.5rem + 1.8vw, 3.1rem);
   font-weight: 500;
   color: var(--tinta);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
 }
 
 .cf-explica-texto {
   max-width: 34ch;
-  font-size: clamp(17px, 1rem + 0.2vw, 19px);
+  font-size: clamp(19px, 1.1rem + 0.35vw, 22px);
   color: var(--tinta-media);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 /* La ceja como pastilla con filo, la del «Built for enterprises» de
@@ -149,15 +159,217 @@
   background: color-mix(in srgb, var(--banda), var(--acento) 5%);
 }
 
-/* El teléfono queda entero y centrado verticalmente; su alto sale de la
-   proporción 71.5 / 149.6 de `.phone-shell`. */
-.cf-telefono .phone-shell {
-  /* 33 cqw da un alto de 414 px en 600×455 y deja 20 px arriba y abajo. */
-  --ancho: 33cqw;
+/* Transiciones suaves entre composiciones (adelante y hacia atrás),
+   utilizando la curva de aceleración/desaceleración suave de «Problema». */
+.cf-composicion,
+.cf-telefono {
   position: absolute;
-  top: 4.5%;
-  /* 5 % reserva borde y mantiene los chips fuera del teléfono. */
+  inset: 0;
+  opacity: 0;
+  translate: 0 8px;
+  pointer-events: none;
+  transition:
+    opacity 450ms cubic-bezier(0.3, 0, 0.2, 1),
+    translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
+  will-change: opacity, translate;
+}
+
+/* Teléfono, tarjeta de mapa y selector se alternan según la pestaña activa. */
+.cf-escena[data-paso="ruta"] .cf-telefono,
+.cf-escena[data-paso="bus"] .cf-mapa-tarjeta,
+.cf-escena[data-paso="aviso"] .cf-aviso-composicion {
+  opacity: 1;
+  translate: 0 0;
+  pointer-events: auto;
+}
+.cf-escena[data-paso="ruta"] .cf-capa--ruta {
+  opacity: 1;
+  translate: none;
+}
+
+.cf-escena[data-paso="bus"] .cf-telefono,
+.cf-escena[data-paso="aviso"] .cf-telefono {
+  opacity: 0;
+  translate: 0 8px;
+  pointer-events: none;
+}
+
+/* El mapa ocupa toda la tarjeta y oculta el radio de proximidad a esta escala. */
+.cf-mapa-tarjeta {
+  overflow: visible;
+}
+.cf-mapa-tarjeta #cf-mapa {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radio-marco);
+  box-shadow: var(--sombra-producto);
+}
+/* El radio de 2 km tapa la ruta a este encuadre y no aporta a esta vista. */
+.cf-mapa-tarjeta .map-radio {
+  display: none;
+}
+/* 0,72 mantiene visibles las calles y destaca el trazado activo. */
+.cf-mapa-tarjeta .routes-svg-layer image {
+  filter: saturate(0.72);
+}
+
+/* La distancia destaca sobre una tarjeta blanca con la sombra de interfaz. */
+.cf-mapa-distancia {
+  position: absolute;
+  right: 4%;
+  bottom: 5%;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  gap: 0 5px;
+  padding: 16px 20px;
+  border-radius: var(--radio-tarjeta);
+  background: var(--surface);
+  box-shadow: var(--sombra-producto);
+  color: var(--tinta);
+}
+.cf-mapa-distancia .eta-number {
+  font-size: 30px;
+  font-weight: 700;
+}
+/* 15 px separa la unidad de la cifra principal sin competir con ella. */
+.cf-mapa-unidad {
+  font-size: 15px;
+  font-weight: 600;
+}
+/* 12 px mantiene secundaria la descripción de cómo se mide la distancia. */
+.cf-mapa-etiqueta {
+  grid-column: 1 / -1;
+  color: var(--tinta-media);
+  font-size: 12px;
+}
+
+/* La llamada a crear un aviso refleja el CTA de eta_bottom_sheet.dart. */
+.cf-bus-cta {
+  position: absolute;
+  top: 5%;
+  left: 4%;
+  padding: 10px 14px;
+  border-radius: var(--radio-tarjeta);
+  background: var(--surface);
+  box-shadow: var(--sombra-tarjeta);
+  color: var(--azul-boton);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* La rueda tiene cinco opciones; 20 px de margen y radio 16 la mantienen compacta. */
+.cf-aviso-selector {
+  position: absolute;
+  top: 5%;
+  left: 8%;
+  width: 84%;
+  padding: 20px;
+  border-radius: var(--radio-marco);
+  background: var(--surface);
+  box-shadow: var(--sombra-producto);
+  text-align: center;
+}
+.cf-aviso-titulo-rueda {
+  margin: 0 0 14px;
+  color: var(--tinta);
+  font-size: clamp(16px, 2.7cqw, 22px);
+  font-weight: 600;
+}
+/* 4 px separan las cinco filas sin ocultar ninguna opción de la rueda. */
+.cf-rueda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+  color: var(--tinta-tenue);
+}
+.cf-rueda span {
+  font-size: 13px;
+}
+/* 0,38 deja tenues las filas exteriores de la rueda. */
+.cf-rueda span:first-child,
+.cf-rueda span:last-child {
+  opacity: 0.38;
+}
+/* 0,68 mantiene legibles las dos filas contiguas a la selección. */
+.cf-rueda span:nth-child(2),
+.cf-rueda span:nth-last-child(2) {
+  opacity: 0.68;
+}
+/* 8 px y el fondo muted destacan la opción elegida entre sus vecinas. */
+.cf-rueda strong {
+  width: 100%;
+  padding: 8px;
+  border-radius: var(--radio-tarjeta);
+  border-block: 1px solid var(--linea);
+  background: var(--surface-muted);
+  color: var(--tinta);
+  font-size: 17px;
+}
+/* 10 px da al CTA de guardar una altura cómoda dentro de la tarjeta. */
+.cf-guardar {
+  display: block;
+  padding: 10px;
+  border-radius: 9px;
+  background: var(--azul-boton);
+  color: var(--surface);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* 12 px separan la confirmación y conservan el tono secundario de eta_bottom_sheet.dart. */
+.cf-aviso-confirmacion {
+  display: block;
+  margin-top: 12px;
+  color: var(--tinta-media);
+  font-size: 12px;
+  line-height: 1.5;
+}
+/* El botón secundario conserva contraste en el texto de confirmación. */
+.cf-aviso-confirmacion .eta-detail-accion {
+  color: var(--azul-boton);
+  font-weight: 600;
+}
+
+/* 5 % de margen y 78 % de ancho dejan la notificación dentro del mapa; conserva ruta y omite placa, como bus_notification_service.dart. */
+.cf-aviso-notificacion {
+  position: absolute;
   right: 5%;
+  bottom: 5%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 78%;
+  padding: 14px;
+  border-radius: var(--radio-marco);
+  background: var(--surface);
+  box-shadow: var(--sombra-producto);
+}
+
+/* El fundido queda sin desplazamiento cuando se reduce el movimiento. */
+@media (prefers-reduced-motion: reduce) {
+  .cf-composicion,
+  .cf-telefono {
+    translate: none;
+    transition: opacity 0.2s linear;
+  }
+}
+
+/* El teléfono queda entero y centrado verticalmente; con sombra profunda como en la referencia. */
+.cf-telefono .phone-shell {
+  --ancho: clamp(230px, 41cqw, 310px);
+  z-index: 2;
+  position: absolute;
+  top: 3.5%;
+  right: 8%;
+  box-shadow:
+    0 16px 40px -8px rgba(11, 18, 32, 0.2),
+    0 8px 20px -4px rgba(11, 18, 32, 0.12);
 }
 
 /* Atenúa solo las teselas; las rutas y marcadores siguen intactos. */
@@ -168,99 +380,115 @@
   opacity: 0.72;
 }
 
-/* Los dos chips de lo que hace la app en cada paso, como «Checking
-   schedule» y «Paging on-call engineer»: blancos, con filo y sombra
-   corta, el segundo un poco ladeado. */
+/* Los dos chips con sus textos e íconos duotono de «Problema»,
+   como en incident.io («Checking schedule» y «Paging on-call engineer»):
+   compactos, delicados, pegados al hombro izquierdo del teléfono y el segundo ladeado. */
 .cf-chips {
   position: absolute;
-  top: 20%;
-  left: 4%;
+  top: 13%;
+  left: 8.5%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
   opacity: 0;
-  translate: 0 8px;
+  translate: 0 6px;
   transition:
-    opacity 0.3s var(--ease-out-cubic),
-    translate 0.4s var(--ease-out-cubic);
+    opacity 450ms cubic-bezier(0.3, 0, 0.2, 1),
+    translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
+  will-change: opacity, translate;
 }
 
 .cf-chip {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
-  border: 1px solid var(--app-hairline);
-  border-radius: 8px;
+  padding: 6.5px 13px;
+  border: 1px solid rgba(20, 39, 78, 0.06);
+  border-radius: 7px;
   background: var(--surface);
-  box-shadow: 0 1px 2px rgba(20, 39, 78, 0.06);
-  font-size: 14px;
+  box-shadow:
+    0 4px 12px rgba(11, 18, 32, 0.05),
+    0 1px 2px rgba(11, 18, 32, 0.03);
+  font-size: 13px;
   font-weight: 500;
-  color: var(--tinta-media);
+  line-height: 1.2;
+  color: var(--tinta);
   white-space: nowrap;
-}
-
-/* 0,35 s entre chips deja leer cada elemento antes del siguiente. */
-.cf-chip {
-  /* El chip entra con un fundido y un desplazamiento corto. */
   opacity: 0;
-  translate: 0 5px;
-  transition: opacity 0.3s var(--ease-out-cubic), translate 0.3s var(--ease-out-cubic);
-  /* El primer chip no espera; el segundo recibe la pausa indicada abajo. */
+  translate: 0 4px;
+  transition:
+    opacity 450ms cubic-bezier(0.3, 0, 0.2, 1),
+    translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
   transition-delay: 0s;
-}
-.cf-chip:nth-child(2) {
-  /* 0,35 s retrasa el segundo elemento de cada par. */
-  transition-delay: 0.35s;
-}
-
-.cf-chip-visto {
-  /* 13 px conserva aire al texto y el visto usa el verde de marca. */
-  width: 13px !important;
-  height: 13px !important;
-  color: var(--acento);
-  opacity: 0;
-  transition: opacity 0.2s var(--ease-out-cubic) 0.12s;
-}
-
-.cf-escena[data-paso="ruta"] .cf-chips[data-paso="ruta"] .cf-chip-visto,
-.cf-escena[data-paso="bus"] .cf-chips[data-paso="bus"] .cf-chip-visto,
-.cf-escena[data-paso="aviso"] .cf-chips[data-paso="aviso"] .cf-chip-visto { opacity: 1; }
-
-.cf-escena[data-paso="ruta"] .cf-chips[data-paso="ruta"] .cf-chip,
-.cf-escena[data-paso="bus"] .cf-chips[data-paso="bus"] .cf-chip,
-.cf-escena[data-paso="aviso"] .cf-chips[data-paso="aviso"] .cf-chip {
-  opacity: 1;
-  translate: none;
+  will-change: opacity, translate;
 }
 
 .cf-chip:nth-child(2) {
-  rotate: -3deg;
-  margin-left: 4px;
+  rotate: -3.5deg;
+  margin-left: 3px;
 }
 
 .cf-chip svg {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
+  color: var(--tinta);
 }
 
-/* La flecha que baja de los chips al teléfono, en trazo fino. */
-.cf-flecha {
-  position: absolute;
-  top: 37%;
-  left: 15%;
-  width: 18%;
-  color: var(--tinta-tenue);
-  opacity: 0.45;
+/* Colores duotono heredados de la sección Problema: */
+.cf-chip .r {
+  fill: var(--acento);
+}
+.cf-chip .r.ic-verde { fill: #00a859; }
+.cf-chip .r.ic-amarillo { fill: #ffc107; }
+.cf-chip .r.ic-arena { fill: #ffb74d; }
+.cf-chip .r.ic-azul { fill: #64b5f6; }
+.cf-chip .r.ic-verde-suave { fill: #a5e3c3; }
+.cf-chip .r.ic-cielo { fill: #90caf9; }
+.cf-chip .b {
+  fill: #ffffff;
 }
 
 .cf-escena[data-paso="ruta"] .cf-chips[data-paso="ruta"],
 .cf-escena[data-paso="bus"] .cf-chips[data-paso="bus"],
 .cf-escena[data-paso="aviso"] .cf-chips[data-paso="aviso"] {
   opacity: 1;
-  translate: none;
+  translate: 0 0;
+}
+
+.cf-escena[data-paso="ruta"] .cf-chips[data-paso="ruta"] .cf-chip,
+.cf-escena[data-paso="bus"] .cf-chips[data-paso="bus"] .cf-chip,
+.cf-escena[data-paso="aviso"] .cf-chips[data-paso="aviso"] .cf-chip {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* Cascada sutil al entrar en el paso */
+.cf-escena[data-paso="ruta"] .cf-chips[data-paso="ruta"] .cf-chip:nth-child(2) {
+  transition-delay: 0.12s;
+}
+
+/* La flecha curva corta y fina que baja del segundo chip y apunta al teléfono. */
+.cf-flecha {
+  position: absolute;
+  top: 28%;
+  left: 17%;
+  width: clamp(100px, 24cqw, 150px);
+  color: #cfc5b4;
+  opacity: 0;
+  translate: 0 4px;
+  transition:
+    opacity 450ms cubic-bezier(0.3, 0, 0.2, 1),
+    translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
+  pointer-events: none;
+  will-change: opacity, translate;
+}
+
+.cf-escena[data-paso="ruta"] .cf-flecha {
+  opacity: 0.85;
+  translate: 0 0;
+  transition-delay: 0.18s;
 }
 
 /* Lo de encima del mapa, por paso: el selector con su barrera (1), la
@@ -278,167 +506,12 @@
   translate: none;
 }
 
-.cf-capa--aviso {
-  translate: 0 -40%;
-}
-
-.cf-escena[data-paso="ruta"] .cf-capa--ruta,
-.cf-escena[data-paso="bus"] .cf-capa--bus,
-.cf-escena[data-paso="aviso"] .cf-capa--bus,
-.cf-escena[data-paso="aviso"] .cf-capa--aviso {
-  opacity: 1;
-  translate: none;
-}
-
-.cf-capa--ruta .sheet-head {
-  margin-bottom: calc(12 * var(--u));
-}
-
-/* La hoja del bus (eta_bottom_sheet.dart, diseño «A»). La tarjeta de la
-   distancia ya trae su filo; la nota «Te avisamos a… · Cambiar» es
-   `_Nota.distancia` con `_PildoraCambiar`, la píldora gris con letra
-   `coralAccessible` (`--app-coral-accessible`). */
-.cf-capa--bus .eta-tarjeta {
-  margin-top: calc(8 * var(--u));
-  margin-inline: calc(24 * var(--u));
-}
-
-/* eta_bottom_sheet.dart deja el botón como último elemento de la hoja;
-   el estado activado ocupa el mismo sitio para que no duplique su altura. */
-.cf-capa--bus .cf-cta-pedir,
-.cf-capa--bus .cf-cta-activo {
-  margin-inline: calc(24 * var(--u));
-}
-
-.cf-capa--bus .cf-cta-activo {
-  position: absolute;
-  right: 0;
-  bottom: calc(26 * var(--u) + var(--alto-inferior));
-  left: 0;
-}
-
-/* eta_bottom_sheet.dart cambia nota y CTA al activar el aviso; ambos estados
-   comparten esta hoja y se funden según el paso de la pestaña. */
-.cf-capa--bus .cf-cta-pedir,
-.cf-capa--bus .cf-cta-activo {
-  transition: opacity 0.25s var(--ease-out-cubic);
-}
-
-.cf-capa--bus .cf-nota-aviso {
-  max-height: 0;
-  overflow: hidden;
-  margin-top: 0;
-  padding-block: 0;
-  border-width: 0;
-  opacity: 0;
-  transition:
-    opacity 0.25s var(--ease-out-cubic),
-    max-height 0.25s var(--ease-out-cubic),
-    margin 0.25s var(--ease-out-cubic),
-    padding 0.25s var(--ease-out-cubic),
-    border-width 0.25s var(--ease-out-cubic);
-}
-
-.cf-capa--bus .cf-nota-aviso {
-  margin-inline: calc(24 * var(--u));
-}
-
-.cf-escena[data-paso="aviso"] .cf-capa--bus .cf-nota-aviso {
-  max-height: calc(54 * var(--u));
-  margin-top: calc(14 * var(--u));
-  padding: calc(10 * var(--u)) calc(12 * var(--u));
-  border-width: 1px;
-  opacity: 1;
-}
-
-.cf-capa--bus .cf-cta-activo {
-  opacity: 0;
-}
-
-.cf-escena[data-paso="aviso"] .cf-capa--bus .cf-cta-activo {
-  opacity: 1;
-}
-
-.cf-escena[data-paso="aviso"] .cf-capa--bus .cf-cta-pedir {
-  opacity: 0;
-}
-
-/* La notificación de iOS (bus_notification_service.dart: «Tu bus de la
-   ruta $ruta está cerca de ti», con ruta y sin placa ni distancia): bajo
-   la isla, a 10 de los bordes, material claro con desenfoque, radio 22,
-   ícono de 38 con 9 de radio, la marca en versalitas y el título en 700.
-   Va por encima de la hoja y por debajo de la isla (40). */
-.cf-banner {
-  position: absolute;
-  top: calc(58 * var(--u));
-  left: calc(10 * var(--u));
-  right: calc(10 * var(--u));
-  z-index: 36;
-  display: flex;
-  align-items: center;
-  gap: calc(10 * var(--u));
-  padding: calc(12 * var(--u)) calc(14 * var(--u));
-  border-radius: calc(22 * var(--u));
-  background: rgba(255, 255, 255, 0.86);
-  backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: 0 calc(6 * var(--u)) calc(24 * var(--u)) rgba(20, 39, 78, 0.18);
-}
-
-.cf-banner .cf-aviso-icono {
-  width: calc(38 * var(--u));
-  height: calc(38 * var(--u));
-  border-radius: calc(9 * var(--u));
-}
-
-.cf-banner .cf-aviso-icono img {
-  width: 66%;
-  height: auto;
-}
-
-.cf-banner .cf-aviso-app {
-  font-size: calc(12 * var(--u));
-}
-
-.cf-banner .cf-aviso-titulo {
-  font-size: calc(15 * var(--u));
-}
-
-.cf-aviso-icono {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
-  background: var(--green-tint);
-}
-
-.cf-aviso-texto {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.cf-aviso-app {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--app-text-secondary);
-}
-
-.cf-aviso-titulo {
-  font-size: 13.5px;
-  font-weight: 700;
-  line-height: 1.3;
-  color: var(--app-text-primary);
-}
-
 /* Las pestañas de los pasos, como las de incident.io: ícono y nombre en
    la tinta tenue sobre una raya, y la elegida en tinta con la raya y el
    ícono en el verde de letra (`--acento`, 6,1:1 sobre blanco). La tinta
    tenue da 4,9:1, que pasa AA para texto normal. */
+/* Las pestañas de los pasos: ícono y texto centrados horizontalmente
+   sobre su línea, con animación de carga/llenado progresivo. */
 .cf-pasos {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -449,21 +522,21 @@
 .cf-paso {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  padding: 12px 2px;
+  padding: 14px 6px;
   border: 0;
   border-bottom: 2px solid var(--linea);
   background: none;
   font: inherit;
-  /* 14 px: control secundario, sin competir con la escena. */
   font-size: 14px;
   font-weight: 500;
   color: var(--tinta-tenue);
-  text-align: left;
+  text-align: center;
   cursor: pointer;
+  position: relative;
   transition:
-    color 0.2s var(--ease-out-cubic),
-    border-color 0.2s var(--ease-out-cubic);
+    color 0.2s var(--ease-out-cubic);
 }
 
 .cf-paso svg {
@@ -480,27 +553,29 @@
 
 .cf-paso[aria-selected="true"] {
   color: var(--tinta);
-  border-bottom-color: var(--acento);
+  border-bottom-color: var(--linea);
 }
 
 .cf-paso[aria-selected="true"] svg {
   color: var(--acento);
 }
 
-.cf-paso { position: relative; }
 .cf-paso[aria-selected="true"]::after {
   content: '';
   position: absolute;
   inset: auto 0 -2px;
   height: 2px;
   background: var(--acento);
+  border-radius: 2px;
   transform: scaleX(1);
   transform-origin: left;
 }
+
 .cf-pasos[data-auto] .cf-paso[aria-selected="true"]::after {
   /* 5 s empata el llenado de la línea con el intervalo automático. */
   animation: cf-progreso 5s linear forwards;
 }
+
 @keyframes cf-progreso {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
@@ -525,19 +600,14 @@
     transition: opacity 0.2s linear;
     transition-delay: 0s;
   }
-  .cf-chip-visto {
-    /* El visto acompaña al fundido sin esperar su retraso habitual. */
-    transition-delay: 0s;
-  }
   .cf-pasos[data-auto] .cf-paso[aria-selected="true"]::after {
     /* Movimiento reducido quita la animación de progreso. */
     animation: none;
   }
 }
 
-/* En móvil, el cuadro más alto, el teléfono al centro y sin chips ni
-   flecha (no caben al lado); las pestañas, con el ícono encima. 343/590
-   deja entero el CTA de eta_bottom_sheet.dart tras la hoja. */
+/* En móvil, el cuadro alto contiene el teléfono y las tarjetas; los chips
+   y la flecha se ocultan porque no caben al lado. 343/590 conserva el aire. */
 @media (max-width: 1023px) {
   .cf-escena {
     /* La altura adicional mantiene visible el botón inferior completo. */
@@ -551,6 +621,37 @@
     right: auto;
     left: 19%;
   }
+
+  /* 4 % deja aire al rótulo y la tarjeta de distancia sin salir del mapa. */
+  .cf-mapa-distancia {
+    right: 4%;
+    bottom: 4%;
+    padding: 12px 16px;
+  }
+  /* 4 % y 11 px contienen el CTA sobre la esquina superior del mapa. */
+  .cf-bus-cta {
+    top: 4%;
+    left: 4%;
+    max-width: 70%;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  /* 4 % / 6 % ajustan el selector al ancho útil del escenario móvil. */
+  .cf-aviso-selector {
+    top: 4%;
+    left: 6%;
+    width: 88%;
+    padding: 16px;
+  }
+  /* 6 % conserva márgenes laterales y 10 px compacta la notificación. */
+  .cf-aviso-notificacion {
+    right: 6%;
+    bottom: 4%;
+    width: 88%;
+    padding: 10px;
+  }
+
 
   .cf-chips,
   .cf-flecha {
@@ -570,11 +671,10 @@
   }
 }
 
-/* Como incident.io, el texto angosto arriba y la demo ancha. */
+/* Como incident.io, texto centrado verticalmente frente a la demo. */
 @media (min-width: 1024px) {
   .cf-grid {
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-    /* El titular arriba, a la altura del borde del cuadro de dentro. */
-    align-items: start;
+    align-items: center;
   }
 }

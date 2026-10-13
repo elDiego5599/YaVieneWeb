@@ -150,17 +150,21 @@ export class PhoneMap {
     });
   };
 
-  constructor(svg: SVGSVGElement, host: HTMLElement) {
+  /** `zoom` ajusta el encuadre SVG del mapa grande sin escalar sus marcadores por CSS. */
+  constructor(svg: SVGSVGElement, host: HTMLElement, opciones: { zoom?: number } = {}) {
     this.#svg = svg;
     this.#host = host;
     this.#sufijo = String(++instancias);
 
     const [vx, vy, w, h] = YV_RUTAS.viewBox;
+    const zoom = Math.max(1, opciones.zoom ?? 1);
+    const anchoCamara = (w * CAMARA.w) / zoom;
+    const altoCamara = (h * CAMARA.h) / zoom;
     this.#camara = {
-      x: vx + w * CAMARA.x,
-      y: vy + h * CAMARA.y,
-      w: w * CAMARA.w,
-      h: h * CAMARA.h,
+      x: vx + w * (CAMARA.x + (CAMARA.w - CAMARA.w / zoom) / 2),
+      y: vy + h * (CAMARA.y + (CAMARA.h - CAMARA.h / zoom) / 2),
+      w: anchoCamara,
+      h: altoCamara,
     };
     this.#lienzo = { w: this.#camara.w, h: this.#camara.h };
     this.activeRoute = this.rutas[0];

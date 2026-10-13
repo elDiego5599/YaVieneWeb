@@ -79,16 +79,17 @@ const arrancar = (): void => {
   }
 
   /*
-    «Cómo funciona»: el teléfono de los tres pasos lleva el mismo mapa,
-    otra foto fija: la C16 del selector, el pin en el hueco entre la
-    notificación de arriba y la hoja de abajo y, 1,8 km por detrás —la
-    cifra de la hoja—, el bus que viene. Las pestañas cambian lo de encima.
+    «Cómo funciona»: el teléfono tiene su propio mapa quieto para el
+    selector. La composición del bus comparte la ruta C16 con otro mapa,
+    encuadrado a nivel de calle para mostrar el pin y el bus a 1,8 km.
   */
   const svgCf = document.querySelector<SVGSVGElement>('#cf-mapa-rutas');
   const lienzoCf = document.querySelector<HTMLElement>('#cf-mapa');
+  const svgCfTel = document.querySelector<SVGSVGElement>('#cf-mapa-tel-rutas');
+  const lienzoCfTel = document.querySelector<HTMLElement>('#cf-mapa-tel');
   let llevarBus: ((metros: number) => void) | undefined;
   if (svgCf && lienzoCf) {
-    const mapaCf = new PhoneMap(svgCf, lienzoCf);
+    const mapaCf = new PhoneMap(svgCf, lienzoCf, { zoom: 2.1 });
     mapaCf.setRoute('R-106');
     const pin = mapaCf.tVisible(0.55, 0.36, [1800]);
     mapaCf.setPin(pin);
@@ -96,11 +97,18 @@ const arrancar = (): void => {
     mapaCf.showRoute(true);
     mapaCf.showPin(true);
     mapaCf.showBuses(true);
-    const distancia = document.querySelector<HTMLElement>('.cf-capa--bus .eta-number');
+    const distancia = document.querySelector<HTMLElement>('.cf-mapa-distancia .eta-number');
     llevarBus = (metros: number): void => {
       mapaCf.setBuses([pin - metros / mapaCf.metrosDeRuta]);
       if (distancia) distancia.textContent = (metros / 1000).toFixed(1).replace('.', ',');
     };
+  }
+  if (svgCfTel && lienzoCfTel) {
+    const mapaCfTel = new PhoneMap(svgCfTel, lienzoCfTel);
+    mapaCfTel.setRoute('R-106');
+    mapaCfTel.setPin(mapaCfTel.tVisible(0.5, 0.2));
+    mapaCfTel.showRoute(true);
+    mapaCfTel.showPin(true);
   }
   const demo = document.querySelector<HTMLElement>('.cf-demo');
   const animarLlegada = (): void => {

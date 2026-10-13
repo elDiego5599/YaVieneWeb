@@ -54,10 +54,9 @@ describe('banda «Cómo funciona»', () => {
     expect(franja.replace(/<[^>]*>/g, '').trim()).toBe('');
   });
 
-  it('lleva ceja, titular y párrafo, sin botón', () => {
-    expect(banda).toMatch(/<span class="seccion-rotulo cf-ceja">CÓMO FUNCIONA<\/span>\s*<h2/);
-    expect(css).toMatch(/\.cf-ceja \{/);
-    expect(banda).toMatch(/<h2[^>]*>\s*Tres pasos y ya sabes dónde viene\.\s*<\/h2>/);
+  it('lleva titular con acento verde y párrafo, sin ceja ni botón (dueño, 2026-10-12)', () => {
+    expect(banda).not.toMatch(/cf-ceja/);
+    expect(banda).toMatch(/<h2[^>]*>\s*Tres pasos <span class="acentuado">y ya sabes dónde viene\.<\/span>\s*<\/h2>/);
     expect(banda).toContain(
       'Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso. Te avisamos cuando esté cerca de ti.'
     );
@@ -91,16 +90,15 @@ describe('banda «Cómo funciona»', () => {
   it('el teléfono es decoración, con el mapa de los del hero', () => {
     expect(banda).toMatch(/class="cf-telefono"[^>]*aria-hidden="true"/);
     expect(banda).toMatch(/class="phone-shell"/);
+    expect(banda).toMatch(/class="phone-map" id="cf-mapa-tel"/);
     expect(banda).toMatch(/class="phone-map" id="cf-mapa"/);
-    expect(leer('src/main.ts')).toMatch(/#cf-mapa/);
+    expect(leer('src/main.ts')).toMatch(/#cf-mapa-tel/);
     // Lo que nombra la app, con sus palabras.
     expect(banda).toContain('Elige tu ruta');
     expect(banda).toMatch(/Te avisamos a 1,0 km/);
     expect(banda).toMatch(/eta-detail-accion">Cambiar</);
-    // El aviso, con ruta y sin placa ni distancia: de su capa al cierre.
-    const ini = banda.indexOf('cf-capa--aviso');
-    expect(ini).toBeGreaterThan(-1);
-    const aviso = banda.slice(ini, banda.indexOf('</div>', banda.indexOf('cf-aviso-titulo')));
+    document.body.innerHTML = banda;
+    const aviso = document.querySelector('.cf-aviso-notificacion')!.textContent ?? '';
     expect(aviso).toContain('Tu bus de la ruta C16 está cerca de ti');
     expect(aviso).not.toMatch(/[A-Z]{3}\d{3}/);
     expect(aviso).not.toMatch(/\d\s?(m|km)\b/);
@@ -114,14 +112,38 @@ describe('banda «Cómo funciona»', () => {
     expect(new Set(idsHero).size).toBe(idsHero.length);
   });
 
-  it('pone las capas de los tres pasos dentro de la pantalla y las pestañas en la demo', () => {
-    // Un </div> de más las saca: la hoja queda sin estilos y las pestañas
-    // fuera de `Pasos`.
+  it('monta el mapa compartido como composición independiente para el paso del bus', () => {
     document.body.innerHTML = banda;
-    for (const capa of ['ruta', 'aviso', 'bus']) {
-      expect(document.querySelector(`.cf-capa--${capa}`)!.closest('.phone-screen')).not.toBeNull();
-    }
+    expect(document.querySelectorAll('#cf-mapa')).toHaveLength(1);
+    expect(document.querySelectorAll('#cf-mapa-tel')).toHaveLength(1);
+    expect(banda).not.toMatch(/cf-capa--bus|cf-capa--aviso/);
+    expect(document.querySelector('#cf-mapa')!.closest('.cf-mapa-tarjeta')).not.toBeNull();
+    expect(document.querySelector('#cf-mapa-tel')!.closest('.phone-screen')).not.toBeNull();
+    expect(document.querySelector('.cf-mapa-distancia')?.textContent).toContain('medido por la calle');
+    expect(document.querySelector('.cf-mapa-distancia .eta-number')?.textContent).toBe('1,8');
     expect(document.querySelector('[role="tablist"]')!.closest('.cf-demo')).not.toBeNull();
+  });
+
+  it('muestra el selector de distancia y la notificación en la composición del aviso', () => {
+    expect(banda).toContain('¿A qué distancia te avisamos?');
+    expect(banda).toContain('900 m');
+    expect(banda).toContain('1,0 km');
+    expect(banda).toContain('1,1 km');
+    expect(banda).toContain('800 m');
+    expect(banda).toContain('1,2 km');
+    expect(banda).toMatch(/class="cf-aviso-notificacion[^"]*"[^>]*aria-hidden="true"/);
+    expect(banda).toMatch(/class="cf-guardar"[^>]*>Guardar</);
+    expect(banda).toMatch(/class="eta-detail-accion">Cambiar</);
+    expect(banda).toMatch(/Aviso activado/);
+    expect(banda).toMatch(/Avisarme cuando esté cerca/);
+    document.body.innerHTML = banda;
+    expect(document.querySelector('.cf-aviso-composicion button, .cf-aviso-composicion h1, .cf-aviso-composicion h2, .cf-aviso-composicion h3')).toBeNull();
+  });
+
+  it('en el paso de la ruta enseña el selector dentro del teléfono', () => {
+    // Sin esta regla las capas se quedan en `opacity: 0` y el teléfono sale
+    // con el mapa pelado.
+    expect(css).toMatch(/\.cf-escena\[data-paso="ruta"\] \.cf-capa--ruta\s*\{[^}]*opacity:\s*1/);
   });
 
   it('espeja Dart con su comentario y entra con el .reveal de la página', () => {

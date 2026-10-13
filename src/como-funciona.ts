@@ -102,6 +102,7 @@ export class Pasos {
       pestana.tabIndex = si ? 0 : -1;
     }
     this.#escena.dataset.paso = paso;
+    this.#escena.closest('.cf-grid')?.setAttribute('data-paso', paso);
     this.#escena.setAttribute('aria-labelledby', elegida.id);
     for (const p of this.#descripciones) p.hidden = p.dataset.paso !== paso;
     this.#alCambiar?.(paso);
