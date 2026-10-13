@@ -20,3 +20,19 @@ test('el teléfono del hero sólo trae las vistas que enseña, y no arma listas'
   ]);
   await expect(telefono.locator('.app-tile')).toHaveCount(0);
 });
+
+/* El lienzo recorta con su filo redondeado, pero no es un contenedor de
+   scroll: con `overflow: hidden` lo era, y traer su botón a la vista desde
+   abajo (`scrollIntoView`, un ancla, el foco con Tab) lo corría 130 px por
+   dentro y la copia quedaba subida, cortada por arriba. Con `clip` no hay
+   nada que correr. */
+test('el lienzo del hero no se desplaza por dentro al traer su botón a la vista', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'load' });
+  const corrido = await page.evaluate(async () => {
+    window.scrollTo({ top: 1800, behavior: 'instant' });
+    await new Promise((r) => setTimeout(r, 300));
+    document.querySelector<HTMLElement>('.hero-actions .btn-green')!.scrollIntoView({ block: 'center', behavior: 'instant' });
+    return document.querySelector<HTMLElement>('.hero-panel')!.scrollTop;
+  });
+  expect(corrido).toBe(0);
+});

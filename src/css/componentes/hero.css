@@ -41,8 +41,10 @@
     radial-gradient(circle at 50% 0%, rgba(0, 168, 89, 0.07) 0%, transparent 50%);
   border-bottom-left-radius: 32px;
   border-bottom-right-radius: 32px;
-  /* El filo redondeado corta los teléfonos: el escenario sangra. */
-  overflow: hidden;
+  /* El filo redondeado corta los teléfonos: el escenario sangra. `clip`
+     y no `hidden`: recorta igual pero no es contenedor de scroll, y así
+     traer su botón a la vista no corre la copia por dentro. */
+  overflow: clip;
 }
 
 /*
