@@ -176,3 +176,10 @@ describe('el árbol crece por piezas', () => {
     expect(vigas.map((v) => v.izq)).toEqual([true, true, false, false]);
   });
 });
+
+describe('tramos sin camino', () => {
+  it('un d vacío o sin órdenes no da ninguna pieza', () => {
+    expect(tramos('')).toEqual([]);
+    expect(tramos('sin órdenes')).toEqual([]);
+  });
+});

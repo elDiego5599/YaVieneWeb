@@ -198,3 +198,42 @@ describe('empresas.html: el formulario', () => {
     expect(form).toMatch(/id="telefono-ayuda"[^>]*>\s*Ej\.: 300 123 4567/);
   });
 });
+
+describe('ContactForm: eventos que no son de un campo y campos raros', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+    HTMLElement.prototype.scrollIntoView = vi.fn();
+  });
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('salir del botón o escribir fuera de un campo no marca nada', () => {
+    const form = montar();
+    new ContactForm(form);
+    form.querySelector('button')!.dispatchEvent(new Event('focusout', { bubbles: true }));
+    form.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(form.querySelectorAll('[aria-invalid]')).toHaveLength(0);
+    expect(aviso('nombre')).toBe('');
+  });
+
+  it('un campo obligatorio sin mensaje propio recibe el genérico', () => {
+    const form = montar({ nombre: 'Ana', empresa: 'Sobusa', telefono: '3001234567' });
+    form.insertAdjacentHTML('afterbegin', '<input required id="ciudad" name="ciudad" /><p id="ciudad-error"></p>');
+    new ContactForm(form);
+    salir('ciudad');
+    expect(aviso('ciudad')).toBe('Complete este campo.');
+  });
+
+  it('un archivo adjunto no viaja entre los datos del envío', async () => {
+    const form = montar({ nombre: 'Ana', empresa: 'Sobusa', telefono: '3001234567' });
+    form.insertAdjacentHTML('afterbegin', '<input type="file" name="adjunto" />');
+    const abrir = vi.spyOn(window, 'open').mockImplementation(() => null);
+    new ContactForm(form);
+    await enviar(form);
+    expect(abrir).toHaveBeenCalledTimes(1);
+    expect(decodeURIComponent(String(abrir.mock.calls[0][0]))).not.toContain('adjunto');
+  });
+});

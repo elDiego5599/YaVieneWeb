@@ -112,3 +112,12 @@ describe('distanciaAviso', () => {
     expect(distanciaAviso(3000)).toBe('3,0 km');
   });
 });
+
+describe('cifraViva sin texto previo', () => {
+  it('un elemento vacío y sin valor previo cambia en seco a una palabra', () => {
+    const el = document.createElement('div');
+    cifraViva(el, 'Ya llegó', 0);
+    expect(el.textContent).toBe('Ya llegó');
+    expect(el.dataset.valor).toBe('0');
+  });
+});

@@ -131,3 +131,39 @@ describe('avance automático de los pasos', () => {
     expect(document.querySelector('[role="tablist"]')!.hasAttribute('data-auto')).toBe(false);
   });
 });
+
+describe('avance automático: sin observador y al salir de la vista', () => {
+  beforeEach(() => vi.useFakeTimers());
+
+  it('sin IntersectionObserver el avance arranca en el acto', () => {
+    vi.stubGlobal('IntersectionObserver', undefined);
+    delete (window as { IntersectionObserver?: unknown }).IntersectionObserver;
+    new Pasos(document.querySelector<HTMLElement>('.cf-demo')!, { intervalo: 5000 });
+    vi.advanceTimersByTime(5000);
+    expect(escena().dataset.paso).toBe('bus');
+  });
+
+  it('al salir de la vista se para, y al volver sigue desde donde iba', () => {
+    let avisar!: (e: { isIntersecting: boolean }[]) => void;
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(cb: typeof avisar) {
+          avisar = cb;
+        }
+        observe(): void {}
+        disconnect(): void {}
+      }
+    );
+    new Pasos(document.querySelector<HTMLElement>('.cf-demo')!, { intervalo: 5000 });
+    avisar([{ isIntersecting: true }]);
+    vi.advanceTimersByTime(5000);
+    expect(escena().dataset.paso).toBe('bus');
+    avisar([{ isIntersecting: false }]);
+    vi.advanceTimersByTime(20000);
+    expect(escena().dataset.paso).toBe('bus');
+    avisar([{ isIntersecting: true }]);
+    vi.advanceTimersByTime(5000);
+    expect(escena().dataset.paso).toBe('aviso');
+  });
+});
