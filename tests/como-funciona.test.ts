@@ -57,10 +57,25 @@ describe('banda «Cómo funciona»', () => {
   it('lleva titular con acento verde y párrafo, sin ceja ni botón (dueño, 2026-10-12)', () => {
     expect(banda).not.toMatch(/cf-ceja/);
     expect(banda).toMatch(/<h2[^>]*>\s*Tres pasos <span class="acentuado">y ya sabes dónde viene\.<\/span>\s*<\/h2>/);
-    expect(banda).toContain(
-      'Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso. Te avisamos cuando esté cerca de ti.'
-    );
     expect(banda.slice(0, banda.indexOf('cf-demo'))).not.toMatch(/<a\b|btn-primary/);
+  });
+
+  it('separa la segunda frase del subtítulo y añade una explicación por paso', () => {
+    expect(banda).toMatch(/class="seccion-lead">Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso\.<br\s*\/>Te avisamos cuando esté cerca de ti\./);
+    const extras = [
+      'Antes tenías que adivinar si el Sobusa ya había pasado o te tocaba esperar otra media hora. Ahora solo toca la ruta antes de salir y de inmediato sabes si viene uno cerca.',
+      'Ver el bus acercándose metro a metro en el mapa te quita toda la incertidumbre: no hay que exponerse a robos ni a calores de mediodía.',
+      'Pon la alerta mientras terminas de desayunar o de arreglarte en la casa. Cuando suena el aviso, es tu señal exacta para bajar al paradero sin esperar nada.',
+    ];
+    for (const [i, paso] of ['ruta', 'bus', 'aviso'].entries()) {
+      expect(banda).toContain(`<p class="cf-explica-extra">${extras[i]}</p>`);
+      expect(banda.match(new RegExp(`<p class="solo-lectores" data-paso="${paso}"[^>]*>[\\s\\S]*?${extras[i]}`))).not.toBeNull();
+    }
+    expect(css).toMatch(/\.cf-texto\s*\{[^}]*align-self:\s*stretch/s);
+    expect(css).toMatch(/\.cf-explica-extra\s*\{[^}]*background:\s*#fff/s);
+    // El desliz de lado solo sin movimiento reducido: allí queda el fundido.
+    const conMovimiento = css.slice(css.indexOf('@media (prefers-reduced-motion: no-preference)'));
+    expect(conMovimiento).toMatch(/^@media[^{]*\{[^@]*data-direccion="adelante"\] \.cf-explica \{ translate: -48px 0; \}/);
   });
 
   it('la columna de texto no lleva logos ni botón', () => {

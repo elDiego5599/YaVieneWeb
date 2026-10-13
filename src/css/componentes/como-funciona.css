@@ -50,13 +50,13 @@
   color: var(--acento);
 }
 
-/* 17–19 px en la tinta media, dos renglones a 1440 como el de allá. */
+/* 17–19 px en la tinta media, dos renglones: la primera frase entera y
+   «Te avisamos…» tras el `<br>` (dueño, 2026-10-12). */
 .cf-cabeza .seccion-lead {
-  max-width: 46ch;
+  max-width: none;
   font-size: clamp(17px, 1rem + 0.2vw, 19px);
   color: var(--tinta-media);
   line-height: 1.45;
-  text-wrap: balance;
 }
 
 /* El cuadro grande del On-call de incident.io: el texto del paso, la demo
@@ -85,22 +85,40 @@
    (lo pone `como-funciona.ts`; sin JavaScript, el del marcado: «ruta»). */
 .cf-texto {
   display: grid;
-  align-self: center;
+  align-self: stretch;
+  min-height: 0;
 }
 
 .cf-explica {
   grid-area: 1 / 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
   gap: 16px;
   opacity: 0;
-  translate: 0 8px;
+  translate: 48px 0;
   transition:
     opacity 450ms cubic-bezier(0.3, 0, 0.2, 1),
     translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
   will-change: opacity, translate;
+}
+
+/* El cuadro blanco con la explicación de más va al pie de la columna,
+   que mide lo que la escena de al lado: `margin-top: auto` lo baja y
+   deja el número, el título y el texto arriba. */
+.cf-explica-extra {
+  width: 100%;
+  margin: auto 0 0;
+  /* El relleno y radio compactos dejan sitio al párrafo dentro de la escena. */
+  padding: clamp(14px, 1.5vw, 22px);
+  border: 1px solid var(--cf-borde);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: var(--cf-sombra);
+  font-size: clamp(15px, 0.9rem + 0.15vw, 17px);
+  color: var(--tinta-media);
+  line-height: 1.45;
 }
 
 .cf-grid[data-paso="ruta"] .cf-explica[data-paso="ruta"],
@@ -111,6 +129,28 @@
 .cf-grid:has(.cf-escena[data-paso="aviso"]) .cf-explica[data-paso="aviso"] {
   opacity: 1;
   translate: 0 0;
+}
+
+/* Al cambiar de paso el que se va sale por el lado contrario al que entra
+   el nuevo, y la vuelta deshace el mismo camino. 48 px: lo bastante para
+   leerse como un desliz de lado y poco para no pisar la escena de al lado.
+   El que entra lo trae una animación, porque su `translate` de reposo es
+   el del lado por donde salió la última vez. Con movimiento reducido no
+   hay desliz: solo el fundido de abajo. */
+@media (prefers-reduced-motion: no-preference) {
+  .cf-grid[data-direccion="adelante"] .cf-explica { translate: -48px 0; }
+  .cf-grid[data-direccion="atras"] .cf-explica { translate: 48px 0; }
+
+  .cf-grid[data-direccion][data-paso="ruta"] .cf-explica[data-paso="ruta"],
+  .cf-grid[data-direccion][data-paso="bus"] .cf-explica[data-paso="bus"],
+  .cf-grid[data-direccion][data-paso="aviso"] .cf-explica[data-paso="aviso"] {
+    translate: 0 0;
+    animation: cf-entra 480ms cubic-bezier(0.3, 0, 0.2, 1) both;
+  }
+
+  .cf-grid[data-direccion="atras"] .cf-explica { --cf-desde: -48px; }
+
+  @keyframes cf-entra { from { translate: var(--cf-desde, 48px) 0; } }
 }
 
 /* El número en el verde de letra (`--acento`), con mayor presencia. */
@@ -849,6 +889,6 @@
 @media (min-width: 1024px) {
   .cf-grid {
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-    align-items: center;
+    align-items: stretch;
   }
 }

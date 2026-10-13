@@ -18,12 +18,16 @@ const menu = (pagina: string): string[] => {
 };
 
 describe('el nav', () => {
-  it('es el mismo en la portada, empresas, privacidad y términos', () => {
+  it('portada, privacidad y términos comparten menú; empresas tiene el suyo', () => {
     const portada = menu('index.html');
     expect(portada).toEqual(['Cómo funciona → #como-funciona', 'Problema → #problema', 'Para empresas → /empresas.html']);
-    for (const pagina of ['empresas.html', 'privacidad.html', 'terminos.html']) {
+    for (const pagina of ['privacidad.html', 'terminos.html']) {
       expect(menu(pagina), pagina).toEqual(portada);
     }
+    expect(menu('empresas.html')).toEqual([
+      'Inicio → /', 'Panel de control → #panel', 'Beneficios → #beneficios', 'Conecte su flota → #solicitar',
+    ]);
+    expect(leer('empresas.html')).not.toMatch(/nav-island-cta[^>]*aria-current/);
   });
 
   it('su estilo de escritorio no depende del hero de la portada', () => {

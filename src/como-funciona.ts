@@ -57,7 +57,8 @@ export class Pasos {
         if (!ir) return;
         ev.preventDefault();
         const j = ir(i, this.#pestanas.length);
-        this.#elegir(j);
+        // Las flechas dan vuelta en círculo: su lado es el de la tecla.
+        this.#elegir(j, ev.key === 'ArrowRight' ? 'adelante' : ev.key === 'ArrowLeft' ? 'atras' : undefined);
         this.#pestanas[j].focus();
       });
     });
@@ -67,8 +68,7 @@ export class Pasos {
       const arrancar = (): void => {
         if (this.#temporizador || !this.#activo) return;
         this.#temporizador = window.setInterval(() => {
-          const actual = this.#pestanas.findIndex(p => p.getAttribute('aria-selected') === 'true');
-          this.#elegir((actual + 1) % this.#pestanas.length);
+          this.#elegir((this.#actual() + 1) % this.#pestanas.length, 'adelante');
         }, opciones.intervalo);
       };
       if ('IntersectionObserver' in window) {
@@ -84,6 +84,10 @@ export class Pasos {
     }
   }
 
+  #actual(): number {
+    return this.#pestanas.findIndex(p => p.getAttribute('aria-selected') === 'true');
+  }
+
   #detener(): void {
     if (!this.#activo) return;
     this.#activo = false;
@@ -93,7 +97,11 @@ export class Pasos {
     this.#lista?.removeAttribute('data-auto');
   }
 
-  #elegir(indice: number): void {
+  /* El texto del paso entra por el lado hacia el que se va: la pestaña de
+     la derecha llega desde la derecha, la de la izquierda desde la
+     izquierda, y la vuelta automática del tercero al primero sigue
+     adelante, porque es el mismo recorrido que viene repitiendo. */
+  #elegir(indice: number, direccion = indice >= this.#actual() ? 'adelante' : 'atras'): void {
     const elegida = this.#pestanas[indice];
     const paso = elegida.dataset.paso ?? '';
     for (const pestana of this.#pestanas) {
@@ -102,7 +110,9 @@ export class Pasos {
       pestana.tabIndex = si ? 0 : -1;
     }
     this.#escena.dataset.paso = paso;
-    this.#escena.closest('.cf-grid')?.setAttribute('data-paso', paso);
+    const cuadricula = this.#escena.closest('.cf-grid');
+    cuadricula?.setAttribute('data-paso', paso);
+    cuadricula?.setAttribute('data-direccion', direccion);
     this.#escena.setAttribute('aria-labelledby', elegida.id);
     for (const p of this.#descripciones) p.hidden = p.dataset.paso !== paso;
     this.#alCambiar?.(paso);

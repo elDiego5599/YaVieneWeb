@@ -34,6 +34,22 @@ afterEach(() => {
 });
 
 describe('pestañas de los tres pasos', () => {
+  it('el texto entra por el lado al que se va: derecha adelante, izquierda atrás', () => {
+    const cuadro = (): string | undefined => document.querySelector<HTMLElement>('.cf-grid')!.dataset.direccion;
+    pestana('aviso').click();
+    expect(cuadro()).toBe('adelante');
+    pestana('bus').click();
+    expect(cuadro()).toBe('atras');
+    // Las flechas dan la vuelta en círculo: manda la tecla, no el índice.
+    tecla('bus', 'ArrowRight');
+    tecla('aviso', 'ArrowRight');
+    expect(escena().dataset.paso).toBe('ruta');
+    expect(cuadro()).toBe('adelante');
+    tecla('ruta', 'ArrowLeft');
+    expect(escena().dataset.paso).toBe('aviso');
+    expect(cuadro()).toBe('atras');
+  });
+
   it('la entrada al bus anima toque y tarjeta, y cambiar de paso cancela el toque pendiente', () => {
     const main = readFileSync(resolve(process.cwd(), 'src/main.ts'), 'utf8');
     expect(main).toMatch(/setBuses\(\[.*?,.*?\]\)/s);
