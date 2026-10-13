@@ -146,6 +146,24 @@ describe('banda «Cómo funciona»', () => {
     expect(leer('src/main.ts')).toMatch(/cancelAnimationFrame/);
   });
 
+  it('el paso del bus lleva una hoja con la distancia y el botón lleno, como eta_bottom_sheet.dart (dueño, 2026-10-12)', () => {
+    document.body.innerHTML = banda;
+    const hoja = document.querySelector('.cf-mapa-tarjeta .cf-mapa-hoja');
+    expect(hoja?.querySelector('.cf-mapa-distancia')).not.toBeNull();
+    expect(hoja?.querySelector('.cf-bus-cta')?.textContent).toBe('Avisarme cuando esté cerca');
+    expect(css).toMatch(/\.cf-bus-cta\s*\{[^}]*background:\s*var\(--azul-boton\)/s);
+    expect(css).toMatch(/\.cf-bus-cta\s*\{[^}]*color:\s*#fff/s);
+    expect(leer('src/main.ts')).toMatch(/\.cf-mapa-hoja'\)\?\.classList\.(add|remove)\('cf-distancia-espera'\)/);
+  });
+
+  it('«Aviso activado» sale al guardar y la notificación 2 s después (dueño, 2026-10-12)', () => {
+    expect(css).toMatch(/\.cf-aviso-confirmacion\s*\{[^}]*opacity:\s*0/s);
+    expect(css).toMatch(/\.cf-aviso-guardado \.cf-aviso-confirmacion\s*\{[^}]*opacity:\s*1/s);
+    const main = leer('src/main.ts');
+    expect(main).toMatch(/classList\.add\('cf-aviso-guardado'\)/);
+    expect(main).toMatch(/cf-notificacion-visible'\);\s*\}, 2000\)/);
+  });
+
   it('en el paso de la ruta enseña el selector dentro del teléfono', () => {
     // Sin esta regla las capas se quedan en `opacity: 0` y el teléfono sale
     // con el mapa pelado.

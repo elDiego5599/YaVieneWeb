@@ -236,34 +236,59 @@
   filter: saturate(0.72);
 }
 
-/* La distancia destaca sobre una tarjeta blanca con la sombra de interfaz. */
-.cf-mapa-distancia {
+/* La hoja de eta_bottom_sheet.dart sobre el borde inferior del mapa: asa,
+   la distancia a la izquierda y el botón lleno a la derecha (dueño,
+   2026-10-12: el CTA suelto arriba no convencía). 14 % por lado la deja
+   dentro del ancho del mapa (10 %–90 %), así que se lee como suya. */
+.cf-mapa-hoja {
   position: absolute;
-  /* 5 % alinea esta tarjeta con el CTA y los márgenes del selector. */
-  right: 5%;
+  right: 14%;
   bottom: 5%;
-  display: grid;
-  grid-template-columns: auto auto;
-  align-items: baseline;
-  gap: 0 5px;
-  padding: 16px 20px;
+  left: 14%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  /* 22 px arriba dejan sitio al asa sin despegar la cifra. */
+  padding: 22px 20px 18px 24px;
   border: 1px solid var(--cf-borde);
-  /* 16 px mantiene una curva coherente en las tarjetas flotantes. */
-  border-radius: 16px;
+  /* 20 px: la hoja es la superficie mayor que flota, va más redonda. */
+  border-radius: 20px;
   background: var(--surface);
   box-shadow: var(--cf-sombra);
   color: var(--tinta);
-  /* 260 ms acompaña la entrada de la tarjeta al terminar el toque. */
-  transition: opacity 260ms ease, scale 260ms ease;
+  /* 260 ms acompaña la entrada de la hoja al terminar el toque. */
+  transition: opacity 260ms ease, translate 260ms ease;
 }
-.cf-mapa-distancia.cf-distancia-espera {
+/* El asa de la hoja: 36 × 4 como en la app, centrada a 8 px del borde. */
+.cf-mapa-hoja::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--cf-borde);
+  translate: -50% 0;
+}
+.cf-mapa-hoja.cf-distancia-espera {
   opacity: 0;
-  /* 0,96 reduce apenas la tarjeta mientras permanece oculta. */
-  scale: 0.96;
+  /* 10 px: la hoja sube desde el borde como en la app. */
+  translate: 0 10px;
+}
+.cf-mapa-distancia {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: start;
+  align-items: baseline;
+  gap: 0 5px;
 }
 .cf-mapa-distancia .eta-number {
   font-size: 30px;
   font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 /* 15 px separa la unidad de la cifra principal sin competir con ella. */
 .cf-mapa-unidad {
@@ -277,21 +302,17 @@
   font-size: 12px;
 }
 
-/* La llamada a crear un aviso refleja el CTA de eta_bottom_sheet.dart. */
+/* El botón lleno de la hoja, en el azul de los botones (#1E56A8, blanco
+   encima 7,2:1); 12 px de radio como el de la app. */
 .cf-bus-cta {
-  position: absolute;
-  top: 5%;
-  /* 5 % hace coincidir el CTA con los otros elementos flotantes. */
-  left: 5%;
-  padding: 10px 14px;
-  border: 1px solid var(--cf-borde);
-  /* 14 px da al CTA una curva menor que la tarjeta principal. */
-  border-radius: 14px;
-  background: var(--surface);
-  box-shadow: var(--cf-sombra);
-  color: var(--azul-boton);
-  font-size: 13px;
+  flex: none;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: var(--azul-boton);
+  color: #fff;
+  font-size: 14px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 /* Cinco opciones; el 5 % de inset y 20 px de relleno mantienen aire alrededor de la rueda. */
@@ -356,13 +377,21 @@
   font-weight: 600;
 }
 
-/* 12 px separan la confirmación y conservan el tono secundario de eta_bottom_sheet.dart. */
+/* 12 px separan la confirmación y conservan el tono secundario de eta_bottom_sheet.dart.
+   Guarda su sitio pero no se ve hasta que se guarda (dueño, 2026-10-12). */
 .cf-aviso-confirmacion {
   display: block;
   margin-top: 12px;
   color: var(--tinta-media);
   font-size: 12px;
   line-height: 1.5;
+  opacity: 0;
+  translate: 0 4px;
+  transition: opacity 260ms ease, translate 260ms ease;
+}
+.cf-aviso-guardado .cf-aviso-confirmacion {
+  opacity: 1;
+  translate: 0 0;
 }
 /* El botón secundario conserva contraste en el texto de confirmación. */
 .cf-aviso-confirmacion .eta-detail-accion {
@@ -737,6 +766,8 @@
     animation: none;
   }
   .cf-aviso-notificacion { opacity: 1; translate: none; transition: none; }
+  .cf-aviso-confirmacion,
+  .cf-mapa-hoja { translate: none; transition: opacity 0.2s linear; }
   .cf-guardar.cf-guardando,
   .cf-aviso-composicion.cf-aviso-rodando .cf-rueda > *,
   .cf-escena.cf-ruta-reproduciendo .cf-chips,
@@ -764,19 +795,20 @@
     left: 19%;
   }
 
-  /* 4 % deja aire al rótulo y la tarjeta de distancia sin salir del mapa. */
-  .cf-mapa-distancia {
-    right: 5%;
-    bottom: 7%;
-    padding: 12px 16px;
-  }
-  /* 4 % y 11 px contienen el CTA sobre la esquina superior del mapa. */
-  .cf-bus-cta {
-    top: 7%;
+  /* En el teléfono la hoja ocupa el ancho del mapa y apila la cifra y el
+     botón, que va a todo lo ancho como en la app. */
+  .cf-mapa-hoja {
+    right: 7%;
+    bottom: 5%;
     left: 7%;
-    max-width: 70%;
-    padding: 8px 10px;
-    font-size: 11px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 20px 16px 16px;
+  }
+  .cf-bus-cta {
+    text-align: center;
+    font-size: 13px;
   }
 
   /* 4 % / 6 % ajustan el selector al ancho útil del escenario móvil. */

@@ -102,7 +102,7 @@ const arrancar = (): void => {
     mapaCf.showPin(true);
     mapaCf.showBuses(true);
     const distancia = document.querySelector<HTMLElement>('.cf-mapa-distancia .eta-number');
-    const tarjeta = document.querySelector<HTMLElement>('.cf-mapa-distancia');
+    const tarjeta = document.querySelector<HTMLElement>('.cf-mapa-hoja');
     let toque: SVGCircleElement | null = null;
     mostrarToque = (): void => {
       const bus = mapaCf.nodoBus(0);
@@ -159,11 +159,17 @@ const arrancar = (): void => {
     secuenciaTimer = 0;
     toqueAnimTimer = 0;
     document.querySelector('.cf-tap')?.remove();
-    document.querySelector('.cf-mapa-distancia')?.classList.remove('cf-distancia-espera');
+    document.querySelector('.cf-mapa-hoja')?.classList.remove('cf-distancia-espera');
     ruedaAviso?.classList.remove('cf-aviso-rodando');
     guardarAviso?.classList.remove('cf-guardando');
+    ruedaAviso?.classList.remove('cf-aviso-guardado');
     notificacionAviso?.classList.remove('cf-notificacion-visible');
     demo?.querySelector('.cf-escena')?.classList.remove('cf-ruta-reproduciendo');
+  };
+  /** El aviso ya guardado: la confirmación y la notificación a la vista. */
+  const avisoListo = (): void => {
+    ruedaAviso?.classList.add('cf-aviso-guardado');
+    notificacionAviso?.classList.add('cf-notificacion-visible');
   };
   const iniciarCiclo = (): void => {
     limpiarSecuencia();
@@ -171,7 +177,7 @@ const arrancar = (): void => {
     const ciclo = (): void => {
       if (sinMovimiento()) {
         llevarBus?.(1800); // 1,8 km es la llegada final que enseña la escena.
-        notificacionAviso?.classList.add('cf-notificacion-visible');
+        avisoListo();
         return;
       }
       if (pasoActual === 'ruta') {
@@ -182,17 +188,20 @@ const arrancar = (): void => {
       } else if (pasoActual === 'bus') {
         animarLlegada();
       } else if (pasoActual === 'aviso') {
-        ruedaAviso?.classList.remove('cf-aviso-rodando');
+        ruedaAviso?.classList.remove('cf-aviso-rodando', 'cf-aviso-guardado');
         guardarAviso?.classList.remove('cf-guardando');
         notificacionAviso?.classList.remove('cf-notificacion-visible');
         void ruedaAviso?.offsetWidth;
         ruedaAviso?.classList.add('cf-aviso-rodando');
         secuenciaTimer = window.setTimeout(() => {
           guardarAviso?.classList.add('cf-guardando');
+          // «Aviso activado» sale con el toque de «Guardar» (dueño, 2026-10-12).
+          ruedaAviso?.classList.add('cf-aviso-guardado');
+          // 2 s: el aviso llega un rato después de guardarlo, no encima
+          // (dueño, 2026-10-12); 950 + 2000 ms caben en los 5 s del paso.
           secuenciaTimer = window.setTimeout(() => {
             notificacionAviso?.classList.add('cf-notificacion-visible');
-            // 700 ms deja que se lea el toque antes de mostrar el aviso.
-          }, 700);
+          }, 2000);
           // 950 ms deja terminar el giro de la rueda antes de guardar.
         }, 950);
       }
@@ -207,12 +216,12 @@ const arrancar = (): void => {
     if (!llevarBus) return;
     if (llegadaFrame) cancelAnimationFrame(llegadaFrame);
     if (toqueTimer) window.clearTimeout(toqueTimer);
-    document.querySelector('.cf-mapa-distancia')?.classList.add('cf-distancia-espera');
+    document.querySelector('.cf-mapa-hoja')?.classList.add('cf-distancia-espera');
     const desde = 2600;
     const hasta = 1800;
     if (sinMovimiento()) {
       llevarBus(hasta);
-      document.querySelector('.cf-mapa-distancia')?.classList.remove('cf-distancia-espera');
+      document.querySelector('.cf-mapa-hoja')?.classList.remove('cf-distancia-espera');
       return;
     }
     const inicio = performance.now();
@@ -238,14 +247,14 @@ const arrancar = (): void => {
   if (demo) {
     const escena = demo.querySelector<HTMLElement>('.cf-escena');
     const movimientoReducido = sinMovimiento();
-    if (movimientoReducido) notificacionAviso?.classList.add('cf-notificacion-visible');
+    if (movimientoReducido) avisoListo();
     else iniciarCiclo();
     new Pasos(demo, { intervalo: 5000, alCambiar: paso => {
       pasoActual = paso;
       iniciarCiclo();
       if (movimientoReducido) {
         llevarBus?.(1800); // La tarjeta de bus queda en su distancia final.
-        notificacionAviso?.classList.add('cf-notificacion-visible');
+        avisoListo();
         escena?.classList.remove('cf-ruta-reproduciendo');
       }
     } });

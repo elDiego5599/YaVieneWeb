@@ -635,6 +635,10 @@
     align-items: center;
     min-height: 460px;
     padding-block: 0;
+    /* Más ancho que el contenedor (dueño, 2026-10-12: avisos más anchos y
+       menos altos): hasta 1320 px, sin pasar de la calle de la pantalla. El
+       margen negativo sale a los dos lados por igual; a 1024 px es 0. */
+    margin-inline: calc((100% - min(1320px, 100vw - 2 * var(--calle))) / 2);
   }
 
   .escenario-red,

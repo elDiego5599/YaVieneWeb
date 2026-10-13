@@ -186,6 +186,11 @@ describe('el escenario de «Qué resuelve»', () => {
     expect(css).toMatch(/\.aviso-titulo\s*\{[^}]*padding-inline-start:\s*calc\(var\(--icono\)/);
   });
 
+  it('en ancho el escenario sale del contenedor hasta 1320 px para ensanchar los avisos (dueño, 2026-10-12)', () => {
+    const ancho = css.slice(css.indexOf('@media (min-width: 1024px)'));
+    expect(ancho).toMatch(/\.escenario\s*\{[^}]*margin-inline:\s*calc\(\(100% - min\(1320px, 100vw - 2 \* var\(--calle\)\)\) \/ 2\)/);
+  });
+
   it('los textos largos ya no cuelgan debajo: viven en los avisos', () => {
     expect(doc.querySelector('.columnas, .columna-titulo, .columna-texto')).toBeNull();
   });
