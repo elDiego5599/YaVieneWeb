@@ -40,10 +40,9 @@ describe('«Preguntas frecuentes»', () => {
       '¿Cómo sabe dónde viene el bus?',
       '¿La distancia es en línea recta?',
       '¿Me avisa con la app cerrada?',
-      '¿Qué empresas están?',
       '¿Qué pasa con mi ubicación?',
     ]);
-    expect(seccion.match(/<details/g)).toHaveLength(6);
+    expect(seccion.match(/<details/g)).toHaveLength(5);
     expect(seccion).not.toMatch(/<button|onclick|role="button"/);
   });
 
@@ -53,13 +52,13 @@ describe('«Preguntas frecuentes»', () => {
     expect(texto).toMatch(/GPS va (montado )?en el bus/);
     expect(texto).toMatch(/por la calle/);
     expect(texto).toMatch(/En iPhone[^.]*app abierta/);
-    expect(texto).toMatch(/Sobusa/);
-    expect(texto).toMatch(/Coolitoral/);
+    // Sin «qué empresas están»: las rutas están en la app, pero todavía no
+    // se trabaja con ninguna empresa (dueño, 2026-10-12).
+    expect(texto).not.toMatch(/Sobusa|Coolitoral|empresas están/);
     expect(texto).not.toMatch(/minutos|llega en|tiempo de llegada/i);
     expect(texto).not.toMatch(/\bETA\b/);
     expect(texto).not.toMatch(/rutas reales/);
     expect(seccion).toMatch(/href="\/privacidad\.html"/);
-    expect(seccion).toMatch(/href="\/empresas\.html"/);
   });
 
   it('el CSS entra por el índice, antes del pie, y respeta el movimiento reducido', () => {

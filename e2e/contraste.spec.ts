@@ -81,7 +81,6 @@ const MUESTRAS: Record<string, string[]> = {
     '.apagado',
     '#problema .aviso-titulo',
     '.footer-nav-group > span',
-    '.footer-status > span',
     '.footer-nav a',
     '.footer-legal-links a',
   ],

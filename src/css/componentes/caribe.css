@@ -17,7 +17,9 @@
 
 @media (min-width: 760px) {
   .footer-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(260px, 1.2fr) minmax(160px, 0.7fr);
+    /* Dos columnas: la marca y la navegación. La tercera era la caja
+       «En movimiento · 6 rutas reales», que se quitó (dueño, 2026-10-12). */
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 1.2fr);
     align-items: start;
     gap: clamp(38px, 5vw, 86px);
   }

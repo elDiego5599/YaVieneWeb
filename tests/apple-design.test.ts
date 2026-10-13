@@ -190,9 +190,7 @@ describe('tipografía', () => {
     );
   });
 
-  it('el pie: cifra apretada y titular a 30 px en móvil y 54 en escritorio', () => {
-    const fuerte = Array.from(pie.matchAll(/\.footer-status strong\s*\{([^}]*)\}/g)).map((m) => m[1]).join('');
-    expect(fuerte).toMatch(/line-height:\s*1\.05/);
+  it('el pie: titular a 30 px en móvil y 54 en escritorio', () => {
     expect(pie).toMatch(/font-size:\s*clamp\(30px,\s*1\.35rem \+ 2\.25vw,\s*54px\)/);
   });
 

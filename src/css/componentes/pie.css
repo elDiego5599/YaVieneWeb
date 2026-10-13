@@ -126,8 +126,7 @@
   box-shadow: 0 8px 18px -7px var(--green-glow);
 }
 
-.footer-intro p,
-.footer-status p {
+.footer-intro p {
   color: var(--text-secondary);
   font-size: var(--step-body);
   line-height: 1.55;
@@ -146,8 +145,7 @@
   gap: 11px;
 }
 
-.footer-nav-group > span,
-.footer-status > span {
+.footer-nav-group > span {
   color: var(--text-muted);
   font-size: 11px;
   font-weight: 800;
@@ -178,19 +176,7 @@
   }
 }
 
-.footer-status {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  padding-left: 24px;
-  border-left: 1px solid rgba(11, 22, 40, 0.14);
-}
 
-.footer-status p {
-  max-width: 22ch;
-  font-size: 14px;
-}
 
 .footer-bottom {
   display: flex;
@@ -362,13 +348,11 @@
   color: var(--tinta);
 }
 
-.footer-intro p,
-.footer-status p {
+.footer-intro p {
   color: var(--tinta-media);
 }
 
-.footer-nav-group > span,
-.footer-status > span {
+.footer-nav-group > span {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
@@ -389,20 +373,7 @@
   }
 }
 
-.footer-status {
-  border-left: 1px solid var(--linea);
-}
 
-.footer-status strong {
-  color: var(--tinta);
-  font-family: var(--font-display);
-  font-size: clamp(24px, 2.5vw, 34px);
-  font-weight: 600;
-  /* 1,05 y no el 1,1 heredado de `h1…h4`: es una cifra de una línea, y a
-     34 px el aire de más la separaba de su rótulo. */
-  line-height: 1.05;
-  letter-spacing: -0.04em;
-}
 
 .footer-bottom {
   margin-top: clamp(38px, 4vw, 54px);
