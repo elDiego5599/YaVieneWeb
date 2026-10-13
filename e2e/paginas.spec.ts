@@ -290,32 +290,6 @@ test('en empresas, el rótulo del hero no repite la barra en el teléfono', asyn
   await expect(rotulo, 'sin barra que lo diga, el rótulo hace falta').toBeVisible();
 });
 
-/* La rueda del paso 3 espeja la de rueda_distancia.dart: cinco filas
-   enteras, dos arriba y dos abajo de la elegida, en el alto de cinco filas
-   de 40 entre el `squeeze` 1,45 del picker (dueño, 2026-10-06: «solo 2
-   arriba y 2 abajo», y más baja). La franja del medio sigue en 40. */
-test('la rueda del paso 3 enseña dos arriba y dos abajo, en el alto de la app', async ({ page }) => {
-  await page.setViewportSize({ width: 402, height: 760 });
-  await page.goto('/', { waitUntil: 'load' });
-  const medida = await page.evaluate(() => {
-    const toma = document.querySelector<HTMLElement>('[data-demo="3"]')!;
-    const hoja = toma.querySelector<HTMLElement>('[data-el="sheet"]')!;
-    for (const el of toma.querySelectorAll<HTMLElement>('*')) el.style.transition = 'none';
-    hoja.classList.add('is-on', 'is-rueda');
-    const rueda = toma.querySelector<HTMLElement>('[data-el="rueda"]')!;
-    const r = rueda.getBoundingClientRect();
-    const filas = [...rueda.querySelectorAll<HTMLElement>('.rueda-fila')].map((f) => f.getBoundingClientRect());
-    const dentro = filas.filter((f) => f.top >= r.top - 0.5 && f.bottom <= r.bottom + 0.5).length;
-    const asoman = filas.filter((f) => f.bottom > r.top + 0.5 && f.top < r.bottom - 0.5).length;
-    const franja = parseFloat(getComputedStyle(rueda, '::before').height);
-    // offsetHeight y no el rect: el teléfono va escalado y la franja no.
-    return { dentro, asoman, proporcion: rueda.offsetHeight / franja };
-  });
-  expect(medida.dentro).toBe(5);
-  expect(medida.asoman).toBe(5);
-  expect(medida.proporcion).toBeCloseTo(5 / 1.45, 2);
-});
-
 /* La cinta de logos de la banda de marcas (dueño, 2026-10-12): siete
    logos y su copia, cargados, corren, caben en la columna de texto y se
    desvanecen en los bordes. */

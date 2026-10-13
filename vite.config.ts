@@ -65,6 +65,9 @@ export function seoDeRaiz(): Plugin {
       sitio = String(config.env.VITE_SITE_URL ?? '').replace(/\/+$/, '');
 
       /*
+        El hero carga sus videos locales, por eso `media-src 'self'` permite
+        únicamente archivos servidos desde este sitio.
+
         El `connect-src 'self'` de vercel.json bloquea cualquier fetch a otro
         origen, y el formulario manda a VITE_CONTACT_ENDPOINT. Con la variable
         vacía —como está hoy— no pasa nada, porque el formulario se va por
