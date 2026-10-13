@@ -12,7 +12,7 @@ import { describe, expect, it } from 'vitest';
  * pestañas que cambian lo que enseña la pantalla. El teléfono es
  * decoración (`aria-hidden`); cada paso lleva su descripción para el
  * lector de pantalla. El divisor que sigue a la cinta de logos queda antes
- * de esta banda, y otro la separa de «Problema» (dueño, 2026-10-12).
+ * de esta banda; entre ella y «Problema» ya no va raya (dueño, 2026-10-12).
  *
  * Su id NO es `solucion`: `sin-como-funciona.test.ts` sigue vigilando
  * que la sección vieja no vuelva.
@@ -25,12 +25,12 @@ const banda = /<section[^>]*id="como-funciona"[^>]*>[\s\S]*?<\/section>/.exec(ht
 const divisor = '<hr class="divisor" aria-hidden="true" />';
 
 describe('banda «Cómo funciona»', () => {
-  it('va antes de #problema, con un divisor entre las dos (dueño, 2026-10-12)', () => {
+  it('va justo antes de #problema, sin divisor entre las dos (dueño, 2026-10-12: la raya sobraba)', () => {
     expect(banda).not.toBe('');
     const ini = html.indexOf(banda);
     const problema = html.indexOf('id="problema"');
     expect(problema).toBeGreaterThan(ini);
-    expect(html.slice(ini + banda.length).trimStart().startsWith(divisor)).toBe(true);
+    expect(html.slice(ini + banda.length).trimStart().startsWith('<section class="panel panel--banda" id="problema"')).toBe(true);
     const finMarcas = html.indexOf('</section>', html.indexOf('id="marcas"')) + '</section>'.length;
     expect(html.slice(finMarcas).trimStart().startsWith(divisor)).toBe(true);
   });
@@ -43,7 +43,7 @@ describe('banda «Cómo funciona»', () => {
     expect(html.indexOf('id="hero"')).toBeLessThan(ini);
     expect(html.slice(html.indexOf('id="hero"'), ini)).not.toContain(divisor);
     expect(html.slice(fin).trimStart().startsWith(divisor)).toBe(true);
-    expect(html.split(divisor)).toHaveLength(3);
+    expect(html.split(divisor)).toHaveLength(2);
     expect(html.indexOf('id="como-funciona"')).toBeGreaterThan(fin);
     expect(franja.match(/empresa-marcas-grupo/g)).toHaveLength(2);
     expect(franja).toMatch(/empresa-marcas-grupo" aria-hidden="true"/);

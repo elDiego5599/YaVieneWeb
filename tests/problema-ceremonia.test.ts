@@ -340,6 +340,13 @@ describe('lo que pone problema.ts', () => {
     for (const t of tramos) expect(['0', '1']).toContain(t.style.getPropertyValue('--orden'));
   });
 
+  it('los cuatro avisos toman el alto del más alto (dueño, 2026-10-12: mismo ancho y alto)', () => {
+    const altos = [118, 135, 115, 136];
+    document.querySelectorAll<HTMLElement>('.aviso').forEach((aviso, i) => fijar(aviso, { offsetHeight: altos[i] }));
+    new Problema(seccion());
+    expect(document.querySelector<HTMLElement>('.avisos')!.style.getPropertyValue('--alto-aviso')).toBe('136px');
+  });
+
   it('quien pidió que nada se mueva no ve el cambio solo: no se vigila el asomo', () => {
     window.matchMedia = ((q: string) => ({ matches: q.includes('reduce'), media: q, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
     new Problema(seccion());

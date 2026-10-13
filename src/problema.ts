@@ -170,6 +170,16 @@ export class Problema {
     const sobra = this.#estado.offsetWidth - (claro?.offsetWidth ?? 0) - parseFloat(paddingLeft) - parseFloat(paddingRight);
     this.#estado.style.setProperty('--recorte', `${Math.max(0, sobra / 2)}px`);
 
+    // Los cuatro avisos, del alto del más alto (dueño, 2026-10-12): el
+    // texto de cada uno cambia lo que mide y la fila quedaba dentada. Se
+    // mide sin el mínimo puesto, para que encoja si el texto encoge.
+    const lista = this.#seccion.querySelector<HTMLElement>('.avisos');
+    if (lista) {
+      lista.style.removeProperty('--alto-aviso');
+      const alto = Math.max(...Array.from(lista.querySelectorAll<HTMLElement>('.aviso'), (a) => a.offsetHeight));
+      if (alto > 0) lista.style.setProperty('--alto-aviso', `${alto}px`);
+    }
+
     const red = this.#seccion.querySelector<SVGSVGElement>('.escenario-red');
     const escena = red?.parentElement;
     if (!red || !escena || getComputedStyle(red).display === 'none') return;

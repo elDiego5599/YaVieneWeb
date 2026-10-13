@@ -359,6 +359,8 @@
 }
 
 .aviso {
+  /* El alto del más alto de los cuatro, que pone problema.ts. */
+  min-height: var(--alto-aviso, 0px);
   /* Icono y texto comparten la celda: el título se corre a la derecha del
      icono y la frase pasa por debajo de los dos, a todo el ancho (dueño,
      2026-10-12: tarjeta más ancha y menos alta). Las caras no se tocan:

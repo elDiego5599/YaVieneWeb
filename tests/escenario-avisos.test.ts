@@ -191,6 +191,14 @@ describe('el escenario de «Qué resuelve»', () => {
     expect(ancho).toMatch(/\.escenario\s*\{[^}]*margin-inline:\s*calc\(\(100% - min\(1320px, 100vw - 2 \* var\(--calle\)\)\) \/ 2\)/);
   });
 
+  it('los cuatro avisos miden igual de ancho y de alto (dueño, 2026-10-12)', () => {
+    // Un alto mínimo para los cuatro, el del más largo (lo mide
+    // `problema.ts`, ver problema-ceremonia.test.ts); sin él cada uno
+    // medía lo que su texto y la fila quedaba dentada. Mínimo y no fijo:
+    // con la letra agrandada el texto sigue cabiendo.
+    expect(css).toMatch(/\.aviso\s*\{[^}]*min-height:\s*var\(--alto-aviso, 0px\)/);
+  });
+
   it('los textos largos ya no cuelgan debajo: viven en los avisos', () => {
     expect(doc.querySelector('.columnas, .columna-titulo, .columna-texto')).toBeNull();
   });
