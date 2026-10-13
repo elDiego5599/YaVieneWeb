@@ -17,6 +17,11 @@
  * arrastrar con el ratón o el dedo, pegado 1:1; al soltar se proyecta la
  * velocidad (la fórmula de las listas de iOS) y se pasa de paso si el
  * gesto llevaba a más de un tercio del ancho.
+ *
+ * La escena va en el mismo carrusel, dentro de su marco: es una sola (la
+ * del lector y la que anima `main.ts`), así que la que se ve salir, o
+ * asomar al arrastrar, es una copia muda (`.cf-escena--fantasma`) que se
+ * quita al llegar.
  */
 
 import { sinMovimiento } from './scrolly';
@@ -25,6 +30,9 @@ export type OpcionesPasos = {
   intervalo?: number;
   alCambiar?: (paso: string) => void;
 };
+
+/** Los 480 ms del desliz y un margen; luego la copia sobra. */
+const VIAJE = 500;
 
 /** Lo que se mueve el dedo antes de que el gesto sea de lado (o no). */
 const UMBRAL = 10;
@@ -49,6 +57,10 @@ export class Pasos {
   readonly #cuadricula: Element | null;
   readonly #texto: HTMLElement | null;
   readonly #explicas: HTMLElement[];
+  readonly #marco: HTMLElement | null;
+  #fantasma: HTMLElement | null = null;
+  #preparada = '';
+  #llegada = 0;
   #temporizador = 0;
   #observador?: IntersectionObserver;
   #activo = true;
@@ -64,7 +76,8 @@ export class Pasos {
     this.#cuadricula = this.#escena.closest('.cf-grid');
     this.#texto = this.#cuadricula?.querySelector<HTMLElement>('.cf-texto') ?? null;
     this.#explicas = Array.from(this.#texto?.querySelectorAll<HTMLElement>('.cf-explica[data-paso]') ?? []);
-    if (this.#texto) this.#arrastrable(this.#texto);
+    this.#marco = this.#escena.parentElement?.classList.contains('cf-marco') ? this.#escena.parentElement : null;
+    this.#arrastrable([this.#texto, this.#marco].filter((e): e is HTMLElement => e !== null));
 
     this.#pestanas.forEach((pestana, i) => {
       pestana.addEventListener('click', () => {
@@ -129,12 +142,13 @@ export class Pasos {
       pestana.setAttribute('aria-selected', String(si));
       pestana.tabIndex = si ? 0 : -1;
     }
-    this.#escena.dataset.paso = paso;
+    const entrada = direccion === 'adelante' ? 'despues' : 'antes';
+    this.#moverEscena(paso, entrada);
     this.#cuadricula?.setAttribute('data-paso', paso);
     this.#cuadricula?.setAttribute('data-direccion', direccion);
     this.#escena.setAttribute('aria-labelledby', elegida.id);
     for (const p of this.#descripciones) p.hidden = p.dataset.paso !== paso;
-    this.#mover(paso, direccion === 'adelante' ? 'despues' : 'antes');
+    this.#mover(paso, entrada);
     this.#alCambiar?.(paso);
   }
 
@@ -159,10 +173,74 @@ export class Pasos {
     nueva.dataset.lugar = 'actual';
   }
 
+  /* Una copia de la escena que se ve y no se oye: sin ids, sin pestaña que
+     la nombre, sin las descripciones ni el toque. Va detrás de la viva, así
+     `querySelector('.cf-escena')` sigue dando esa. */
+  #copiar(paso: string, lugar: string): HTMLElement {
+    this.#quitarFantasma();
+    const copia = this.#escena.cloneNode(true) as HTMLElement;
+    copia.removeAttribute('id');
+    copia.removeAttribute('role');
+    copia.removeAttribute('aria-labelledby');
+    copia.removeAttribute('data-entra');
+    copia.setAttribute('aria-hidden', 'true');
+    copia.inert = true;
+    copia.classList.add('cf-escena--fantasma');
+    for (const e of copia.querySelectorAll('.solo-lectores, .cf-tap')) e.remove();
+    for (const e of copia.querySelectorAll('[id]')) e.removeAttribute('id');
+    copia.dataset.paso = paso;
+    copia.dataset.lugar = lugar;
+    this.#escena.after(copia);
+    this.#fantasma = copia;
+    return copia;
+  }
+
+  #quitarFantasma(): void {
+    window.clearTimeout(this.#llegada);
+    this.#fantasma?.remove();
+    this.#fantasma = null;
+  }
+
+  /* Deja la escena lista para entrar: la de ahora, copiada, en el centro;
+     la viva, ya con su paso, en el lado por donde llega. Sin animar: se
+     fuerza el cálculo para que el desliz parta de ahí. */
+  #preparar(paso: string, entrada: 'antes' | 'despues'): void {
+    this.#copiar(this.#escena.dataset.paso ?? '', 'actual');
+    this.#escena.dataset.entra = '';
+    this.#escena.dataset.paso = paso;
+    this.#escena.dataset.lugar = entrada;
+    void this.#escena.offsetWidth;
+    this.#preparada = paso;
+  }
+
+  #moverEscena(paso: string, entrada: 'antes' | 'despues'): void {
+    if (!this.#marco || sinMovimiento()) {
+      this.#escena.dataset.paso = paso;
+      return;
+    }
+    if (this.#preparada !== paso) {
+      if (this.#escena.dataset.paso === paso) return;
+      this.#preparar(paso, entrada);
+    }
+    this.#preparada = '';
+    const vieja = this.#fantasma!;
+    vieja.dataset.sale = '';
+    vieja.dataset.lugar = entrada === 'despues' ? 'antes' : 'despues';
+    this.#escena.dataset.lugar = 'actual';
+    this.#llegada = window.setTimeout(() => {
+      this.#fantasma?.remove();
+      this.#fantasma = null;
+      delete this.#escena.dataset.entra;
+    }, VIAJE);
+  }
+
   /* El arrastre: tras 10 px se decide si el gesto es de lado; si lo es, el
      texto sigue al dedo y el vecino de ese lado asoma. Al soltar, la
      velocidad de los últimos ~100 ms se proyecta y decide. */
-  #arrastrable(texto: HTMLElement): void {
+  #arrastrable(asas: HTMLElement[]): void {
+    const grid = (this.#cuadricula as HTMLElement | null) ?? asas[0];
+    if (!grid) return;
+    let asa: HTMLElement = asas[0];
     let inicio: { x: number; y: number } | null = null;
     let deLado = false;
     let muestras: { x: number; t: number }[] = [];
@@ -174,19 +252,24 @@ export class Pasos {
       for (const e of this.#explicas) {
         if (e.dataset.paso === paso && e.dataset.lugar !== lado) e.dataset.lugar = lado;
       }
+      const f = this.#fantasma;
+      if (this.#marco && !sinMovimiento() && (!f || f.dataset.paso !== paso || f.dataset.lugar !== lado)) {
+        this.#copiar(paso ?? '', lado);
+      }
     };
     const soltar = (): void => {
-      texto.removeAttribute('data-arrastrando');
-      texto.style.removeProperty('--cf-arrastre');
+      grid.removeAttribute('data-arrastrando');
+      grid.style.removeProperty('--cf-arrastre');
     };
 
-    texto.addEventListener('pointerdown', (ev) => {
+    const empezar = (ev: PointerEvent): void => {
       if (ev.button > 0) return;
+      asa = ev.currentTarget as HTMLElement;
       inicio = { x: ev.clientX, y: ev.clientY };
       deLado = false;
       muestras = [{ x: ev.clientX, t: performance.now() }];
-    });
-    texto.addEventListener('pointermove', (ev) => {
+    };
+    const mover = (ev: PointerEvent): void => {
       if (!inicio) return;
       const dx = ev.clientX - inicio.x;
       const dy = ev.clientY - inicio.y;
@@ -198,15 +281,18 @@ export class Pasos {
         }
         deLado = true;
         this.#detener();
-        texto.setPointerCapture?.(ev.pointerId);
-        texto.setAttribute('data-arrastrando', '');
+        // Una escena que aún llega se planta: el gesto manda.
+        this.#quitarFantasma();
+        delete this.#escena.dataset.entra;
+        grid.setAttribute('data-arrastrando', '');
+        asa.setPointerCapture?.(ev.pointerId);
       }
       asomar(dx);
-      texto.style.setProperty('--cf-arrastre', `${dx}px`);
+      grid.style.setProperty('--cf-arrastre', `${dx}px`);
       const t = performance.now();
       muestras.push({ x: ev.clientX, t });
       muestras = muestras.filter(m => t - m.t <= 100);
-    });
+    };
     const terminar = (ev: PointerEvent): void => {
       if (!inicio || !deLado) {
         inicio = null;
@@ -220,16 +306,32 @@ export class Pasos {
       const v = primera && t > primera.t ? (ev.clientX - primera.x) / (t - primera.t) : 0;
       const llega = dx + proyectar(v);
       inicio = null;
-      soltar();
-      const ancho = texto.clientWidth || 1;
+      const ancho = asa.clientWidth || 1;
       if (ev.type === 'pointerup' && Math.abs(llega) > ancho / 3 && Math.sign(llega) === Math.sign(dx)) {
-        this.#elegir(vecino(dx), dx < 0 ? 'adelante' : 'atras');
+        const j = vecino(dx);
+        // La escena se cambia aún pegada al dedo, para que el desliz salga
+        // de donde se soltó y no del centro.
+        if (this.#marco && !sinMovimiento()) {
+          this.#preparar(this.#pestanas[j].dataset.paso ?? '', dx < 0 ? 'despues' : 'antes');
+        }
+        soltar();
+        this.#elegir(j, dx < 0 ? 'adelante' : 'atras');
       } else {
+        soltar();
         // Vuelve a su sitio: el vecino que asomaba también se va animado.
         for (const e of this.#explicas) if (e.dataset.lugar !== 'actual') e.dataset.sale = '';
+        const f = this.#fantasma;
+        if (f) {
+          f.dataset.sale = '';
+          this.#llegada = window.setTimeout(() => this.#quitarFantasma(), VIAJE);
+        }
       }
     };
-    texto.addEventListener('pointerup', terminar);
-    texto.addEventListener('pointercancel', terminar);
+    for (const e of asas) {
+      e.addEventListener('pointerdown', empezar);
+      e.addEventListener('pointermove', mover);
+      e.addEventListener('pointerup', terminar);
+      e.addEventListener('pointercancel', terminar);
+    }
   }
 }

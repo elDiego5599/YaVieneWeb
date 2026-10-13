@@ -837,7 +837,10 @@
           </div>
 
           <div class="cf-demo reveal">
-            <div class="cf-escena" id="cf-escena" role="tabpanel" aria-labelledby="cf-paso-ruta" data-paso="ruta">
+            <!-- El marco es la caja redonda y quieta; la escena se desliza
+                 dentro, en el mismo carrusel que el texto (dueño, 2026-10-12). -->
+            <div class="cf-marco">
+            <div class="cf-escena" id="cf-escena" role="tabpanel" aria-labelledby="cf-paso-ruta" data-paso="ruta" data-lugar="actual">
               <p class="solo-lectores" data-paso="ruta">Paso 1: en la app escoges la empresa y la ruta, y la ves en el mapa. Cero fricción. Sin cuentas, sin correos y sin contraseñas. Abres la app, seleccionas tu empresa y en dos toques estás viendo el recorrido completo.</p>
               <p class="solo-lectores" data-paso="bus" hidden>Paso 2: ves el bus moverse en el mapa y a qué distancia viene de ti, medida por la calle. Cálculo real. La distancia no se mide en línea recta; calcula los giros y el trazado real de la calle. Si la app dice 940 metros, es porque esa es la distancia exacta sobre el asfalto.</p>
               <p class="solo-lectores" data-paso="aviso" hidden>Paso 3: dejas un aviso a la distancia que quieras y la app te avisa cuando tu bus esté cerca. Seguridad en la calle. Activa la notificación y guarda el teléfono. No tienes que estar con el celular en la mano en el paradero mirando la pantalla cada 30 segundos.</p>
@@ -1046,6 +1049,7 @@
                   <div class="cf-aviso-texto"><span class="cf-aviso-app">Ya Viene · ahora</span><strong class="cf-aviso-titulo">Bus de la ruta C16 está cerca de ti</strong></div>
                 </div>
               </div>
+            </div>
             </div>
 
             <div class="cf-pasos" role="tablist" aria-label="Los tres pasos">

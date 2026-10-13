@@ -164,7 +164,6 @@ const arrancar = (): void => {
     guardarAviso?.classList.remove('cf-guardando');
     ruedaAviso?.classList.remove('cf-aviso-guardado');
     notificacionAviso?.classList.remove('cf-notificacion-visible');
-    demo?.querySelector('.cf-escena')?.classList.remove('cf-ruta-reproduciendo');
   };
   /** El aviso ya guardado: la confirmación y la notificación a la vista. */
   const avisoListo = (): void => {
@@ -180,12 +179,8 @@ const arrancar = (): void => {
         avisoListo();
         return;
       }
-      if (pasoActual === 'ruta') {
-        const escena = demo?.querySelector<HTMLElement>('.cf-escena');
-        escena?.classList.remove('cf-ruta-reproduciendo');
-        void escena?.offsetWidth;
-        escena?.classList.add('cf-ruta-reproduciendo');
-      } else if (pasoActual === 'bus') {
+      // «Elige tu ruta» se queda quieta: no repite su entrada (dueño, 2026-10-12).
+      if (pasoActual === 'bus') {
         animarLlegada();
       } else if (pasoActual === 'aviso') {
         ruedaAviso?.classList.remove('cf-aviso-rodando', 'cf-aviso-guardado');
@@ -245,7 +240,6 @@ const arrancar = (): void => {
     visibilidad.observe(demo);
   }
   if (demo) {
-    const escena = demo.querySelector<HTMLElement>('.cf-escena');
     const movimientoReducido = sinMovimiento();
     if (movimientoReducido) avisoListo();
     else iniciarCiclo();
@@ -255,7 +249,6 @@ const arrancar = (): void => {
       if (movimientoReducido) {
         llevarBus?.(1800); // La tarjeta de bus queda en su distancia final.
         avisoListo();
-        escena?.classList.remove('cf-ruta-reproduciendo');
       }
     } });
   }

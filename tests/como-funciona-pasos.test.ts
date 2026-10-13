@@ -15,6 +15,7 @@ const banda = /<section[^>]*id="como-funciona"[^>]*>[\s\S]*?<\/section>/.exec(ht
 const pestana = (paso: string): HTMLButtonElement =>
   document.querySelector<HTMLButtonElement>(`[role="tab"][data-paso="${paso}"]`)!;
 const escena = (): HTMLElement => document.querySelector<HTMLElement>('#cf-escena')!;
+const fantasma = (): HTMLElement | null => document.querySelector<HTMLElement>('.cf-escena--fantasma');
 const tecla = (paso: string, key: string): void => {
   pestana(paso).dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
 };
@@ -49,6 +50,31 @@ describe('pestañas de los tres pasos', () => {
     tecla('ruta', 'ArrowLeft');
     expect(escena().dataset.paso).toBe('aviso');
     expect([lugar('aviso'), lugar('ruta')]).toEqual(['actual', 'despues']);
+  });
+
+  it('la escena va en el carrusel: la vieja se va de lado, copia muda, y se quita al llegar', () => {
+    vi.useFakeTimers();
+    pestana('bus').click();
+    const vieja = fantasma()!;
+    expect([vieja.dataset.paso, vieja.dataset.lugar]).toEqual(['ruta', 'antes']);
+    expect(vieja.hasAttribute('data-sale')).toBe(true);
+    // Muda para el lector y sin ids repetidos ni otra pestaña que nombrar.
+    expect(vieja.getAttribute('aria-hidden')).toBe('true');
+    expect(vieja.querySelector('[id], .solo-lectores')).toBeNull();
+    expect(vieja.hasAttribute('role') || vieja.id !== '').toBe(false);
+    // Va detrás de la escena viva: `querySelector('.cf-escena')` sigue dando esa.
+    expect(document.querySelector('.cf-escena')).toBe(escena());
+    expect([escena().dataset.paso, escena().dataset.lugar]).toEqual(['bus', 'actual']);
+    vi.advanceTimersByTime(600);
+    expect(fantasma()).toBeNull();
+    expect(escena().hasAttribute('data-entra')).toBe(false);
+  });
+
+  it('con movimiento reducido la escena cambia en su sitio, sin copia', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    pestana('aviso').click();
+    expect(escena().dataset.paso).toBe('aviso');
+    expect(fantasma()).toBeNull();
   });
 
   it('la entrada al bus anima toque y tarjeta, y cambiar de paso cancela el toque pendiente', () => {
@@ -187,8 +213,9 @@ describe('avance automático: sin observador y al salir de la vista', () => {
 
 describe('arrastrar los pasos de lado', () => {
   const texto = (): HTMLElement => document.querySelector<HTMLElement>('.cf-texto')!;
-  const puntero = (tipo: string, x: number, y = 0): void => {
-    texto().dispatchEvent(new PointerEvent(tipo, { clientX: x, clientY: y, pointerId: 1, bubbles: true }));
+  const cuadricula = (): HTMLElement => document.querySelector<HTMLElement>('.cf-grid')!;
+  const puntero = (tipo: string, x: number, y = 0, en: HTMLElement = texto()): void => {
+    en.dispatchEvent(new PointerEvent(tipo, { clientX: x, clientY: y, pointerId: 1, bubbles: true }));
   };
 
   beforeEach(() => {
@@ -199,14 +226,35 @@ describe('arrastrar los pasos de lado', () => {
   it('arrastrar hacia la izquierda trae el paso siguiente, pegado al dedo', () => {
     puntero('pointerdown', 300);
     puntero('pointermove', 280);
-    expect(texto().hasAttribute('data-arrastrando')).toBe(true);
+    expect(cuadricula().hasAttribute('data-arrastrando')).toBe(true);
     puntero('pointermove', 100);
-    expect(texto().style.getPropertyValue('--cf-arrastre')).toBe('-200px');
+    expect(cuadricula().style.getPropertyValue('--cf-arrastre')).toBe('-200px');
     vi.advanceTimersByTime(100);
     puntero('pointerup', 100);
     expect(escena().dataset.paso).toBe('bus');
-    expect(texto().hasAttribute('data-arrastrando')).toBe(false);
-    expect(texto().style.getPropertyValue('--cf-arrastre')).toBe('');
+    expect(cuadricula().hasAttribute('data-arrastrando')).toBe(false);
+    expect(cuadricula().style.getPropertyValue('--cf-arrastre')).toBe('');
+  });
+
+  it('la escena asoma también: su vecino entra pegado al dedo y, al soltar, el viejo se va', () => {
+    puntero('pointerdown', 300);
+    puntero('pointermove', 100);
+    const asoma = fantasma()!;
+    expect([asoma.dataset.paso, asoma.dataset.lugar]).toEqual(['bus', 'despues']);
+    vi.advanceTimersByTime(100);
+    puntero('pointerup', 100);
+    expect([escena().dataset.paso, escena().dataset.lugar]).toEqual(['bus', 'actual']);
+    expect([fantasma()!.dataset.paso, fantasma()!.dataset.lugar]).toEqual(['ruta', 'antes']);
+  });
+
+  it('se arrastra también desde la escena', () => {
+    const marco = document.querySelector<HTMLElement>('.cf-marco')!;
+    Object.defineProperty(marco, 'clientWidth', { value: 400, configurable: true });
+    puntero('pointerdown', 300, 0, marco);
+    puntero('pointermove', 100, 0, marco);
+    vi.advanceTimersByTime(100);
+    puntero('pointerup', 100, 0, marco);
+    expect(escena().dataset.paso).toBe('bus');
   });
 
   it('hacia la derecha trae el anterior, dando la vuelta', () => {
@@ -226,6 +274,10 @@ describe('arrastrar los pasos de lado', () => {
     expect(escena().dataset.paso).toBe('ruta');
     // El vecino que asomaba se va animado, no de golpe.
     expect(document.querySelector<HTMLElement>('.cf-explica[data-paso="bus"]')!.hasAttribute('data-sale')).toBe(true);
+    // Y la escena que asomaba también vuelve animada y luego se quita.
+    expect(fantasma()!.hasAttribute('data-sale')).toBe(true);
+    vi.advanceTimersByTime(600);
+    expect(fantasma()).toBeNull();
     puntero('pointerdown', 200);
     vi.advanceTimersByTime(16);
     puntero('pointermove', 150);
@@ -237,7 +289,7 @@ describe('arrastrar los pasos de lado', () => {
   it('menos de 10 px, o un gesto vertical, no arrastra ni cambia de paso', () => {
     puntero('pointerdown', 200, 0);
     puntero('pointermove', 205, 0);
-    expect(texto().hasAttribute('data-arrastrando')).toBe(false);
+    expect(cuadricula().hasAttribute('data-arrastrando')).toBe(false);
     puntero('pointermove', 210, 80);
     puntero('pointermove', 100, 80);
     puntero('pointerup', 100, 80);

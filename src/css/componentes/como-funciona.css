@@ -100,7 +100,7 @@
   cursor: grab;
 }
 
-.cf-texto[data-arrastrando] {
+.cf-grid[data-arrastrando] :is(.cf-texto, .cf-marco) {
   cursor: grabbing;
 }
 
@@ -129,7 +129,7 @@
   transition: translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
 }
 
-.cf-texto[data-arrastrando] .cf-explica {
+.cf-grid[data-arrastrando] :is(.cf-explica, .cf-escena) {
   transition: none;
 }
 
@@ -205,17 +205,56 @@
   min-width: 0;
 }
 
+/* El marco es la caja, quieta: fondo, filo y esquinas. La escena se
+   desliza dentro como el texto de al lado (dueño, 2026-10-12) y el marco
+   la recorta; la que sale es una copia muda (`.cf-escena--fantasma`, de
+   `como-funciona.ts`) en la misma celda. */
+.cf-marco {
+  position: relative;
+  display: grid;
+  overflow: clip;
+  /* 20 px suaviza las esquinas de la escena. */
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--banda), var(--acento) 5%);
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+}
+/* El filo va encima, para que la escena que pasa no lo tape; 1 px de
+   brillo conserva profundidad. */
+.cf-marco::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border: 1px solid var(--cf-borde);
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  pointer-events: none;
+}
+
+/* Las mismas cuentas que `.cf-explica`: su ancho más 32 px de aire. */
 .cf-escena {
+  --cf-lugar: 0;
+  grid-area: 1 / 1;
   container-type: inline-size;
   position: relative;
   overflow: hidden;
   /* 600 / 455 da la escena apaisada de referencia y deja aire al teléfono. */
   aspect-ratio: 600 / 455;
-  border: 1px solid var(--cf-borde);
-  /* 20 px suaviza las esquinas de la escena; 1 px de brillo conserva profundidad. */
-  border-radius: 20px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  background: color-mix(in srgb, var(--banda), var(--acento) 5%);
+  translate: calc(var(--cf-lugar) * (100% + 32px) + var(--cf-arrastre, 0px)) 0;
+  will-change: translate;
+}
+.cf-escena[data-lugar="antes"] { --cf-lugar: -1; }
+.cf-escena[data-lugar="despues"] { --cf-lugar: 1; }
+.cf-escena[data-lugar="actual"],
+.cf-escena[data-sale] {
+  transition: translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
+}
+/* La escena que entra ya trae su paso puesto: lo de dentro no se funde
+   mientras viaja, llega entera. */
+#cf-escena[data-entra] * {
+  transition: none;
 }
 
 /* Transiciones suaves entre composiciones (adelante y hacia atrás),
@@ -680,26 +719,6 @@
   transition-delay: 0.18s;
 }
 
-/* Al volver al paso, los chips y la flecha repiten su entrada. */
-.cf-escena.cf-ruta-reproduciendo .cf-chips,
-.cf-escena.cf-ruta-reproduciendo .cf-flecha {
-  /* 900 ms reproduce la entrada sin competir con el cambio de pestaña. */
-  animation: cf-ruta-entrada 900ms ease both;
-}
-.cf-escena.cf-ruta-reproduciendo .cf-telefono .map-route-active {
-  /* El trazo también se anima cuando los chips se ocultan en móvil. */
-  animation: cf-ruta-trazo 900ms ease both;
-}
-@keyframes cf-ruta-entrada {
-  /* 8 px devuelve chips y flecha desde el mismo reposo visual. */
-  0% { opacity: 0; translate: 0 8px; }
-  100% { opacity: 1; translate: 0 0; }
-}
-@keyframes cf-ruta-trazo {
-  /* El 0,45 revela el mismo trazo activo que termina en opacidad plena. */
-  0% { opacity: 0.45; }
-  100% { opacity: 1; }
-}
 
 /* Lo de encima del mapa, por paso: el selector con su barrera (1), la
    hoja del bus (2 y 3) y la notificación (3). La hoja sube desde abajo y
@@ -806,7 +825,8 @@
     transition: opacity 0.2s linear;
   }
   /* Sin desliz: el paso que no toca se apaga y el nuevo aparece. */
-  .cf-explica {
+  .cf-explica,
+  .cf-escena {
     translate: none;
     transition: opacity 0.2s linear;
   }
@@ -826,10 +846,7 @@
   .cf-aviso-confirmacion,
   .cf-mapa-hoja { translate: none; transition: opacity 0.2s linear; }
   .cf-guardar.cf-guardando,
-  .cf-aviso-composicion.cf-aviso-rodando .cf-rueda > *,
-  .cf-escena.cf-ruta-reproduciendo .cf-chips,
-  .cf-escena.cf-ruta-reproduciendo .cf-flecha,
-  .cf-escena.cf-ruta-reproduciendo .cf-telefono .map-route-active { animation: none; }
+  .cf-aviso-composicion.cf-aviso-rodando .cf-rueda > * { animation: none; }
   .cf-pasos[data-auto] .cf-paso[aria-selected="true"]::after {
     /* Movimiento reducido quita la animación de progreso. */
     animation: none;

@@ -96,10 +96,20 @@ describe('banda «Cómo funciona»', () => {
     expect(css).toMatch(/\.cf-explica\[data-lugar="antes"\]\s*\{[^}]*--cf-lugar:\s*-1/s);
     expect(css).toMatch(/\.cf-explica\[data-lugar="despues"\]\s*\{[^}]*--cf-lugar:\s*1/s);
     // Mientras se arrastra no hay transición: el texto va pegado al dedo.
-    expect(css).toMatch(/\.cf-texto\[data-arrastrando\] \.cf-explica\s*\{[^}]*transition:\s*none/s);
+    expect(css).toMatch(/\.cf-grid\[data-arrastrando\] :is\(\.cf-explica, \.cf-escena\)\s*\{[^}]*transition:\s*none/s);
+    // La escena va en el mismo carrusel, recortada por su marco redondo.
+    expect(banda).toMatch(/<div class="cf-marco">\s*<div class="cf-escena"/);
+    expect(css).toMatch(/\.cf-marco\s*\{[^}]*overflow:\s*clip/s);
+    expect(css).toMatch(/\.cf-escena\[data-lugar="antes"\]\s*\{[^}]*--cf-lugar:\s*-1/s);
     // Con movimiento reducido no hay desliz: solo el fundido.
     const reducido = css.slice(css.lastIndexOf('@media (prefers-reduced-motion: reduce)'));
-    expect(reducido).toMatch(/\.cf-explica\s*\{[^}]*translate:\s*none/s);
+    expect(reducido).toMatch(/\.cf-explica,\s*\.cf-escena\s*\{[^}]*translate:\s*none/s);
+  });
+
+  it('«Elige tu ruta» se queda quieta: no repite su entrada (dueño, 2026-10-12)', () => {
+    const main = readFileSync(resolve(process.cwd(), 'src/main.ts'), 'utf8');
+    expect(main).not.toContain('cf-ruta-reproduciendo');
+    expect(css).not.toContain('cf-ruta-reproduciendo');
   });
 
   it('la columna de texto no lleva logos ni botón', () => {
@@ -119,7 +129,7 @@ describe('banda «Cómo funciona»', () => {
     expect(pestanas[0]).toMatch(/aria-selected="true"/);
     expect(pestanas.slice(1).every((p) => /aria-selected="false"[^>]*tabindex="-1"/.test(p))).toBe(true);
     expect(banda).toMatch(
-      /id="cf-escena" role="tabpanel" aria-labelledby="cf-paso-ruta" data-paso="ruta"/
+      /id="cf-escena" role="tabpanel" aria-labelledby="cf-paso-ruta" data-paso="ruta" data-lugar="actual"/
     );
     // Una descripción por paso; sin JavaScript se lee la del primero.
     expect(banda.match(/class="solo-lectores" data-paso="\w+"/g)).toHaveLength(3);

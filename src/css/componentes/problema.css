@@ -972,7 +972,9 @@
   }
 
   .ruido:nth-child(2) {
-    top: 9%;
+    /* 5 % y no el 9 de la primera: un poco más arriba, que respire sobre
+       el aviso de debajo (dueño, 2026-10-12). */
+    top: 5%;
     right: 1%;
     --giro: 2.5deg;
   }

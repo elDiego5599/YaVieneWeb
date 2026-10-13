@@ -149,6 +149,10 @@ describe('el escenario de «Qué resuelve»', () => {
     expect(css).toMatch(/\[data-cara='claro'\] \.ruido[^{]*\{[^}]*opacity:\s*0/);
   });
 
+  it('«llevo 30 minutos esperando» va un poco más arriba que «¿ya pasó el bus?» (dueño, 2026-10-12)', () => {
+    expect(css).toMatch(/\.ruido:nth-child\(2\)\s*\{[^}]*top:\s*5%/);
+  });
+
   it('lo retirado no deja CSS huérfano', () => {
     for (const viejo of ['.ficha', '.escenario-arbol', '.escenario-circuito', '.circuito-cable', '.red-cable', 'chispa--signo', '.columna']) {
       expect(css, viejo).not.toContain(viejo);
