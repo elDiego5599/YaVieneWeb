@@ -34,20 +34,21 @@ afterEach(() => {
 });
 
 describe('pestañas de los tres pasos', () => {
-  it('el texto entra por el lado al que se va: derecha adelante, izquierda atrás', () => {
-    const cuadro = (): string | undefined => document.querySelector<HTMLElement>('.cf-grid')!.dataset.direccion;
+  it('carrusel: el paso que entra llega por el lado al que se va, y el que sale se va por el otro', () => {
+    const lugar = (paso: string): string | undefined =>
+      document.querySelector<HTMLElement>(`.cf-explica[data-paso="${paso}"]`)!.dataset.lugar;
     pestana('aviso').click();
-    expect(cuadro()).toBe('adelante');
+    expect([lugar('aviso'), lugar('ruta')]).toEqual(['actual', 'antes']);
     pestana('bus').click();
-    expect(cuadro()).toBe('atras');
+    expect([lugar('bus'), lugar('aviso')]).toEqual(['actual', 'despues']);
     // Las flechas dan la vuelta en círculo: manda la tecla, no el índice.
     tecla('bus', 'ArrowRight');
     tecla('aviso', 'ArrowRight');
     expect(escena().dataset.paso).toBe('ruta');
-    expect(cuadro()).toBe('adelante');
+    expect([lugar('ruta'), lugar('aviso')]).toEqual(['actual', 'antes']);
     tecla('ruta', 'ArrowLeft');
     expect(escena().dataset.paso).toBe('aviso');
-    expect(cuadro()).toBe('atras');
+    expect([lugar('aviso'), lugar('ruta')]).toEqual(['actual', 'despues']);
   });
 
   it('la entrada al bus anima toque y tarjeta, y cambiar de paso cancela el toque pendiente', () => {
@@ -181,5 +182,88 @@ describe('avance automático: sin observador y al salir de la vista', () => {
     avisar([{ isIntersecting: true }]);
     vi.advanceTimersByTime(5000);
     expect(escena().dataset.paso).toBe('aviso');
+  });
+});
+
+describe('arrastrar los pasos de lado', () => {
+  const texto = (): HTMLElement => document.querySelector<HTMLElement>('.cf-texto')!;
+  const puntero = (tipo: string, x: number, y = 0): void => {
+    texto().dispatchEvent(new PointerEvent(tipo, { clientX: x, clientY: y, pointerId: 1, bubbles: true }));
+  };
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    Object.defineProperty(texto(), 'clientWidth', { value: 400, configurable: true });
+  });
+
+  it('arrastrar hacia la izquierda trae el paso siguiente, pegado al dedo', () => {
+    puntero('pointerdown', 300);
+    puntero('pointermove', 280);
+    expect(texto().hasAttribute('data-arrastrando')).toBe(true);
+    puntero('pointermove', 100);
+    expect(texto().style.getPropertyValue('--cf-arrastre')).toBe('-200px');
+    vi.advanceTimersByTime(100);
+    puntero('pointerup', 100);
+    expect(escena().dataset.paso).toBe('bus');
+    expect(texto().hasAttribute('data-arrastrando')).toBe(false);
+    expect(texto().style.getPropertyValue('--cf-arrastre')).toBe('');
+  });
+
+  it('hacia la derecha trae el anterior, dando la vuelta', () => {
+    puntero('pointerdown', 100);
+    puntero('pointermove', 300);
+    vi.advanceTimersByTime(100);
+    puntero('pointerup', 300);
+    expect(escena().dataset.paso).toBe('aviso');
+  });
+
+  it('un tirón corto y lento vuelve a su sitio; uno corto y rápido pasa de paso', () => {
+    puntero('pointerdown', 200);
+    puntero('pointermove', 170);
+    vi.advanceTimersByTime(1000);
+    puntero('pointermove', 170);
+    puntero('pointerup', 170);
+    expect(escena().dataset.paso).toBe('ruta');
+    // El vecino que asomaba se va animado, no de golpe.
+    expect(document.querySelector<HTMLElement>('.cf-explica[data-paso="bus"]')!.hasAttribute('data-sale')).toBe(true);
+    puntero('pointerdown', 200);
+    vi.advanceTimersByTime(16);
+    puntero('pointermove', 150);
+    vi.advanceTimersByTime(16);
+    puntero('pointerup', 150);
+    expect(escena().dataset.paso).toBe('bus');
+  });
+
+  it('menos de 10 px, o un gesto vertical, no arrastra ni cambia de paso', () => {
+    puntero('pointerdown', 200, 0);
+    puntero('pointermove', 205, 0);
+    expect(texto().hasAttribute('data-arrastrando')).toBe(false);
+    puntero('pointermove', 210, 80);
+    puntero('pointermove', 100, 80);
+    puntero('pointerup', 100, 80);
+    expect(escena().dataset.paso).toBe('ruta');
+  });
+
+  it('arrastrar detiene el avance automático', () => {
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(readonly avisar: (e: { isIntersecting: boolean }[]) => void) {}
+        observe(): void {
+          this.avisar([{ isIntersecting: true }]);
+        }
+        disconnect(): void {}
+      }
+    );
+    document.body.innerHTML = banda;
+    Object.defineProperty(texto(), 'clientWidth', { value: 400, configurable: true });
+    new Pasos(document.querySelector<HTMLElement>('.cf-demo')!, { intervalo: 5000 });
+    puntero('pointerdown', 200);
+    puntero('pointermove', 100);
+    vi.advanceTimersByTime(100);
+    puntero('pointerup', 100);
+    expect(escena().dataset.paso).toBe('bus');
+    vi.advanceTimersByTime(20000);
+    expect(escena().dataset.paso).toBe('bus');
   });
 });

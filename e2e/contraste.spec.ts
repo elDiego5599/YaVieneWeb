@@ -80,6 +80,9 @@ const MUESTRAS: Record<string, string[]> = {
     '.hero-subtext-lead',
     '.apagado',
     '#problema .aviso-titulo',
+    // La idea de cada paso de «Cómo funciona»: título en rojo y texto gris.
+    '.cf-explica[data-lugar="actual"] .cf-extra-titulo',
+    '.cf-explica[data-lugar="actual"] .cf-extra-texto',
     '.footer-nav-group > span',
     '.footer-nav a',
     '.footer-legal-links a',

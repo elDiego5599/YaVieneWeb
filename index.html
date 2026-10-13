@@ -816,31 +816,31 @@
           <!-- Lo que dice el paso elegido, a la vista. Lo oye el lector en la
                escena (sus `.solo-lectores`), así que aquí va aria-hidden. -->
           <div class="cf-texto" aria-hidden="true">
-            <div class="cf-explica" data-paso="ruta">
+            <div class="cf-explica" data-paso="ruta" data-lugar="actual">
               <span class="cf-numero">Paso 1 de 3</span>
               <p class="cf-explica-titulo">Elige tu ruta</p>
               <p class="cf-explica-texto">Escoges la empresa y la ruta, y la ves dibujada en el mapa.</p>
-              <p class="cf-explica-extra">Antes tenías que adivinar si el Sobusa ya había pasado o te tocaba esperar otra media hora. Ahora solo toca la ruta antes de salir y de inmediato sabes si viene uno cerca.</p>
+              <div class="cf-explica-extra"><p class="cf-extra-titulo">Cero fricción</p><p class="cf-extra-texto">Sin cuentas, sin correos y sin contraseñas. Abres la app, seleccionas tu empresa y en dos toques estás viendo el recorrido completo.</p></div>
             </div>
-            <div class="cf-explica" data-paso="bus">
+            <div class="cf-explica" data-paso="bus" data-lugar="despues">
               <span class="cf-numero">Paso 2 de 3</span>
               <p class="cf-explica-titulo">Mira el bus</p>
               <p class="cf-explica-texto">Ves el bus moverse en el mapa y a qué distancia viene de ti, medida por la calle.</p>
-              <p class="cf-explica-extra">Ver el bus acercándose metro a metro en el mapa te quita toda la incertidumbre: no hay que exponerse a robos ni a calores de mediodía.</p>
+              <div class="cf-explica-extra"><p class="cf-extra-titulo">Cálculo real</p><p class="cf-extra-texto">La distancia no se mide en línea recta; calcula los giros y el trazado real de la calle. Si la app dice 940 metros, es porque esa es la distancia exacta sobre el asfalto.</p></div>
             </div>
-            <div class="cf-explica" data-paso="aviso">
+            <div class="cf-explica" data-paso="aviso" data-lugar="antes">
               <span class="cf-numero">Paso 3 de 3</span>
               <p class="cf-explica-titulo">Deja un aviso</p>
               <p class="cf-explica-texto">Eliges a qué distancia quieres el aviso y la app te avisa cuando tu bus esté cerca.</p>
-              <p class="cf-explica-extra">Pon la alerta mientras terminas de desayunar o de arreglarte en la casa. Cuando suena el aviso, es tu señal exacta para bajar al paradero sin esperar nada.</p>
+              <div class="cf-explica-extra"><p class="cf-extra-titulo">Seguridad en la calle</p><p class="cf-extra-texto">Activa la notificación y guarda el teléfono. No tienes que estar con el celular en la mano en el paradero mirando la pantalla cada 30 segundos.</p></div>
             </div>
           </div>
 
           <div class="cf-demo reveal">
             <div class="cf-escena" id="cf-escena" role="tabpanel" aria-labelledby="cf-paso-ruta" data-paso="ruta">
-              <p class="solo-lectores" data-paso="ruta">Paso 1: en la app escoges la empresa y la ruta, y la ves en el mapa. Antes tenías que adivinar si el Sobusa ya había pasado o te tocaba esperar otra media hora. Ahora solo toca la ruta antes de salir y de inmediato sabes si viene uno cerca.</p>
-              <p class="solo-lectores" data-paso="bus" hidden>Paso 2: ves el bus moverse en el mapa y a qué distancia viene de ti, medida por la calle. Ver el bus acercándose metro a metro en el mapa te quita toda la incertidumbre: no hay que exponerse a robos ni a calores de mediodía.</p>
-              <p class="solo-lectores" data-paso="aviso" hidden>Paso 3: dejas un aviso a la distancia que quieras y la app te avisa cuando tu bus esté cerca. Pon la alerta mientras terminas de desayunar o de arreglarte en la casa. Cuando suena el aviso, es tu señal exacta para bajar al paradero sin esperar nada.</p>
+              <p class="solo-lectores" data-paso="ruta">Paso 1: en la app escoges la empresa y la ruta, y la ves en el mapa. Cero fricción. Sin cuentas, sin correos y sin contraseñas. Abres la app, seleccionas tu empresa y en dos toques estás viendo el recorrido completo.</p>
+              <p class="solo-lectores" data-paso="bus" hidden>Paso 2: ves el bus moverse en el mapa y a qué distancia viene de ti, medida por la calle. Cálculo real. La distancia no se mide en línea recta; calcula los giros y el trazado real de la calle. Si la app dice 940 metros, es porque esa es la distancia exacta sobre el asfalto.</p>
+              <p class="solo-lectores" data-paso="aviso" hidden>Paso 3: dejas un aviso a la distancia que quieras y la app te avisa cuando tu bus esté cerca. Seguridad en la calle. Activa la notificación y guarda el teléfono. No tienes que estar con el celular en la mano en el paradero mirando la pantalla cada 30 segundos.</p>
 
               <div class="cf-telefono" aria-hidden="true">
                 <div class="cf-chips" data-paso="ruta">

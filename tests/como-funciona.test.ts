@@ -62,20 +62,44 @@ describe('banda «Cómo funciona»', () => {
 
   it('separa la segunda frase del subtítulo y añade una explicación por paso', () => {
     expect(banda).toMatch(/class="seccion-lead">Escoge tu ruta, mira el bus moverse en el mapa y deja un aviso\.<br\s*\/>Te avisamos cuando esté cerca de ti\./);
+    // Cada paso lleva su idea con título en el rojo de «Problema» y el
+    // texto en gris (dueño, 2026-10-12).
     const extras = [
-      'Antes tenías que adivinar si el Sobusa ya había pasado o te tocaba esperar otra media hora. Ahora solo toca la ruta antes de salir y de inmediato sabes si viene uno cerca.',
-      'Ver el bus acercándose metro a metro en el mapa te quita toda la incertidumbre: no hay que exponerse a robos ni a calores de mediodía.',
-      'Pon la alerta mientras terminas de desayunar o de arreglarte en la casa. Cuando suena el aviso, es tu señal exacta para bajar al paradero sin esperar nada.',
+      ['Cero fricción', 'Sin cuentas, sin correos y sin contraseñas. Abres la app, seleccionas tu empresa y en dos toques estás viendo el recorrido completo.'],
+      ['Cálculo real', 'La distancia no se mide en línea recta; calcula los giros y el trazado real de la calle. Si la app dice 940 metros, es porque esa es la distancia exacta sobre el asfalto.'],
+      ['Seguridad en la calle', 'Activa la notificación y guarda el teléfono. No tienes que estar con el celular en la mano en el paradero mirando la pantalla cada 30 segundos.'],
     ];
     for (const [i, paso] of ['ruta', 'bus', 'aviso'].entries()) {
-      expect(banda).toContain(`<p class="cf-explica-extra">${extras[i]}</p>`);
-      expect(banda.match(new RegExp(`<p class="solo-lectores" data-paso="${paso}"[^>]*>[\\s\\S]*?${extras[i]}`))).not.toBeNull();
+      const [titulo, texto] = extras[i];
+      expect(banda).toContain(
+        `<div class="cf-explica-extra"><p class="cf-extra-titulo">${titulo}</p><p class="cf-extra-texto">${texto}</p></div>`
+      );
+      expect(banda.match(new RegExp(`<p class="solo-lectores" data-paso="${paso}"[^>]*>[^<]*${titulo}\\. ${texto}</p>`))).not.toBeNull();
     }
-    expect(css).toMatch(/\.cf-texto\s*\{[^}]*align-self:\s*stretch/s);
+    expect(banda).not.toMatch(/Sobusa ya había pasado|desayunar|metro a metro/);
     expect(css).toMatch(/\.cf-explica-extra\s*\{[^}]*background:\s*#fff/s);
-    // El desliz de lado solo sin movimiento reducido: allí queda el fundido.
-    const conMovimiento = css.slice(css.indexOf('@media (prefers-reduced-motion: no-preference)'));
-    expect(conMovimiento).toMatch(/^@media[^{]*\{[^@]*data-direccion="adelante"\] \.cf-explica \{ translate: -48px 0; \}/);
+    expect(css).toMatch(/\.cf-extra-titulo\s*\{[^}]*color:\s*var\(--coral-accessible\)/s);
+    expect(css).toMatch(/\.cf-extra-texto\s*\{[^}]*color:\s*var\(--tinta-tenue\)/s);
+  });
+
+  it('a lo ancho, el texto del paso termina donde termina la escena, no las pestañas', () => {
+    const ancho = css.slice(css.lastIndexOf('@media (min-width: 1024px)'));
+    // La demo ocupa dos filas (escena y pestañas) y comparte sus líneas con
+    // la caja: el texto vive solo en la primera, la de la escena.
+    expect(ancho).toMatch(/\.cf-demo\s*\{[^}]*grid-row:\s*1 \/ span 2[^}]*grid-template-rows:\s*subgrid/s);
+    expect(ancho).toMatch(/\.cf-texto\s*\{[^}]*grid-row:\s*1/s);
+    expect(ancho).toMatch(/\.cf-grid\s*\{[^}]*row-gap:\s*0/s);
+  });
+
+  it('los pasos son un carrusel: se recorta de lado y se arrastra', () => {
+    expect(css).toMatch(/\.cf-texto\s*\{[^}]*overflow-x:\s*clip[^}]*touch-action:\s*pan-y/s);
+    expect(css).toMatch(/\.cf-explica\[data-lugar="antes"\]\s*\{[^}]*--cf-lugar:\s*-1/s);
+    expect(css).toMatch(/\.cf-explica\[data-lugar="despues"\]\s*\{[^}]*--cf-lugar:\s*1/s);
+    // Mientras se arrastra no hay transición: el texto va pegado al dedo.
+    expect(css).toMatch(/\.cf-texto\[data-arrastrando\] \.cf-explica\s*\{[^}]*transition:\s*none/s);
+    // Con movimiento reducido no hay desliz: solo el fundido.
+    const reducido = css.slice(css.lastIndexOf('@media (prefers-reduced-motion: reduce)'));
+    expect(reducido).toMatch(/\.cf-explica\s*\{[^}]*translate:\s*none/s);
   });
 
   it('la columna de texto no lleva logos ni botón', () => {

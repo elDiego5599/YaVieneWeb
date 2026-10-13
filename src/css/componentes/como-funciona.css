@@ -81,33 +81,64 @@
 
 /* Lo que dice el paso elegido, donde allá van «On-call gets the right
    people in the room» y su párrafo. Los tres textos se apilan en la misma
-   celda, así el alto no salta, y se ve el del `data-paso` de la escena
-   (lo pone `como-funciona.ts`; sin JavaScript, el del marcado: «ruta»). */
+   celda, así el alto no salta, y es un carrusel (dueño, 2026-10-12): el
+   paso entero se va de lado y el siguiente entra por el otro, y se puede
+   agarrar y arrastrar. `data-lugar` lo pone `como-funciona.ts` (sin
+   JavaScript queda el del marcado: «ruta» a la vista). El recorte es
+   solo de lado y con 16 px de aire, que cubren la sombra del cuadro
+   blanco (la honda se encoge 24 y difumina 40: no pasa del filo); `pan-y` deja al dedo bajar la página y el gesto de lado es
+   nuestro. */
 .cf-texto {
   display: grid;
   align-self: stretch;
   min-height: 0;
+  overflow-x: clip;
+  margin-inline: -16px;
+  padding-inline: 16px;
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
 }
 
+.cf-texto[data-arrastrando] {
+  cursor: grabbing;
+}
+
+/* Cada paso se corre su ancho más el aire de 16 px de cada lado (32),
+   así el de al lado espera justo fuera del recorte. `--cf-arrastre` es lo
+   que va del dedo, 1:1. 480 ms con la curva de «Problema». */
 .cf-explica {
+  --cf-lugar: 0;
   grid-area: 1 / 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
   gap: 16px;
-  opacity: 0;
-  translate: 48px 0;
-  transition:
-    opacity 450ms cubic-bezier(0.3, 0, 0.2, 1),
-    translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
-  will-change: opacity, translate;
+  translate: calc(var(--cf-lugar) * (100% + 32px) + var(--cf-arrastre, 0px)) 0;
+  will-change: translate;
 }
 
-/* El cuadro blanco con la explicación de más va al pie de la columna,
-   que mide lo que la escena de al lado: `margin-top: auto` lo baja y
-   deja el número, el título y el texto arriba. */
+.cf-explica[data-lugar="antes"] { --cf-lugar: -1; }
+.cf-explica[data-lugar="despues"] { --cf-lugar: 1; }
+
+/* Solo se anima el que entra y el que sale: el tercero cambia de lado
+   por detrás del recorte, sin cruzar la vista. */
+.cf-explica[data-lugar="actual"],
+.cf-explica[data-sale] {
+  transition: translate 480ms cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+.cf-texto[data-arrastrando] .cf-explica {
+  transition: none;
+}
+
+/* El cuadro blanco con la idea del paso va al pie de la columna, que mide
+   lo que la escena de al lado: `margin-top: auto` lo baja y deja el
+   número, el título y el texto arriba. */
 .cf-explica-extra {
+  display: grid;
+  gap: 6px;
   width: 100%;
   margin: auto 0 0;
   /* El relleno y radio compactos dejan sitio al párrafo dentro de la escena. */
@@ -116,41 +147,20 @@
   border-radius: 12px;
   background: #fff;
   box-shadow: var(--cf-sombra);
-  font-size: clamp(15px, 0.9rem + 0.15vw, 17px);
-  color: var(--tinta-media);
   line-height: 1.45;
 }
 
-.cf-grid[data-paso="ruta"] .cf-explica[data-paso="ruta"],
-.cf-grid[data-paso="bus"] .cf-explica[data-paso="bus"],
-.cf-grid[data-paso="aviso"] .cf-explica[data-paso="aviso"],
-.cf-grid:has(.cf-escena[data-paso="ruta"]) .cf-explica[data-paso="ruta"],
-.cf-grid:has(.cf-escena[data-paso="bus"]) .cf-explica[data-paso="bus"],
-.cf-grid:has(.cf-escena[data-paso="aviso"]) .cf-explica[data-paso="aviso"] {
-  opacity: 1;
-  translate: 0 0;
+/* El título en el rojo de «Problema» (`--coral-accessible`, 5,2:1 sobre
+   blanco), y el texto en el gris tenue del sitio (`--tinta-tenue`): 4,9:1, AA. */
+.cf-extra-titulo {
+  font-size: clamp(16px, 0.95rem + 0.2vw, 18px);
+  font-weight: 600;
+  color: var(--coral-accessible);
 }
 
-/* Al cambiar de paso el que se va sale por el lado contrario al que entra
-   el nuevo, y la vuelta deshace el mismo camino. 48 px: lo bastante para
-   leerse como un desliz de lado y poco para no pisar la escena de al lado.
-   El que entra lo trae una animación, porque su `translate` de reposo es
-   el del lado por donde salió la última vez. Con movimiento reducido no
-   hay desliz: solo el fundido de abajo. */
-@media (prefers-reduced-motion: no-preference) {
-  .cf-grid[data-direccion="adelante"] .cf-explica { translate: -48px 0; }
-  .cf-grid[data-direccion="atras"] .cf-explica { translate: 48px 0; }
-
-  .cf-grid[data-direccion][data-paso="ruta"] .cf-explica[data-paso="ruta"],
-  .cf-grid[data-direccion][data-paso="bus"] .cf-explica[data-paso="bus"],
-  .cf-grid[data-direccion][data-paso="aviso"] .cf-explica[data-paso="aviso"] {
-    translate: 0 0;
-    animation: cf-entra 480ms cubic-bezier(0.3, 0, 0.2, 1) both;
-  }
-
-  .cf-grid[data-direccion="atras"] .cf-explica { --cf-desde: -48px; }
-
-  @keyframes cf-entra { from { translate: var(--cf-desde, 48px) 0; } }
+.cf-extra-texto {
+  font-size: clamp(15px, 0.9rem + 0.15vw, 17px);
+  color: var(--tinta-tenue);
 }
 
 /* El número en el verde de letra (`--acento`), con mayor presencia. */
@@ -791,10 +801,17 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cf-chips,
-  .cf-capa,
+  .cf-capa {
+    translate: none;
+    transition: opacity 0.2s linear;
+  }
+  /* Sin desliz: el paso que no toca se apaga y el nuevo aparece. */
   .cf-explica {
     translate: none;
     transition: opacity 0.2s linear;
+  }
+  .cf-explica:not([data-lugar="actual"]) {
+    opacity: 0;
   }
   .cf-chip {
     /* Con movimiento reducido los chips solo hacen un fundido, sin retraso. */
@@ -889,6 +906,22 @@
 @media (min-width: 1024px) {
   .cf-grid {
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    grid-template-rows: auto auto;
+    row-gap: 0;
     align-items: stretch;
+  }
+
+  /* La demo ocupa dos filas, escena y pestañas, con las líneas de la caja:
+     así el texto, que vive solo en la primera, termina donde termina la
+     escena y no donde las pestañas (dueño, 2026-10-12). */
+  .cf-demo {
+    grid-row: 1 / span 2;
+    display: grid;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+  }
+
+  .cf-texto {
+    grid-row: 1;
   }
 }
