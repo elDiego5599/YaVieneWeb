@@ -64,6 +64,16 @@ test('con el ratón se abre al entrar y se cierra al salir', async ({ page }, in
   test.skip(info.project.name !== 'escritorio', 'el puntero es del escritorio');
   await page.goto('/');
   const isla = page.locator('.nav-island');
+  // Como en el toque: en la CI lenta la isla aún llegaba a su sitio, se
+  // iba de debajo del puntero y el `pointerleave` la cerraba. Una persona
+  // apunta a donde la ve quieta.
+  await page.evaluate(async () => {
+    for (;;) {
+      const vivas = document.getAnimations().filter(a => a.playState === 'running' && (a.effect as KeyframeEffect | null)?.target?.closest('.nav-island, header'));
+      if (vivas.length === 0) return;
+      await Promise.allSettled(vivas.map(a => a.finished));
+    }
+  });
   await isla.hover();
   await expect(isla).toHaveClass(/\bis-open\b/);
   await page.mouse.move(5, 700);
