@@ -98,7 +98,11 @@ export class NavIsland {
       this.#cerrar();
     });
 
-    window.addEventListener('scroll', () => this.#cerrar(), { passive: true });
+    // Se cierra cuando la página se mueve de verdad: un aviso de scroll
+    // que llega tarde, sin desplazamiento, no deshace el toque que abrió.
+    window.addEventListener('scroll', () => {
+      if (Math.abs(window.scrollY - this.#yAlAbrir) > 4) this.#cerrar();
+    }, { passive: true });
 
     // Fundido con el hero: arriba la cabecera es el mismo papel, sin velo
     // ni línea; al bajar aparecen los dos. Ver nav.css `.is-arriba`.
@@ -192,10 +196,13 @@ export class NavIsland {
     addEventListener('resize', repasar, { passive: true });
   }
 
+  #yAlAbrir = 0;
+
   #abrir(): void {
     this.#cancelarPendiente();
     if (this.#abierta) return;
     this.#abierta = true;
+    this.#yAlAbrir = window.scrollY;
     this.#isla.classList.add('is-open');
     this.#boton.setAttribute('aria-expanded', 'true');
     this.#boton.setAttribute('aria-label', 'Cerrar el menú');

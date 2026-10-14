@@ -12,7 +12,7 @@ import { test, expect, type Page } from '@playwright/test';
 const SONDA = `(() => {
   const filas = []; let vivo = true;
   const tomar = () => {
-    const f = {};
+    const f = { ms: performance.now() };
     for (const e of document.querySelectorAll('.cf-explica')) f['t' + e.dataset.paso] = e.getBoundingClientRect().left;
     for (const e of document.querySelectorAll('.cf-escena')) (f['s' + e.dataset.paso] ??= []).push(e.getBoundingClientRect().left);
     filas.push(f);
@@ -36,7 +36,11 @@ function roturas(filas: Fila[], separacion: number, ancho: number): string[] {
         if ((seVe(t) || seVe(s)) && Math.abs(s - t - separacion) > 1.5) malos.push(`${i} ${p}: texto ${t.toFixed(0)}, cuadro ${s.toFixed(0)}`);
       }
       const antes = filas[i - 1]?.['t' + p] as number | undefined;
-      if (antes !== undefined && seVe(antes) && seVe(t) && Math.abs(t - antes) > ancho / 6) malos.push(`${i} ${p}: salta de ${antes.toFixed(0)} a ${t.toFixed(0)}`);
+      // Un salto es más de un sexto de ventana en un cuadro de 60 Hz: si el
+      // navegador se saltó cuadros (la CI, con un hilo), el tramo crece
+      // con el tiempo que pasó y no cuenta como salto.
+      const cuadros = Math.max(1, ((f.ms as number) - ((filas[i - 1]?.ms as number) ?? 0)) / (1000 / 60));
+      if (antes !== undefined && seVe(antes) && seVe(t) && Math.abs(t - antes) > (ancho / 6) * cuadros) malos.push(`${i} ${p}: salta de ${antes.toFixed(0)} a ${t.toFixed(0)}`);
     }
   });
   return malos;

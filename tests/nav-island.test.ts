@@ -101,11 +101,19 @@ describe('NavIsland', () => {
     expect(abierta(isla)).toBe(false);
   });
 
-  it('desplazar la página la cierra', () => {
+  it('desplazar la página la cierra; un aviso de scroll sin moverla, no', () => {
+    let y = 0;
+    const espia = vi.spyOn(window, 'scrollY', 'get').mockImplementation(() => y);
     const { isla, boton } = montar();
     boton.click();
+    // El aviso que llega tarde de un desplazamiento ya hecho (el de
+    // llevar el botón a la vista antes del toque) no movió nada.
+    window.dispatchEvent(new Event('scroll'));
+    expect(abierta(isla)).toBe(true);
+    y = 40;
     window.dispatchEvent(new Event('scroll'));
     expect(abierta(isla)).toBe(false);
+    espia.mockRestore();
   });
 
   it('Escape la cierra y devuelve el foco al botón sin volver a abrirla', () => {
