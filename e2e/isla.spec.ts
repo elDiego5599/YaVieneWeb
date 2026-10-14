@@ -6,11 +6,6 @@ import { expect, test } from '@playwright/test';
   adjunta: un fallo que sólo pasa allá trae su explicación.
 */
 test.beforeEach(async ({ page }) => {
-  // El cursor de Chromium sobrevive entre pruebas en el mismo hilo: el
-  // toque o el hover de la anterior lo deja sobre la isla, y al cargar
-  // ese ratón fantasma la abría antes del primer toque (visto en la CI).
-  // Un teléfono no tiene ratón: se aparca en una esquina.
-  await page.mouse.move(1, (page.viewportSize()?.height ?? 800) - 1);
   await page.addInitScript(() => {
     const log: string[] = ((window as unknown as { __isla: string[] }).__isla = []);
     const t0 = performance.now();

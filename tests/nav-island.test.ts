@@ -73,6 +73,16 @@ describe('NavIsland', () => {
     expect(abierta(isla)).toBe(true);
   });
 
+  it('en un teléfono, sin hover, un ratón fantasma no la abre', () => {
+    // La CI emula el Pixel 7 y su cursor de la prueba anterior queda
+    // sobre la isla: abría antes del primer toque, que entonces la cerraba.
+    const media = vi.spyOn(window, 'matchMedia').mockImplementation(q => ({ matches: q !== '(hover: hover)' }) as MediaQueryList);
+    const { isla } = montar();
+    isla.dispatchEvent(puntero('pointerover', 'mouse', { bubbles: true }));
+    expect(abierta(isla)).toBe(false);
+    media.mockRestore();
+  });
+
   it('volver dentro del respiro la deja abierta: el hueco hasta el panel no la cierra', () => {
     const { isla } = montar();
     isla.dispatchEvent(puntero('pointerover', 'mouse'));
