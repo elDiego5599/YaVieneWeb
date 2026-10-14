@@ -1,5 +1,33 @@
 import { expect, test } from '@playwright/test';
 
+/*
+  En la CI la isla aparecía abierta antes de tocarla, y nadie sabía quién
+  la abría. Cada prueba anota lo que le llega a la isla y, si falla, lo
+  adjunta: un fallo que sólo pasa allá trae su explicación.
+*/
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    const log: string[] = ((window as unknown as { __isla: string[] }).__isla = []);
+    const t0 = performance.now();
+    for (const tipo of ['pointerover', 'pointerenter', 'pointerleave', 'pointerdown', 'click', 'focusin', 'focusout', 'scroll', 'touchstart']) {
+      addEventListener(tipo, e => {
+        const t = e.target as Element | null;
+        const pt = (e as PointerEvent).pointerType ?? '';
+        log.push(`${(performance.now() - t0).toFixed(0)} ${tipo} ${pt} ${t?.className?.toString?.() ?? t?.nodeName ?? 'window'} y=${scrollY}`);
+      }, true);
+    }
+    new MutationObserver(ms => {
+      for (const m of ms) if ((m.target as Element).classList?.contains('nav-island')) log.push(`${(performance.now() - t0).toFixed(0)} clase ${(m.target as Element).className}`);
+    }).observe(document, { subtree: true, attributes: true, attributeFilter: ['class'] });
+  });
+});
+test.afterEach(async ({ page }, info) => {
+  if (info.status === info.expectedStatus) return;
+  const log = await page.evaluate(() => (window as unknown as { __isla?: string[] }).__isla ?? []).catch(() => []);
+  await info.attach('eventos-isla', { body: log.join('\n'), contentType: 'text/plain' });
+  console.log(`eventos de la isla:\n${log.join('\n')}`);
+});
+
 /**
  * La isla de navegación, tocada y tabulada como se usa.
  *
