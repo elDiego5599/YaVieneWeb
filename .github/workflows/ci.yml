@@ -108,5 +108,9 @@ jobs:
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: informe-playwright
-          path: playwright-report/
+          # En la CI el informe es el de GitHub y no deja carpeta: lo que
+          # explica un fallo son las trazas de test-results/.
+          path: |
+            playwright-report/
+            test-results/
           retention-days: 7
