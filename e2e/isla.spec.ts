@@ -6,6 +6,11 @@ import { expect, test } from '@playwright/test';
   adjunta: un fallo que sólo pasa allá trae su explicación.
 */
 test.beforeEach(async ({ page }) => {
+  // El cursor de Chromium sobrevive entre pruebas en el mismo hilo: el
+  // toque o el hover de la anterior lo deja sobre la isla, y al cargar
+  // ese ratón fantasma la abría antes del primer toque (visto en la CI).
+  // Un teléfono no tiene ratón: se aparca en una esquina.
+  await page.mouse.move(1, (page.viewportSize()?.height ?? 800) - 1);
   await page.addInitScript(() => {
     const log: string[] = ((window as unknown as { __isla: string[] }).__isla = []);
     const t0 = performance.now();
@@ -92,16 +97,6 @@ test('con el ratón se abre al entrar y se cierra al salir', async ({ page }, in
   test.skip(info.project.name !== 'escritorio', 'el puntero es del escritorio');
   await page.goto('/');
   const isla = page.locator('.nav-island');
-  // Como en el toque: en la CI lenta la isla aún llegaba a su sitio, se
-  // iba de debajo del puntero y el `pointerleave` la cerraba. Una persona
-  // apunta a donde la ve quieta.
-  await page.evaluate(async () => {
-    for (;;) {
-      const vivas = document.getAnimations().filter(a => a.playState === 'running' && (a.effect as KeyframeEffect | null)?.target?.closest('.nav-island, header'));
-      if (vivas.length === 0) return;
-      await Promise.allSettled(vivas.map(a => a.finished));
-    }
-  });
   await isla.hover();
   await expect(isla).toHaveClass(/\bis-open\b/);
   await page.mouse.move(5, 700);

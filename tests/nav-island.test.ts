@@ -55,7 +55,7 @@ describe('NavIsland', () => {
 
   it('el ratón la abre al entrar y la cierra al salir, con un respiro de 120 ms', () => {
     const { isla } = montar();
-    isla.dispatchEvent(puntero('pointerenter', 'mouse'));
+    isla.dispatchEvent(puntero('pointerover', 'mouse'));
     expect(abierta(isla)).toBe(true);
 
     isla.dispatchEvent(puntero('pointerleave', 'mouse'));
@@ -65,19 +65,27 @@ describe('NavIsland', () => {
     expect(abierta(isla)).toBe(false);
   });
 
+  it('el ratón que ya está encima al cargar la abre al moverse: sólo llega pointerover', () => {
+    // Chromium, con el cursor quieto sobre la isla al cargar la página,
+    // manda `pointerover` y nunca `pointerenter` (visto en la CI).
+    const { isla } = montar();
+    isla.querySelector('a')!.dispatchEvent(puntero('pointerover', 'mouse', { bubbles: true }));
+    expect(abierta(isla)).toBe(true);
+  });
+
   it('volver dentro del respiro la deja abierta: el hueco hasta el panel no la cierra', () => {
     const { isla } = montar();
-    isla.dispatchEvent(puntero('pointerenter', 'mouse'));
+    isla.dispatchEvent(puntero('pointerover', 'mouse'));
     isla.dispatchEvent(puntero('pointerleave', 'mouse'));
     vi.advanceTimersByTime(80);
-    isla.dispatchEvent(puntero('pointerenter', 'mouse'));
+    isla.dispatchEvent(puntero('pointerover', 'mouse'));
     vi.advanceTimersByTime(500);
     expect(abierta(isla)).toBe(true);
   });
 
   it('el dedo no la abre ni la cierra al entrar o salir: eso es cosa del botón', () => {
     const { isla, boton } = montar();
-    isla.dispatchEvent(puntero('pointerenter', 'touch'));
+    isla.dispatchEvent(puntero('pointerover', 'touch'));
     expect(abierta(isla)).toBe(false);
     boton.click();
     isla.dispatchEvent(puntero('pointerleave', 'touch'));

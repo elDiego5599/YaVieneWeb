@@ -47,9 +47,11 @@ export class NavIsland {
       else this.#abrir();
     });
 
-    // Puntero. `pointerenter` no llega en pantallas táctiles, así que el
-    // toque sigue dependiendo del botón y no hay nada que filtrar aquí.
-    isla.addEventListener('pointerenter', e => {
+    // Puntero. `pointerover` y no `pointerenter`: con el cursor quieto
+    // sobre la isla al cargar, Chromium manda el primero y nunca el
+    // segundo, y la isla no se abría hasta salir y volver a entrar. El
+    // toque sigue dependiendo del botón.
+    isla.addEventListener('pointerover', e => {
       if (e.pointerType === 'touch') return;
       this.#abrir();
     });
