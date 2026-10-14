@@ -245,10 +245,10 @@
   pointer-events: none;
 }
 
-/* Dos píxeles y sin remate, como los de incident.io (4 en su lienzo de
-   2400). */
+/* Tres píxeles y sin remate: los 2 de incident.io (4 en su lienzo de
+   2400) se veían flojos (dueño, 2026-10-14). */
 .hilo {
-  stroke-width: 2;
+  stroke-width: 3;
 }
 
 .hilo--enredo {

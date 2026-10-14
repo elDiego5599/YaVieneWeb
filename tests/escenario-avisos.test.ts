@@ -90,6 +90,8 @@ describe('el escenario de «Qué resuelve»', () => {
       ['Ese tiempo suma', 'Media hora perdida en el paradero'],
       ['Expuesto a robos', 'Mucho rato en la calle, celular en mano'],
     ]);
+    // «sin sombra» arriba y «y mojándose» abajo (dueño, 2026-10-14).
+    expect(seccion).toMatch(/sin sombra<br \/>\s*y mojándose/);
   });
 
   it('con Ya Viene: lo mismo resuelto, y el aviso de la app tal cual con una ruta real de Sobusa', () => {
