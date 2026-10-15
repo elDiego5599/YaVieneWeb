@@ -244,7 +244,7 @@
             <form class="aviso-form" id="aviso-lanzamiento" data-estado="cerrado" inert novalidate aria-label="Avísame cuando salga">
               <div class="aviso-pildora">
                 <label class="sr-only" for="aviso-telefono">Tu número de celular</label>
-                <input class="aviso-input" id="aviso-telefono" name="telefono" type="tel" inputmode="tel" autocomplete="tel" placeholder="300 000 0000" pattern="[0-9+ ()\-]{7,20}" required aria-describedby="aviso-error" />
+                <input class="aviso-input" id="aviso-telefono" name="telefono" type="tel" inputmode="tel" autocomplete="tel" placeholder="300 000 0000" maxlength="20" required aria-describedby="aviso-error" />
                 <button class="aviso-enviar" type="submit" aria-label="Enviar mi número"><svg class="aviso-boton-icono aviso-boton-enviar" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg><svg class="aviso-boton-icono aviso-boton-cerrar" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
                 <p class="aviso-listo" role="status" tabindex="-1"></p>
               </div>

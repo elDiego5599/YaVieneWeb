@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { AvisoLanzamiento } from '../src/aviso-lanzamiento';
+import { readFileSync } from 'node:fs';
+import { AvisoLanzamiento, celularValido } from '../src/aviso-lanzamiento';
 import { BACKEND } from '../src/backend';
 
 /**
@@ -15,7 +16,7 @@ function montar(): { form: HTMLFormElement; cta: HTMLButtonElement } {
       <a href="#como-funciona">Cómo funciona</a>
       <form id="aviso-lanzamiento" data-estado="cerrado" inert novalidate>
         <div class="aviso-pildora">
-          <input name="telefono" type="tel" pattern="[0-9+ ()\\-]{7,20}" required />
+          <input name="telefono" type="tel" maxlength="20" required />
           <button type="submit" aria-label="Enviar mi número"><svg class="aviso-boton-icono aviso-boton-enviar" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg><svg class="aviso-boton-icono aviso-boton-cerrar" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
           <p class="aviso-listo" role="status" tabindex="-1"></p>
         </div>
@@ -217,7 +218,9 @@ describe('AvisoLanzamiento', () => {
       cta.click();
       escribir('12');
       enviar(form);
-      escribir('300 000');
+      escribir('300 123 456');
+      expect(error()).not.toBe('');
+      escribir('3001234567');
       expect(error()).toBe('');
       expect(telefono().hasAttribute('aria-invalid')).toBe(false);
     });
@@ -227,6 +230,90 @@ describe('AvisoLanzamiento', () => {
       cta.click();
       escribir('1');
       expect(error()).toBe('');
+    });
+
+    it('solo vale lo que acepta el backend: celular de Colombia o un número con su +', () => {
+      for (const bueno of ['3001234567', '300 123 4567', '(300) 123-4567', '+57 300 123 4567', '573001234567', '+1 305 555 0100']) {
+        expect(celularValido(bueno), bueno).toBe(true);
+      }
+      for (const malo of ['1234567', '12345678', '1234567890', '+57 123 456 7890', '300 123 456', '300+1234567', '++573001234567', '+1234567', '']) {
+        expect(celularValido(malo), malo).toBe(false);
+      }
+    });
+
+    it('un fijo o un número a medias no sale: lo dice y no llama al backend', () => {
+      const { form, cta } = montar();
+      const pedir = vi.fn();
+      vi.stubGlobal('fetch', pedir);
+      cta.click();
+      acepto().checked = true;
+      for (const malo of ['1234567', '1234567890', '300 123 456']) {
+        escribir(malo);
+        enviar(form);
+        expect(error(), malo).toBe('Escribe un celular válido, como 300 123 4567.');
+      }
+      expect(pedir).not.toHaveBeenCalled();
+    });
+
+    it('las letras no entran y el + solo va adelante', () => {
+      const { cta } = montar();
+      cta.click();
+      escribir('abc12');
+      expect(telefono().value).toBe('12');
+      escribir('+57 30a0');
+      expect(telefono().value).toBe('+57 300');
+      escribir('300+12');
+      expect(telefono().value).toBe('300 12');
+    });
+
+    it('el celular de Colombia se agrupa solo, 300 123 4567, y no pasa de 10 cifras', () => {
+      const { cta } = montar();
+      cta.click();
+      escribir('3001');
+      expect(telefono().value).toBe('300 1');
+      escribir('3001234567');
+      expect(telefono().value).toBe('300 123 4567');
+      escribir('300123456789');
+      expect(telefono().value).toBe('300 123 4567');
+    });
+
+    it('el campo solo es válido con un número que sirve: el botón se apaga hasta entonces', () => {
+      const { cta } = montar();
+      cta.click();
+      escribir('300 123');
+      expect(telefono().checkValidity()).toBe(false);
+      escribir('3001234567');
+      expect(telefono().checkValidity()).toBe(true);
+    });
+
+    it('index.html no usa pattern: con el modo v de los navegadores el de antes no compilaba y todo pasaba', () => {
+      const html = readFileSync('index.html', 'utf8');
+      const campo = html.match(/<input[^>]*id="aviso-telefono"[^>]*>/)![0];
+      expect(campo).not.toContain('pattern=');
+      expect(campo).toContain('maxlength="20"');
+    });
+
+    it('un error sacude lo que falla, como una contraseña mala; sin movimiento, no', () => {
+      const animar = vi.fn();
+      const original = HTMLElement.prototype.animate;
+      HTMLElement.prototype.animate = animar as unknown as typeof original;
+      try {
+        const { form, cta } = montar();
+        const pildora = form.querySelector('.aviso-pildora');
+        cta.click();
+        escribir('12');
+        enviar(form);
+        expect(animar).toHaveBeenCalledTimes(1);
+        expect(animar.mock.contexts[0]).toBe(pildora);
+        escribir('3001234567');
+        enviar(form);
+        expect(animar.mock.contexts[1]).toBe(acepto().closest('label'));
+        vi.stubGlobal('matchMedia', (q: string) => ({ matches: q === '(prefers-reduced-motion: reduce)' }));
+        enviar(form);
+        expect(animar).toHaveBeenCalledTimes(2);
+      } finally {
+        HTMLElement.prototype.animate = original;
+      }
     });
 
     it('marcar la casilla quita su error', () => {
@@ -370,7 +457,7 @@ describe('AvisoLanzamiento', () => {
       await esperar();
       expect(error()).toBe(mensaje);
       expect(form.dataset.estado).toBe('abierto');
-      expect(telefono().value).toBe(' 300 000 0000 ');
+      expect(telefono().value).toBe('300 000 0000');
       expect(acepto().checked).toBe(true);
     });
 
@@ -392,7 +479,7 @@ describe('AvisoLanzamiento', () => {
       await esperar();
       expect(error()).toBe('No pudimos guardar tu número. Inténtalo de nuevo.');
       expect(form.dataset.estado).toBe('abierto');
-      expect(telefono().value).toBe(' 300 000 0000 ');
+      expect(telefono().value).toBe('300 000 0000');
     });
 
     it('si cerraron la píldora mientras viajaba, la respuesta no la reabre', async () => {

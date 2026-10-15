@@ -856,8 +856,31 @@
 /* Mientras el número viaja al backend: la flecha se apaga y deja de
    aceptar toques, para que se note que ya salió. */
 .aviso-form[aria-busy] .aviso-enviar {
-  opacity: 0.55;
   pointer-events: none;
+}
+
+/* Mientras viaja el número la flecha cede su sitio a un aro que gira:
+   16 px dentro del círculo de 40, 2 px de trazo como la flecha, una
+   vuelta cada 0,7 s (lo que tarda ngrok en contestar, a ojo de reloj). */
+.aviso-form[aria-busy] .aviso-boton-enviar {
+  opacity: 0;
+}
+
+.aviso-form[aria-busy] .aviso-enviar::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgb(255 255 255 / 0.35);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: aviso-girar 0.7s linear infinite;
+}
+
+@keyframes aviso-girar {
+  to {
+    rotate: 1turn;
+  }
 }
 
 .aviso-enviar:active {
@@ -932,6 +955,8 @@
 /* La palomita, dibujada con dos filos: 6 × 11 girada 45°. */
 .aviso-listo::before {
   content: '';
+  scale: 0.4;
+  transition: scale 0.4s var(--ease-resorte);
   flex: none;
   width: 6px;
   height: 11px;
@@ -943,6 +968,12 @@
 
 .aviso-form[data-estado="listo"] .aviso-listo {
   opacity: 1;
+  transition-delay: 0.1s;
+}
+
+/* La palomita llega con el resorte, del 40 % a su tamaño, tras el fundido. */
+.aviso-form[data-estado="listo"] .aviso-listo::before {
+  scale: 1;
   transition-delay: 0.1s;
 }
 
@@ -1004,8 +1035,10 @@
 }
 
 /* El error entra suave: se funde y baja 4 px. Coral accesible, 4,86:1
-   sobre el crema, en 600. */
+   sobre el crema, en 600. Su línea queda reservada (13 × 1,45) para que
+   el hero no salte al aparecer o irse; un error de dos líneas sí crece. */
 .aviso-error {
+  min-height: calc(13px * 1.45);
   margin: 4px 0 0;
   font-size: 13px;
   font-weight: 600;
@@ -1015,7 +1048,6 @@
 }
 
 .aviso-error:empty {
-  margin: 0;
   opacity: 0;
   translate: 0 -4px;
 }
@@ -1076,6 +1108,20 @@
 
   .aviso-detalles {
     transition: none;
+  }
+
+  .aviso-listo::before {
+    scale: none;
+  }
+
+  /* El aro no gira: queda quieto y a medio tono, señal de espera sin
+     movimiento. */
+  .aviso-form[aria-busy] .aviso-enviar::after {
+    animation: none;
+  }
+
+  .aviso-form[aria-busy] .aviso-enviar {
+    opacity: 0.55;
   }
 
   .aviso-enviar,

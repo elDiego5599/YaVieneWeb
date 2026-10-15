@@ -11,8 +11,9 @@
  *
  * El número va al backend (`POST /api/lanzamiento`, D15 del backend) con
  * el permiso marcado; allí se guarda con la fecha y se borra a pedido o
- * tras el aviso. El backend lo normaliza y es el que decide si vale: aquí
- * solo se filtra lo que el campo ya marca como malo.
+ * tras el aviso. El campo aplica la misma regla que el backend
+ * (`celularValido`, espejo de `normalizarTelefono` en
+ * YaVieneBackend/src/data/lanzamiento.ts): lo que no sirve no sale.
  */
 import { BACKEND } from './backend';
 
@@ -24,6 +25,40 @@ const FALLO = 'No pudimos guardar tu número. Inténtalo de nuevo.';
 const LISTO = 'Listo. Te avisamos cuando salga.';
 /** Lo que se queda la confirmación antes de volver al CTA: da para leerla. */
 const DURA_LISTO = 2400;
+/** El «no» de una contraseña mala: un vaivén corto que se apaga. */
+const SACUDIDA: Keyframe[] = [0, -8, 7, -5, 3, -1, 0].map(x => ({ transform: `translateX(${x}px)` }));
+
+// Lo que se puede escribir: cifras, espacios, guiones, paréntesis y un +
+// solo adelante. Igual que `ESCRITO` en el backend.
+const ESCRITO = /^\+?[0-9 ()-]+$/;
+
+/**
+ * El número sirve para avisar por WhatsApp. Sin +, solo un celular de
+ * Colombia: 10 cifras que empiezan por 3, o esas mismas con su 57 delante.
+ * Con +, el de otro país, en E.164 (8 a 15 cifras); el +57 tiene que ser
+ * igual un celular. Ni un fijo ni diez cifras cualquiera.
+ */
+export function celularValido(valor: string): boolean {
+  const escrito = valor.trim();
+  if (escrito.length > 32 || !ESCRITO.test(escrito)) return false;
+  const cifras = escrito.replace(/\D/g, '');
+  if (/^(57)?3\d{9}$/.test(cifras)) return true;
+  return escrito.startsWith('+') && !cifras.startsWith('57') && cifras.length >= 8 && cifras.length <= 15;
+}
+
+/**
+ * Lo escrito, sin lo que no puede ir: fuera letras y cualquier + que no
+ * sea el primero. Un celular de Colombia (sin + y empezando por 3) se
+ * agrupa como se dicta, 300 123 4567, y no pasa de sus 10 cifras.
+ */
+function limpiar(valor: string): string {
+  const mas = valor.trimStart().startsWith('+');
+  const resto = valor.replace(/[^0-9 ()-]/g, '');
+  if (mas) return `+${resto.trimStart()}`;
+  const cifras = resto.replace(/\D/g, '');
+  if (!cifras.startsWith('3')) return resto;
+  return [cifras.slice(0, 3), cifras.slice(3, 6), cifras.slice(6, 10)].filter(Boolean).join(' ');
+}
 
 export class AvisoLanzamiento {
   readonly #form: HTMLFormElement;
@@ -45,6 +80,7 @@ export class AvisoLanzamiento {
     this.#error = form.querySelector<HTMLElement>('.aviso-error')!;
     this.#listo = form.querySelector<HTMLElement>('.aviso-listo')!;
     this.#boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    this.#validar();
     this.#pintarBoton();
     // Sin nada escrito el botón es una × que deshace la apertura (también
     // con Enter: el envío implícito pulsa este mismo botón).
@@ -85,6 +121,14 @@ export class AvisoLanzamiento {
       }
     });
     this.#telefono.addEventListener('input', () => {
+      // Se limpia solo con el cursor al final, que es como se escribe un
+      // número: en medio, reescribir el valor le movería el cursor.
+      const campo = this.#telefono;
+      if (campo.selectionStart === null || campo.selectionStart === campo.value.length) {
+        const limpio = limpiar(campo.value);
+        if (limpio !== campo.value) campo.value = limpio;
+      }
+      this.#validar();
       this.#pintarBoton();
       if (this.#errorDeTelefono()) this.#mostrar(this.#errorTelefono());
     });
@@ -129,6 +173,13 @@ export class AvisoLanzamiento {
     if (conFoco) this.#cta.focus();
   }
 
+  /** La validez del campo es la de `celularValido`: con ella el CSS apaga
+      enviar (`:valid`) hasta que el número sirve. */
+  #validar(): void {
+    const valor = this.#telefono.value;
+    this.#telefono.setCustomValidity(valor.trim() === '' || celularValido(valor) ? '' : MALO);
+  }
+
   #errorTelefono(): string {
     if (this.#telefono.value.trim() === '') return FALTA;
     return this.#telefono.checkValidity() ? '' : MALO;
@@ -153,6 +204,7 @@ export class AvisoLanzamiento {
     this.#mostrar(mensaje);
     if (mensaje) {
       (mensaje === SIN_ACEPTAR ? this.#acepto : this.#telefono).focus();
+      this.#sacudir(mensaje === SIN_ACEPTAR ? this.#acepto.closest('label')! : this.#pildora);
       return;
     }
     this.#form.setAttribute('aria-busy', 'true');
@@ -170,8 +222,17 @@ export class AvisoLanzamiento {
         if (this.#form.dataset.estado !== 'abierto') return;
         if (estado === 201) return this.#confirmar();
         this.#mostrar(estado === 400 ? MALO : estado === 429 ? MUCHOS : FALLO);
-        if (estado === 400) this.#telefono.focus();
+        if (estado === 400) {
+          this.#telefono.focus();
+          this.#sacudir(this.#pildora);
+        }
       });
+  }
+
+  /** Sacude lo que falló. Sin movimiento basta el mensaje y el filo coral. */
+  #sacudir(elemento: HTMLElement): void {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    elemento.animate?.(SACUDIDA, { duration: 400, easing: 'ease-out' });
   }
 
   #pintarBoton(): void {
@@ -182,6 +243,7 @@ export class AvisoLanzamiento {
 
   #confirmar(): void {
     this.#form.reset();
+    this.#validar();
     this.#pintarBoton();
     this.#listo.textContent = LISTO;
     this.#estado('listo');
