@@ -16,7 +16,7 @@ function montar(): { form: HTMLFormElement; cta: HTMLButtonElement } {
       <form id="aviso-lanzamiento" data-estado="cerrado" inert novalidate>
         <div class="aviso-pildora">
           <input name="telefono" type="tel" pattern="[0-9+ ()\\-]{7,20}" required />
-          <button type="submit" aria-label="Enviar mi número"><span aria-hidden="true">→</span></button>
+          <button type="submit" aria-label="Enviar mi número"><svg class="aviso-boton-icono aviso-boton-enviar" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg><svg class="aviso-boton-icono aviso-boton-cerrar" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
           <p class="aviso-listo" role="status" tabindex="-1"></p>
         </div>
         <label><input type="checkbox" name="acepto" required /> Acepto</label>
@@ -118,13 +118,13 @@ describe('AvisoLanzamiento', () => {
       const pedir = vi.fn();
       vi.stubGlobal('fetch', pedir);
       cta.click();
-      expect(boton.textContent).toBe('×');
+      expect(boton.hasAttribute('data-cerrar')).toBe(true);
       expect(boton.getAttribute('aria-label')).toBe('Cerrar');
       escribir('3');
-      expect(boton.textContent).toBe('→');
+      expect(boton.hasAttribute('data-cerrar')).toBe(false);
       expect(boton.getAttribute('aria-label')).toBe('Enviar mi número');
       escribir('  ');
-      expect(boton.textContent).toBe('×');
+      expect(boton.hasAttribute('data-cerrar')).toBe(true);
       boton.click();
       expect(form.dataset.estado).toBe('cerrado');
       expect(document.activeElement).toBe(cta);
@@ -142,7 +142,7 @@ describe('AvisoLanzamiento', () => {
       boton.click();
       for (let i = 0; i < 10; i++) await Promise.resolve();
       expect(form.dataset.estado).toBe('listo');
-      expect(boton.textContent).toBe('×');
+      expect(boton.hasAttribute('data-cerrar')).toBe(true);
     });
 
     it('Escape cierra; otra tecla no', () => {

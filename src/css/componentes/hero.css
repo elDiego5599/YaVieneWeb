@@ -836,7 +836,8 @@
   translate: calc(-1 * var(--aviso-der, 0px) - 7px) 0;
   scale: 0.65;
   transition: translate 0.4s var(--ease-resorte), scale 0.4s var(--ease-resorte),
-    opacity 0.2s var(--ease-out-cubic), transform 0.1s var(--ease-out-cubic);
+    opacity 0.2s var(--ease-out-cubic), transform 0.1s var(--ease-out-cubic),
+    background-color 0.2s var(--ease-out-cubic);
 }
 
 .aviso-form[data-estado="abierto"] .aviso-enviar {
@@ -861,6 +862,42 @@
 
 .aviso-enviar:active {
   transform: scale(0.97);
+}
+
+/* Los dos íconos van dibujados y no con letra: la × y la flecha de la
+   fuente caen bajo el centro (su tinta vive en la altura de la x). 16 en
+   un círculo de 40, trazo 2 como la flecha del CTA. Sin número se ve la
+   ×, con número la flecha (`data-cerrar`, src/aviso-lanzamiento.ts). */
+.aviso-boton-icono {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.38s var(--ease-fluida);
+}
+
+.aviso-enviar[data-cerrar] .aviso-boton-enviar,
+.aviso-enviar:not([data-cerrar]) .aviso-boton-cerrar {
+  display: none;
+}
+
+/* El puntero encima: oscurece como `.btn-green` (#036145) y el ícono
+   acompaña, la flecha hacia donde va y la × con un cuarto de giro. */
+@media (hover: hover) {
+  .aviso-enviar:hover {
+    background: #036145;
+  }
+
+  .aviso-enviar:hover .aviso-boton-enviar {
+    transform: translateX(2px);
+  }
+
+  .aviso-enviar:hover .aviso-boton-cerrar {
+    transform: rotate(90deg);
+  }
 }
 
 .hero-actions .btn-green:active {
@@ -1045,6 +1082,10 @@
   .hero-actions .btn-outline {
     translate: none;
     scale: none;
+  }
+
+  .aviso-enviar:hover .aviso-boton-icono {
+    transform: none;
   }
 
   .hero-actions:has(.aviso-form:not([data-estado="cerrado"])) .btn-outline {
