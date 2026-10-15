@@ -106,6 +106,13 @@
   cursor: pointer;
   transition: color 0.4s var(--ease-out-cubic);
 }
+/* Alto de 29 con el relleno de la píldora: la capa invisible lo lleva a 45
+   (blanco de dedo de 44) sin engordar el dibujo; el ancho ya pasa de 100. */
+.interruptor-opcion::before {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
+}
 
 .interruptor-opcion[aria-pressed='true'] {
   color: var(--papel);

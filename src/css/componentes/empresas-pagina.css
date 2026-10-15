@@ -1758,3 +1758,15 @@
 
 /* ── Marcas: la cinta vive en `componentes/marcas.css`, que comparten la
    portada y esta página: los mismos siete logos en los dos sitios. ── */
+
+/* «Abrir WhatsApp otra vez»: la salida si la pestaña no abrió. 44 px de alto
+   (WCAG 2.5.5) con padding, sin cambiar el aspecto del texto. */
+.form-success-message a[data-exito-reabrir] {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--green-accessible);
+  font-weight: 600;
+  text-decoration: underline;
+}

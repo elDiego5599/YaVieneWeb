@@ -307,8 +307,10 @@
 
 .nav-island-toggle {
   flex: none;
-  width: 38px;
-  height: 38px;
+  /* 44 de verdad (Apple HIG, WCAG 2.5.5): con 38 y una capa invisible de 3 de
+     margen el blanco quedaba en 42, descontado el borde de la barra v3. */
+  width: 44px;
+  height: 44px;
   border: 0;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
@@ -465,8 +467,9 @@
    Blancos de dedo
    --------------------------------------------------------------- */
 
-/* En la píldora los dos objetos tocables se quedan cortos para un dedo:
-   el botón mide treinta y ocho y la marca veintiocho de alto. Crecerlos
+/* En la píldora los dos objetos tocables se quedaban cortos para un dedo:
+   el botón medía treinta y ocho (ya mide cuarenta y cuatro) y la marca
+   veintiocho de alto. Crecerlos
    de verdad engordaría la píldora, que es lo único que flota sobre toda
    la página y que está medida al píxel. Así que crece el blanco y no el
    dibujo: una capa invisible por encima, estirada hasta los cuarenta y
@@ -474,20 +477,14 @@
    píldora y los dos están en extremos opuestos, así que ninguno pisa al
    otro. Sólo en pantallas de dedo. */
 @media (pointer: coarse) {
-  .nav-island-brand,
-  .nav-island-toggle {
+  .nav-island-brand {
     position: relative;
   }
 
-  .nav-island-brand::after,
-  .nav-island-toggle::after {
+  .nav-island-brand::after {
     content: '';
     position: absolute;
     inset: -8px 0;
-  }
-
-  .nav-island-toggle::after {
-    inset: -3px;
   }
 }
 

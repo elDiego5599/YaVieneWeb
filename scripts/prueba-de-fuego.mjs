@@ -34,7 +34,12 @@ export const MUTACIONES = [
   { archivo: 'src/contact-form.ts', de: "if (!ventana) throw new Error('El navegador bloqueó la ventana de WhatsApp');", a: 'if (!ventana) return;', que: 'WhatsApp bloqueado por el navegador' },
   { archivo: 'src/contact-form.ts', de: 'ventana.opener = null;', a: 'void ventana;', que: 'la pestaña de WhatsApp sin opener' },
   { archivo: 'src/contact-form.ts', de: 'encodeURIComponent(texto)', a: 'texto', que: 'el mensaje de WhatsApp codificado' },
-  { archivo: 'src/contact-form.ts', de: 'if (porWhatsApp) {', a: 'if (!porWhatsApp) {', que: 'el éxito cuenta por dónde salió' },
+  { archivo: 'src/contact-form.ts', de: 'if (whatsapp) {', a: 'if (!whatsapp) {', que: 'el éxito cuenta por dónde salió' },
+  { archivo: 'src/contact-form.ts', de: 'this.#enlaceReabrir().href = whatsapp;', a: 'this.#enlaceReabrir().href = \'\';', que: 'el enlace para abrir WhatsApp otra vez lleva el mensaje' },
+  { archivo: 'src/panel-flota.ts', de: "raiz.toggleAttribute('inert', movil.matches)", a: "raiz.toggleAttribute('inert', false)", que: 'la maqueta del panel inerte en el teléfono' },
+  { archivo: 'src/por-ruta.ts', de: 'return largo - a < RUIDO_ATRAS ? 0 : a;', a: 'return a;', que: 'el ruido del GPS en la ruta circular' },
+  { archivo: 'src/por-ruta.ts', de: 'if (d < 0) return d > -RUIDO_ATRAS ? 0 : null;', a: 'if (d < 0) return null;', que: 'el ruido del GPS en la ruta abierta' },
+  { archivo: 'src/por-ruta.ts', de: 'if (todos[0].desvio > DESVIO_PUNTO_MAXIMO) return null;', a: '', que: 'punto lejos de la ruta cae a línea recta' },
   { archivo: 'src/contact-form.ts', de: 'this.#boton.disabled = true;', a: 'this.#boton.disabled = false;', que: 'botón bloqueado mientras envía' },
   { archivo: 'src/contact-form.ts', de: "this.#error.hidden = mensaje === '';", a: 'this.#error.hidden = false;', que: 'el error vacío se esconde' },
   // La cifra viva de la hoja.

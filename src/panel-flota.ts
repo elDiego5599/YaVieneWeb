@@ -218,6 +218,17 @@ export class PanelFlota {
     // marcador que lo contiene. El de la ficha no está dentro de ninguno y
     // actúa sobre el elegido, igual que allá.
     raiz.addEventListener('click', (e) => this.#tocar(e));
+
+    // En el teléfono (880 es el corte de la página) es un dibujo pequeño y no
+    // una herramienta: inerte, no se lleva el toque ni el desplazamiento de
+    // quien baja la página, ni da foco de teclado a botones de 8 px.
+    const movil = window.matchMedia('(max-width: 879px)');
+    const inerte = (): void => {
+      raiz.toggleAttribute('inert', movil.matches);
+    };
+    inerte();
+    movil.addEventListener('change', inerte);
+
     this.#pintar();
   }
 

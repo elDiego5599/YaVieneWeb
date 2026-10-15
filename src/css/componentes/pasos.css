@@ -518,6 +518,7 @@
   align-content: start;
   gap: 5px;
   width: 100%;
+  min-height: 44px; /* blanco de dedo: con el relleno mínimo quedaba en 41 */
   padding: clamp(11px, 1.5vh, 18px) 6px clamp(11px, 1.5vh, 18px) 18px;
   border: 0;
   border-radius: 0;

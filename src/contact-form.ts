@@ -75,10 +75,12 @@ export class ContactForm {
       // mismo commit; `vite.config.ts` revienta la construcción si no se
       // hace, y `tests/csp-contacto.test.ts` vigila que siga reventando.
       const endpoint = import.meta.env.VITE_CONTACT_ENDPOINT;
+      // El enlace se arma antes del `reset`, que vacía los datos.
+      let whatsapp: string | null = null;
       if (endpoint) await ContactForm.#publicar(endpoint, this.#datos);
-      else this.#abrirWhatsApp();
+      else whatsapp = this.#abrirWhatsApp();
       this.#form.reset();
-      this.#mostrarExito(!endpoint);
+      this.#mostrarExito(whatsapp);
     } catch {
       // El formulario vuelve con los datos escritos, para reintentar.
       this.#form.hidden = false;
@@ -104,7 +106,7 @@ export class ContactForm {
   }
 
   /** Mensaje con lo que la empresa acaba de escribir, listo para enviar. */
-  #abrirWhatsApp(): void {
+  #abrirWhatsApp(): string {
     const { nombre = '', empresa = '', telefono = '' } = this.#datos;
     const texto =
       `Hola, soy ${nombre} de ${empresa}. ` +
@@ -130,7 +132,9 @@ export class ContactForm {
     } catch {
       // Navegador que no deja tocarlo: la pestaña se abre igual.
     }
-    ventana.location.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
+    const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
+    ventana.location.href = url;
+    return url;
   }
 
   /**
@@ -139,9 +143,9 @@ export class ContactForm {
    * recibida» sería mentirle sobre el único paso que falta, así que cada
    * camino cuenta lo que de verdad pasó.
    */
-  #mostrarExito(porWhatsApp: boolean): void {
+  #mostrarExito(whatsapp: string | null): void {
     if (!this.#exito) return;
-    if (porWhatsApp) {
+    if (whatsapp) {
       const titulo = this.#exito.querySelector('[data-exito-titulo]');
       const texto = this.#exito.querySelector('[data-exito-texto]');
       if (titulo) titulo.textContent = 'Le abrimos WhatsApp';
@@ -149,6 +153,9 @@ export class ContactForm {
         texto.textContent =
           'La conversación lleva sus datos ya escritos. Pulse enviar y le responderemos por ese medio.';
       }
+      // El formulario se va con los datos vaciados: si la pestaña no llegó a
+      // abrirse o la persona volvió sin enviar, esta es la salida.
+      this.#enlaceReabrir().href = whatsapp;
     }
     // El panel sale donde estaba el formulario, y el formulario se va: ya
     // está enviado, y dejarlo a la vista vacío pedía rellenarlo otra vez.
@@ -161,6 +168,20 @@ export class ContactForm {
     // que hace que un lector de pantalla lo lea entero y que el siguiente
     // tabulador salga de aquí y no del formulario que acaba de desaparecer.
     this.#exito.focus({ preventScroll: true });
+  }
+
+  #enlaceReabrir(): HTMLAnchorElement {
+    const panel = this.#exito!;
+    let enlace = panel.querySelector<HTMLAnchorElement>('a[data-exito-reabrir]');
+    if (!enlace) {
+      enlace = document.createElement('a');
+      enlace.setAttribute('data-exito-reabrir', '');
+      enlace.target = '_blank';
+      enlace.rel = 'noopener noreferrer';
+      enlace.textContent = 'Abrir WhatsApp otra vez';
+      panel.appendChild(enlace);
+    }
+    return enlace;
   }
 
   #mostrarError(mensaje: string): void {

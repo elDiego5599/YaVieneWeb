@@ -19,6 +19,7 @@
  */
 
 import { YV_RUTAS } from './data/rutas-landing';
+import { rutaMedible, type RutaMedible } from './por-ruta';
 import { fichaDeRuta } from './rutas';
 import { sinMovimiento } from './scrolly';
 import type { Punto, RutaLanding } from './types';
@@ -74,8 +75,10 @@ interface Bus {
   nodo: SVGGElement;
   /** Posición sobre el recorrido, de 0 a 1. */
   t: number;
-  /** Metros que le faltan para el punto de espera, en línea recta. */
+  /** Metros que le faltan para el punto de espera, por la ruta si se puede. */
   metros: number;
+  /** Falso si cayó a línea recta: el punto queda a más de 300 m de la ruta. */
+  porRuta: boolean;
 }
 
 export class MapaVivo {
@@ -101,6 +104,8 @@ export class MapaVivo {
 
   #ruta: RutaLanding;
   #largo = 0;
+  /** La ruta lista para medir por ella, como la app (por_ruta.dart). */
+  #medible: RutaMedible | null = null;
   #unidadesPorPx = 1;
   #pinPunto: Punto = { x: 0, y: 0 };
   /** El punto del recorrido más cercano al pin: desde ahí llegan los buses. */
@@ -195,7 +200,7 @@ export class MapaVivo {
     for (const placa of BUSES) {
       const nodo = MapaVivo.#hacerBus();
       this.#svg.appendChild(nodo);
-      this.#buses.push({ placa, nodo, t: 0, metros: Infinity });
+      this.#buses.push({ placa, nodo, t: 0, metros: Infinity, porRuta: true });
     }
 
     this.#pintarLista();
@@ -328,6 +333,9 @@ export class MapaVivo {
     this.#casing.setAttribute('d', ruta.d);
     this.#activa.setAttribute('d', ruta.d);
     this.#largo = this.#activa.getTotalLength();
+    this.#medible = rutaMedible(
+      puntosDe(ruta.d).map(([x, y]) => [x * this.#metrosPorUnidad, y * this.#metrosPorUnidad])
+    );
 
     for (const boton of this.#lista.querySelectorAll<HTMLElement>('[data-ruta]')) {
       boton.setAttribute('aria-pressed', String(boton.dataset.ruta === id));
@@ -492,9 +500,17 @@ export class MapaVivo {
         'transform',
         `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${this.#rumbo(bus.t).toFixed(1)}) scale(${escala.toFixed(4)})`
       );
-      const dx = p.x - this.#pinPunto.x;
-      const dy = p.y - this.#pinPunto.y;
-      bus.metros = Math.sqrt(dx * dx + dy * dy) * mpu;
+      // Como la app: lo que el bus tiene que andar hasta pasar por el punto.
+      // Su avance es `t` sobre el trazo (va sobre él: no hay que proyectarlo).
+      // Si no se puede medir —punto a más de 300 m de la ruta—, la app cae a
+      // la línea recta y esta página también.
+      const porRuta = this.#medible?.medir(bus.t * this.#largo * mpu, [
+        this.#pinPunto.x * mpu,
+        this.#pinPunto.y * mpu,
+      ]);
+      bus.porRuta = porRuta != null;
+      bus.metros =
+        porRuta ?? Math.hypot(p.x - this.#pinPunto.x, p.y - this.#pinPunto.y) * mpu;
     }
   }
 
@@ -562,7 +578,9 @@ export class MapaVivo {
     this.#lectura.classList.toggle('es-fuera', fuera);
     this.#lecturaPie.textContent = fuera
       ? `esta ruta no pasa a menos de ${legible(this.#aparte)} de tu punto`
-      : 'en línea recta hasta tu punto';
+      : cerca.porRuta
+        ? 'por la ruta hasta tu punto'
+        : 'en línea recta hasta tu punto';
 
     if (dentro && !this.#avisado) {
       this.#avisado = true;
@@ -584,6 +602,14 @@ export class MapaVivo {
     this.#aviso.classList.remove('is-on');
     this.#raiz.classList.remove('es-avisado');
   }
+}
+
+/** Los pares de un `d` hecho sólo de M y L, como los emite el generador. */
+function puntosDe(d: string): Array<[number, number]> {
+  const n = (d.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
+  const pares: Array<[number, number]> = [];
+  for (let i = 0; i + 1 < n.length; i += 2) pares.push([n[i], n[i + 1]]);
+  return pares;
 }
 
 function req<T extends Element>(raiz: ParentNode, sel: string): T {

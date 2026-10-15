@@ -382,7 +382,7 @@ test.describe('el mapa en vivo con el teclado', () => {
     await expect(voz).toHaveText('');
     await page.keyboard.press('ArrowRight');
     await expect(voz).toContainText('Punto de espera movido');
-    await expect(voz).toContainText('en línea recta hasta tu punto');
+    await expect(voz).toContainText('por la ruta hasta tu punto');
 
     // La flecha no puede además desplazar la página: si lo hiciera, mover
     // el punto sacaría el mapa de la pantalla a cada pulsación.

@@ -113,6 +113,36 @@ describe('ContactForm', () => {
     expect(exito.querySelector('[data-exito-texto]')?.textContent).toContain('Pulse enviar');
   });
 
+  it('por WhatsApp deja un enlace «Abrir WhatsApp otra vez» con el mismo mensaje', async () => {
+    vi.stubEnv('VITE_CONTACT_ENDPOINT', '');
+    vi.stubGlobal('open', vi.fn().mockReturnValue({ opener: {}, location: { href: '' } }));
+
+    const form = montarFormulario();
+    new ContactForm(form);
+    await enviar(form);
+
+    // El formulario se vació y se ocultó al enviar: el enlace es la única
+    // salida si la pestaña no llegó o la persona volvió sin enviar.
+    const enlace = document.querySelector<HTMLAnchorElement>('#form-success a[data-exito-reabrir]');
+    expect(enlace?.hidden).toBe(false);
+    expect(enlace?.textContent).toBe('Abrir WhatsApp otra vez');
+    expect(enlace?.href).toContain('https://wa.me/573004438626');
+    expect(decodeURIComponent(enlace?.href ?? '')).toContain('Hola, soy Diego de Sobusa');
+    expect(enlace?.target).toBe('_blank');
+    expect(enlace?.rel).toContain('noopener');
+  });
+
+  it('con endpoint no hay enlace de WhatsApp en el éxito', async () => {
+    vi.stubEnv('VITE_CONTACT_ENDPOINT', 'https://api.example.com/contacto');
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 200 })));
+
+    const form = montarFormulario();
+    new ContactForm(form);
+    await enviar(form);
+
+    expect(document.querySelector('#form-success a[data-exito-reabrir]')).toBeNull();
+  });
+
   it('con la ventana bloqueada muestra error y no da por enviado nada', async () => {
     vi.stubEnv('VITE_CONTACT_ENDPOINT', '');
     vi.stubGlobal('open', vi.fn().mockReturnValue(null));
