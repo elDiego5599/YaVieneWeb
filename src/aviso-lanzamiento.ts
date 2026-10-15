@@ -33,6 +33,7 @@ export class AvisoLanzamiento {
   readonly #acepto: HTMLInputElement;
   readonly #error: HTMLElement;
   readonly #listo: HTMLElement;
+  readonly #boton: HTMLButtonElement;
   #temporizador = 0;
 
   constructor(form: HTMLFormElement, cta: HTMLButtonElement) {
@@ -43,6 +44,15 @@ export class AvisoLanzamiento {
     this.#acepto = form.querySelector<HTMLInputElement>('input[name="acepto"]')!;
     this.#error = form.querySelector<HTMLElement>('.aviso-error')!;
     this.#listo = form.querySelector<HTMLElement>('.aviso-listo')!;
+    this.#boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    this.#pintarBoton();
+    // Sin nada escrito el botón es una × que deshace la apertura (también
+    // con Enter: el envío implícito pulsa este mismo botón).
+    this.#boton.addEventListener('click', e => {
+      if (this.#boton.dataset.cerrar === undefined) return;
+      e.preventDefault();
+      this.#cerrar();
+    });
 
     cta.addEventListener('click', () => this.#abrir());
     // Tocar fuera cierra solo si no hay nada escrito: un toque perdido no
@@ -75,6 +85,7 @@ export class AvisoLanzamiento {
       }
     });
     this.#telefono.addEventListener('input', () => {
+      this.#pintarBoton();
       if (this.#errorDeTelefono()) this.#mostrar(this.#errorTelefono());
     });
     this.#acepto.addEventListener('change', () => {
@@ -163,8 +174,16 @@ export class AvisoLanzamiento {
       });
   }
 
+  #pintarBoton(): void {
+    const vacio = !this.#telefono.value.trim();
+    this.#boton.toggleAttribute('data-cerrar', vacio);
+    this.#boton.setAttribute('aria-label', vacio ? 'Cerrar' : 'Enviar mi número');
+    this.#boton.firstElementChild!.textContent = vacio ? '×' : '→';
+  }
+
   #confirmar(): void {
     this.#form.reset();
+    this.#pintarBoton();
     this.#listo.textContent = LISTO;
     this.#estado('listo');
     this.#listo.focus();

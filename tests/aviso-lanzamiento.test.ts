@@ -16,7 +16,7 @@ function montar(): { form: HTMLFormElement; cta: HTMLButtonElement } {
       <form id="aviso-lanzamiento" data-estado="cerrado" inert novalidate>
         <div class="aviso-pildora">
           <input name="telefono" type="tel" pattern="[0-9+ ()\\-]{7,20}" required />
-          <button type="submit" aria-label="Enviar mi número">→</button>
+          <button type="submit" aria-label="Enviar mi número"><span aria-hidden="true">→</span></button>
           <p class="aviso-listo" role="status" tabindex="-1"></p>
         </div>
         <label><input type="checkbox" name="acepto" required /> Acepto</label>
@@ -110,6 +110,39 @@ describe('AvisoLanzamiento', () => {
       document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
       expect(form.dataset.estado).toBe('cerrado');
       expect(cta.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('sin nada escrito el botón es una × que cierra; al escribir vuelve la flecha', () => {
+      const { form, cta } = montar();
+      const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+      const pedir = vi.fn();
+      vi.stubGlobal('fetch', pedir);
+      cta.click();
+      expect(boton.textContent).toBe('×');
+      expect(boton.getAttribute('aria-label')).toBe('Cerrar');
+      escribir('3');
+      expect(boton.textContent).toBe('→');
+      expect(boton.getAttribute('aria-label')).toBe('Enviar mi número');
+      escribir('  ');
+      expect(boton.textContent).toBe('×');
+      boton.click();
+      expect(form.dataset.estado).toBe('cerrado');
+      expect(document.activeElement).toBe(cta);
+      expect(error()).toBe('');
+      expect(pedir).not.toHaveBeenCalled();
+    });
+
+    it('tras enviar, el campo vacío vuelve a mostrar la ×', async () => {
+      const { form, cta } = montar();
+      const boton = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 201 })));
+      cta.click();
+      escribir('300 000 0000');
+      acepto().checked = true;
+      boton.click();
+      for (let i = 0; i < 10; i++) await Promise.resolve();
+      expect(form.dataset.estado).toBe('listo');
+      expect(boton.textContent).toBe('×');
     });
 
     it('Escape cierra; otra tecla no', () => {

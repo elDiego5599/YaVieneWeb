@@ -845,9 +845,10 @@
 }
 
 /* Parece en espera mientras falte el número o la casilla, pero se puede
-   pulsar: pulsarlo es lo que dice qué falta. Al 55 % la flecha queda a
+   pulsar: pulsarlo es lo que dice qué falta. Sin número es la × de
+   cerrar, que no espera nada: va entera. Al 55 % la flecha queda a
    2,4:1 de su fondo; es un estado, no un texto. */
-.aviso-form[data-estado="abierto"]:not(:has(.aviso-input:valid):has(input[name="acepto"]:checked)) .aviso-enviar {
+.aviso-form[data-estado="abierto"]:not(:has(.aviso-input:valid):has(input[name="acepto"]:checked)) .aviso-enviar:not([data-cerrar]) {
   opacity: 0.55;
 }
 
