@@ -460,6 +460,7 @@
 /* El botón lleno de la hoja, en el azul de los botones (#1E56A8, blanco
    encima 7,2:1); 12 px de radio como el de la app. */
 .cf-bus-cta {
+  position: relative;
   flex: none;
   padding: 12px 18px;
   border-radius: 12px;
@@ -468,6 +469,63 @@
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
+}
+
+/* Al tocar «Avisarme» (dueño, 2026-10-15): el botón se hunde como
+   «Guardar», asoma una campanita en su esquina y la hoja vibra como el
+   teléfono que recibe el aviso. La campanita: 24 px de círculo blanco con
+   la campana de 14 en el azul del botón, montada 8 px sobre la esquina; entra
+   del 40 % con el resorte y se mece desde su argolla. */
+.cf-campana {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  padding: 5px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--cf-sombra);
+  color: var(--azul-boton);
+  opacity: 0;
+  scale: 0.4;
+  transform-origin: 50% 20%;
+  transition: opacity 200ms ease, scale 400ms var(--ease-resorte);
+}
+.cf-aviso-puesto .cf-campana {
+  opacity: 1;
+  scale: 1;
+  /* 150 ms: suena cuando ya llegó, no mientras crece. */
+  animation: cf-campana 700ms ease-out 150ms;
+}
+.cf-aviso-puesto .cf-bus-cta {
+  animation: cf-guardar-toque 650ms ease-out;
+}
+.cf-aviso-puesto {
+  /* 200 ms tras el toque, 450 ms de zumbido: tres idas y vueltas. */
+  animation: cf-vibrar 450ms linear 200ms;
+}
+/* El vaivén de una campana que se apaga: 18° y la mitad cada vez. */
+@keyframes cf-campana {
+  0%, 100% { rotate: 0deg; }
+  15% { rotate: 18deg; }
+  35% { rotate: -14deg; }
+  55% { rotate: 9deg; }
+  75% { rotate: -4deg; }
+}
+/* La vibración: 2 px y medio grado de lado a lado, rápido y corto, como el
+   teléfono en la mesa. Va en transform para no pisar el translate de la
+   entrada de la hoja y del aviso. */
+@keyframes cf-vibrar {
+  0%, 100% { transform: none; }
+  12%, 62% { transform: translateX(-2px) rotate(-0.5deg); }
+  37%, 87% { transform: translateX(2px) rotate(0.5deg); }
+}
+/* La copia que se va no repite el zumbido. */
+.cf-escena--fantasma .cf-aviso-puesto,
+.cf-escena--fantasma .cf-aviso-puesto *,
+.cf-escena--fantasma .cf-notificacion-visible {
+  animation: none;
 }
 
 /* Cinco opciones; el 5 % de inset y 20 px de relleno mantienen aire alrededor de la rueda. */
@@ -533,10 +591,16 @@
 }
 
 /* 12 px separan la confirmación y conservan el tono secundario de eta_bottom_sheet.dart.
-   Guarda su sitio pero no se ve hasta que se guarda (dueño, 2026-10-12). */
+   Guarda su sitio pero no se ve hasta que se guarda (dueño, 2026-10-12).
+   Como la fila de la app: el estado a la izquierda y «Cambiar» al filo
+   (dueño, 2026-10-15: dentro de la frase se veía maluco). */
 .cf-aviso-confirmacion {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-top: 12px;
+  text-align: left;
   color: var(--tinta-media);
   font-size: 12px;
   line-height: 1.5;
@@ -548,10 +612,24 @@
   opacity: 1;
   translate: 0 0;
 }
-/* El botón secundario conserva contraste en el texto de confirmación. */
+/* «Aviso activado» en tinta y 13 px manda; la distancia, debajo, en el
+   tono secundario. */
+.cf-aviso-estado {
+  display: grid;
+}
+.cf-aviso-estado strong {
+  color: var(--tinta);
+  font-size: 13px;
+}
+/* `_PildoraCambiar` de eta_bottom_sheet.dart en px de la web: la cara de
+   «Quitar» (gris, filo, 12 × 6) con la letra roja, 5,0:1 sobre el gris. */
 .cf-aviso-confirmacion .eta-detail-accion {
-  color: var(--azul-boton);
-  font-weight: 600;
+  padding: 6px 12px;
+  border: 1px solid var(--app-hairline);
+  border-radius: 999px;
+  background: var(--surface-muted);
+  font-size: 12px;
+  color: var(--app-coral-accessible);
 }
 
 /* 5 % de margen y 90 % de ancho alinean la notificación y conservan ruta sin placa, como bus_notification_service.dart. */
@@ -576,6 +654,8 @@
 .cf-aviso-notificacion.cf-notificacion-visible {
   opacity: 1;
   translate: 0 0;
+  /* Vibra al llegar, cuando ya bajó (350 ms), como el aviso de verdad. */
+  animation: cf-vibrar 450ms linear 350ms;
 }
 /* Dos renglones como la notificación del sistema: la app y la hora arriba,
    en 12 px tenue, y el aviso debajo en 14 px y 600 (dueño, 2026-10-12:
@@ -917,6 +997,9 @@
   .cf-mapa-hoja { translate: none; transition: opacity 0.2s linear; }
   .cf-guardar.cf-guardando,
   .cf-aviso-composicion.cf-aviso-rodando .cf-rueda > * { animation: none; }
+  .cf-aviso-puesto,
+  .cf-aviso-puesto *,
+  .cf-aviso-notificacion.cf-notificacion-visible { animation: none; }
   .cf-pasos[data-auto] .cf-paso[aria-selected="true"]::after {
     /* Movimiento reducido quita la animación de progreso. */
     animation: none;

@@ -278,4 +278,30 @@ describe('banda «Cómo funciona»', () => {
     expect(banda).toMatch(/class="cf-demo reveal"/);
     expect(leer('src/css/components.css')).toContain("./componentes/como-funciona.css");
   });
+
+  it('en el paso 2 se toca «Avisarme», sale la campanita y la hoja vibra (dueño, 2026-10-15)', () => {
+    document.body.innerHTML = banda;
+    const cta = document.querySelector('.cf-mapa-hoja .cf-bus-cta');
+    expect(cta?.querySelector('svg.cf-campana[aria-hidden="true"]')).not.toBeNull();
+    const main = leer('src/main.ts');
+    expect(main).toMatch(/classList\.add\('cf-aviso-puesto'\)/);
+    expect(main).toMatch(/classList\.remove\([^)]*'cf-aviso-puesto'/);
+    expect(css).toMatch(/\.cf-aviso-puesto\s*\{[^}]*animation:\s*cf-vibrar/s);
+    expect(css).toMatch(/\.cf-aviso-puesto \.cf-campana\s*\{[^}]*animation:\s*cf-campana/s);
+  });
+
+  it('en el paso 3 el aviso que llega también vibra; sin movimiento, nada vibra', () => {
+    expect(css).toMatch(/\.cf-aviso-notificacion\.cf-notificacion-visible\s*\{[^}]*animation:\s*cf-vibrar/s);
+    const quieto = css.slice(css.lastIndexOf('@media (prefers-reduced-motion: reduce)'));
+    expect(quieto).toMatch(/\.cf-aviso-puesto[^{]*\{[^}]*animation:\s*none/s);
+    expect(quieto).toMatch(/\.cf-notificacion-visible[^{]*\{[^}]*animation:\s*none/s);
+  });
+
+  it('«Cambiar» del paso 3 es la píldora de la app al filo, no un enlace en la frase', () => {
+    document.body.innerHTML = banda;
+    const conf = document.querySelector('.cf-aviso-confirmacion')!;
+    expect(conf.querySelector('br')).toBeNull();
+    expect(conf.lastElementChild?.matches('.eta-detail-accion')).toBe(true);
+    expect(css).toMatch(/\.cf-aviso-confirmacion \.eta-detail-accion\s*\{[^}]*border-radius:\s*999px[^}]*color:\s*var\(--app-coral-accessible\)/s);
+  });
 });

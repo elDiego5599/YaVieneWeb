@@ -126,6 +126,9 @@ const arrancar = (): void => {
         toque?.remove();
         toque = null;
         tarjeta?.classList.remove('cf-distancia-espera');
+        // 700 ms con la hoja quieta y el dedo toca «Avisarme»: la campanita
+        // sale y la hoja vibra (dueño, 2026-10-15). Llega a ~3,1 s de los 5.
+        toqueAnimTimer = window.setTimeout(() => tarjeta?.classList.add('cf-aviso-puesto'), 700);
       }, 650);
     };
     llevarBus = (metros: number): void => {
@@ -163,7 +166,7 @@ const arrancar = (): void => {
     secuenciaTimer = 0;
     toqueAnimTimer = 0;
     document.querySelector('.cf-tap')?.remove();
-    document.querySelector('.cf-mapa-hoja')?.classList.remove('cf-distancia-espera');
+    document.querySelector('.cf-mapa-hoja')?.classList.remove('cf-distancia-espera', 'cf-aviso-puesto');
     ruedaAviso?.classList.remove('cf-aviso-rodando');
     guardarAviso?.classList.remove('cf-guardando');
     ruedaAviso?.classList.remove('cf-aviso-guardado');
@@ -215,6 +218,8 @@ const arrancar = (): void => {
     if (!llevarBus) return;
     if (llegadaFrame) cancelAnimationFrame(llegadaFrame);
     if (toqueTimer) window.clearTimeout(toqueTimer);
+    if (toqueAnimTimer) window.clearTimeout(toqueAnimTimer);
+    document.querySelector('.cf-mapa-hoja')?.classList.remove('cf-aviso-puesto');
     document.querySelector('.cf-mapa-hoja')?.classList.add('cf-distancia-espera');
     const desde = 2600;
     const hasta = 1800;
