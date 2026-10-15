@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import type { ResolvedConfig } from 'vite';
 import { describe, expect, it } from 'vitest';
 
+import { BACKEND } from '../src/backend';
 import { seoDeRaiz } from '../vite.config';
 
 /**
@@ -75,5 +76,19 @@ describe('el endpoint de contacto contra la CSP', () => {
     const csp = vercel.headers[0]?.headers
       ?.find((h) => h.key === 'Content-Security-Policy')?.value ?? '';
     expect(csp).toMatch(/connect-src [^;]*'self'/);
+  });
+
+  it('la CSP deja salir al backend de «Avísame cuando salga» y a nada más', () => {
+    // El hero guarda el número en el backend (D15 del backend): si su
+    // origen cambia y la CSP no, el navegador corta el envío en
+    // producción y la persona solo ve «No pudimos guardar tu número».
+    const vercel = JSON.parse(readFileSync(resolve(raiz, 'vercel.json'), 'utf8')) as {
+      headers: { headers: { key: string; value: string }[] }[];
+    };
+    const csp = vercel.headers[0]?.headers
+      ?.find((h) => h.key === 'Content-Security-Policy')?.value ?? '';
+    const conectar = csp.match(/connect-src ([^;]*)/)?.[1].trim().split(/\s+/);
+    expect(conectar).toEqual(["'self'", new URL(BACKEND).origin]);
+    expect(BACKEND).toBe(new URL(BACKEND).origin);
   });
 });

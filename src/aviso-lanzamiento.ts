@@ -9,17 +9,19 @@
  * invierte a medias, parte de donde va. Aquí solo hay estado
  * (`data-estado`: cerrado · abierto · listo), foco y mensajes.
  *
- * Sin endpoint propio (la CSP es `connect-src 'self'`), el envío abre
- * WhatsApp con el mensaje y el número escritos, como el formulario de
- * empresas.
+ * El número va al backend (`POST /api/lanzamiento`, D15 del backend) con
+ * el permiso marcado; allí se guarda con la fecha y se borra a pedido o
+ * tras el aviso. El backend lo normaliza y es el que decide si vale: aquí
+ * solo se filtra lo que el campo ya marca como malo.
  */
-import { WHATSAPP } from './whatsapp';
+import { BACKEND } from './backend';
 
 const FALTA = 'Escribe tu número de celular.';
-const MALO = 'Escribe un número válido: solo números, de 7 a 20 caracteres.';
+const MALO = 'Escribe un celular válido, como 300 123 4567.';
 const SIN_ACEPTAR = 'Acepta el tratamiento de datos para continuar.';
-const BLOQUEADA = 'El navegador bloqueó la ventana de WhatsApp. Inténtalo de nuevo.';
-const LISTO = 'Listo. Te escribimos por WhatsApp.';
+const MUCHOS = 'Ya recibimos varios números desde aquí. Inténtalo más tarde.';
+const FALLO = 'No pudimos guardar tu número. Inténtalo de nuevo.';
+const LISTO = 'Listo. Te avisamos cuando salga.';
 /** Lo que se queda la confirmación antes de volver al CTA: da para leerla. */
 const DURA_LISTO = 2400;
 
@@ -134,24 +136,34 @@ export class AvisoLanzamiento {
   }
 
   #enviar(): void {
+    // Un doble toque no manda dos: el que viaja decide.
+    if (this.#form.hasAttribute('aria-busy')) return;
     const mensaje = this.#errorTelefono() || (this.#acepto.checked ? '' : SIN_ACEPTAR);
     this.#mostrar(mensaje);
     if (mensaje) {
       (mensaje === SIN_ACEPTAR ? this.#acepto : this.#telefono).focus();
       return;
     }
-    const texto = `Hola, avísenme cuando salga la app de Ya Viene. Mi número es ${this.#telefono.value.trim()}.`;
-    const ventana = window.open('', '_blank');
-    if (!ventana) {
-      this.#error.textContent = BLOQUEADA;
-      return;
-    }
-    try {
-      ventana.opener = null;
-    } catch {
-      // Navegador que no deja tocarlo: la pestaña se abre igual.
-    }
-    ventana.location.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
+    this.#form.setAttribute('aria-busy', 'true');
+    fetch(`${BACKEND}/api/lanzamiento`, {
+      method: 'POST',
+      // Sin la cabecera, ngrok gratis contesta a un navegador con su página
+      // de aviso en vez de pasar la petición al backend.
+      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' },
+      body: JSON.stringify({ telefono: this.#telefono.value.trim(), acepto: true })
+    })
+      .then(r => r.status, () => 0)
+      .then(estado => {
+        this.#form.removeAttribute('aria-busy');
+        // Si la cerraron mientras viajaba, la respuesta no la reabre.
+        if (this.#form.dataset.estado !== 'abierto') return;
+        if (estado === 201) return this.#confirmar();
+        this.#mostrar(estado === 400 ? MALO : estado === 429 ? MUCHOS : FALLO);
+        if (estado === 400) this.#telefono.focus();
+      });
+  }
+
+  #confirmar(): void {
     this.#form.reset();
     this.#listo.textContent = LISTO;
     this.#estado('listo');

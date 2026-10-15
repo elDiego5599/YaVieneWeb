@@ -197,7 +197,7 @@ describe('la privacidad dice qué pasa con la app cerrada', () => {
   it('la fecha del documento acompaña al cambio', () => {
     // Un texto legal que cambia sin cambiar su fecha no se distingue del
     // anterior, y la app usa la misma fecha para decir cuál está leyendo.
-    expect(leer('privacidad.html')).toContain('Actualizado el 6 de octubre de 2026');
+    expect(leer('privacidad.html')).toContain('Actualizado el 14 de octubre de 2026');
   });
 });
 

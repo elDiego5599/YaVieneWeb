@@ -851,6 +851,13 @@
   opacity: 0.55;
 }
 
+/* Mientras el número viaja al backend: la flecha se apaga y deja de
+   aceptar toques, para que se note que ya salió. */
+.aviso-form[aria-busy] .aviso-enviar {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
 .aviso-enviar:active {
   transform: scale(0.97);
 }

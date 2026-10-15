@@ -1,11 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AvisoLanzamiento } from '../src/aviso-lanzamiento';
+import { BACKEND } from '../src/backend';
 
 /**
  * «Avísame cuando salga», montado como vive en index.html: el CTA, el
  * enlace de al lado y el formulario cuya píldora nace del CTA. Lo que se
- * prueba es lo que ve y oye la persona: estado, foco, mensajes y la
- * pestaña de WhatsApp.
+ * prueba es lo que ve y oye la persona: estado, foco, mensajes y lo que
+ * sale hacia el backend.
  */
 function montar(): { form: HTMLFormElement; cta: HTMLButtonElement } {
   document.body.innerHTML = `
@@ -153,7 +154,7 @@ describe('AvisoLanzamiento', () => {
       cta.click();
       escribir('12');
       enviar(form);
-      expect(error()).toBe('Escribe un número válido: solo números, de 7 a 20 caracteres.');
+      expect(error()).toBe('Escribe un celular válido, como 300 123 4567.');
     });
 
     it('sin la casilla: la pide, la marca y le pasa el foco', () => {
@@ -174,7 +175,7 @@ describe('AvisoLanzamiento', () => {
       expect(error()).toBe('');
       escribir('12');
       telefono().dispatchEvent(new FocusEvent('blur'));
-      expect(error()).toBe('Escribe un número válido: solo números, de 7 a 20 caracteres.');
+      expect(error()).toBe('Escribe un celular válido, como 300 123 4567.');
       expect(telefono().getAttribute('aria-invalid')).toBe('true');
     });
 
@@ -213,32 +214,81 @@ describe('AvisoLanzamiento', () => {
       escribir(' 300 000 0000 ');
       acepto().checked = true;
     };
+    const responde = (status: number): ReturnType<typeof vi.fn> => {
+      const pedir = vi.fn().mockResolvedValue(new Response(null, { status }));
+      vi.stubGlobal('fetch', pedir);
+      return pedir;
+    };
+    /** Deja correr la respuesta del fetch y sus `.then` (microtareas: no
+        mueve el reloj, falso o no). */
+    const esperar = async (): Promise<void> => {
+      for (let i = 0; i < 10; i++) await Promise.resolve();
+      expect(document.querySelector('form')!.hasAttribute('aria-busy')).toBe(false);
+    };
 
-    it('abre WhatsApp sin opener, con número y texto codificados', () => {
+    it('manda el número y el permiso al backend, con la cabecera que salta el aviso de ngrok', async () => {
       const { form, cta } = montar();
-      const ventana = { opener: {} as unknown, location: { href: '' } };
-      const abrir = vi.fn().mockReturnValue(ventana);
-      vi.stubGlobal('open', abrir);
+      const pedir = responde(201);
       llenar(cta);
       enviar(form);
-      expect(abrir).toHaveBeenCalledWith('', '_blank');
-      expect(ventana.opener).toBeNull();
-      expect(ventana.location.href).toBe(
-        'https://wa.me/573004438626?text=Hola%2C%20av%C3%ADsenme%20cuando%20salga%20la%20app%20de%20Ya%20Viene.%20Mi%20n%C3%BAmero%20es%20300%20000%200000.'
-      );
+      await esperar();
+      expect(pedir).toHaveBeenCalledTimes(1);
+      const [url, opciones] = pedir.mock.calls[0] as [string, RequestInit];
+      expect(url).toBe(`${BACKEND}/api/lanzamiento`);
+      expect(opciones.method).toBe('POST');
+      expect(opciones.headers).toEqual({
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': '1'
+      });
+      expect(JSON.parse(opciones.body as string)).toEqual({ telefono: '300 000 0000', acepto: true });
     });
 
-    it('confirma en la misma píldora y luego vuelve al CTA', () => {
-      vi.useFakeTimers();
+    it('no abre WhatsApp: el número va solo al backend', async () => {
       const { form, cta } = montar();
-      vi.stubGlobal('open', vi.fn().mockReturnValue({ opener: null, location: { href: '' } }));
+      const abrir = vi.fn();
+      vi.stubGlobal('open', abrir);
+      responde(201);
       llenar(cta);
       enviar(form);
+      await esperar();
+      expect(abrir).not.toHaveBeenCalled();
+    });
+
+    it('mientras viaja, otro envío no sale: un doble toque no manda dos', async () => {
+      const { form, cta } = montar();
+      let soltar: (r: Response) => void = () => {};
+      const pedir = vi.fn().mockReturnValue(new Promise<Response>(r => (soltar = r)));
+      vi.stubGlobal('fetch', pedir);
+      llenar(cta);
+      enviar(form);
+      expect(form.getAttribute('aria-busy')).toBe('true');
+      enviar(form);
+      expect(pedir).toHaveBeenCalledTimes(1);
+      soltar(new Response(null, { status: 201 }));
+      await esperar();
       expect(form.dataset.estado).toBe('listo');
-      expect(listo().textContent).toBe('Listo. Te escribimos por WhatsApp.');
+    });
+
+    it('confirma en la misma píldora y luego vuelve al CTA', async () => {
+      const { form, cta } = montar();
+      responde(201);
+      llenar(cta);
+      enviar(form);
+      await esperar();
+      expect(form.dataset.estado).toBe('listo');
+      expect(listo().textContent).toBe('Listo. Te avisamos cuando salga.');
       expect(document.activeElement).toBe(listo());
       expect(telefono().value).toBe('');
       expect(acepto().checked).toBe(false);
+    });
+
+    it('la confirmación dura 2,4 s y el foco vuelve al CTA', async () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+      const { form, cta } = montar();
+      responde(201);
+      llenar(cta);
+      enviar(form);
+      await esperar();
       vi.advanceTimersByTime(2399);
       expect(form.dataset.estado).toBe('listo');
       vi.advanceTimersByTime(1);
@@ -247,12 +297,13 @@ describe('AvisoLanzamiento', () => {
       expect(document.activeElement).toBe(cta);
     });
 
-    it('si el foco ya se fue a otra parte, volver al CTA no se lo roba', () => {
-      vi.useFakeTimers();
+    it('si el foco ya se fue a otra parte, volver al CTA no se lo roba', async () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
       const { form, cta } = montar();
-      vi.stubGlobal('open', vi.fn().mockReturnValue({ opener: null, location: { href: '' } }));
+      responde(201);
       llenar(cta);
       enviar(form);
+      await esperar();
       const enlace = document.querySelector<HTMLAnchorElement>('a')!;
       enlace.focus();
       vi.advanceTimersByTime(2400);
@@ -260,41 +311,68 @@ describe('AvisoLanzamiento', () => {
       expect(document.activeElement).toBe(enlace);
     });
 
-    it('reabrir durante la confirmación la corta: el temporizador no la cierra después', () => {
-      vi.useFakeTimers();
+    it('reabrir durante la confirmación la corta: el temporizador no la cierra después', async () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
       const { form, cta } = montar();
-      vi.stubGlobal('open', vi.fn().mockReturnValue({ opener: null, location: { href: '' } }));
+      responde(201);
       llenar(cta);
       enviar(form);
+      await esperar();
       listo().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
       cta.click();
       vi.advanceTimersByTime(2400);
       expect(form.dataset.estado).toBe('abierto');
     });
 
-    it('ventana bloqueada: lo dice y se queda abierta con lo escrito', () => {
+    it.each([
+      [400, 'Escribe un celular válido, como 300 123 4567.'],
+      [429, 'Ya recibimos varios números desde aquí. Inténtalo más tarde.'],
+      [503, 'No pudimos guardar tu número. Inténtalo de nuevo.'],
+      [500, 'No pudimos guardar tu número. Inténtalo de nuevo.']
+    ])('si el backend responde %i lo dice y se queda abierta con lo escrito', async (status, mensaje) => {
       const { form, cta } = montar();
-      vi.stubGlobal('open', vi.fn().mockReturnValue(null));
+      responde(status);
       llenar(cta);
       enviar(form);
-      expect(error()).toBe('El navegador bloqueó la ventana de WhatsApp. Inténtalo de nuevo.');
+      await esperar();
+      expect(error()).toBe(mensaje);
+      expect(form.dataset.estado).toBe('abierto');
+      expect(telefono().value).toBe(' 300 000 0000 ');
+      expect(acepto().checked).toBe(true);
+    });
+
+    it('el 400 marca el número y le devuelve el foco', async () => {
+      const { form, cta } = montar();
+      responde(400);
+      llenar(cta);
+      enviar(form);
+      await esperar();
+      expect(telefono().getAttribute('aria-invalid')).toBe('true');
+      expect(document.activeElement).toBe(telefono());
+    });
+
+    it('sin red lo dice igual, sin perder lo escrito', async () => {
+      const { form, cta } = montar();
+      vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
+      llenar(cta);
+      enviar(form);
+      await esperar();
+      expect(error()).toBe('No pudimos guardar tu número. Inténtalo de nuevo.');
       expect(form.dataset.estado).toBe('abierto');
       expect(telefono().value).toBe(' 300 000 0000 ');
     });
 
-    it('un navegador que no deja tocar opener abre WhatsApp igual', () => {
+    it('si cerraron la píldora mientras viajaba, la respuesta no la reabre', async () => {
       const { form, cta } = montar();
-      const ventana = {
-        location: { href: '' },
-        set opener(_: unknown) {
-          throw new Error('no');
-        }
-      };
-      vi.stubGlobal('open', vi.fn().mockReturnValue(ventana));
+      let soltar: (r: Response) => void = () => {};
+      vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise<Response>(r => (soltar = r))));
       llenar(cta);
       enviar(form);
-      expect(ventana.location.href).toMatch(/^https:\/\/wa\.me\/573004438626\?text=/);
-      expect(form.dataset.estado).toBe('listo');
+      telefono().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      soltar(new Response(null, { status: 500 }));
+      await esperar();
+      expect(form.dataset.estado).toBe('cerrado');
+      expect(error()).toBe('');
     });
   });
 });
