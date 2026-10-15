@@ -178,7 +178,6 @@ export class AvisoLanzamiento {
     const vacio = !this.#telefono.value.trim();
     this.#boton.toggleAttribute('data-cerrar', vacio);
     this.#boton.setAttribute('aria-label', vacio ? 'Cerrar' : 'Enviar mi número');
-    this.#boton.firstElementChild!.textContent = vacio ? '×' : '→';
   }
 
   #confirmar(): void {
