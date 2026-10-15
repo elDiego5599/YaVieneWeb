@@ -1,0 +1,300 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { AvisoLanzamiento } from '../src/aviso-lanzamiento';
+
+/**
+ * «Avísame cuando salga», montado como vive en index.html: el CTA, el
+ * enlace de al lado y el formulario cuya píldora nace del CTA. Lo que se
+ * prueba es lo que ve y oye la persona: estado, foco, mensajes y la
+ * pestaña de WhatsApp.
+ */
+function montar(): { form: HTMLFormElement; cta: HTMLButtonElement } {
+  document.body.innerHTML = `
+    <div class="hero-actions">
+      <button type="button" data-aviso-abrir aria-expanded="false" aria-controls="aviso-lanzamiento">Avísame cuando salga</button>
+      <a href="#como-funciona">Cómo funciona</a>
+      <form id="aviso-lanzamiento" data-estado="cerrado" inert novalidate>
+        <div class="aviso-pildora">
+          <input name="telefono" type="tel" pattern="[0-9+ ()\\-]{7,20}" required />
+          <button type="submit" aria-label="Enviar mi número">→</button>
+          <p class="aviso-listo" role="status" tabindex="-1"></p>
+        </div>
+        <label><input type="checkbox" name="acepto" required /> Acepto</label>
+        <p class="aviso-error" role="alert"></p>
+      </form>
+    </div>`;
+  const form = document.querySelector<HTMLFormElement>('form')!;
+  const cta = document.querySelector<HTMLButtonElement>('[data-aviso-abrir]')!;
+  new AvisoLanzamiento(form, cta);
+  return { form, cta };
+}
+
+const telefono = (): HTMLInputElement => document.querySelector('input[name="telefono"]')!;
+const acepto = (): HTMLInputElement => document.querySelector('input[name="acepto"]')!;
+const error = (): string => document.querySelector('.aviso-error')!.textContent ?? '';
+const listo = (): HTMLElement => document.querySelector('.aviso-listo')!;
+const enviar = (form: HTMLFormElement): void => {
+  form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+};
+const escribir = (valor: string): void => {
+  telefono().value = valor;
+  telefono().dispatchEvent(new Event('input', { bubbles: true }));
+};
+
+describe('AvisoLanzamiento', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    document.body.innerHTML = '';
+  });
+
+  describe('abrir y cerrar', () => {
+    it('el CTA abre la píldora, le pasa el foco al número y se aparta', () => {
+      const { form, cta } = montar();
+      cta.click();
+      expect(form.dataset.estado).toBe('abierto');
+      expect(cta.getAttribute('aria-expanded')).toBe('true');
+      expect(form.hasAttribute('inert')).toBe(false);
+      expect(cta.hasAttribute('inert')).toBe(true);
+      expect(document.activeElement).toBe(telefono());
+    });
+
+    it('la píldora sale del sitio exacto del CTA', () => {
+      const { form, cta } = montar();
+      const pildora = form.querySelector<HTMLElement>('.aviso-pildora')!;
+      vi.spyOn(cta, 'getBoundingClientRect').mockReturnValue(new DOMRect(100, 0, 230, 48));
+      vi.spyOn(pildora, 'getBoundingClientRect').mockReturnValue(new DOMRect(100, 0, 470, 48));
+      cta.click();
+      expect(form.style.getPropertyValue('--aviso-izq')).toBe('0px');
+      expect(form.style.getPropertyValue('--aviso-der')).toBe('240px');
+    });
+
+    it('no hay × en la píldora: se cierra con Escape o tocando fuera', () => {
+      const { form } = montar();
+      expect(form.querySelector('[data-aviso-cerrar]')).toBeNull();
+    });
+
+    it('tocar fuera con el campo vacío cierra por el mismo camino', () => {
+      const { form, cta } = montar();
+      cta.click();
+      document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      expect(form.dataset.estado).toBe('cerrado');
+      expect(cta.getAttribute('aria-expanded')).toBe('false');
+      expect(form.hasAttribute('inert')).toBe(true);
+      expect(cta.hasAttribute('inert')).toBe(false);
+      expect(document.activeElement).not.toBe(telefono());
+    });
+
+    it('tocar fuera con un número escrito no cierra: no se pierde lo escrito', () => {
+      const { form, cta } = montar();
+      cta.click();
+      escribir('3001234567');
+      document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      expect(form.dataset.estado).toBe('abierto');
+    });
+
+    it('tocar dentro del formulario o en el CTA no cierra', () => {
+      const { form, cta } = montar();
+      cta.click();
+      acepto().dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      cta.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      expect(form.dataset.estado).toBe('abierto');
+    });
+
+    it('cerrado, tocar fuera no hace nada', () => {
+      const { form, cta } = montar();
+      document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      expect(form.dataset.estado).toBe('cerrado');
+      expect(cta.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('Escape cierra; otra tecla no', () => {
+      const { form, cta } = montar();
+      cta.click();
+      telefono().dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }));
+      expect(form.dataset.estado).toBe('abierto');
+      telefono().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      expect(form.dataset.estado).toBe('cerrado');
+      expect(document.activeElement).toBe(cta);
+    });
+
+    it('cerrar guarda lo escrito pero borra el error', () => {
+      const { form, cta } = montar();
+      cta.click();
+      escribir('12');
+      enviar(form);
+      expect(error()).not.toBe('');
+      telefono().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      expect(error()).toBe('');
+      expect(telefono().hasAttribute('aria-invalid')).toBe(false);
+      expect(telefono().value).toBe('12');
+    });
+  });
+
+  describe('validación', () => {
+    it('vacío: pide el número, lo marca inválido y vuelve a él', () => {
+      const { form, cta } = montar();
+      const abrir = vi.fn();
+      vi.stubGlobal('open', abrir);
+      cta.click();
+      acepto().focus();
+      enviar(form);
+      expect(error()).toBe('Escribe tu número de celular.');
+      expect(telefono().getAttribute('aria-invalid')).toBe('true');
+      expect(document.activeElement).toBe(telefono());
+      expect(abrir).not.toHaveBeenCalled();
+    });
+
+    it('número malo: lo dice', () => {
+      const { form, cta } = montar();
+      cta.click();
+      escribir('12');
+      enviar(form);
+      expect(error()).toBe('Escribe un número válido: solo números, de 7 a 20 caracteres.');
+    });
+
+    it('sin la casilla: la pide, la marca y le pasa el foco', () => {
+      const { form, cta } = montar();
+      cta.click();
+      escribir('300 000 0000');
+      enviar(form);
+      expect(error()).toBe('Acepta el tratamiento de datos para continuar.');
+      expect(acepto().getAttribute('aria-invalid')).toBe('true');
+      expect(telefono().hasAttribute('aria-invalid')).toBe(false);
+      expect(document.activeElement).toBe(acepto());
+    });
+
+    it('al salir del campo: un número malo se avisa, el vacío no', () => {
+      const { cta } = montar();
+      cta.click();
+      telefono().dispatchEvent(new FocusEvent('blur'));
+      expect(error()).toBe('');
+      escribir('12');
+      telefono().dispatchEvent(new FocusEvent('blur'));
+      expect(error()).toBe('Escribe un número válido: solo números, de 7 a 20 caracteres.');
+      expect(telefono().getAttribute('aria-invalid')).toBe('true');
+    });
+
+    it('al corregir el número el error se va sin esperar al envío', () => {
+      const { form, cta } = montar();
+      cta.click();
+      escribir('12');
+      enviar(form);
+      escribir('300 000');
+      expect(error()).toBe('');
+      expect(telefono().hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('escribir sin error a la vista no adelanta ninguno', () => {
+      const { cta } = montar();
+      cta.click();
+      escribir('1');
+      expect(error()).toBe('');
+    });
+
+    it('marcar la casilla quita su error', () => {
+      const { form, cta } = montar();
+      cta.click();
+      escribir('300 000 0000');
+      enviar(form);
+      acepto().checked = true;
+      acepto().dispatchEvent(new Event('change', { bubbles: true }));
+      expect(error()).toBe('');
+      expect(acepto().hasAttribute('aria-invalid')).toBe(false);
+    });
+  });
+
+  describe('envío', () => {
+    const llenar = (cta: HTMLButtonElement): void => {
+      cta.click();
+      escribir(' 300 000 0000 ');
+      acepto().checked = true;
+    };
+
+    it('abre WhatsApp sin opener, con número y texto codificados', () => {
+      const { form, cta } = montar();
+      const ventana = { opener: {} as unknown, location: { href: '' } };
+      const abrir = vi.fn().mockReturnValue(ventana);
+      vi.stubGlobal('open', abrir);
+      llenar(cta);
+      enviar(form);
+      expect(abrir).toHaveBeenCalledWith('', '_blank');
+      expect(ventana.opener).toBeNull();
+      expect(ventana.location.href).toBe(
+        'https://wa.me/573004438626?text=Hola%2C%20av%C3%ADsenme%20cuando%20salga%20la%20app%20de%20Ya%20Viene.%20Mi%20n%C3%BAmero%20es%20300%20000%200000.'
+      );
+    });
+
+    it('confirma en la misma píldora y luego vuelve al CTA', () => {
+      vi.useFakeTimers();
+      const { form, cta } = montar();
+      vi.stubGlobal('open', vi.fn().mockReturnValue({ opener: null, location: { href: '' } }));
+      llenar(cta);
+      enviar(form);
+      expect(form.dataset.estado).toBe('listo');
+      expect(listo().textContent).toBe('Listo. Te escribimos por WhatsApp.');
+      expect(document.activeElement).toBe(listo());
+      expect(telefono().value).toBe('');
+      expect(acepto().checked).toBe(false);
+      vi.advanceTimersByTime(2399);
+      expect(form.dataset.estado).toBe('listo');
+      vi.advanceTimersByTime(1);
+      expect(form.dataset.estado).toBe('cerrado');
+      expect(listo().textContent).toBe('');
+      expect(document.activeElement).toBe(cta);
+    });
+
+    it('si el foco ya se fue a otra parte, volver al CTA no se lo roba', () => {
+      vi.useFakeTimers();
+      const { form, cta } = montar();
+      vi.stubGlobal('open', vi.fn().mockReturnValue({ opener: null, location: { href: '' } }));
+      llenar(cta);
+      enviar(form);
+      const enlace = document.querySelector<HTMLAnchorElement>('a')!;
+      enlace.focus();
+      vi.advanceTimersByTime(2400);
+      expect(form.dataset.estado).toBe('cerrado');
+      expect(document.activeElement).toBe(enlace);
+    });
+
+    it('reabrir durante la confirmación la corta: el temporizador no la cierra después', () => {
+      vi.useFakeTimers();
+      const { form, cta } = montar();
+      vi.stubGlobal('open', vi.fn().mockReturnValue({ opener: null, location: { href: '' } }));
+      llenar(cta);
+      enviar(form);
+      listo().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      cta.click();
+      vi.advanceTimersByTime(2400);
+      expect(form.dataset.estado).toBe('abierto');
+    });
+
+    it('ventana bloqueada: lo dice y se queda abierta con lo escrito', () => {
+      const { form, cta } = montar();
+      vi.stubGlobal('open', vi.fn().mockReturnValue(null));
+      llenar(cta);
+      enviar(form);
+      expect(error()).toBe('El navegador bloqueó la ventana de WhatsApp. Inténtalo de nuevo.');
+      expect(form.dataset.estado).toBe('abierto');
+      expect(telefono().value).toBe(' 300 000 0000 ');
+    });
+
+    it('un navegador que no deja tocar opener abre WhatsApp igual', () => {
+      const { form, cta } = montar();
+      const ventana = {
+        location: { href: '' },
+        set opener(_: unknown) {
+          throw new Error('no');
+        }
+      };
+      vi.stubGlobal('open', vi.fn().mockReturnValue(ventana));
+      llenar(cta);
+      enviar(form);
+      expect(ventana.location.href).toMatch(/^https:\/\/wa\.me\/573004438626\?text=/);
+      expect(form.dataset.estado).toBe('listo');
+    });
+  });
+});

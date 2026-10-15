@@ -234,8 +234,30 @@
             llegar a tu paradero.</p>
 
           <div class="hero-actions reveal" data-reveal-delay="0">
-            <a href="#como-funciona" class="btn-primary btn-green">Cómo funciona <span class="btn-flecha" aria-hidden="true">→</span></a>
-            <a href="/empresas.html" class="btn-outline">Para empresas</a>
+            <!-- Avisar del lanzamiento: el botón se vuelve el campo, en su
+                 mismo sitio (src/aviso-lanzamiento.ts). El número solo
+                 sirve para avisar que la app salió y la persona lo acepta
+                 antes. -->
+            <button type="button" class="btn-primary btn-green" data-aviso-abrir aria-expanded="false" aria-controls="aviso-lanzamiento">Avísame cuando salga <span class="btn-flecha" aria-hidden="true">→</span></button>
+            <a href="#como-funciona" class="btn-outline">Cómo funciona</a>
+
+            <form class="aviso-form" id="aviso-lanzamiento" data-estado="cerrado" inert novalidate aria-label="Avísame cuando salga">
+              <div class="aviso-pildora">
+                <label class="sr-only" for="aviso-telefono">Tu número de celular</label>
+                <input class="aviso-input" id="aviso-telefono" name="telefono" type="tel" inputmode="tel" autocomplete="tel" placeholder="Tu número de celular" pattern="[0-9+ ()\-]{7,20}" required aria-describedby="aviso-error" />
+                <button class="aviso-enviar" type="submit" aria-label="Enviar mi número"><span aria-hidden="true">→</span></button>
+                <p class="aviso-listo" role="status" tabindex="-1"></p>
+              </div>
+              <div class="aviso-detalles">
+                <div class="aviso-detalles-caja">
+                  <label class="aviso-acepto">
+                    <input type="checkbox" name="acepto" id="aviso-acepto" required aria-describedby="aviso-error" />
+                    <span>Acepto el tratamiento de mis datos. Solo se usará para avisarme que la app ya salió. <a href="/privacidad.html">Política de privacidad</a></span>
+                  </label>
+                  <p class="aviso-error" id="aviso-error" role="alert"></p>
+                </div>
+              </div>
+            </form>
           </div>
 
           <!-- Dónde se consigue la app: es lo primero que pregunta

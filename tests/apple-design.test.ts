@@ -237,3 +237,60 @@ describe('contraste del texto secundario', () => {
     expect(pieRaiz).not.toMatch(/border-top/);
   });
 });
+
+describe('«Avísame cuando salga»: el CTA se vuelve el campo', () => {
+  const hero = css('componentes/hero.css');
+  /** Todos los `@media` con esa condición, juntos (hero.css tiene varios). */
+  const medias = (condicion: string): string => {
+    let resto = hero;
+    let todo = '';
+    for (let cuerpo = media(resto, condicion); cuerpo; cuerpo = media(resto, condicion)) {
+      todo += cuerpo;
+      resto = resto.slice(resto.indexOf(`@media ${condicion}`) + 1);
+    }
+    return todo;
+  };
+
+  it('la píldora crece desde el CTA con clip-path, sin animar caja', () => {
+    const p = reglas(hero, '.aviso-pildora');
+    expect(p).toMatch(/clip-path:\s*inset\(0 var\(--aviso-der[^)]*\) 0 var\(--aviso-izq/);
+    expect(p).toMatch(/transition:[^;]*clip-path [\d.]+s var\(--ease-resorte\)/);
+    expect(p).not.toMatch(/transition:[^;]*\b(width|height|left|right|top|max-width)\b/);
+    expect(reglas(hero, '.aviso-form:not([data-estado="cerrado"]) .aviso-pildora')).toMatch(/clip-path:\s*inset\(0 round/);
+  });
+
+  it('el resorte es críticamente amortiguado: no pasa de 1', () => {
+    const resorte = /--ease-resorte:\s*linear\(([^)]*)\)/.exec(css('variables.css'));
+    expect(resorte).not.toBeNull();
+    const valores = resorte![1].split(',').map((v) => parseFloat(v));
+    expect(Math.max(...valores)).toBe(1);
+    expect(valores.every((v, i) => i === 0 || v >= valores[i - 1])).toBe(true);
+  });
+
+  it('la casilla crece con grid-template-rows, no de golpe', () => {
+    expect(reglas(hero, '.aviso-detalles')).toMatch(/grid-template-rows:\s*0fr/);
+    expect(reglas(hero, '.aviso-detalles')).toMatch(/transition:[^;]*grid-template-rows/);
+    expect(reglas(hero, '.aviso-form[data-estado="abierto"] .aviso-detalles')).toMatch(
+      /grid-template-rows:\s*1fr/
+    );
+  });
+
+  it('CTA y enviar se hunden a 0,97 al presionar', () => {
+    expect(reglas(hero, '.aviso-enviar:active')).toMatch(/transform:\s*scale\(0?\.97\)/);
+    expect(reglas(hero, '.hero-actions .btn-green:active')).toMatch(/transform:\s*scale\(0?\.97\)/);
+  });
+
+  it('enviar es verde como el CTA, no el círculo azul', () => {
+    const e = reglas(hero, '.aviso-enviar');
+    expect(e).toMatch(/background:\s*var\(--green-accessible\)/);
+    expect(e).not.toMatch(/azul-boton/);
+  });
+
+  it('con movimiento reducido: fundido corto, sin crecer ni deslizar', () => {
+    const r = medias('(prefers-reduced-motion: reduce)');
+    expect(reglas(r, '.aviso-pildora')).toMatch(/clip-path:\s*none/);
+    expect(reglas(r, '.aviso-pildora')).toMatch(/transition:\s*opacity 0?\.2s/);
+    expect(reglas(r, '.aviso-detalles')).toMatch(/transition:\s*none/);
+    expect(r).toMatch(/\.btn-flecha[^{]*\{[^}]*transform:\s*none/);
+  });
+});

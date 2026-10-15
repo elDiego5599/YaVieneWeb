@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { YV_RUTAS } from '../src/data/rutas-landing';
-import { WHATSAPP } from '../src/contact-form';
+import { WHATSAPP } from '../src/whatsapp';
 
 /**
  * Los datos del mapa se regeneran solos (`npm run mapa`) desde el repo de

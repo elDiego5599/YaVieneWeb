@@ -9,10 +9,7 @@
  * escritos, el aviso de error y el botón listo para reintentar.
  */
 
-/** El WhatsApp de Ya Viene, el mismo del botón de la sección. Se exporta
-    para que `tests/coherencia.test.ts` compruebe que los enlaces escritos
-    a mano en el HTML siguen apuntando a este número y no a uno viejo. */
-export const WHATSAPP = '573004438626';
+import { WHATSAPP } from './whatsapp';
 
 /** Lo que se le dice a la empresa cuando un campo viene vacío. */
 const FALTA: Record<string, string> = {

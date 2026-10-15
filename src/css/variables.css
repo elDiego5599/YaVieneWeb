@@ -173,6 +173,11 @@
   /* Sale disparada y frena larguísimo: es la curva que hace que algo
      grande se sienta ligero. La misma que ya usaba --transition-smooth. */
   --ease-fluida: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Resorte críticamente amortiguado (amortiguación 1, sin rebote: es un
+     clic, no un lanzamiento), muestreado de x = 1 − (1 + k·u)·e^(−k·u) con
+     k = 9,23: en 0,4 s llega a 0,999 (respuesta ≈ 0,27 s). */
+  --ease-resorte: linear(0, 0.079 5%, 0.236 10%, 0.403 15%, 0.551 20%, 0.671 25%, 0.764 30%,
+    0.833 35%, 0.883 40%, 0.944 50%, 0.974 60%, 0.988 70%, 0.995 80%, 1);
   --transition-fast: 0.15s var(--ease-out-cubic);
   /* El paso del puntero. 0.15s se lee como un salto —el botón está abajo y
      de pronto está arriba, sin nada en medio— y 0.3s ya se arrastra bajo

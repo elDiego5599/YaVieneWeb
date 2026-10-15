@@ -182,12 +182,19 @@
 }
 
 .hero-actions {
+  /* Caja de la píldora del aviso, que se monta encima de la fila. 470 es
+     el ancho de la columna de la copia en escritorio: la píldora abierta
+     llega justo al filo del párrafo. */
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 12px;
+  width: 100%;
+  max-width: 470px;
   margin-top: 32px;
+  margin-inline: auto;
 }
 
 /* Los dos CTA en píldora completa. El primario es verde sólido con sombra
@@ -641,8 +648,18 @@
     font-size: 16px;
   }
 
-  .hero-grid--video .hero-actions a {
+  /* Los dos a 17: antes solo el enlace (`a`) y el CTA, que ahora es
+     botón, se quedaba en 14,5 al lado de «Cómo funciona». */
+  .hero-grid--video .hero-actions .btn-primary,
+  .hero-grid--video .hero-actions .btn-outline,
+  .hero-grid--video .aviso-input {
     font-size: 17px;
+  }
+
+  /* La píldora se ancla a la izquierda con la copia: crece desde el CTA
+     hacia la derecha, nunca hacia los dos lados. */
+  .hero-grid--video .hero-actions {
+    margin-inline: 0;
   }
 
   .hero-grid--video .hero-actions,
@@ -668,4 +685,374 @@
     --tel: min(360px, calc(100vw - 40px));
     --sangrado: calc(var(--alto-tel) * 0.1);
   }
+}
+
+/* ── «Avísame cuando salga»: el CTA se vuelve el campo ────────────────
+   La píldora vive encima de la fila de botones y está siempre montada;
+   cerrada, su recorte es exactamente el rectángulo del CTA
+   (`--aviso-izq` / `--aviso-der`, que mide src/aviso-lanzamiento.ts al
+   abrir) y lleva su verde encima, así que abrir es abrir el recorte:
+   el botón se estira hasta ser el campo y el verde se va. Cerrar es el
+   mismo camino al revés. Solo se anima `clip-path`, `opacity`,
+   `translate` y `scale`: nada de caja, y una transición CSS a medias se
+   invierte desde donde va. */
+.aviso-form {
+  width: 100%;
+  /* Anula el hueco de 12 de la fila: cerrado, el formulario no ocupa
+     nada y el hero queda como estaba. El aire va dentro de la caja. */
+  margin-top: -12px;
+  text-align: left;
+}
+
+.aviso-pildora {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  /* 48, el alto del CTA: el campo ocupa su sitio, no uno nuevo. */
+  height: 48px;
+  /* 4 a la derecha: enviar (40) queda centrado en el alto, 4 por lado. */
+  padding: 0 4px 0 0;
+  border-radius: 24px;
+  /* Tinta al 50 % sobre blanco: el filo del campo pide 3:1 contra el
+     crema del hero (1.4.11) y da 3,48:1; el gris de línea no llegaba. */
+  border: 1px solid rgba(11, 18, 32, 0.5);
+  background: var(--surface);
+  clip-path: inset(0 var(--aviso-der, 0px) 0 var(--aviso-izq, 0px) round 24px);
+  visibility: hidden;
+  /* Al cerrar se queda visible lo que dura el viaje de vuelta (0,4 s) y
+     solo entonces se esconde, ya convertida en el CTA. */
+  transition: clip-path 0.4s var(--ease-resorte), border-color var(--transition-hover),
+    box-shadow var(--transition-hover), visibility 0s linear 0.4s;
+}
+
+.aviso-form:not([data-estado="cerrado"]) .aviso-pildora {
+  clip-path: inset(0 round 24px);
+  visibility: visible;
+  transition: clip-path 0.4s var(--ease-resorte), border-color var(--transition-hover),
+    box-shadow var(--transition-hover), visibility 0s;
+}
+
+/* El foco del campo enciende la píldora entera: anillo verde accesible,
+   5,37:1 contra el crema. */
+.aviso-pildora:focus-within {
+  border-color: var(--green-accessible);
+  box-shadow: inset 0 0 0 1px var(--green-accessible);
+}
+
+.aviso-pildora:has([aria-invalid]) {
+  border-color: var(--coral-accessible);
+  box-shadow: inset 0 0 0 1px var(--coral-accessible);
+}
+
+/* El verde del CTA, encima de todo. Cerrada la cubre entera (la píldora
+   recortada ES el botón); al abrir se funde en 0,2 s, la mitad del
+   viaje, para que el blanco llegue antes que el ancho. En «listo»
+   vuelve: la confirmación habla desde el mismo verde. */
+.aviso-pildora::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: var(--green-accessible);
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease-out-cubic);
+}
+
+.aviso-form[data-estado="abierto"] .aviso-pildora::before {
+  opacity: 0;
+}
+
+.aviso-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  /* 22: el texto arranca donde arrancaba la letra del CTA (26 de
+     relleno menos el filo y el redondeo que ya se come el ojo). */
+  padding: 0 8px 0 22px;
+  border: 0;
+  border-radius: 24px 0 0 24px;
+  background: none;
+  color: var(--tinta);
+  /* 16 como mínimo: menos y Safari de iPhone acerca la página al tocar. */
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+/* Tinta tenue: 4,90:1 sobre el blanco de la píldora. */
+.aviso-input::placeholder {
+  color: var(--tinta-tenue);
+  opacity: 1;
+}
+
+.aviso-input {
+  /* Llega un pelo después del recorte: primero el botón se estira,
+     luego aparece lo que hay dentro. */
+  opacity: 0;
+  transition: opacity 0.15s var(--ease-out-cubic);
+}
+
+.aviso-form[data-estado="abierto"] .aviso-input {
+  opacity: 1;
+  transition: opacity 0.2s var(--ease-out-cubic) 0.12s;
+}
+
+.aviso-enviar {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  /* 40 de círculo dentro de los 48; el ::before lo lleva a 44 de blanco
+     táctil sin agrandar la píldora. */
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.aviso-enviar::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+}
+
+/* Enviar es la flecha del CTA que viajó: sale de donde estaba su círculo
+   (31 px antes del filo del CTA; el suyo va a 24 del filo de la
+   píldora, de ahí los 7) y a su tamaño, 26 de 40. Viaja con el mismo
+   resorte que el recorte, así que va pegada al filo que crece. */
+.aviso-enviar {
+  background: var(--green-accessible);
+  color: var(--text-white);
+  font-size: 17px;
+  line-height: 1;
+  translate: calc(-1 * var(--aviso-der, 0px) - 7px) 0;
+  scale: 0.65;
+  transition: translate 0.4s var(--ease-resorte), scale 0.4s var(--ease-resorte),
+    opacity 0.2s var(--ease-out-cubic), transform 0.1s var(--ease-out-cubic);
+}
+
+.aviso-form[data-estado="abierto"] .aviso-enviar {
+  translate: 0 0;
+  scale: 1;
+}
+
+/* Parece en espera mientras falte el número o la casilla, pero se puede
+   pulsar: pulsarlo es lo que dice qué falta. Al 55 % la flecha queda a
+   2,4:1 de su fondo; es un estado, no un texto. */
+.aviso-form[data-estado="abierto"]:not(:has(.aviso-input:valid):has(input[name="acepto"]:checked)) .aviso-enviar {
+  opacity: 0.55;
+}
+
+.aviso-enviar:active {
+  transform: scale(0.97);
+}
+
+.hero-actions .btn-green:active {
+  transform: scale(0.97);
+}
+
+.aviso-enviar:focus-visible {
+  outline: 2px solid var(--green-accessible);
+  outline-offset: 2px;
+}
+
+/* «Listo»: el verde vuelve a cubrir la píldora y habla desde ahí.
+   Blanco sobre el verde accesible: 5,78:1. */
+.aviso-listo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0 22px;
+  color: var(--text-white);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  outline: none;
+  transition: opacity 0.2s var(--ease-out-cubic);
+}
+
+/* La palomita, dibujada con dos filos: 6 × 11 girada 45°. */
+.aviso-listo::before {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 11px;
+  margin: -3px 4px 0 2px;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  rotate: 45deg;
+}
+
+.aviso-form[data-estado="listo"] .aviso-listo {
+  opacity: 1;
+  transition-delay: 0.1s;
+}
+
+.aviso-form[data-estado="listo"] .aviso-input,
+.aviso-form[data-estado="listo"] .aviso-enviar {
+  visibility: hidden;
+}
+
+/* La casilla crece de 0fr a 1fr: el hero baja lo que mide la casilla y
+   nada más, y lo baja deslizando. */
+.aviso-detalles {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.4s var(--ease-resorte), opacity 0.2s var(--ease-out-cubic);
+}
+
+.aviso-form[data-estado="abierto"] .aviso-detalles {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.aviso-detalles-caja {
+  min-height: 0;
+  overflow: hidden;
+  /* 12 arriba: el hueco de la fila que el formulario anuló. 4 a los
+     lados y abajo: sitio para el anillo de foco de la casilla. */
+  padding: 12px 4px 4px;
+}
+
+.aviso-acepto {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  /* 44 de alto tocable: la etiqueta entera marca la casilla. */
+  min-height: 44px;
+  font-size: 13px;
+  line-height: 1.45;
+  /* Tinta media: 9,05:1 sobre el crema. */
+  color: var(--tinta-media);
+}
+
+.aviso-acepto input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: var(--green-accessible);
+}
+
+.aviso-acepto input:focus-visible {
+  outline: 2px solid var(--green-accessible);
+  outline-offset: 2px;
+}
+
+.aviso-acepto a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* El error entra suave: se funde y baja 4 px. Coral accesible, 4,86:1
+   sobre el crema, en 600. */
+.aviso-error {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--coral-accessible);
+  transition: opacity 0.2s var(--ease-out-cubic), translate 0.2s var(--ease-out-cubic);
+}
+
+.aviso-error:empty {
+  margin: 0;
+  opacity: 0;
+  translate: 0 -4px;
+}
+
+/* «Cómo funciona» se aparta: la píldora necesita su sitio. Se funde y
+   corre 12 px hacia donde la empuja el filo que crece. */
+.hero-actions .btn-outline {
+  transition: background-color var(--transition-hover), border-color var(--transition-hover),
+    box-shadow var(--transition-hover), transform var(--transition-hover),
+    opacity 0.2s var(--ease-out-cubic), translate 0.4s var(--ease-resorte), visibility 0s;
+}
+
+.hero-actions:has(.aviso-form:not([data-estado="cerrado"])) .btn-outline {
+  opacity: 0;
+  translate: 12px 0;
+  visibility: hidden;
+  transition: opacity 0.2s var(--ease-out-cubic), translate 0.4s var(--ease-resorte),
+    visibility 0s linear 0.2s;
+}
+
+/* En el teléfono los dos botones van uno encima del otro (231 + 160 no
+   caben en 366): la casilla entra entre el CTA y «Cómo funciona», que se
+   queda a la vista y baja. */
+@media (max-width: 719px) {
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .aviso-form {
+    order: 1;
+  }
+
+  .hero-actions .btn-outline {
+    order: 2;
+  }
+
+  .hero-actions:has(.aviso-form:not([data-estado="cerrado"])) .btn-outline {
+    opacity: 1;
+    translate: none;
+    visibility: visible;
+  }
+}
+
+/* Sin movimiento: nada crece ni viaja; la píldora y la casilla aparecen
+   con un fundido de 0,2 s y la flecha no se desliza. */
+@media (prefers-reduced-motion: reduce) {
+  .aviso-pildora {
+    clip-path: none;
+    opacity: 0;
+    transition: opacity 0.2s var(--ease-out-cubic), visibility 0s linear 0.2s;
+  }
+
+  .aviso-form:not([data-estado="cerrado"]) .aviso-pildora {
+    clip-path: none;
+    opacity: 1;
+    transition: opacity 0.2s var(--ease-out-cubic), visibility 0s;
+  }
+
+  .aviso-detalles {
+    transition: none;
+  }
+
+  .aviso-enviar,
+  .hero-actions .btn-outline {
+    translate: none;
+    scale: none;
+  }
+
+  .hero-actions:has(.aviso-form:not([data-estado="cerrado"])) .btn-outline {
+    translate: none;
+  }
+
+  .hero-actions .btn-flecha {
+    transform: none;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

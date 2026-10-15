@@ -19,6 +19,7 @@ import './css/phone-simulator.css';
 import './css/animations.css';
 import './css/accesibilidad.css';
 
+import { AvisoLanzamiento } from './aviso-lanzamiento';
 import { Pasos } from './como-funciona';
 import { NavIsland } from './nav-island';
 import { PhoneMap } from './phone-map';
@@ -52,6 +53,9 @@ const arrancar = (): void => {
   const botonIsla = isla?.querySelector<HTMLButtonElement>('.nav-island-toggle');
   if (isla && botonIsla) new NavIsland(isla, botonIsla);
   reboteDelPie();
+  const avisoForm = document.querySelector<HTMLFormElement>('#aviso-lanzamiento');
+  const avisoAbrir = document.querySelector<HTMLButtonElement>('[data-aviso-abrir]');
+  if (avisoForm && avisoAbrir) new AvisoLanzamiento(avisoForm, avisoAbrir);
 
   const svg = document.querySelector<SVGSVGElement>('#phone-routes');
   const lienzo = document.querySelector<HTMLElement>('#phone-map');
