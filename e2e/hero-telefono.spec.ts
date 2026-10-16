@@ -36,3 +36,25 @@ test('el lienzo del hero no se desplaza por dentro al traer su botón a la vista
   });
   expect(corrido).toBe(0);
 });
+
+/* De 1024 a ~1300 el trío a la derecha le dejaba a la copia 238 px: el
+   párrafo iba palabra por palabra y lo que no cabía quedaba debajo de los
+   teléfonos (dueño, 2026-10-16). A cualquier ancho de escritorio la copia
+   tiene al menos 380 px, nada suyo se sale de su caja y, si va al lado del
+   trío, no lo pisa. */
+for (const [ancho, alto] of [[1024, 768], [1180, 880], [1280, 800], [1339, 900], [1340, 1200], [1366, 768], [1440, 900], [1920, 1080]] as const) {
+  test(`a ${ancho}×${alto} la copia del hero cabe entera y no la tapa el trío`, async ({ page }, info) => {
+    test.skip(info.project.name !== 'escritorio', 'los anchos los pone la prueba');
+    await page.setViewportSize({ width: ancho, height: alto });
+    await page.goto('/', { waitUntil: 'load' });
+    const m = await page.evaluate(() => {
+      const copia = document.querySelector<HTMLElement>('.hero-grid--video .hero-copy')!;
+      const escena = document.querySelector<HTMLElement>('.hero-grid--video .hero-scene')!.getBoundingClientRect();
+      const c = copia.getBoundingClientRect();
+      return { ancho: c.width, sobra: copia.scrollWidth - copia.clientWidth, alLado: c.bottom > escena.top, pisa: c.right - escena.left };
+    });
+    expect(m.ancho).toBeGreaterThanOrEqual(380);
+    expect(m.sobra).toBeLessThanOrEqual(0);
+    if (m.alLado) expect(m.pisa).toBeLessThanOrEqual(0);
+  });
+}

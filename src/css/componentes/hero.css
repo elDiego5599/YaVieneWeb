@@ -583,9 +583,12 @@
   object-fit: cover;
 }
 
-/* Desde 1024 el trío va a la derecha y la copia a la izquierda (dueño,
-   2026-10-11), con los tamaños de letra que ya tenía junto al video. */
-@media (min-width: 1024px) {
+/* Desde 1340 el trío va a la derecha y la copia a la izquierda (dueño,
+   2026-10-11), con los tamaños de letra que ya tenía junto al video. Desde
+   1024 la copia se quedaba en 238 px y el trío tapaba el párrafo (dueño,
+   2026-10-16): 1340 es lo mínimo con el teléfono en 330 (más chico no
+   gustó) y la copia en 400; por debajo van apilados, como en la tableta. */
+@media (min-width: 1340px) {
   .hero-grid--video {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -622,7 +625,11 @@
        así que (alto − 200) × 0,5 deja ~200 px para el nav y el aire; de
        0,53 a 0,5 le cede a la copia el ancho para su letra más grande
        (dueño, 2026-10-12). */
-    --tel: clamp(330px, (100svh - 200px) * 0.5, 400px);
+    /* El ancho también lo topa: la escena mide 2,302 × tel (tel + 2 ×
+       lado × 0,7) y 580 es lo que no es trío —calles y lienzo 136, hueco
+       ~26, barra 15 y copia 400—: en una ventana alta y angosta el
+       teléfono cede antes que la copia (dueño, 2026-10-16). */
+    --tel: clamp(330px, min((100svh - 200px) * 0.5, (100vw - 580px) / 2.302), 400px);
     --sangrado: calc(var(--alto-tel) * 0.1);
   }
 
