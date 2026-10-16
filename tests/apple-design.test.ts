@@ -286,6 +286,19 @@ describe('«Avísame cuando salga»: el CTA se vuelve el campo', () => {
     expect(e).not.toMatch(/azul-boton/);
   });
 
+  it('enviando: barra de 2 px en el filo de abajo, sin aro que gira', () => {
+    expect(hero).not.toMatch(/aviso-girar/);
+    const barra = reglas(hero, '.aviso-form[aria-busy] .aviso-pildora::after');
+    expect(barra).toMatch(/height:\s*2px/);
+    expect(barra).toMatch(/bottom:\s*0/);
+    expect(barra).toMatch(/left:\s*24px/);
+    expect(barra).toMatch(/right:\s*24px/);
+    expect(barra).toMatch(/animation:\s*aviso-barra 1\.4s cubic-bezier\(0?\.32,\s*0?\.72,\s*0,\s*1\) infinite/);
+    expect(reglas(hero, '.aviso-form[aria-busy] .aviso-enviar')).toMatch(/opacity:\s*0?\.55/);
+    const r = medias('(prefers-reduced-motion: reduce)');
+    expect(reglas(r, '.aviso-form[aria-busy] .aviso-pildora::after')).toMatch(/animation:\s*none/);
+  });
+
   it('con movimiento reducido: fundido corto, sin crecer ni deslizar', () => {
     const r = medias('(prefers-reduced-motion: reduce)');
     expect(reglas(r, '.aviso-pildora')).toMatch(/clip-path:\s*none/);

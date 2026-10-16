@@ -866,27 +866,35 @@
   pointer-events: none;
 }
 
-/* Mientras viaja el número la flecha cede su sitio a un aro que gira:
-   16 px dentro del círculo de 40, 2 px de trazo como la flecha, una
-   vuelta cada 0,7 s (lo que tarda ngrok en contestar, a ojo de reloj). */
-.aviso-form[aria-busy] .aviso-boton-enviar {
-  opacity: 0;
+/* Mientras viaja el número, una barra de 2 px corre por el filo de abajo
+   de la píldora, como la de Geist: la espera se ve sin tapar la flecha,
+   que se queda a medio tono. 24 por lado: el tramo recto entre las dos
+   puntas redondas (radio 24), donde el recorte no la muerde. El tramo
+   verde mide el 40 % y cruza de lado a lado (de -67 % a 167 %: con 40 %
+   de ancho, ahí queda justo fuera) cada 1,4 s con la curva de Vaul,
+   que arranca rápido y se posa. La pista al 18 % deja ver el carril. */
+.aviso-form[aria-busy] .aviso-enviar {
+  opacity: 0.55;
 }
 
-.aviso-form[aria-busy] .aviso-enviar::after {
+.aviso-form[aria-busy] .aviso-pildora::after {
   content: '';
   position: absolute;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgb(255 255 255 / 0.35);
-  border-top-color: currentColor;
-  border-radius: 50%;
-  animation: aviso-girar 0.7s linear infinite;
+  left: 24px;
+  right: 24px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 1px;
+  background:
+    linear-gradient(var(--green-accessible) 0 0) no-repeat -67% 0 / 40% 100%,
+    color-mix(in srgb, var(--green-accessible) 18%, transparent);
+  pointer-events: none;
+  animation: aviso-barra 1.4s cubic-bezier(0.32, 0.72, 0, 1) infinite;
 }
 
-@keyframes aviso-girar {
+@keyframes aviso-barra {
   to {
-    rotate: 1turn;
+    background-position: 167% 0, 0 0;
   }
 }
 
@@ -1121,14 +1129,11 @@
     scale: none;
   }
 
-  /* El aro no gira: queda quieto y a medio tono, señal de espera sin
-     movimiento. */
-  .aviso-form[aria-busy] .aviso-enviar::after {
+  /* La barra no corre: el tramo verde se queda al centro, señal de
+     espera sin movimiento (la flecha ya va a medio tono). */
+  .aviso-form[aria-busy] .aviso-pildora::after {
     animation: none;
-  }
-
-  .aviso-form[aria-busy] .aviso-enviar {
-    opacity: 0.55;
+    background-position: 50% 0, 0 0;
   }
 
   .aviso-enviar,
