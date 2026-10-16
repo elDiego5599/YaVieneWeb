@@ -240,6 +240,7 @@ describe('contraste del texto secundario', () => {
 
 describe('«Avísame cuando salga»: el CTA se vuelve el campo', () => {
   const hero = css('componentes/hero.css');
+  const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
   /** Todos los `@media` con esa condición, juntos (hero.css tiene varios). */
   const medias = (condicion: string): string => {
     let resto = hero;
@@ -286,17 +287,29 @@ describe('«Avísame cuando salga»: el CTA se vuelve el campo', () => {
     expect(e).not.toMatch(/azul-boton/);
   });
 
-  it('enviando: barra de 2 px en el filo de abajo, sin aro que gira', () => {
-    expect(hero).not.toMatch(/aviso-girar/);
-    const barra = reglas(hero, '.aviso-form[aria-busy] .aviso-pildora::after');
-    expect(barra).toMatch(/height:\s*2px/);
-    expect(barra).toMatch(/bottom:\s*0/);
-    expect(barra).toMatch(/left:\s*24px/);
-    expect(barra).toMatch(/right:\s*24px/);
-    expect(barra).toMatch(/animation:\s*aviso-barra 1\.4s cubic-bezier\(0?\.32,\s*0?\.72,\s*0,\s*1\) infinite/);
+  it('enviando: un tramo verde da vueltas por todo el filo, sin barra ni aro', () => {
+    expect(hero).not.toMatch(/aviso-girar|aviso-barra/);
+    expect(reglas(hero, '.aviso-form[aria-busy] .aviso-pildora::after')).toBe('');
+    // El tramo es un trazo del rectángulo redondeado del propio filo: con
+    // pathLength 100 mide lo mismo en cualquier ancho y corre parejo.
+    expect(html).toMatch(
+      /<svg class="aviso-carga" aria-hidden="true"><rect width="100%" height="100%" rx="23" pathLength="100"\/><\/svg>/
+    );
+    const trazo = reglas(hero, '.aviso-carga rect');
+    expect(trazo).toMatch(/stroke:\s*var\(--green-accessible\)/);
+    expect(trazo).toMatch(/stroke-width:\s*2px/);
+    expect(trazo).toMatch(/stroke-dasharray:\s*25 75/);
+    expect(reglas(hero, '.aviso-form[aria-busy] .aviso-carga rect')).toMatch(
+      /animation:\s*aviso-vuelta 1\.6s linear infinite/
+    );
+    expect(hero).toMatch(/@keyframes aviso-vuelta\s*\{\s*to\s*\{\s*stroke-dashoffset:\s*-100;?\s*\}/);
+    // El filo vuelve a su gris mientras tanto: verde sobre verde no se ve.
+    expect(reglas(hero, '.aviso-form[aria-busy] .aviso-pildora')).toMatch(/box-shadow:\s*none/);
     expect(reglas(hero, '.aviso-form[aria-busy] .aviso-enviar')).toMatch(/opacity:\s*0?\.55/);
     const r = medias('(prefers-reduced-motion: reduce)');
-    expect(reglas(r, '.aviso-form[aria-busy] .aviso-pildora::after')).toMatch(/animation:\s*none/);
+    const quieto = reglas(r, '.aviso-form[aria-busy] .aviso-carga rect');
+    expect(quieto).toMatch(/animation:\s*none/);
+    expect(quieto).toMatch(/stroke-dasharray:\s*none/);
   });
 
   it('con movimiento reducido: fundido corto, sin crecer ni deslizar', () => {

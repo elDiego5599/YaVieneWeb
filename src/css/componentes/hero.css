@@ -866,35 +866,54 @@
   pointer-events: none;
 }
 
-/* Mientras viaja el número, una barra de 2 px corre por el filo de abajo
-   de la píldora, como la de Geist: la espera se ve sin tapar la flecha,
-   que se queda a medio tono. 24 por lado: el tramo recto entre las dos
-   puntas redondas (radio 24), donde el recorte no la muerde. El tramo
-   verde mide el 40 % y cruza de lado a lado (de -67 % a 167 %: con 40 %
-   de ancho, ahí queda justo fuera) cada 1,4 s con la curva de Vaul,
-   que arranca rápido y se posa. La pista al 18 % deja ver el carril. */
+/* Mientras viaja el número, un tramo verde da vueltas por el filo de la
+   píldora: la espera se ve sin tapar la flecha, que se queda a medio
+   tono. El trazo es el rectángulo del borde de relleno (46 de alto,
+   radio 23): 2 px centrados ahí cubren el filo de 1 y uno hacia dentro,
+   y el recorte (radio 24) no lo muerde. Con pathLength 100 el tramo es
+   la cuarta parte del contorno en cualquier ancho, y lineal: en una
+   vuelta que no acaba, una curva lo haría latir. 1,6 s por vuelta, unos
+   460 px/s en el teléfono. */
 .aviso-form[aria-busy] .aviso-enviar {
   opacity: 0.55;
 }
 
-.aviso-form[aria-busy] .aviso-pildora::after {
-  content: '';
-  position: absolute;
-  left: 24px;
-  right: 24px;
-  bottom: 0;
-  height: 2px;
-  border-radius: 1px;
-  background:
-    linear-gradient(var(--green-accessible) 0 0) no-repeat -67% 0 / 40% 100%,
-    color-mix(in srgb, var(--green-accessible) 18%, transparent);
-  pointer-events: none;
-  animation: aviso-barra 1.4s cubic-bezier(0.32, 0.72, 0, 1) infinite;
+/* El filo vuelve a su gris aunque el campo tenga el foco: verde sobre
+   verde no deja ver el tramo. */
+.aviso-form[aria-busy] .aviso-pildora {
+  border-color: rgba(11, 18, 32, 0.5);
+  box-shadow: none;
 }
 
-@keyframes aviso-barra {
+.aviso-carga {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.aviso-form[aria-busy] .aviso-carga {
+  visibility: visible;
+}
+
+.aviso-carga rect {
+  fill: none;
+  stroke: var(--green-accessible);
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-dasharray: 25 75;
+}
+
+.aviso-form[aria-busy] .aviso-carga rect {
+  animation: aviso-vuelta 1.6s linear infinite;
+}
+
+@keyframes aviso-vuelta {
   to {
-    background-position: 167% 0, 0 0;
+    stroke-dashoffset: -100;
   }
 }
 
@@ -1129,11 +1148,11 @@
     scale: none;
   }
 
-  /* La barra no corre: el tramo verde se queda al centro, señal de
-     espera sin movimiento (la flecha ya va a medio tono). */
-  .aviso-form[aria-busy] .aviso-pildora::after {
+  /* Sin vuelta: el filo entero se queda verde, señal de espera sin
+     movimiento (la flecha ya va a medio tono). */
+  .aviso-form[aria-busy] .aviso-carga rect {
     animation: none;
-    background-position: 50% 0, 0 0;
+    stroke-dasharray: none;
   }
 
   .aviso-enviar,
