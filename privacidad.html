@@ -113,7 +113,7 @@
   </header>
 
   <main id="contenido" class="legal-hoja">
-    <p class="legal-fecha">Actualizado el 14 de octubre de 2026</p>
+    <p class="legal-fecha">Actualizado el 18 de octubre de 2026</p>
     <h1>Privacidad</h1>
     <p class="legal-entrada">Ya Viene es una aplicación para saber por dónde va tu bus. Para
       eso necesita muy poco, y lo poco que necesita casi todo se queda dentro de tu
@@ -207,7 +207,7 @@
         ruta, cuándo lo activaste, cuándo sonó y, si lo activaste sobre un punto marcado a
         mano, ese punto. Es lo que deja que un aviso siga armado cuando vuelves a abrir la app. Se
         guardan los 50 más recientes de los últimos 30 días; los que todavía no han sonado
-        se quedan hasta que suenen o los quites. Los borras todos desde Notificaciones.</li>
+        se quedan hasta que suenen o los quites. Los borras todos desde Avisos.</li>
       <li><strong>Lo que ya aprendiste</strong>: si ya viste la bienvenida y la guía del
         mapa, y si ya se te pidió el permiso de ubicación.</li>
       <li><strong>Que aceptaste esto</strong>, con la versión del texto que aceptaste. Es lo
@@ -227,6 +227,18 @@
       y la velocidad. Eso es un vehículo de servicio público en su recorrido, y es lo que
       hace posible que tú lo veas en el mapa.</p>
 
+    <!-- El buzón de la app (D14 del backend): `buzon.dart` manda tipo,
+         texto, plataforma y versión; el backend lo guarda en cola, lo manda
+         al Gmail del equipo y borra la fila cuando el correo sale. Mismo
+         texto que `legal_docs.dart`. -->
+    <h2>Si nos escribes por el buzón</h2>
+    <p>El buzón de la app sirve para contarnos un problema o una sugerencia. Lo que
+      escribes viaja a nuestro servidor con el tipo que elegiste, si tu teléfono es
+      Android o iPhone y la versión de la app. No te pedimos nombre ni forma de
+      contactarte, y tu ubicación no va. El servidor lo manda al correo del equipo, en
+      Gmail, y lo borra en cuanto el correo sale. Por eso te pedimos que no escribas
+      datos personales: si los escribes, se quedan en ese correo.</p>
+
     <!-- Firebase Authentication salió de esta lista en T6.9: sin cuenta no
          hay registro ni inicio de sesión (pubspec.yaml sin firebase_auth ni
          google_sign_in). Firebase Cloud Messaging entró el 2 de octubre de
@@ -242,6 +254,8 @@
       <li><strong>Firebase Cloud Messaging</strong>, de Google — solo en Android y solo para
         un aviso armado con la app cerrada: entrega la notificación. Lleva el bus, la ruta
         y la distancia, no tu ubicación.</li>
+      <li><strong>Gmail</strong>, de Google — recibe en el correo del equipo lo que mandas
+        por el buzón. Lleva tu mensaje, no tu ubicación.</li>
     </ul>
 
     <!-- Antes «Borrar tu cuenta». Las cuentas creadas antes de T6.9 siguen en

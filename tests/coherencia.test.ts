@@ -197,7 +197,7 @@ describe('la privacidad dice qué pasa con la app cerrada', () => {
   it('la fecha del documento acompaña al cambio', () => {
     // Un texto legal que cambia sin cambiar su fecha no se distingue del
     // anterior, y la app usa la misma fecha para decir cuál está leyendo.
-    expect(leer('privacidad.html')).toContain('Actualizado el 14 de octubre de 2026');
+    expect(leer('privacidad.html')).toContain('Actualizado el 18 de octubre de 2026');
   });
 });
 
@@ -338,5 +338,36 @@ describe('el formulario de empresas cumple lo de la Ley 1581', () => {
     expect(nota, 'el formulario no pide la autorización').toContain('usted autoriza');
     expect(nota).toContain('href="/privacidad.html#empresas"');
     expect(form.indexOf('form-autoriza')).toBeGreaterThan(form.indexOf('form-submit-btn'));
+  });
+});
+
+/**
+ * El buzón de la app (D14 del backend) manda lo que el pasajero escribe al
+ * servidor, que lo reenvía al Gmail del equipo. La privacidad no lo decía
+ * (AUD16-01), y la de la web y la de la app ya no eran espejo: la web
+ * nombraba «Notificaciones», la pestaña que hoy se llama «Avisos» (C1). Las
+ * frases son las de `legal_docs.dart`, que vigila `legal_buzon_test.dart`.
+ */
+describe('la privacidad cuenta el buzón, como la app', () => {
+  const texto = (): string =>
+    leer('privacidad.html')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<[^>]+>/g, '')
+      .replace(/\s+/g, ' ');
+
+  it('dice qué viaja con el buzón y a dónde va', () => {
+    const html = texto();
+    expect(html).toContain('Si nos escribes por el buzón');
+    expect(html).toContain(
+      'viaja a nuestro servidor con el tipo que elegiste, si tu teléfono es Android o iPhone y la versión de la app',
+    );
+    expect(html).toContain('al correo del equipo, en Gmail, y lo borra');
+    expect(html).toContain('Gmail, de Google');
+  });
+
+  it('los avisos se borran desde la pestaña que la app llama «Avisos»', () => {
+    const html = texto();
+    expect(html).toContain('Los borras todos desde Avisos.');
+    expect(html).not.toContain('Notificaciones');
   });
 });
