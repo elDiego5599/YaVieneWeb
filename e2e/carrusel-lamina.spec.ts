@@ -46,6 +46,26 @@ function roturas(filas: Fila[], separacion: number, ancho: number): string[] {
   return malos;
 }
 
+/**
+ * Espera a que el carrusel quede en reposo: sin animaciones finitas vivas
+ * en la cuadrícula (salvo la barra del avance solo), sin copias, rebote ni textos saliendo. Por estado y no
+ * por reloj (AUD16-10): con la máquina cargada, 900 ms no alcanzaban.
+ */
+async function quieto(page: Page): Promise<void> {
+  await page.waitForFunction(() => {
+    const grid = document.querySelector('.cf-grid');
+    if (!grid) return false;
+    const vivas = grid.getAnimations({ subtree: true })
+      // `cf-progreso` es la barra del avance solo: corre siempre.
+      .filter(a => a.playState === 'running' && a.effect?.getTiming().iterations !== Infinity
+        && (a as CSSAnimation).animationName !== 'cf-progreso');
+    return vivas.length === 0
+      && !document.querySelector('.cf-escena--fantasma')
+      && !grid.hasAttribute('data-rebote')
+      && !document.querySelector('.cf-explica[data-sale]');
+  }, undefined, { timeout: 15_000 });
+}
+
 const pestana = (page: Page, paso: string) => page.locator(`[role=tab][data-paso="${paso}"]`);
 
 async function mover(page: Page, direccion: 'anterior' | 'siguiente'): Promise<void> {
@@ -84,7 +104,7 @@ test('texto y cuadro de cada paso se mueven como una sola lámina', async ({ pag
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   await page.locator('.cf-grid').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(800);
+  await quieto(page);
   const ancho = page.viewportSize()!.width;
   // La separación de reposo entre el texto y el cuadro del paso que se ve.
   const separacion = await page.evaluate(() => {
@@ -96,7 +116,7 @@ test('texto y cuadro de cada paso se mueven como una sola lámina', async ({ pag
   for (const [nombre, gesto] of GESTOS) {
     await page.evaluate(SONDA);
     await gesto(page, ancho);
-    await page.waitForTimeout(900);
+    await quieto(page);
     const filas = (await page.evaluate('window.__lamina()')) as Fila[];
     expect(filas.length, nombre).toBeGreaterThan(20);
     expect(roturas(filas, separacion, ancho), nombre).toEqual([]);
@@ -113,18 +133,33 @@ test('texto y cuadro de cada paso se mueven como una sola lámina', async ({ pag
 test('el mapa llena el cuadro igual en la escena viva y en su copia', async ({ page }) => {
   await page.goto('/');
   await pestana(page, 'bus').click();
-  await page.waitForTimeout(600);
+  await quieto(page);
   // El mapa contra su propio cuadro: en reposo la escena viva, y luego la
-  // copia que sale, medida en pleno viaje.
-  const medir = (sel: string) => page.evaluate(s => {
-    const e = document.querySelector<HTMLElement>(s)!;
-    const c = e.getBoundingClientRect();
-    const m = e.querySelector('.cf-mapa-tarjeta .phone-map')!.getBoundingClientRect();
-    return [m.width - c.width, m.height - c.height, m.left - c.left, m.top - c.top].map(Math.abs);
-  }, sel);
-  const viva = await medir('#cf-escena');
+  // copia que sale. La copia vive lo que dura el viaje y, con la máquina
+  // cargada, la ida y vuelta de Playwright llega cuando ya se quitó
+  // (AUD16-10): la página la mide sola en cuanto se inserta, ya en su sitio.
+  await page.evaluate(() => {
+    const w = window as unknown as { __medir: (e: Element) => number[]; __copia?: number[] };
+    w.__medir = e => {
+      const c = e.getBoundingClientRect();
+      const m = e.querySelector('.cf-mapa-tarjeta .phone-map')!.getBoundingClientRect();
+      return [m.width - c.width, m.height - c.height, m.left - c.left, m.top - c.top].map(Math.abs);
+    };
+    const vigia = new MutationObserver(() => {
+      const copia = document.querySelector('.cf-escena--fantasma[data-paso="bus"]');
+      if (!copia) return;
+      w.__copia = w.__medir(copia);
+      vigia.disconnect();
+    });
+    vigia.observe(document.querySelector('.cf-grid')!, { childList: true, subtree: true });
+  });
+  const viva = (await page.evaluate(() =>
+    (window as unknown as { __medir: (e: Element) => number[] }).__medir(document.querySelector('#cf-escena')!),
+  ));
   await pestana(page, 'aviso').click();
-  const copia = await medir('.cf-escena--fantasma[data-paso="bus"]');
+  const copia = (await (await page.waitForFunction(() =>
+    (window as unknown as { __copia?: number[] }).__copia,
+  )).jsonValue())!;
   for (const d of [...viva, ...copia]) expect(d).toBeLessThanOrEqual(1);
 });
 
