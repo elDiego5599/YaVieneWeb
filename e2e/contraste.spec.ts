@@ -83,6 +83,8 @@ const MUESTRAS: Record<string, string[]> = {
     // La idea de cada paso de «Cómo funciona»: título en rojo y texto gris.
     '.cf-explica[data-lugar="actual"] .cf-extra-titulo',
     '.cf-explica[data-lugar="actual"] .cf-extra-texto',
+    // El rótulo «Simulación» de la atribución del hero (D8): letra de 10,5.
+    '[data-mapa-simulacion]',
     '.footer-nav-group > span',
     '.footer-nav a',
     '.footer-legal-links a',
