@@ -16,7 +16,7 @@ export const YV_RUTAS: DatosLanding = {
     src: mapaUrl,
     ancho: 804,
     alto: 1750,
-    atribucion: "© OpenStreetMap · © CARTO"
+    atribucion: "© OpenStreetMap, © CARTO"
   },
   rutas: [
     {

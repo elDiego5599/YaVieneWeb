@@ -323,7 +323,7 @@ def main():
             "src": "src/assets/map/barranquilla.webp",
             "ancho": out_w,
             "alto": out_h,
-            "atribucion": "© OpenStreetMap · © CARTO",
+            "atribucion": "© OpenStreetMap, © CARTO",
         },
         "rutas": out_rutas,
     }

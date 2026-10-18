@@ -290,7 +290,7 @@
                en el flujo justo encima de él. «Simulación» va primero
                (D8): los buses del teléfono derecho los mueve la página, no
                son buses de verdad. -->
-          <p class="hero-credit"><strong data-mapa-simulacion>Simulación.</strong> Mapa base © <a href="https://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> · © <a href="https://carto.com" target="_blank" rel="noopener">CARTO</a></p>
+          <p class="hero-credit"><strong data-mapa-simulacion>Simulación.</strong> Mapa base © <a href="https://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a>, © <a href="https://carto.com" target="_blank" rel="noopener">CARTO</a></p>
         </div>
 
         <!--
@@ -543,11 +543,10 @@
                 <!-- Píldora de búsqueda + chip de ubicación. -->
                 <div class="phone-topbar phone-topbar--vivo" data-el="topbar">
                   <div class="app-pill" data-el="pill">
-                    <span class="app-pill-btn">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                        stroke-linecap="round">
-                        <path d="M4 7h16M4 12h16M4 17h16" />
-                      </svg>
+                    <!-- La punta izquierda lleva el logo, como en la app
+                         (search_pill_bar.dart, dueño 2026-10-18). -->
+                    <span class="app-pill-btn app-pill-logo">
+                      <img src="/logo.svg" alt="" width="36" height="36">
                     </span>
 
                     <span class="app-pill-text">
@@ -560,11 +559,10 @@
                     </span>
 
                     <span class="app-pill-btn app-pill-btn--der" data-el="pill-der">
-                      <svg class="icono-tune" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                      <svg class="icono-lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                         stroke-linecap="round">
-                        <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
-                        <circle cx="15" cy="7" r="2" />
-                        <circle cx="9" cy="17" r="2" />
+                        <circle cx="11" cy="11" r="6.5" />
+                        <path d="M16 16l4 4" />
                       </svg>
                       <!-- Con ruta activa el botón deja de ajustar y pasa a limpiar. -->
                       <svg class="icono-cerrar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
@@ -1078,7 +1076,7 @@
                   </div>
                   <div class="cf-aviso-notificacion" aria-hidden="true">
                     <div class="cf-aviso-icono"><img src="/logo.svg" alt="" width="20" height="20"></div>
-                    <div class="cf-aviso-texto"><span class="cf-aviso-app">Ya Viene · ahora</span><strong class="cf-aviso-titulo">Bus de la ruta C16 está cerca de ti</strong></div>
+                    <div class="cf-aviso-texto"><span class="cf-aviso-app">Ya Viene, ahora</span><strong class="cf-aviso-titulo">Bus de la ruta C16 está cerca de ti</strong></div>
                   </div>
                 </div>
               </div>
@@ -1330,7 +1328,7 @@
     </div>
 
     <div class="footer-bottom">
-      <p>© 2026 YaViene · Barranquilla, Colombia</p>
+      <p>© 2026 YaViene. Barranquilla, Colombia</p>
       <div class="footer-legal-links">
         <a href="/terminos.html">Términos</a>
         <a href="/privacidad.html">Privacidad</a>

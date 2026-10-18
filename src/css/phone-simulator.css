@@ -616,14 +616,32 @@
   display: block;
 }
 
+/* El logo de la punta izquierda (search_pill_bar.dart): 36 en el hueco
+   de 48, con `Alignment(-0.5, 0)`, que lo corre (48 − 36) / 2 × 0,5 = 3 a
+   la izquierda. Con el filo de 1 y el relleno de 8, su centro cae a 30 del
+   borde de afuera: concéntrico con la punta redonda de la píldora de 60,
+   con 12 de aire arriba, abajo y a la izquierda. */
+.app-pill-logo img {
+  width: calc(36 * var(--u));
+  height: calc(36 * var(--u));
+  translate: calc(-3 * var(--u)) 0;
+  display: block;
+}
+
 .app-pill-btn--der svg {
   width: calc(20 * var(--u));
   height: calc(20 * var(--u));
 }
 
+/* La lupa va en 22, como `Icons.search_rounded` en `_lupa()`; la X, en 20. */
+.app-pill-btn--der .icono-lupa {
+  width: calc(22 * var(--u));
+  height: calc(22 * var(--u));
+}
+
 /*
   El botón de la derecha no es uno, son dos, y la app los cambia:
-  `Icons.tune_rounded` en navy y sin fondo mientras no hay ruta, y una
+  `Icons.search_rounded` en navy y sin fondo mientras no hay ruta, y una
   `Icons.close_rounded` gris dentro de un círculo relleno cuando sí la
   hay —porque entonces lo que hace es quitarla, no filtrar—.
 */
@@ -638,7 +656,7 @@
 }
 
 .app-pill-btn--der .icono-cerrar,
-.app-pill-btn--der.es-cerrar .icono-tune {
+.app-pill-btn--der.es-cerrar .icono-lupa {
   display: none;
 }
 
