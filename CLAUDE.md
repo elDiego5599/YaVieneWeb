@@ -117,7 +117,8 @@ diario y las reglas de trabajo están en `AGENTS.md`.
   rojo, términos y privacidad llevan la isla y el pie del sitio con título
   «Ya Viene Términos/Privacidad», y la ruta del mapa va verde sobre orla
   blanca como «El producto» en el teléfono de la web (`4af2267`) y en el
-  pasajero (`EstiloRuta`, app `0c7cf4d`); los pasos de «Cómo funciona»
+  pasajero (`EstiloRuta`, app `0c7cf4d`; desde el 2026-10-19 cada ruta en
+  su color, `src/data/color-ruta.ts`); los pasos de «Cómo funciona»
   ruedan en vertical al bajar (≥1024 px, sin GSAP: `--paso-giro` en
   pasos.css, web `6acb895`; la órbita `a0b77d4` no gustó; tope CSS 117→121);
   retoque visual del panel (app `b275c7f`): filas planas, carril de
