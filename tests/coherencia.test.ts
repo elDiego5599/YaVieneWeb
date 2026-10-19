@@ -174,7 +174,7 @@ describe('la privacidad dice qué pasa con la app cerrada', () => {
 
   it('dice que la ubicación deja de actualizarse y contra qué se mide', () => {
     const html = texto();
-    expect(html).toContain('solo mientras la uso');
+    expect(html).toContain('solo mientras la usas');
     expect(html).toContain('no el de segundo plano');
     expect(html).toContain('la distancia se mide contra el último punto que conoció');
   });
@@ -370,4 +370,22 @@ describe('la privacidad cuenta el buzón, como la app', () => {
     expect(html).toContain('Los borras todos desde Avisos.');
     expect(html).not.toContain('Notificaciones');
   });
+});
+
+/**
+ * Los textos legales van sin comillas angulares ni rayas (dueño, 2026-10-18:
+ * «no uses caracteres especiales como << o -- en los textos»), como su copia
+ * en la app, que vigila `test/textos_sin_signos_test.dart`. Los comentarios
+ * no se leen.
+ */
+describe('los textos legales no llevan «», rayas ni --', () => {
+  for (const pagina of ['privacidad.html', 'terminos.html']) {
+    it(pagina, () => {
+      const visible = leer(pagina)
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(/<(script|style)[\s\S]*?<\/\1>/g, '')
+        .replace(/<[^>]+>/g, ' ');
+      expect(visible.match(/.{0,30}(?:[«»—–]|--).{0,30}/g) ?? []).toEqual([]);
+    });
+  }
 });
