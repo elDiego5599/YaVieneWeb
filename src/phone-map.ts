@@ -2,7 +2,7 @@
  * PhoneMap — el mapa del mockup, con el mismo material que ve el pasajero.
  *
  * El fondo es un mosaico real de Barranquilla en CARTO Voyager, el mismo
- * estilo que carga map_widget.dart, y encima va la polilínea, en el color de la
+ * estilo que carga map_widget.dart, y encima va la polilínea verde de la
  * ruta activa con los waypoints reales de rutas.json. Los generó
  * scripts/gen_mapa_landing.py, así que fondo y trazado comparten el
  * encuadre Web Mercator: la ruta cae sobre las calles que le tocan.
@@ -22,7 +22,6 @@
  * matriz cambia al hacer scroll, los marcadores se iban a la deriva.
  */
 
-import { colorRuta } from './data/color-ruta';
 import { YV_RUTAS } from './data/rutas-landing';
 import type { MapaBase, Punto, RutaLanding } from './types';
 
@@ -182,8 +181,8 @@ export class PhoneMap {
     const defs = nuevo('defs');
     defs.innerHTML = `
       <linearGradient id="busBody-${s}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" style="stop-color: color-mix(in srgb, var(--ruta) 70%, #FFFFFF)"/>
-        <stop offset="100%" style="stop-color: var(--ruta)"/>
+        <stop offset="0%" stop-color="#EF978E"/>
+        <stop offset="100%" stop-color="#E86A5E"/>
       </linearGradient>
       <clipPath id="busClip-${s}">
         <rect x="-16" y="-30" width="32" height="60" rx="16"/>
@@ -223,7 +222,7 @@ export class PhoneMap {
     this.#radioEl.setAttribute('class', 'map-radio');
     this.#svg.appendChild(this.#radioEl);
 
-    // Ruta activa: la orla blanca y encima la línea en su color, las dos capas
+    // Ruta activa: la orla blanca y encima la línea verde, las dos capas
     // que map_widget.dart le pone a la ruta (estilo_ruta.dart) y las
     // mismas del mapa de «El producto».
     this.#casingEl = nuevo('path');
@@ -344,9 +343,6 @@ export class PhoneMap {
     const route = this.rutas.find(r => r.id === routeId);
     if (!route) return;
     this.activeRoute = route;
-    // El trazo, las terminales y el bus van en el color de la ruta, como
-    // en la app (`colorRuta`, color_ruta.dart).
-    this.#svg.style.setProperty('--ruta', colorRuta(route.nombre));
 
     this.#casingEl.setAttribute('d', route.d);
     this.#activeEl.setAttribute('d', route.d);

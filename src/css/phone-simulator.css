@@ -408,10 +408,9 @@
 }
 
 /*
-  Ruta seleccionada: la orla blanca y encima la línea en el color de su
-  ruta (`--ruta`, que pone phone-map.ts con `colorRuta`), como la pinta la
-  app (estilo_ruta.dart; verde para todas desde el 2026-09-28, una por
-  ruta desde el 2026-10-19). Los números son los de estilo_ruta.dart en `--u`, píxeles
+  Ruta seleccionada: la orla blanca y encima la línea verde, como la pinta
+  la app desde que el dueño pidió una sola ruta en todas partes
+  (2026-09-28). Los números son los de estilo_ruta.dart en `--u`, píxeles
   lógicos del teléfono: la línea mide 4, lo que medía cuando era azul, y
   la orla 8 con 0,95 de opacidad, la proporción de 7 contra 3,4 de la
   web. El grosor no va en píxeles de pantalla porque el teléfono del
@@ -431,15 +430,15 @@
 
 .map-route-active {
   fill: none;
-  stroke: var(--ruta, var(--azul-boton));
+  stroke: var(--green);
   stroke-width: calc(4 * var(--u));
 }
 
-/* Terminales: `circleRadius: 7` con borde de 2,5 en el color de la ruta,
-   de estilo_ruta.dart. */
+/* Terminales: `circleRadius: 7` con borde de 2,5 en el mismo verde, de
+   estilo_ruta.dart. */
 .map-terminals circle {
   fill: #FFFFFF;
-  stroke: var(--ruta, var(--azul-boton));
+  stroke: var(--green);
   stroke-width: calc(2.5 * var(--u));
 }
 
