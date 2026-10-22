@@ -140,9 +140,11 @@ describe('banda «Cómo funciona»', () => {
     expect(ancho).toMatch(/\.cf-control--siguiente \{ translate:\s*calc\(100% \+ 16px\) -50%/);
     expect(ancho).toMatch(/\.cf-carrusel::before\s*\{[^}]*inset:\s*0 -60px/s);
   });
-  it('el teléfono no pinta una sombra rectangular sobre el fondo de la escena', () => {
+  it('el teléfono lleva la sombra larga de incident.io recortada a la silueta del marco', () => {
     const tel = css.match(/\.cf-telefono \.phone-shell\s*\{[^}]*\}/)![0];
+    const marco = css.match(/\.cf-telefono \.tel-marco-img\s*\{[^}]*\}/)![0];
     expect(tel).not.toMatch(/box-shadow/);
+    expect(marco).toMatch(/filter:[^;]*drop-shadow\(0 2px 6px rgba\(11, 18, 32, 0\.08\)\)[^;]*drop-shadow\(18px 22px 36px rgba\(11, 18, 32, 0\.2\)\)[^;]*drop-shadow\(42px 50px 80px rgba\(11, 18, 32, 0\.18\)\)/s);
   });
 
   it('«Elige tu ruta» se queda quieta: no repite su entrada (dueño, 2026-10-12)', () => {

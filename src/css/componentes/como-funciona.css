@@ -713,13 +713,23 @@
   }
 }
 
-/* El teléfono queda entero y centrado; sin sombra rectangular sobre el halo. */
+/* El teléfono queda entero y centrado verticalmente. Su sombra es la del
+   teléfono de On-call de incident.io (dueño, 2026-10-13): larga, suave y
+   echada abajo a la derecha, aplicada al marco para seguir su silueta. Como
+   drop-shadow no admite spread, se reducen desplazamientos y desenfoques. */
 .cf-telefono .phone-shell {
   --ancho: clamp(230px, 41cqw, 310px);
   z-index: 2;
   position: absolute;
   top: 3.5%;
   right: 8%;
+}
+
+.cf-telefono .tel-marco-img {
+  filter:
+    drop-shadow(0 2px 6px rgba(11, 18, 32, 0.08))
+    drop-shadow(18px 22px 36px rgba(11, 18, 32, 0.2))
+    drop-shadow(42px 50px 80px rgba(11, 18, 32, 0.18));
 }
 
 /* Atenúa solo las teselas; las rutas y marcadores siguen intactos. */
