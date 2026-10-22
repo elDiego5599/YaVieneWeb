@@ -301,8 +301,7 @@
   overflow: hidden;
   /* 20 px suaviza las esquinas del cuadro. */
   border-radius: 20px;
-  /* Resplandor azul bajo y difuso, fundido en un gris casi blanco. */
-  background: radial-gradient(ellipse 95% 80% at 100% 100%, rgba(30, 86, 168, 0.14), transparent 75%), linear-gradient(135deg, #FCFDFE, #F1F5FA);
+  background: color-mix(in srgb, var(--banda), var(--acento) 5%);
   /* 600 / 455 da la escena apaisada de referencia y deja aire al teléfono. */
   aspect-ratio: 600 / 455;
   translate: calc(var(--cf-lugar) * var(--cf-viaje)) 0;
