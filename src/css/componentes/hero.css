@@ -380,7 +380,14 @@
    sombra realista de dos capas; los laterales ya quedan detrás por su
    z-index menor. */
 .hero-phone-wrap .phone-shell {
+  /* El aparato conserva el ancho aprobado; el hueco de pantalla ocupa el 89,8 % de ese ancho. */
   --ancho: var(--tel);
+  /* La imagen mide 720 × 1469: su proporción fija el alto del marco completo. */
+  aspect-ratio: 720 / 1469;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
   filter:
     drop-shadow(0 40px 48px rgba(11, 22, 32, 0.22))
     drop-shadow(0 10px 20px rgba(11, 22, 32, 0.12));
@@ -401,11 +408,44 @@
 }
 
 .hero-phone-side .phone-shell {
+  /* El aparato lateral conserva su ancho aprobado; el hueco de pantalla ocupa el 89,8 % de ese ancho. */
   --ancho: var(--lado);
+  /* La imagen mide 720 × 1469: su proporción fija el alto del marco completo. */
+  aspect-ratio: 720 / 1469;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
 }
 
 .hero-phone-side .phone-shell::before {
   opacity: 0.5;
+}
+
+/* El WebP de 720 × 1469 conserva proporción con su tamaño intrínseco y no intercepta eventos. */
+.hero-phone-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* 5,10 % lateral y 2,20 % vertical: márgenes transparentes medidos en el archivo original de 1470 × 3000. */
+.hero-phone-shell .phone-screen {
+  /* 89,8 % del ancho: x=75..1394 en la imagen original; --u mantiene el ancho previo del contenido. */
+  --u: calc(var(--ancho) * 0.898 / 402);
+  position: absolute;
+  /* x=75/1470 y y=66/3000: inicio medido del hueco de pantalla. */
+  left: 5.1%;
+  top: 2.2%;
+  /* 1319/1470 y 2867/3000: tamaño medido del hueco, sin escalar el contenido. */
+  width: 89.8%;
+  height: 95.57%;
+  /* 190 px de radio: porcentajes elípticos que dan 14,4 % del ancho y 6,62 % del alto del hueco medido. */
+  border-radius: 14.4% / 6.62%;
+  box-shadow: none;
 }
 
 /*
@@ -476,8 +516,8 @@
     margin-left: 0;
     transform: none;
   }
-
   .hero-phone-side--der .phone-shell {
+    /* En móvil el aparato derecho ocupa el lugar del central; la pantalla ocupa el 89,8 % de ese ancho. */
     --ancho: var(--tel);
   }
 
