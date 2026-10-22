@@ -140,11 +140,19 @@ describe('banda «Cómo funciona»', () => {
     expect(ancho).toMatch(/\.cf-control--siguiente \{ translate:\s*calc\(100% \+ 16px\) -50%/);
     expect(ancho).toMatch(/\.cf-carrusel::before\s*\{[^}]*inset:\s*0 -60px/s);
   });
-  it('el teléfono lleva la sombra larga de incident.io recortada a la silueta del marco', () => {
+  it('la sombra larga de incident.io usa un halo estático detrás del teléfono', () => {
     const tel = css.match(/\.cf-telefono \.phone-shell\s*\{[^}]*\}/)![0];
-    const marco = css.match(/\.cf-telefono \.tel-marco-img\s*\{[^}]*\}/)![0];
-    expect(tel).not.toMatch(/box-shadow/);
-    expect(marco).toMatch(/filter:[^;]*drop-shadow\(0 2px 6px rgba\(11, 18, 32, 0\.08\)\)[^;]*drop-shadow\(18px 22px 36px rgba\(11, 18, 32, 0\.2\)\)[^;]*drop-shadow\(42px 50px 80px rgba\(11, 18, 32, 0\.18\)\)/s);
+    const sombra = css.match(/\.cf-telefono \.phone-shell::after\s*\{[^}]*\}/)![0];
+    expect(tel).not.toMatch(/box-shadow|filter/);
+    expect(sombra).toMatch(/z-index:\s*-1/);
+    expect(sombra).toMatch(/border-radius:\s*14\.4% \/ 6\.62%/);
+    expect(sombra).toMatch(/background:\s*linear-gradient\(135deg,[^;]*rgba\(11, 18, 32/);
+    expect(sombra).toMatch(/translate:\s*18% 14%/);
+    expect(sombra).toMatch(/filter:\s*blur\(28px\)/);
+    expect(sombra).not.toMatch(/drop-shadow/);
+    expect(css.match(/\.cf-telefono\s*\{[^}]*\}/)![0]).not.toMatch(/overflow/);
+    expect(cssTelefono.match(/\.tel-marco\s*\{[^}]*\}/)![0]).not.toMatch(/overflow/);
+    expect(css.match(/\.cf-escena\s*\{[^}]*\}/)![0]).toMatch(/overflow:\s*hidden/);
   });
 
   it('«Elige tu ruta» se queda quieta: no repite su entrada (dueño, 2026-10-12)', () => {
