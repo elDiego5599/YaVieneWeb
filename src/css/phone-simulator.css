@@ -3,10 +3,8 @@
 /*
   Dos piezas independientes:
 
-  1. La carcasa (.phone-shell) — un iPhone: bisel finísimo y parejo, isla
-     dinámica en vez de agujero, cantos de titanio cepillado con las
-     esquinas muy redondeadas y los botones repartidos como en el aparato
-     (acción y volumen a la izquierda, encendido a la derecha).
+  1. El marco (.tel-marco) —una imagen del aparato real por encima de la
+     pantalla HTML, cuyo hueco se recorta con las medidas del archivo.
 
   2. La pantalla — la app de verdad, redibujada en HTML. Cada medida sale
      del código Flutter (search_pill_bar.dart, location_status_chip.dart,
@@ -22,88 +20,8 @@
 */
 
 .phone-shell {
-  /* Todas las medidas de la carcasa cuelgan del ancho, para que el bisel y
-     los radios encojan con el aparato en vez de quedarse en píxeles fijos. */
-  --ancho: clamp(268px, 30vw, 356px);
-  /* El bisel son dos piezas, como en el aparato real: el riel de metal por
-     fuera y el marco negro de la pantalla por dentro.
-
-     El reparto entre los dos importa más que la suma. Con el marco negro
-     gordo y el riel escondido lo que se ve es un borde negro ancho, que
-     es exactamente lo que tenía un iPhone 8. En el 17 Pro pasa al revés
-     —el riel de metal es la pieza que se ve y el negro es una línea— así
-     que aquí el riel gana al marco.
-
-     Y el conjunto es fino: 3,6 % del ancho entre los dos, repartido 1,8
-     de metal y 1,8 de negro —el negro empatado con el metal, no por
-     debajo: más fino que esto el marco se convertía en un pelo y la
-     pantalla parecía pegada al canto. Ninguno de los dos le cuesta nada a la app:
-     `--u` sale del ancho menos los dos biseles, así que al adelgazar
-     el bisel la interfaz crece entera y en proporción. */
-  --riel: calc(var(--ancho) * 0.018);
-  --negro: calc(var(--ancho) * 0.018);
-  --bisel: calc(var(--riel) + var(--negro));
-  /* La esquina del iPhone no es un radio, es una curva continua, y de
-     todos los valores de un `border-radius` normal el que más se le
-     parece es este. Corta se lee iPhone 8; el 17 Pro tiene la esquina
-     mucho más abierta, y a este tamaño esa diferencia es toda la
-     diferencia entre un aparato de hoy y uno de hace ocho años. */
-  --radio: calc(var(--ancho) * 0.178);
-
   position: relative;
   width: var(--ancho);
-  /* iPhone 17: 149.6 × 71.5 mm. */
-  aspect-ratio: 71.5 / 149.6;
-  padding: var(--bisel);
-  border-radius: var(--radio);
-
-  /*
-    El riel: aluminio plata, neutro.
-
-    Pasó por dos versiones malas. La primera salía de `color-mix` sobre el
-    #5E6B82 de los textos, un gris azulado, y a este tamaño el azul no se
-    disimula: el canto se leía como una línea eléctrica alrededor del
-    aparato. La segunda era gris puro pero oscuro, y un metal oscuro
-    envuelto en un marco negro no se distingue del marco: desaparecía, y
-    lo único que quedaba a la vista era el borde negro.
-
-    Éste es el metal del aparato de verdad: claro, con cuerpo, y con el
-    volumen puesto donde le pega la luz. El orden es el de un canto
-    pulido: filo en sombra, reflejo, cuerpo, reflejo, filo en sombra. Los
-    dos reflejos son estrechos y casi blancos a propósito; anchos, el
-    canto se aplana y queda una barra gris.
-
-    El cuerpo va claro —del #D0 para arriba— y no medio gris: el aluminio
-    pulido devuelve casi toda la luz y solo se oscurece en los dos filos,
-    donde la superficie se va de canto. Un cuerpo gris medio con reflejos
-    blancos no parece metal claro con brillo, parece metal oscuro sucio.
-  */
-  background: linear-gradient(
-    100deg,
-    #83868A 0%,
-    #CACDD0 1.2%,
-    #FFFFFF 3%,
-    #ECEEEF 5%,
-    #D8DBDD 9%,
-    #C6C9CB 16%,
-    #DCDEE0 32%,
-    #EAECED 50%,
-    #D9DCDE 68%,
-    #BFC2C5 80%,
-    #FDFDFD 86%,
-    #E3E5E7 90%,
-    #ADB1B4 95%,
-    #7C7F83 100%
-  );
-  /* El contorno tiene que ser más oscuro que el metal más claro del riel:
-     con el aluminio subido de tono, un filo tenue dejaba el aparato sin
-     silueta contra el fondo crema —el canto y la página se fundían. */
-  box-shadow:
-    var(--shadow-phone),
-    inset 0 0.5px 0 rgba(255, 255, 255, 0.62),
-    inset 0 0 0 0.5px rgba(0, 0, 0, 0.3),
-    inset 0 -0.5px 0 rgba(0, 0, 0, 0.28);
-
 }
 
 /* Luz ambiental detrás del aparato, el reflejo verde de la marca. */
@@ -117,70 +35,27 @@
   z-index: -1;
 }
 
-/*
-  Botones. En el iPhone no están todos del mismo lado: el de encendido va
-  a la derecha, y a la izquierda van el de acción —corto, arriba de todo—
-  y las dos teclas de volumen, separadas. Sobresalen apenas medio píxel:
-  se notan de perfil, no de frente.
-*/
-.phone-key {
+/* El archivo de 720 × 1469 fija el marco completo para cada teléfono. */
+.tel-marco {
+  aspect-ratio: 720 / 1469;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.tel-marco-img {
   position: absolute;
-  width: calc(var(--bisel) * 0.17);
-  background: linear-gradient(
-    180deg,
-    #FCFCFD 0%,
-    #DBDEE0 22%,
-    #C2C5C8 60%,
-    #9BA0A3 100%
-  );
-}
-
-/* Derecha: encendido. */
-.phone-key--power {
-  right: calc(var(--bisel) * -0.17);
-  border-radius: 0 1.5px 1.5px 0;
-  box-shadow: 0.5px 0 1.5px rgba(0, 0, 0, 0.4);
-  top: 27%;
-  height: 9.5%;
-}
-
-/* Izquierda: acción, y las dos de volumen. */
-.phone-key--accion,
-.phone-key--vol-sube,
-.phone-key--vol-baja {
-  left: calc(var(--bisel) * -0.17);
-  border-radius: 1.5px 0 0 1.5px;
-  box-shadow: -0.5px 0 1.5px rgba(0, 0, 0, 0.4);
-}
-
-.phone-key--accion {
-  top: 18.5%;
-  height: 4.4%;
-}
-
-.phone-key--vol-sube {
-  top: 25.5%;
-  height: 6.4%;
-}
-
-.phone-key--vol-baja {
-  top: 33.4%;
-  height: 6.4%;
+  inset: 0;
+  z-index: 50;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 /* ── Pantalla ──────────────────────────────────────────────────────── */
 
 .phone-screen {
-  /* Un píxel lógico de un iPhone de 402 pt. Toda la interfaz de la app se
-     mide con esto: el ancho de la pantalla —el de la carcasa menos el
-     bisel de cada lado— entre 402.
-
-     En píxeles y no en `cqw`: el teléfono de los pasos vive dentro del
-     `zoom` de la escena, y Safari aplica ese zoom dos veces a las
-     unidades de contenedor —la carcasa se encogía una vez y la app dos,
-     y la isla y la rayita quedaban en dos tercios de su tamaño
-     (tests/pantalla-sin-cq.test.ts). */
-  --u: calc((var(--ancho) - 2 * var(--bisel)) / 402);
   /* Lo que la app tiene prohibido por arriba: reloj e isla. El
      `SafeArea` de iOS en este aparato mide 59 pt, y de él cuelgan tanto la
      barra de estado como el sitio donde empieza a dibujar la app —si se
@@ -199,22 +74,25 @@
   width: 100%;
   height: 100%;
   background: var(--arena);
-  /* Radio exterior menos el bisel: los dos bordes quedan concéntricos. */
-  border-radius: calc(var(--radio) - var(--bisel));
   overflow: hidden;
-  /* El anillo negro se pinta hacia afuera desde el canto de la pantalla y
-     llena justo hasta el riel: es el marco del aparato, lo que separa el
-     metal del vidrio. Sin él el teléfono parece una lámina de color.
-
-     El filo que lo cierra es oscuro, no claro: contra un riel de aluminio
-     una línea blanca no se ve, y lo que hay que marcar aquí es dónde
-     acaba el vidrio y empieza el metal. */
-  box-shadow:
-    0 0 0 var(--negro) #06080C,
-    0 0 0 calc(var(--negro) + 0.6px) rgba(0, 0, 0, 0.42),
-    inset 0 0 0 0.5px rgba(0, 0, 0, 0.55);
   font-size: calc(14 * var(--u));
   color: var(--app-text-primary);
+}
+
+/* El WebP mide 720 × 1469 y el hueco medido ocupa x=75..1394 e y=66..2933
+   en el original de 1470 × 3000: por eso el marco completo conserva su
+   proporción, el hueco empieza al 5,10 % / 2,20 % y mide 89,8 % / 95,57 %.
+   Los 190 px de radio equivalen a 14,4 % del ancho y 6,62 % del alto del
+   hueco. El lienzo lógico de 402 pt conserva el tamaño de la app. */
+.tel-marco .phone-screen {
+  --u: calc(var(--ancho) * 0.898 / 402);
+  position: absolute;
+  left: 5.1%;
+  top: 2.2%;
+  width: 89.8%;
+  height: 95.57%;
+  border-radius: 14.4% / 6.62%;
+  box-shadow: none;
 }
 
 /* El grupo de arriba —píldora y barra de Android— se va y vuelve con la

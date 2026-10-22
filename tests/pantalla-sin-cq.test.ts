@@ -29,8 +29,8 @@ describe('la pantalla del teléfono no depende de unidades de contenedor', () =>
     expect(sinComentarios(css(ruta))).not.toMatch(CQ);
   });
 
-  it('`--u` es el ancho de la pantalla —el de la carcasa menos los dos biseles— entre 402', () => {
-    const regla = /\.phone-screen\s*\{([^}]*)\}/.exec(sinComentarios(css('src/css/phone-simulator.css')));
-    expect(regla?.[1]).toMatch(/--u:\s*calc\(\(var\(--ancho\) - 2 \* var\(--bisel\)\) \/ 402\);/);
+  it('`--u` es el ancho de la pantalla (89,8 % del aparato) entre 402', () => {
+    const regla = /\.tel-marco \.phone-screen\s*\{([^}]*)\}/.exec(sinComentarios(css('src/css/phone-simulator.css')));
+    expect(regla?.[1]).toMatch(/--u:\s*calc\(var\(--ancho\) \* 0\.898 \/ 402\);/);
   });
 });

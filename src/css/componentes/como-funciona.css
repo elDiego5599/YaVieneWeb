@@ -5,7 +5,7 @@
    (dueño, 2026-10-12) con su cuadro grande en la banda de «Problema»,
    otro un punto más hondo con el teléfono y, debajo, los tres pasos como
    pestañas que cambian lo que enseña la pantalla (`como-funciona.ts`).
-   No dibuja nada que ya esté dibujado: el teléfono es `.phone-shell`, el
+   No dibuja nada que ya esté dibujado: el marco es `.tel-marco`, el
    mapa `.phone-map` con su `PhoneMap` (main.ts), y el selector, la hoja
    del bus y su nota reutilizan `.app-select*`, `.eta-*`, que
    miden `--u` (un punto lógico de Flutter) en `phone-simulator.css`. Aquí
@@ -301,7 +301,8 @@
   overflow: hidden;
   /* 20 px suaviza las esquinas del cuadro. */
   border-radius: 20px;
-  background: color-mix(in srgb, var(--banda), var(--acento) 5%);
+  /* Resplandor azul bajo y difuso, fundido en un gris casi blanco. */
+  background: radial-gradient(ellipse 95% 80% at 100% 100%, rgba(30, 86, 168, 0.14), transparent 75%), linear-gradient(135deg, #FCFDFE, #F1F5FA);
   /* 600 / 455 da la escena apaisada de referencia y deja aire al teléfono. */
   aspect-ratio: 600 / 455;
   translate: calc(var(--cf-lugar) * var(--cf-viaje)) 0;
@@ -713,20 +714,13 @@
   }
 }
 
-/* El teléfono queda entero y centrado verticalmente. Su sombra es la del
-   teléfono de On-call de incident.io (dueño, 2026-10-13): larga, suave y
-   echada abajo a la derecha, que se deshace en el fondo; un contacto
-   corto de 2 px lo asienta y la escena la recorta en su cuadro. */
+/* El teléfono queda entero y centrado; sin sombra rectangular sobre el halo. */
 .cf-telefono .phone-shell {
   --ancho: clamp(230px, 41cqw, 310px);
   z-index: 2;
   position: absolute;
   top: 3.5%;
   right: 8%;
-  box-shadow:
-    0 2px 6px rgba(11, 18, 32, 0.08),
-    24px 28px 48px -12px rgba(11, 18, 32, 0.2),
-    56px 64px 110px -20px rgba(11, 18, 32, 0.18);
 }
 
 /* Atenúa solo las teselas; las rutas y marcadores siguen intactos. */

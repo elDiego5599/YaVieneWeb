@@ -20,6 +20,7 @@ import { describe, expect, it } from 'vitest';
 const leer = (ruta: string) => readFileSync(resolve(process.cwd(), ruta), 'utf8');
 const html = leer('index.html').replace(/<!--[\s\S]*?-->/g, '');
 const css = leer('src/css/componentes/como-funciona.css');
+const cssTelefono = leer('src/css/phone-simulator.css');
 
 const banda = /<section[^>]*id="como-funciona"[^>]*>[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
 const divisor = '<hr class="divisor" aria-hidden="true" />';
@@ -139,10 +140,9 @@ describe('banda «Cómo funciona»', () => {
     expect(ancho).toMatch(/\.cf-control--siguiente \{ translate:\s*calc\(100% \+ 16px\) -50%/);
     expect(ancho).toMatch(/\.cf-carrusel::before\s*\{[^}]*inset:\s*0 -60px/s);
   });
-  it('el teléfono de «Elige tu ruta» echa una sombra larga abajo a la derecha (dueño, 2026-10-13)', () => {
+  it('el teléfono no pinta una sombra rectangular sobre el fondo de la escena', () => {
     const tel = css.match(/\.cf-telefono \.phone-shell\s*\{[^}]*\}/)![0];
-    // Cada capa larga corre más a la derecha y abajo que la anterior.
-    expect(tel).toMatch(/box-shadow:[^;]*24px 28px 48px[^;]*56px 64px 110px/s);
+    expect(tel).not.toMatch(/box-shadow/);
   });
 
   it('«Elige tu ruta» se queda quieta: no repite su entrada (dueño, 2026-10-12)', () => {
@@ -177,7 +177,13 @@ describe('banda «Cómo funciona»', () => {
 
   it('el teléfono es decoración, con el mapa de los del hero', () => {
     expect(banda).toMatch(/class="cf-telefono"[^>]*aria-hidden="true"/);
-    expect(banda).toMatch(/class="phone-shell"/);
+    expect(banda).toMatch(/class="phone-shell tel-marco"/);
+    expect(banda).toMatch(/<img class="tel-marco-img" src="\/img\/marco-iphone\.webp" width="720" height="1469"[^>]*aria-hidden="true">/);
+    expect(banda).toMatch(/<span class="phone-island"><\/span>/);
+    expect(banda).not.toContain('phone-key');
+    expect(cssTelefono).toMatch(/\.tel-marco\s*\{[^}]*aspect-ratio:\s*720 \/ 1469[^}]*padding:\s*0/s);
+    expect(cssTelefono).toMatch(/\.tel-marco \.phone-screen\s*\{[^}]*width:\s*89\.8%[^}]*height:\s*95\.57%/s);
+    expect(cssTelefono).toMatch(/\.tel-marco-img\s*\{[^}]*position:\s*absolute[^}]*inset:\s*0/s);
     expect(banda).toMatch(/class="phone-map" id="cf-mapa-tel"/);
     expect(banda).toMatch(/class="phone-map" id="cf-mapa"/);
     expect(leer('src/main.ts')).toMatch(/#cf-mapa-tel/);
