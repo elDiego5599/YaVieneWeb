@@ -310,7 +310,6 @@ export class PanelFlota {
       elegir.setAttribute('aria-pressed', String(elegida));
       elegir.setAttribute('aria-label', `Elegir ${bus.placa}, ${ROTULO[estado].toLowerCase()}`);
       fila.querySelector('[data-accion="visibilidad"]')!.setAttribute('aria-checked', String(bus.visible));
-      fila.querySelector('.flota-permiso-texto')!.textContent = bus.visible ? 'PERMITIDO' : 'OCULTO';
     }
 
     // El marcador sale de la misma `fleetList` que la lista: lo que el

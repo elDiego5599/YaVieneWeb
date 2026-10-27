@@ -179,7 +179,6 @@ describe('ocultar y mostrar', () => {
 
     const fila = raiz.querySelector<HTMLElement>('.flota-fila[data-bus="SFA482"]')!;
     expect(fila.querySelector('[data-accion="visibilidad"]')!.getAttribute('aria-checked')).toBe('false');
-    expect(fila.querySelector('.flota-permiso-texto')!.textContent).toBe('OCULTO');
     expect(fila.classList.contains('flota-fila--oculta')).toBe(true);
     expect(ficha(raiz).querySelector('[data-ficha="ocultar"]')!.textContent).toBe('Mostrar');
     expect(ficha(raiz).querySelector('[data-ficha="ocultar-icono"]')!.getAttribute('href')).toBe('#fi-mostrar');

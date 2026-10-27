@@ -490,13 +490,14 @@
     box-shadow var(--f-tiempo);
 }
 
-/* Lo activo lleno va como en el panel de control: `AppColors.boton`
-   (app_control/lib/core/theme/app_theme.dart), el azul de los botones
-   de la app. */
+/* La ruta elegida como en el panel de control (`_FilterChip`, dueño,
+   2026-10-26): ya no llena de azul, sino en la cápsula de las pestañas
+   Flota y Reportes, `AppColors.capsula` con filo y letra en `online`
+   (4,94:1), el verde de la ruta en el mapa. */
 .flota-filtros .es-activo {
-  border-color: var(--azul-boton);
-  background: var(--azul-boton);
-  color: #fff;
+  border-color: var(--app-primary-accessible);
+  background: var(--green-tint);
+  color: var(--app-primary-accessible);
 }
 
 @media (hover: hover) {
@@ -593,8 +594,10 @@
   letter-spacing: calc(0.8 * var(--u));
 }
 
-/* `_StatusTabs`: la abierta en marino con el texto blanco y la cuenta al
-   70 %; las demás sin fondo. */
+/* `_StatusTabs`: la abierta en la lámina blanca del segmentado de macOS
+   (`elevation: 1`, sombra de tinta al 25 %) con la tinta encima y la
+   cuenta en gris; las demás sin fondo (dueño, 2026-10-26: sin azul
+   lleno). */
 .flota-pestanas {
   display: flex;
   gap: calc(6 * var(--u));
@@ -625,12 +628,9 @@
 }
 
 .flota-pestanas .es-activa {
-  background: var(--azul-boton);
-  color: #fff;
-}
-
-.flota-pestanas .es-activa b {
-  color: rgba(255, 255, 255, 0.7);
+  background: var(--surface);
+  box-shadow: 0 calc(1 * var(--u)) calc(2 * var(--u)) rgba(15, 23, 42, 0.25);
+  color: var(--f-texto);
 }
 
 /* El `Divider` con sangría de 12 por lado y 8 encima, y la lista con sus
@@ -786,28 +786,16 @@
   color: var(--bus-ghost);
 }
 
-/* El interruptor y su rótulo: en el color de «En línea» si el pasajero lo
-   ve y en el de «Oculto» si no, `online` y `hidden`. Ancho fijo y no
-   flexible: «PERMITIDO» es más largo que «OCULTO» y sin esto la columna se
-   encoge al ocultar, y la píldora de la ruta y el lápiz se mueven con
-   ella. 68 cabe el rótulo largo en la fuente del panel con margen. */
+/* El interruptor solo, sin el rótulo PERMITIDO u OCULTO, como en
+   `fleet_list_tile.dart` (dueño, 2026-10-26): el `Switch` ya dice si el
+   pasajero lo ve. Ancho fijo de 52, el del interruptor, y no flexible:
+   así la píldora de la ruta y el lápiz no se mueven al ocultar. */
 .flota-permiso {
   display: flex;
   flex: none;
-  flex-direction: column;
-  align-items: center;
-  gap: calc(2 * var(--u));
-  width: calc(68 * var(--u));
+  justify-content: center;
+  width: calc(52 * var(--u));
   margin-left: calc(2 * var(--u));
-  color: var(--app-primary-accessible);
-  font-size: calc(8 * var(--u));
-  font-weight: 800;
-  letter-spacing: calc(1.2 * var(--u));
-  transition: color var(--f-tiempo);
-}
-
-.flota-fila--oculta .flota-permiso {
-  color: var(--app-text-secondary);
 }
 
 /* El `Switch` de Material 3 recogido a su tamaño, 52 × 32. Encendido:

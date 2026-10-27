@@ -11,7 +11,8 @@ import { describe, expect, it } from 'vitest';
  * - el botón del teléfono de la portada («Elegir empresa») lo espeja,
  *   como el de `route_selector_sheet.dart`;
  * - el panel de flota dibujado en empresas.html pinta el filtro de ruta
- *   y la pestaña activos como el panel de control (`AppColors.boton`);
+ *   y la pestaña activos como el panel de control (hasta el 2026-10-26 en
+ *   `AppColors.boton`; ahora sin azul lleno, ver su prueba);
  * - (y «Qué resuelve» cambió su rojo por ese azul, pero el dueño lo vio
  *   y pidió el rojo de vuelta el mismo día: la cara «A ciegas» es una
  *   alerta y el azul le quitaba la alarma).
@@ -61,11 +62,20 @@ describe('el azul de los botones de la app, en la web', () => {
     expect(reglas(css, '.app-launch')).toMatch(/background:\s*var\(--azul-boton\)/);
   });
 
-  it('el panel de flota dibujado pinta lo activo como el panel de control', () => {
+  // Desde el 2026-10-26 (pulido del panel) lo activo ya no va lleno de
+  // azul: la ruta elegida en la cápsula verde de Flota y Reportes y la
+  // pestaña de estado en la lámina blanca del segmentado de macOS.
+  it('el panel de flota dibujado pinta lo activo como el panel de control, sin azul lleno', () => {
     const css = leer('src/css/componentes/empresas-pagina.css');
-    expect(reglas(css, '.flota-filtros .es-activo')).toMatch(/background:\s*var\(--azul-boton\)/);
-    expect(reglas(css, '.flota-filtros .es-activo')).toMatch(/border-color:\s*var\(--azul-boton\)/);
-    expect(reglas(css, '.flota-pestanas .es-activa')).toMatch(/background:\s*var\(--azul-boton\)/);
+    const filtro = reglas(css, '.flota-filtros .es-activo');
+    expect(filtro).toMatch(/background:\s*var\(--green-tint\)/);
+    expect(filtro).toMatch(/border-color:\s*var\(--app-primary-accessible\)/);
+    expect(filtro).toMatch(/color:\s*var\(--app-primary-accessible\)/);
+    expect(contraste('#047857', '#E6F7F0')).toBeGreaterThanOrEqual(4.5);
+    const pestana = reglas(css, '.flota-pestanas .es-activa');
+    expect(pestana).toMatch(/background:\s*var\(--surface\)/);
+    expect(pestana).toMatch(/color:\s*var\(--f-texto\)/);
+    expect(css).not.toMatch(/\.flota-(filtros|pestanas)[^{]*\{[^}]*azul-boton/);
   });
 
   it('«Qué resuelve» conserva su rojo: ni el azul ni su tinte llegan ahí', () => {
