@@ -440,4 +440,13 @@ describe('las cifras son aproximadas, no exactas', () => {
       expect(visible.match(/.{0,30}(?:exact|al instante|cálculo real|trazado real).{0,30}/gi) ?? []).toEqual([]);
     });
   }
+
+  // «En vivo», no «tiempo real» (dueño, 2026-10-27), también en las
+  // etiquetas que leen los buscadores y las redes.
+  for (const pagina of ['index.html', 'empresas.html', 'privacidad.html', 'terminos.html', '404.html']) {
+    it(`${pagina} dice en vivo, no tiempo real`, () => {
+      const sinComentarios = leer(pagina).replace(/<!--[\s\S]*?-->/g, '');
+      expect(sinComentarios.match(/.{0,30}tiempo real.{0,30}/gi) ?? []).toEqual([]);
+    });
+  }
 });

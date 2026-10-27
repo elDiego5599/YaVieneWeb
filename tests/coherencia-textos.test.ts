@@ -103,7 +103,7 @@ const FRASES: Record<string, string[]> = {
   'Te avisamos a 1,0 km': ['index.html'],
   'Cambiar': ['index.html'],
   'Localizando tu ubicación…': ['index.html'],
-  'Tu ciudad en tiempo real.': ['index.html', 'empresas.html'],
+  'Tu ciudad en vivo.': ['index.html', 'empresas.html'],
 };
 
 describe('los rótulos de la interfaz son los de la app', () => {
@@ -118,7 +118,8 @@ describe('los rótulos de la interfaz son los de la app', () => {
 
 /**
  * La marca firma con un solo lema. En la app, bajo el logo del arranque y
- * de la bienvenida (`ink_hero.dart`), dice «Tu ciudad en tiempo real.»; el
+ * de la bienvenida (`ink_hero.dart`), dice «Tu ciudad en vivo.» (antes «en
+ * tiempo real», dueño, 2026-10-27); el
  * pie de las dos páginas, bajo el mismo logo, decía «Tu ruta, cuando
  * importa. Barranquilla se mueve contigo.»: dos lemas para una marca.
  */
@@ -128,7 +129,7 @@ describe('el pie firma con el lema de la app', () => {
       const plantilla = document.createElement('template');
       plantilla.innerHTML = leer(pagina);
       const lema = plantilla.content.querySelector('.footer-intro p')?.textContent;
-      expect(enUnaLinea(lema ?? '').trim()).toBe('Tu ciudad en tiempo real.');
+      expect(enUnaLinea(lema ?? '').trim()).toBe('Tu ciudad en vivo.');
     });
   }
 });
