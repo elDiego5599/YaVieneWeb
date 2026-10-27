@@ -113,7 +113,7 @@
   </header>
 
   <main id="contenido" class="legal-hoja">
-    <p class="legal-fecha">Actualizado el 18 de octubre de 2026</p>
+    <p class="legal-fecha">Actualizado el 27 de octubre de 2026</p>
     <h1>Privacidad</h1>
     <p class="legal-entrada">Ya Viene es una aplicación para saber por dónde va tu bus. Para
       eso necesita muy poco, y lo poco que necesita casi todo se queda dentro de tu
@@ -127,7 +127,7 @@
          aviso con la app cerrada (más abajo). Las cuentas de versiones anteriores se
          cuentan al final, en «Si usaste una versión anterior». -->
 
-    <h2>Tu ubicación se queda en el teléfono, salvo una vez</h2>
+    <h2>Tu ubicación se queda en el teléfono, salvo dos veces</h2>
     <p>La app te pide permiso de ubicación para dos cosas: centrar el mapa donde estás y
       calcular cuántos metros te separan del bus. Las dos se hacen dentro del aparato.</p>
     <p>Para ver los buses, lo único que tu teléfono le pide al servidor son las
@@ -138,15 +138,36 @@
          sonó o al vencer. Hasta entonces este título decía que la ubicación no
          salía nunca del teléfono. Mismo texto en legal_docs.dart, donde
          legal_segundo_plano_test.dart lo vigila. -->
-    <p>La excepción es el aviso en Android, para que suene con la app cerrada. Mientras
+    <p>La primera excepción es el aviso en Android, para que suene con la app cerrada. Mientras
       tienes uno armado, tu teléfono le deja al servidor el punto desde el que esperas
       (el que marcaste a mano o tu última posición), redondeado a unos 100 metros, y lo
       pone al día cada 20 segundos mientras la app está abierta. Con él van el bus y la
       ruta del aviso, la distancia a la que pediste que te avise y el código con el que
       Firebase Cloud Messaging le hace llegar la notificación a tu teléfono. Se borra
       cuando quitas el aviso o cuando la app ve que sonó, y como mucho a las tres horas de
-      armarlo. No se comparte con la empresa de transporte ni con nadie más. En iPhone tu
-      ubicación no sale del teléfono.</p>
+      armarlo. No se comparte con la empresa de transporte ni con nadie más. En iPhone el
+      aviso no deja tu punto en el servidor.</p>
+
+    <!-- La segunda (D17 del backend, 27 de octubre de 2026): busquedas_api.dart
+         manda la ruta y el centro de la casilla de centroCeldaBusqueda (unos
+         150 m), en Android y en iPhone; busquedas.ts solo suma a un contador
+         por ruta, hora y casilla, muestra una zona desde K_BUSQUEDAS (5) y
+         borra a los 396 días. Solo la empresa dueña de la ruta lo ve en su
+         panel. Mismo texto en legal_docs.dart, donde lo vigila
+         legal_busquedas_test.dart. -->
+    <h2>Las búsquedas de ruta, para las empresas</h2>
+    <p>Cada vez que eliges una empresa y una ruta para verla en el mapa, tu teléfono le
+      cuenta al servidor que alguien buscó esa ruta. Si la app conoce tu punto (tu
+      posición o el que marcaste a mano), manda también la zona donde estás, redondeada a
+      una casilla de unos 150 metros de lado: tu posición exacta no viaja. Pasa igual en
+      Android y en iPhone. El servidor no guarda quién eres, ni tu teléfono, ni tu
+      dirección IP, ni un código tuyo: solo suma uno al contador de esa ruta, esa hora y
+      esa casilla.</p>
+    <p>Solo la empresa dueña de cada ruta ve esos contadores, en su panel, para saber a
+      qué horas y en qué zonas la esperan y poner los buses donde hacen falta. Así ganan
+      los dos: tú esperas menos y la empresa sabe dónde la necesitan. Una zona solo
+      aparece con al menos cinco búsquedas, los contadores no se venden ni se ceden a
+      nadie más y se borran a los 13 meses.</p>
 
     <h2>El aviso lo calcula tu propio teléfono</h2>
     <!-- Hasta el 6 de octubre de 2026 el aviso sonaba a un kilómetro fijo.
@@ -177,14 +198,17 @@
       seguimiento sigue vivo (verás una notificación fija que lo dice), pero tu ubicación
       deja de actualizarse: la app pide el permiso de ubicación solo mientras la usas y
       no el de segundo plano, así que la distancia se mide contra el último punto que
-      conoció, o contra el punto de espera que hayas marcado a mano. Si cierras la app
-      del todo, el seguimiento se detiene y la notificación desaparece: el aviso queda
+      conoció, o contra el punto de espera que hayas marcado a mano. En iPhone, con un
+      aviso armado, la app sigue midiendo con la pantalla bloqueada, con el mismo permiso
+      de mientras la usas, y lo ves en la flecha azul de arriba. Si cierras la app del
+      todo, el seguimiento se detiene y la notificación desaparece: el aviso queda
       guardado y vuelve a vigilar cuando abres la app otra vez, y en Android mientras
-      tanto vigila el servidor. En iPhone el aviso solo suena con la app abierta.</p>
+      tanto vigila el servidor.</p>
 
     <h2>Sin analítica, sin rastreo, sin publicidad</h2>
     <p>La aplicación no incluye herramientas de analítica, de perfiles de uso ni de
-      publicidad, y no vende ni cede datos a terceros.</p>
+      publicidad, y no vende ni cede datos a terceros. El conteo de búsquedas de arriba no
+      dice quién buscó: es un número por ruta, hora y zona.</p>
 
     <!-- Esta sección decía que lo único guardado era el punto de espera, y no
          era cierto: el historial de avisos (alert_history_provider.dart) guarda
@@ -309,7 +333,8 @@
     <h2>Cambios</h2>
     <p>Si algo de esto cambia, cambia también esta página y su fecha. Ya Viene está en
       pruebas y todavía crece; lo que no va a cambiar es la parte de arriba: tu ubicación
-      solo sale del teléfono para el aviso de Android, redondeada y por unas horas.</p>
+      solo sale del teléfono redondeada, para el aviso de Android por unas horas y al
+      buscar una ruta como una casilla que solo ve la empresa dueña.</p>
   </main>
 
   <!-- El pie de la portada. La pregunta que cerraba estas páginas

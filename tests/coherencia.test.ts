@@ -182,7 +182,8 @@ describe('la privacidad dice qué pasa con la app cerrada', () => {
   it('nombra la notificación fija de Android y el caso del iPhone', () => {
     const html = texto();
     expect(html).toContain('notificación fija');
-    expect(html).toContain('En iPhone el aviso solo suena con la app abierta.');
+    expect(html).toContain('la app sigue midiendo con la pantalla bloqueada');
+    expect(html).not.toContain('En iPhone el aviso solo suena con la app abierta.');
   });
 
   it('dice que cerrar la app del todo detiene el seguimiento', () => {
@@ -197,7 +198,7 @@ describe('la privacidad dice qué pasa con la app cerrada', () => {
   it('la fecha del documento acompaña al cambio', () => {
     // Un texto legal que cambia sin cambiar su fecha no se distingue del
     // anterior, y la app usa la misma fecha para decir cuál está leyendo.
-    expect(leer('privacidad.html')).toContain('Actualizado el 18 de octubre de 2026');
+    expect(leer('privacidad.html')).toContain('Actualizado el 27 de octubre de 2026');
   });
 });
 
@@ -243,10 +244,10 @@ describe('la privacidad dice qué sale del teléfono con un aviso de Android', (
 
   it('dice qué sale, cuándo, redondeado y hasta cuándo', () => {
     const html = texto();
-    expect(html).toContain('La excepción es el aviso en Android');
+    expect(html).toContain('La primera excepción es el aviso en Android');
     expect(html).toContain('redondeado a unos 100 metros');
     expect(html).toContain('como mucho a las tres horas de armarlo');
-    expect(html).toContain('En iPhone tu ubicación no sale del teléfono.');
+    expect(html).toContain('En iPhone el aviso no deja tu punto en el servidor.');
   });
 
   it('ya no promete lo que dejó de ser cierto', () => {
@@ -254,6 +255,33 @@ describe('la privacidad dice qué sale del teléfono con un aviso de Android', (
     expect(html).not.toContain('no usa ningún servicio de mensajería');
     expect(html).not.toContain('<h2>Tu ubicación no sale del teléfono</h2>');
     expect(html).not.toContain('tu ubicación se queda en tu teléfono');
+    expect(html).not.toContain('En iPhone tu ubicación no sale');
+    expect(html).not.toContain('solo sale del teléfono para el aviso');
+  });
+});
+
+/**
+ * Las búsquedas de ruta (D17 del backend, 27 de octubre de 2026): al elegir
+ * empresa y ruta, la app manda la ruta y, si conoce el punto, el centro de una
+ * casilla de unos 150 m, en Android y en iPhone. El servidor solo suma a un
+ * contador por ruta, hora y casilla que ve la empresa dueña. Mismas frases que
+ * `legal_docs.dart` de la app, que vigila `test/legal_busquedas_test.dart`.
+ */
+describe('la privacidad dice qué sale al buscar una ruta', () => {
+  const texto = (): string =>
+    leer('privacidad.html')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/\s+/g, ' ');
+
+  it('cuenta qué viaja, quién lo ve y hasta cuándo', () => {
+    const html = texto();
+    expect(html).toContain('<h2>Las búsquedas de ruta, para las empresas</h2>');
+    expect(html).toContain('una casilla de unos 150 metros de lado');
+    expect(html).toContain('ni tu teléfono, ni tu dirección IP');
+    expect(html).toContain('Solo la empresa dueña de cada ruta');
+    expect(html).toContain('al menos cinco búsquedas');
+    expect(html).toContain('se borran a los 13 meses');
+    expect(html).toContain('ganan los dos');
   });
 });
 

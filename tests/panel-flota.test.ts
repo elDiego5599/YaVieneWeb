@@ -240,3 +240,13 @@ describe('el panel montado', () => {
     expect(ficha.querySelector('[data-ficha="estado-icono"]')!.getAttribute('href')).toBe(ICONO.oculto);
   });
 });
+
+describe('el buscador del panel dibujado', () => {
+  it('dice lo mismo que el del panel, sin conductor', () => {
+    // No hay app de conductor ni conductores en el panel: el buscador de
+    // `dashboard_screen.dart` dice «Buscar placa o ruta…» (dueño, 2026-10-27).
+    const html = readFileSync(resolve(process.cwd(), 'empresas.html'), 'utf8');
+    expect(html).toContain('<span>Buscar placa o ruta…</span>');
+    expect(html).not.toMatch(/conductor…/);
+  });
+});
