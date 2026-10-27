@@ -67,7 +67,7 @@ describe('banda «Cómo funciona»', () => {
     // texto en gris (dueño, 2026-10-12).
     const extras = [
       ['Cero fricción', 'Sin cuentas, sin correos y sin contraseñas. Abres la app, seleccionas tu empresa y en dos toques estás viendo el recorrido completo.'],
-      ['Cálculo real', 'La distancia no se mide en línea recta; calcula los giros y el trazado real de la calle. Si la app dice 940 metros, es porque esa es la distancia exacta sobre el asfalto.'],
+      ['Por la calle', 'La distancia no se mide en línea recta; sigue los giros y el trazado de la calle. Si la app dice 940 metros, son unos 940 metros sobre el asfalto.'],
       ['Seguridad en la calle', 'Activa la notificación y guarda el teléfono. No tienes que estar con el celular en la mano en el paradero mirando la pantalla cada 30 segundos.'],
     ];
     for (const [i, paso] of ['ruta', 'bus', 'aviso'].entries()) {
@@ -78,6 +78,8 @@ describe('banda «Cómo funciona»', () => {
       expect(banda.match(new RegExp(`<p class="solo-lectores" data-paso="${paso}"[^>]*>[^<]*${titulo}\\. ${texto}</p>`))).not.toBeNull();
     }
     expect(banda).not.toMatch(/Sobusa ya había pasado|desayunar|metro a metro/);
+    // Nada exacto (dueño, 2026-10-27): la distancia es aproximada.
+    expect(banda).not.toMatch(/exact/i);
     expect(css).toMatch(/\.cf-explica-extra\s*\{[^}]*background:\s*#fff/s);
     expect(css).toMatch(/\.cf-extra-titulo\s*\{[^}]*color:\s*var\(--coral-accessible\)/s);
     expect(css).toMatch(/\.cf-extra-texto\s*\{[^}]*color:\s*var\(--tinta-tenue\)/s);

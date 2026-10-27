@@ -417,3 +417,27 @@ describe('los textos legales no llevan «», rayas ni --', () => {
     });
   }
 });
+
+/**
+ * Ninguna cifra se promete exacta (dueño, 2026-10-27): el GPS tarda y se
+ * desvía, y prometer exactitud es lo que vuelve reclamable una cifra que
+ * falla. Los términos lo dicen como la copia de la app
+ * (`test/legal_aproximado_test.dart`).
+ */
+describe('las cifras son aproximadas, no exactas', () => {
+  it('terminos.html dice que distancias y cifras son aproximadas', () => {
+    const html = leer('terminos.html');
+    expect(html).toContain('Las distancias y las demás cifras que muestra la app son aproximadas.');
+    expect(html).toContain('Actualizado el 27 de octubre de 2026');
+  });
+
+  for (const pagina of ['index.html', 'empresas.html']) {
+    it(`${pagina} no promete nada exacto ni al instante`, () => {
+      const visible = leer(pagina)
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(/<(script|style)[\s\S]*?<\/\1>/g, '')
+        .replace(/<[^>]+>/g, ' ');
+      expect(visible.match(/.{0,30}(?:exact|al instante|cálculo real|trazado real).{0,30}/gi) ?? []).toEqual([]);
+    });
+  }
+});
