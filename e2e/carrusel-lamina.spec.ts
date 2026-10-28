@@ -101,6 +101,9 @@ const GESTOS: [string, (page: Page, ancho: number) => Promise<void>][] = [
 ];
 
 test('texto y cuadro de cada paso se mueven como una sola lámina', async ({ page }) => {
+  // Cinco gestos, cada uno con su espera hasta el reposo: con la suite
+  // entera en paralelo pasaban de los 30 s de una prueba (2026-10-28).
+  test.slow();
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   await page.locator('.cf-grid').scrollIntoViewIfNeeded();
