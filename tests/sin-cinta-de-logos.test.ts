@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
  * como banda propia (`#marcas`) entre las dos rayas tras el hero, sin
  * rótulo ni texto que afirme nada. /empresas.html sigue sin cinta.
  *
- * Sobusa y Coolitoral siguen en la app como rutas; eso es cierto y se dice
+ * Sobusa, Coolitoral y Coochofal siguen en la app como rutas; eso es cierto y se dice
  * así, sin «ya se mueve» ni «ya conectan».
  */
 const leer = (ruta: string) => readFileSync(resolve(process.cwd(), ruta), 'utf8');
