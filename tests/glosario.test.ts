@@ -19,14 +19,14 @@ import { ROTULO, type BusEstado } from "../src/panel-flota";
  * de la landing (sin placa, regla 12) y la cifra de la distancia.
  */
 const HASH_GLOSARIO =
-  "0dd131a5163095d0a970bd26ee4cd17b21b27609c047311ff44fce4c3294cf7b";
+  "65ac0343916432e7685db56de8d9017ffeef5559a4974c68ab18498d7d55a221";
 
 const leer = (nombre: string): string =>
   readFileSync(resolve(process.cwd(), nombre), "utf8");
 const crudo = leer("src/glosario.json");
 const glosario = JSON.parse(crudo) as {
   estadosBus: Record<string, string>;
-  aviso: { landing: string; app: string };
+  aviso: { texto: string };
   distancia: { metros: string; kilometros: string; separadorDecimal: string };
 };
 
@@ -61,14 +61,13 @@ describe("glosario (T6.8)", () => {
     expect(rotulos).toEqual(glosario.estadosBus);
   });
 
-  it("la landing avisa sin placa, con las palabras del glosario", () => {
-    const { landing } = glosario.aviso;
-    expect(leer("src/phone-simulator.ts")).toContain(`'${landing}'`);
-    // Regla 12: la app nombra la ruta (sin placa ni distancia desde el
-    // 2026-10-02); la landing, no.
-    expect(landing).not.toBe(glosario.aviso.app);
-    expect(landing).not.toContain("{ruta}");
-    expect(landing).not.toContain("{placa}");
+  it("la landing avisa con las mismas palabras que la app", () => {
+    const { texto } = glosario.aviso;
+    expect(leer("src/phone-simulator.ts")).toContain(`'${texto}'`);
+    // Un solo aviso en la app y en la landing (dueño, 2026-10-30): sin ruta,
+    // placa ni distancia.
+    expect(texto).toBe("Tu bus está cerca de ti");
+    expect(texto).not.toContain("{");
   });
 
   it("la cifra de la hoja escribe la distancia como la app", () => {

@@ -94,7 +94,7 @@ describe('el escenario de «Qué resuelve»', () => {
     expect(seccion).toMatch(/sin sombra<br \/>\s*y mojándose/);
   });
 
-  it('con Ya Viene: lo mismo resuelto, y el aviso de la app tal cual con una ruta real de Sobusa', () => {
+  it('con Ya Viene: lo mismo resuelto, y el aviso de la app tal cual', () => {
     const claro = avisos('claro');
     expect(claro.map(([titulo]) => titulo)).toEqual([
       'Sabes cuál viene y por dónde',
@@ -107,10 +107,8 @@ describe('el escenario de «Qué resuelve»', () => {
       'La media hora vuelve a tu día',
       'Sales de casa cuando el bus está cerca',
     ]);
-    const rutas = [...leer('src/data/rutas-landing.ts').matchAll(/nombre: "([A-Z]\d+) [^"]+"/g)];
-    // Solo el código: con el nombre entero la frase partía en tres líneas.
-    const ruta = rutas.find((r) => claro[1][1] === glosario.aviso.app.replace('{ruta}', r[1]));
-    expect(ruta, 'la frase es el aviso de la app con un código real').toBeDefined();
+    // La frase es el aviso de la app tal cual (dueño, 2026-10-30).
+    expect(claro[1][1]).toBe(glosario.aviso.texto);
   });
 
   it('con Ya Viene: distancia y no tiempo, y nunca una placa', () => {
