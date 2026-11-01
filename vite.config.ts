@@ -201,6 +201,12 @@ export default defineConfig({
   // Los tests de humo montan el formulario real: necesitan un DOM.
   test: {
     environment: 'happy-dom',
+    // happy-dom no baja CSS: sin esto, cada <link> de las páginas que una
+    // prueba carga deja un error en la consola (AUD29-30) y tapa los de
+    // verdad. Una hoja no bajada cuenta como cargada.
+    environmentOptions: {
+      happyDOM: { settings: { handleDisabledFileLoadingAsSuccess: true } },
+    },
     // Sólo los de humo: e2e/ es de Playwright y Vitest se atraganta con su
     // `test.describe` al recogerlo.
     include: ['tests/**/*.test.ts'],
