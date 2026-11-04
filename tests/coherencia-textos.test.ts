@@ -90,7 +90,7 @@ const FRASES: Record<string, string[]> = {
   'Toca para buscar tu ruta': ['index.html'],
   'Ruta activa': ['index.html'],
   'Elige tu ruta': ['index.html'],
-  'Empresa de transporte masivo': ['index.html'],
+  'Transporte público urbano': ['index.html'],
   'Ver buses en vivo': ['index.html'],
   'Dos pasos y ves los buses moviéndose.': ['index.html'],
   'Avisarme cuando esté cerca': ['index.html'],
