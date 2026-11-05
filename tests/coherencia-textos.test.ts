@@ -95,8 +95,8 @@ const FRASES: Record<string, string[]> = {
   'Dos pasos y ves los buses moviéndose.': ['index.html'],
   'Avisarme cuando esté cerca': ['index.html'],
   'Aviso activado': ['src/phone-simulator.ts'],
-  'Toca el mapa para indicar dónde estás': ['index.html'],
-  'Ahí ponemos tu punto de espera y medimos desde él': ['index.html'],
+  'Toca el mapa donde tomas tu bus': ['index.html'],
+  'Tu punto se pega a la ruta y medimos hasta ahí': ['index.html'],
   // La nota del aviso puesto en el iPhone (`_Nota.distancia`), en la
   // distancia con la que arranca la rueda; los teléfonos de la página son
   // iPhone, así que la nota de Android no se repite aquí.

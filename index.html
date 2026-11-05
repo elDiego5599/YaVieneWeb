@@ -606,13 +606,47 @@
                   <div class="sheet-view active" data-view="empty">
                     <div class="sheet-empty">
                       <div class="sheet-empty-icon">
-                        <svg data-icono="toque" data-grupo="vacio" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
-                          stroke-linejoin="round">
-                          <path d="M10 10V5.5a1.5 1.5 0 0 1 3 0V12" />
-                          <path d="M13 11.5a1.5 1.5 0 0 1 3 0V13" />
-                          <path d="M16 12.5a1.5 1.5 0 0 1 3 0V17a5 5 0 0 1-5 5h-2a5 5 0
-                            0 1-4.3-2.5l-2.3-4a1.5 1.5 0 0 1 2.6-1.5L10 16" />
+                        <!-- SenaTomarRuta (sena_tomar_ruta.dart) en su pose quieta, sobre
+                             el lado de 56 del medallón: la calle, la ruta
+                             verde de 3,2 sobre orla blanca de 6,4 (EstiloRuta
+                             a 0,8) y el pin de createPinMarker a 26 de alto
+                             (0,46 del lado; 72 en su lienzo, escala 0,3578),
+                             posado en la mitad de la curva, (28, 37,52). -->
+                        <svg data-icono="toque" data-grupo="vacio" class="sena-tomar-ruta"
+                          viewBox="0 0 56 56" fill="none" aria-hidden="true">
+                          <defs>
+                            <linearGradient id="sena-gota" x1="0" y1="-72" x2="0" y2="0"
+                              gradientUnits="userSpaceOnUse">
+                              <stop offset="0" stop-color="#4ADE80" />
+                              <stop offset="1" stop-color="#059669" />
+                            </linearGradient>
+                            <linearGradient id="sena-ojo" x1="-9" y1="-55" x2="9" y2="-37"
+                              gradientUnits="userSpaceOnUse">
+                              <stop offset="0" stop-color="#065F46" />
+                              <stop offset="1" stop-color="#00A859" />
+                            </linearGradient>
+                          </defs>
+                          <g stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6.72 43.12C22.4 43.12 33.6 31.92 49.28 31.92"
+                              stroke="#E4E8EF" stroke-width="9.52" />
+                            <path d="M6.72 43.12C22.4 43.12 33.6 31.92 49.28 31.92"
+                              stroke="#fff" stroke-width="6.4" />
+                            <path d="M6.72 43.12C22.4 43.12 33.6 31.92 49.28 31.92"
+                              stroke="#00A859" stroke-width="3.2" />
+                          </g>
+                          <circle cx="28" cy="37.52" r="10.08" stroke="#00A859"
+                            stroke-opacity="0.18" stroke-width="1.4" />
+                          <ellipse cx="28" cy="37.52" rx="5.6" ry="1.68" fill="#000"
+                            fill-opacity="0.18" />
+                          <g transform="translate(28 37.52) scale(0.3578)">
+                            <path d="M0 0Q-30 -28 -26 -46A26 26 0 0 1 26 -46Q30 -28 0 0Z"
+                              fill="url(#sena-gota)" />
+                            <ellipse cx="0" cy="-62" rx="12" ry="4.5" fill="#fff"
+                              fill-opacity="0.2" />
+                            <circle cx="0" cy="-46" r="12.5" fill="#fff" />
+                            <circle cx="0" cy="-46" r="8.5" fill="url(#sena-ojo)" />
+                            <circle cx="-2.5" cy="-49" r="2.2" fill="#fff" fill-opacity="0.85" />
+                          </g>
                         </svg>
                         <svg data-icono="ruta" data-grupo="vacio" hidden viewBox="0 0 24 24"
                           fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
@@ -623,10 +657,10 @@
                         </svg>
                       </div>
                       <div class="sheet-empty-title" data-el="empty-title">
-                        Toca el mapa para indicar dónde estás
+                        Toca el mapa donde tomas tu bus
                       </div>
                       <div class="sheet-empty-sub" data-el="empty-sub">
-                        Ahí ponemos tu punto de espera y medimos desde él
+                        Tu punto se pega a la ruta y medimos hasta ahí
                       </div>
                     </div>
                   </div>
