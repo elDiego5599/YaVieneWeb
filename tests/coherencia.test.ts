@@ -198,7 +198,8 @@ describe('la privacidad dice qué pasa con la app cerrada', () => {
   it('la fecha del documento acompaña al cambio', () => {
     // Un texto legal que cambia sin cambiar su fecha no se distingue del
     // anterior, y la app usa la misma fecha para decir cuál está leyendo.
-    expect(leer('privacidad.html')).toContain('Actualizado el 27 de octubre de 2026');
+    // Versión 8 (D18, 11 de noviembre de 2026): la queja del buzón.
+    expect(leer('privacidad.html')).toContain('Actualizado el 11 de noviembre de 2026');
   });
 });
 
@@ -391,6 +392,29 @@ describe('la privacidad cuenta el buzón, como la app', () => {
     );
     expect(html).toContain('al correo del equipo, en Gmail, y lo borra');
     expect(html).toContain('Gmail, de Google');
+  });
+
+  // La queja (D18 del backend, versión 8 de `legal_docs.dart`): motivo, y si
+  // la persona quiere, ruta, bus y hora en punto; la casilla de 150 m solo
+  // con el interruptor; con ruta, la empresa dueña la lee 13 meses.
+  it('dice qué lleva una queja y quién la lee', () => {
+    const html = texto();
+    expect(html).toContain('contarnos un problema, una sugerencia o una queja');
+    expect(html).toContain('con un problema o una sugerencia tu ubicación no va');
+    expect(html).toContain(
+      'Una queja sobre un bus o su conductor lleva además el motivo que elegiste y, si los pones, la ruta, el bus y la hora en punto en que pasó.',
+    );
+    expect(html).toContain(
+      'Tu ubicación solo va si enciendes el interruptor de compartir la zona, y entonces va como una casilla de unos 150 metros de lado, nunca tu punto exacto.',
+    );
+    expect(html).toContain(
+      'se guarda 13 meses para que la empresa dueña de esa ruta la lea en su panel, con lo que escribiste.',
+    );
+    expect(html).toContain('marcada como sin verificar');
+    expect(html).toContain(
+      'Lleva tu mensaje y, de tu ubicación, solo la casilla de una queja si la compartiste.',
+    );
+    expect(html).not.toContain('Lleva tu mensaje, no tu ubicación.');
   });
 
   it('los avisos se borran desde la pestaña que la app llama «Avisos»', () => {
