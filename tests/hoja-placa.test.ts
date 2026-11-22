@@ -109,7 +109,9 @@ describe('la hoja del bus, diseño «A», en la web', () => {
     expect(regla).toMatch(/border:\s*1px solid var\(--app-hairline\)/);
     expect(regla).toMatch(/border-radius:\s*calc\(24 \* var\(--u\)\)/);
     expect(regla).toMatch(/background:\s*#FFFFFF/);
-    expect(regla).not.toMatch(/box-shadow/);
+    // AppShadows.soft (eta_bottom_sheet.dart): blanca sobre la hoja blanca,
+    // la despega la sombra suave.
+    expect(regla).toMatch(/box-shadow:\s*var\(--sombra-suave\)/);
   });
 
   it('el filo es de un punto en el hairline de la app', () => {

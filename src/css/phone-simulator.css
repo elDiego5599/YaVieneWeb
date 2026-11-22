@@ -69,6 +69,10 @@
      once puntos del canto, casi encima de la rayita, y por eso se veía
      recortado aunque estuviera entero. */
   --alto-inferior: calc(34 * var(--u));
+  /* AppShadows.soft (app_theme.dart): #0F172A al 5 %, blurRadius 12 y
+     Offset(0, 4). La llevan lo blanco que va sobre la hoja blanca y las
+     fichas del selector. */
+  --sombra-suave: 0 calc(4 * var(--u)) calc(12 * var(--u)) rgba(15, 23, 42, 0.05);
 
   position: relative;
   width: 100%;
@@ -777,38 +781,35 @@
 /* ── Hoja inferior: eta_bottom_sheet.dart ──────────────────────────── */
 
 /*
-  La hoja de eta_bottom_sheet.dart. El color es AppColors.arena: no es un
-  tono elegido para la landing, es el de la app, y por eso la hoja se ve
-  más cálida que el blanco del selector.
-
-  Encima va el MapPatternPainter que la app pinta dentro (línea 303 de
-  eta_bottom_sheet.dart, en navy): la retícula de puntos cada 34, con las
-  filas alternas desplazadas 12, radio 1,6, al 6 %. Faltaba, y es lo que
-  le quitaba a la hoja la textura de mapa que tiene en el teléfono. Las
-  curvas del patrón se miden contra el alto del Material, que aquí lo pone
-  el contenido, así que no se copian: se quedan los puntos.
+  La hoja de eta_bottom_sheet.dart (`_superficie`) crece de la barra de
+  abajo (dueño, 2026-10-16): a lo ancho de la barra y apoyada donde ella,
+  no una tarjeta de borde a borde con la barra flotando encima. La barra
+  le cede fondo, filo y sombra (`fundida` en shell_pildora.dart) y se
+  queda en sus 64 de abajo, detrás de una raya.
 */
 .phone-sheet {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  /* PildoraNavegacion.lado: 20 a cada lado, los de la barra. */
+  left: calc(20 * var(--u));
+  right: calc(20 * var(--u));
+  /* PildoraNavegacion.hueco: max(34 - 12, 12) = 22 sobre el borde con la
+     barra de inicio del iPhone, que mide los 34 de --alto-inferior. */
+  bottom: calc(var(--alto-inferior) - 12 * var(--u));
   z-index: 32;
-  /*
-    Arena lisa, como `eta_bottom_sheet.dart`: un filo de un punto arriba y
-    una sombra corta. Llevaba encima un puntillado que la app no tiene
-    —quedó de un fondo anterior— y a este tamaño no se leía como textura
-    sino como grano, que era lo que hacía que las hojas del mockup
-    parecieran una fotocopia de las de la app.
-
-    El filo va solo arriba: la hoja está pegada al borde de abajo y ocupa
-    todo el ancho, así que por los lados no hay nada de qué separarse.
-  */
-  background-color: var(--arena);
-  border-top: 1px solid var(--app-hairline);
-  border-radius: calc(32 * var(--u)) calc(32 * var(--u)) 0 0;
-  box-shadow: 0 calc(-4 * var(--u)) calc(20 * var(--u)) rgba(20, 39, 78, 0.06);
-  padding: calc(14 * var(--u)) 0 calc(26 * var(--u) + var(--alto-inferior));
+  /* AppColors.surface: blanca como la barra de la que crece. */
+  background-color: #FFFFFF;
+  /* El filo AppColors.hairline todo alrededor: separa del mapa mejor que
+     una sombra ancha, que sobre un mapa de color se lee como suciedad. */
+  border: 1px solid var(--app-hairline);
+  /* AppRadius.sheet (32), la mitad de los 64 de la barra: abajo los dos
+     contornos son uno. */
+  border-radius: calc(32 * var(--u));
+  /* La sombra de la barra, que ahora es esta: primaryDeep al 8 %,
+     blurRadius 24 y Offset(0, 8). */
+  box-shadow: 0 calc(8 * var(--u)) calc(24 * var(--u)) rgba(20, 39, 78, 0.08);
+  /* 14 arriba del asa (`EdgeInsets.only(top: 14)`) y abajo los 64 de la
+     barra: la raya de 1 y SizedBox(alto - 1), en `_conSitioParaLaBarra`. */
+  padding: calc(14 * var(--u)) 0 calc(64 * var(--u));
   /* La hoja no recorta a sus hijos: el botón de volver a tu punto cuelga
      por encima de su borde de arriba, que es donde lo pone la app. Quien
      recorta el alto que se anima es `.sheet-views`, y el contenido lleva
@@ -832,8 +833,73 @@
   transition: height 0.26s var(--ease-out-cubic);
 }
 
+/* Apartada (`apartada` en eta_bottom_sheet.dart): AnimatedSlide a 0,4 de
+   su alto y AnimatedOpacity a 0. Se hunde un palmo y se apaga; no cruza
+   la pantalla. */
 .phone-sheet.hidden-sheet {
-  transform: translateY(103%);
+  transform: translateY(40%);
+  opacity: 0;
+}
+
+/* ── La barra de abajo: pildora_navegacion.dart, fundida ─────────────
+
+   Mapa, Avisos, Buzón e Info, donde antes iba el ☰. En el mapa la barra
+   no trae fondo, filo ni sombra propios: va en los 64 de abajo de la
+   hoja, bajo una raya. Es un dibujo, no una navegación: el teléfono
+   entero está escondido del lector. */
+.phone-barra {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* PildoraNavegacion.alto. */
+  height: calc(64 * var(--u));
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* PildoraNavegacion.margen: la cápsula va 6 dentro, y su ancho es
+     (ancho - 12) / 4, que es lo que da la rejilla. */
+  padding: calc(6 * var(--u));
+}
+
+/* La raya de `_conSitioParaLaBarra`: 1 de alto, AppColors.hairline, con
+   AppSpacing.md (16) a cada lado. */
+.phone-barra::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(16 * var(--u));
+  right: calc(16 * var(--u));
+  height: 1px;
+  background: var(--app-hairline);
+}
+
+.phone-barra-pestana {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* SizedBox(height: 2) entre el ícono y el rótulo. */
+  gap: calc(2 * var(--u));
+  border-radius: 999px;
+  /* Rótulo PlusJakartaSans 12 con 1,3, en textSecondary y w600. */
+  font-size: calc(12 * var(--u));
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--app-text-secondary);
+}
+
+/* La elegida: la cápsula primaryTint de radio píldora, y el ícono lleno
+   y el rótulo w700 en primaryAccessible (5,48:1 sobre la cápsula). */
+.phone-barra-pestana--activa {
+  background: var(--green-tint);
+  font-weight: 700;
+  color: var(--app-primary-accessible);
+}
+
+.phone-barra-pestana svg {
+  /* Icon(size: 24). */
+  width: calc(24 * var(--u));
+  height: calc(24 * var(--u));
 }
 
 /* ── Volver a tu punto: map_recenter_button.dart ────────────────────
@@ -851,8 +917,9 @@
    ────────────────────────────────────────────────────────────────────── */
 .phone-recentrar {
   position: absolute;
-  /* EdgeInsets.only(right: AppSpacing.md, bottom: AppSpacing.sm). */
-  right: calc(16 * var(--u));
+  /* Su canto derecho a plomo con el de la hoja, y AppSpacing.sm (8)
+     sobre ella. */
+  right: 0;
   bottom: 100%;
   margin-bottom: calc(8 * var(--u));
   width: calc(48 * var(--u));
@@ -906,10 +973,10 @@
   height: calc(5 * var(--u));
   border-radius: 999px;
   background: var(--divider);
-  /* 18 del relleno del asa más los 6 que la hoja de distancia pone encima
-     de su cabecera: `EdgeInsets.only(top: 14, bottom: 18)` y luego
-     `fromLTRB(24, 6, 24, 20)`. */
-  margin: 0 auto calc(24 * var(--u));
+  /* Los 18 de abajo del relleno del asa,
+     `EdgeInsets.only(top: 14, bottom: 18)`; lo que sigue lo pone cada
+     vista. */
+  margin: 0 auto calc(18 * var(--u));
 }
 
 .sheet-view {
@@ -940,9 +1007,11 @@
   }
 }
 
-/* Estado vacío: medallón, título y subtítulo centrados. */
+/* Estado vacío: medallón, título y subtítulo centrados.
+   `fromLTRB(24, 10, 24, 40)` de `_buildEmptyState`, sin el pin puesto:
+   el texto suelto pide 40 de aire antes de la raya de la barra. */
 .sheet-empty {
-  padding-bottom: calc(16 * var(--u));
+  padding: calc(10 * var(--u)) 0 calc(40 * var(--u));
   text-align: center;
 }
 
@@ -958,6 +1027,9 @@
   background: #fff;
   border: 1px solid var(--app-hairline);
   border-radius: calc(16 * var(--u));
+  /* AppShadows.soft: #0F172A al 5 %, blurRadius 12 y Offset(0, 4). Es la
+     que despega lo blanco de la hoja blanca. */
+  box-shadow: var(--sombra-suave);
   /* El icono en textSecondary y a 26, como el Icon del medallón. */
   color: var(--app-text-secondary);
 }
@@ -1056,8 +1128,8 @@
 /*
   Fila de lista: _compactTile() del selector. Es un ListTile blanco
   —`tileColor: AppColors.surface`— con filo de hairline y radio lg (16),
-  no una ficha gris sin borde: sobre la arena de la hoja, el blanco con su
-  filo es lo que la despega del fondo.
+  no una ficha gris sin borde. Sin sombra: va blanca sobre la hoja blanca
+  y la separa su filo.
 
   Mide lo mismo que las tarjetas de «Elige tu ruta» (_SelectorTile): 78
   de alto mínimo con una línea —empresas— o con dos —rutas—, md (16) a
@@ -1199,18 +1271,28 @@
 
 /* ── Hoja de ETA ───────────────────────────────────────────────────── */
 
+/* La vista de la distancia: `fromLTRB(24, 6, 24, aireAbajo)`, con
+   aireAbajo en 20 sin la fila de la distancia debajo. */
+.sheet-view[data-view='eta'] {
+  padding-bottom: calc(20 * var(--u));
+}
+
 /* La tarjeta con marco (eta_bottom_sheet.dart, `hoja-tarjeta`, prueba
    del dueño 2026-09-30): «BUS», la placa y la distancia juntas, blancas
-   con el filo de las tarjetas del selector y sin sombra. AppRadius.card
-   (24): casi 200 de alto, con 16 se veía recta. 14 arriba y 18 abajo:
-   la unidad no trae aire propio debajo. 12 bajo el asa, donde antes
-   iban la franja de 4 y sus 18. */
+   con el filo y la sombra suave de las fichas del selector, que es lo
+   que la separa de la hoja blanca (dueño, 2026-10-16). AppRadius.card
+   (24): casi 200 de alto, con 16 se veía recta. 14 bajo el asa: los 6
+   del relleno y el SizedBox(height: 8). 12 arriba (dueño, 2026-10-27,
+   más mapa); abajo la app pone 14 porque la cierra la pista de la
+   ocupación, que aquí no va: la unidad no trae aire propio y se quedan
+   los 18 de antes. */
 .eta-tarjeta {
-  margin-top: calc(12 * var(--u));
-  padding: calc(14 * var(--u)) 0 calc(18 * var(--u));
+  margin-top: calc(14 * var(--u));
+  padding: calc(12 * var(--u)) 0 calc(18 * var(--u));
   border: 1px solid var(--app-hairline);
   border-radius: calc(24 * var(--u));
   background: #FFFFFF;
+  box-shadow: var(--sombra-suave);
 }
 
 /* La cabecera: «BUS» y la placa. Sin la franja de color que coronaba la
@@ -1334,7 +1416,8 @@
 
 /* El detalle sólo aparece cuando la app tiene algo que decir, y lo dice
    en una nota (`_NotaHoja` de eta_bottom_sheet.dart): blanca sobre la
-   arena con el filo de siempre, AppRadius.lg (16), 10×12 de relleno. */
+   hoja blanca con el filo de siempre y la sombra suave que la despega,
+   AppRadius.lg (16), 10×12 de relleno. */
 .eta-detail {
   margin-top: calc(14 * var(--u));
   display: flex;
@@ -1344,6 +1427,7 @@
   border: 1px solid var(--app-hairline);
   border-radius: calc(16 * var(--u));
   background: #FFFFFF;
+  box-shadow: var(--sombra-suave);
   /* AppTextStyles.pie en textBody: letra chica que se lee a la primera. */
   font-size: calc(12 * var(--u));
   font-weight: 500;
@@ -1492,22 +1576,24 @@
 }
 
 /*
-  Todas las hojas comparten superficie: la arena de .phone-sheet con el
-  patrón de calles del drawer en navy —MapPatternPainter(color: primaryDeep)—.
-  Antes el selector iba en Material blanco y la hoja de distancia en arena,
-  como en la app; pero puestos uno al lado del otro en la landing, los cinco
-  teléfonos parecían de dos productos distintos. Se unificó en arena aquí y
-  también en route_selector_sheet.dart, así que el espejo sigue siendo fiel.
-  Lo único propio de esta regla es el relleno y la elevación: elevation 16
-  con shadowColor 0x6614274E, que la app sí le da al selector y no a la hoja.
+  El selector (route_selector_sheet.dart) no crece de la barra: es un
+  Material blanco (AppColors.surface) de borde a borde, apoyado en el
+  canto de abajo, que tapa la barra mientras está arriba. Por eso deshace
+  la hoja flotante: sin lados, sin hueco y con el filo solo arriba
+  (`SheetTopBorder`), que es donde hay algo de qué separarse.
 */
 .phone-sheet--fija {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-width: 1px 0 0;
   padding: calc(16 * var(--u)) calc(24 * var(--u))
     calc(24 * var(--u) + var(--alto-inferior));
   /* El asa va dentro, así que el relleno de arriba es el suyo: 16. */
   border-radius: calc(32 * var(--u)) calc(32 * var(--u)) 0 0;
-  /* elevation: 16 con shadowColor 0x6614274E. */
-  box-shadow: 0 calc(-6 * var(--u)) calc(30 * var(--u)) rgba(20, 39, 78, 0.22);
+  /* elevation: 8 con shadowColor 0x3314274E: la sombra de Material sube
+     poco desde el canto de arriba y se abre. */
+  box-shadow: 0 calc(-3 * var(--u)) calc(16 * var(--u)) rgba(20, 39, 78, 0.2);
 }
 
 /*
@@ -1588,7 +1674,8 @@
   flex: none;
   border-radius: 50%;
   border: calc(2 * var(--u)) solid var(--divider);
-  background: var(--arena);
+  /* El color de la hoja (AppColors.surface): el nodo es un hueco en ella. */
+  background: #FFFFFF;
   display: grid;
   place-items: center;
   transition: background-color 0.24s var(--ease-out-cubic),
@@ -1636,6 +1723,9 @@
   background: var(--surface);
   border-radius: calc(16 * var(--u));
   border: calc(1 * var(--u)) solid var(--app-hairline);
+  /* Blanca sobre la hoja blanca: la separa AppShadows.soft, y el filo
+     dice el estado. */
+  box-shadow: var(--sombra-suave);
   transition: border-color 0.24s var(--ease-out-cubic),
     border-width 0.24s var(--ease-out-cubic);
 }
