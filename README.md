@@ -1,5 +1,7 @@
 # Ya Viene — landing
 
+> **Note:** This project targets Barranquilla, Colombia, so its docs and earlier commit history are in Spanish. New commits are in English.
+
 La página de [Ya Viene](https://github.com/elDiego5599/YaViene): el bus en
 vivo en Barranquilla. Vite, TypeScript y CSS a mano. Sin framework de
 interfaz y sin dependencias en producción — lo que se descarga es HTML,
